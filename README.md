@@ -403,13 +403,11 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ### Get Help
 
 - 📖 [Documentation](docs/)
-- 💬 [Discord Community](https://discord.gg/grok-skills)
-- 🐛 [Issue Tracker](https://github.com/your-username/awesome-grok-skills/issues)
-- 📧 [Email Support](mailto:support@awesome-grok-skills.com)
+- 🐛 [Issue Tracker](https://github.com/LifeJiggy/awesome-grok-skills/issues)
+- 📧 [Email Support](mailto:support@Bloomtonjovish@gmail.com)
 
 ### Stay Updated
 
-- 🐦 Follow us on X/Twitter: [@AwesomeGrokSkills](https://twitter.com/awesomegrokskills)
 - 📈 Track our progress: [Roadmap](ROADMAP.md)
 - 🔔 Subscribe to updates: [Newsletter](https://awesome-grok-skills.com/subscribe)
 
