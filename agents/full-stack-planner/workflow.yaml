@@ -1,0 +1,86 @@
+name: "Full-Stack Planner"
+version: "1.0.0"
+description: "End-to-end project architecture and planning agent"
+author: "Awesome Grok Skills"
+license: "MIT"
+
+# Workflow steps
+steps:
+  - name: "requirements_analysis"
+    description: "Analyze project requirements and constraints"
+    inputs:
+      - "requirements_document"
+      - "team_size"
+      - "timeline"
+      - "budget"
+    outputs:
+      - "technical_requirements"
+      - "architecture_needs"
+
+  - name: "technology_selection"
+    description: "Choose optimal tech stack"
+    inputs:
+      - "technical_requirements"
+      - "architecture_needs"
+    outputs:
+      - "frontend_stack"
+      - "backend_stack"
+      - "database_choice"
+      - "deployment_strategy"
+
+  - name: "project_structure"
+    description: "Create project architecture"
+    inputs:
+      - "frontend_stack"
+      - "backend_stack"
+      - "database_choice"
+    outputs:
+      - "directory_structure"
+      - "component_architecture"
+      - "api_design"
+
+  - name: "implementation_plan"
+    description: "Create detailed implementation roadmap"
+    inputs:
+      - "project_structure"
+      - "timeline"
+      - "team_size"
+    outputs:
+      - "development_phases"
+      - "milestones"
+      - "resource_allocation"
+
+# Decision trees
+decision_trees:
+  frontend:
+    mobile_first: 
+      condition: "target_mobile === true"
+      recommendation: "React Native or Flutter"
+    web_app:
+      condition: "target_mobile === false"
+      recommendation: "Next.js or React"
+    
+  database:
+    relational:
+      condition: "structured_data === true AND scale < 'large'"
+      recommendation: "PostgreSQL"
+    nosql:
+      condition: "structured_data === false OR scale === 'large'"
+      recommendation: "MongoDB"
+
+# Templates and patterns
+templates:
+  project_structure: |
+    /src
+    /components
+    /pages
+    /api
+    /utils
+    /styles
+    /tests
+  
+  api_endpoints: |
+    GET /api/resource
+    POST /api/resource
+    PUT /api/resource/:id
+    DELETE /api/resource/:id
