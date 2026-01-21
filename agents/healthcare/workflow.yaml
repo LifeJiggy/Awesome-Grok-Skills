@@ -1,0 +1,95 @@
+name: healthcare-agent
+version: 1.0.0
+
+description: Healthcare operations automation agent
+
+triggers:
+  - patient_admission
+  - lab_results
+  - imaging_study
+  - medication_order
+  - discharge_planning
+
+permissions:
+  - patient_records:read
+  - patient_records:write
+  - lab_results:read
+  - imaging:read
+  - medications:read
+
+steps:
+  - name: patient_intake
+    description: Process new patient admission
+    when: trigger == "patient_admission"
+    actions:
+      - verify_insurance
+      - create_patient_record
+      - assign_primary_care
+      - alert_care_team
+  
+  - name: lab_analysis
+    description: Process and analyze lab results
+    when: trigger == "lab_results"
+    actions:
+      - normalize_results
+      - flag_abnormal_values
+      - notify_ordering_physician
+  
+  - name: imaging_review
+    description: Process medical imaging studies
+    when: trigger == "imaging_study"
+    actions:
+      - verify_study_completeness
+      - run_ai_assessment
+      - route_to_radiologist
+  
+  - name: medication_management
+    description: Manage medication orders
+    when: trigger == "medication_order"
+    actions:
+      - check_drug_interactions
+      - check_allergies
+      - alert_pharmacy
+  
+  - name: discharge_planning
+    description: Coordinate patient discharge
+    when: trigger == "discharge_planning"
+    actions:
+      - review_care_plan
+      - schedule_follow_appointments
+      - print_discharge_instructions
+
+actions:
+  verify_insurance:
+    type: api_call
+    endpoint: /api/insurance/verify
+    method: POST
+    retry: 3
+  
+  create_patient_record:
+    type: database
+    operation: insert
+    table: patients
+  
+  normalize_results:
+    type: transformation
+    format: HL7 FHIR
+  
+  flag_abnormal_values:
+    type: rules_engine
+    rules: abnormal_lab_flags
+  
+  run_ai_assessment:
+    type: ml_inference
+    model: medical-imaging-v2
+    confidence_threshold: 0.85
+  
+  check_drug_interactions:
+    type: rules_engine
+    rules: drug_interactions
+
+metrics:
+  patient_intake_time: "< 5 minutes"
+  lab_notification_latency: "< 30 seconds"
+  imaging_assessment_time: "< 2 minutes"
+  drug_check_latency: "< 1 second"

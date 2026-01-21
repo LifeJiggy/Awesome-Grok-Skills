@@ -1,0 +1,345 @@
+# Kubernetes & Cloud-Native Resources
+
+## Quick Reference
+
+| Resource | Type | Description |
+|----------|------|-------------|
+| `k8s-deployments.yaml` | Config | Kubernetes deployment templates |
+| `service-mesh.yaml` | Config | Istio service mesh configuration |
+| `helm-charts.md` | Documentation | Helm chart best practices |
+| `observability.md` | Documentation | Monitoring stack configuration |
+
+---
+
+## Kubernetes Deployment Templates
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  labels:
+    app: myapp
+    version: v1
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: v1
+    spec:
+      serviceAccountName: myapp-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: app
+          image: myapp:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: ENV
+              value: production
+            - name: LOG_LEVEL
+              value: "info"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: myapp
+                topologyKey: kubernetes.io/hostname
+```
+
+---
+
+## Service Mesh Configuration (Istio)
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: myapp-vs
+spec:
+  hosts:
+    - myapp
+  http:
+    - match:
+        - headers:
+            x-envoy-immediate-healthcheck_fail:
+              exact: "true"
+      route:
+        - destination:
+            host: myapp
+            subset: canary
+          weight: 5
+    - route:
+        - destination:
+            host: myapp
+            subset: stable
+          weight: 95
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: myapp-dr
+spec:
+  host: myapp
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        h2UpgradePolicy: UPGRADE
+        http1MaxPendingRequests: 100
+        http2MaxRequests: 1000
+    loadBalancer:
+      simple: LEAST_REQUEST
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: myapp-authz
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals: ["cluster.local/ns/default/sa/frontend"]
+        - source:
+            principals: ["cluster.local/ns/default/sa/backend"]
+    - to:
+        - operation:
+            paths: ["/health", "/ready"]
+```
+
+---
+
+## Helm Chart Structure
+
+```
+myapp-chart/
+  Chart.yaml
+  values.yaml
+  values-production.yaml
+  values-staging.yaml
+  templates/
+    deployment.yaml
+    service.yaml
+    configmap.yaml
+    secret.yaml
+    hpa.yaml
+    poddisruptionbudget.yaml
+    serviceaccount.yaml
+    networkpolicy.yaml
+  charts/
+```
+
+**Chart.yaml:**
+```yaml
+apiVersion: v2
+name: myapp
+description: My Application Helm Chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+dependencies:
+  - name: postgresql
+    version: 12.x.x
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: redis
+    version: 17.x.x
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+```
+
+---
+
+## Observability Stack
+
+### Prometheus Rules
+
+```yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: myapp-alerts
+spec:
+  groups:
+    - name: myapp.rules
+      rules:
+        - alert: HighErrorRate
+          expr: |
+            rate(http_requests_total{status=~"5.."}[5m]) 
+            / rate(http_requests_total[5m]) > 0.05
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "High error rate on {{ $labels.service }}"
+            description: "Error rate is {{ $value | humanizePercentage }}"
+        
+        - alert: HighLatency
+          expr: |
+            histogram_quantile(0.95, 
+              rate(http_request_duration_seconds_bucket[5m])) > 2
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High latency on {{ $labels.service }}"
+            description: "P95 latency is {{ $value | humanizeDuration }}"
+        
+        - alert: HighMemoryUsage
+          expr: |
+            container_memory_usage_bytes{container="app"} 
+            / container_spec_memory_limit_bytes{container="app"} > 0.85
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High memory usage on {{ $labels.pod }}"
+```
+
+### Grafana Dashboard
+
+```json
+{
+  "dashboard": {
+    "title": "Application Overview",
+    "panels": [
+      {
+        "title": "Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total[5m])",
+            "legendFormat": "{{method}} {{status}}"
+          }
+        ]
+      },
+      {
+        "title": "Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{status=~\"5..\"}[5m]) * 100",
+            "legendFormat": "5xx errors"
+          }
+        ]
+      },
+      {
+        "title": "Latency P95",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 Latency"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+## GitOps Workflow
+
+### ArgoCD Application
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-production
+  namespace: argocd
+spec:
+  project: production
+  source:
+    repoURL: https://github.com/org/manifests
+    targetRevision: main
+    path: myapp/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+```
+
+---
+
+## Cost Optimization
+
+| Strategy | Description | Savings |
+|----------|-------------|---------|
+| Right-sizing | Match resources to actual usage | 20-40% |
+| Spot instances | Use interruptible instances | 60-90% |
+| Vertical Pod Autoscaler | Automatic resource adjustment | 15-30% |
+| Horizontal Pod Autoscaler | Scale based on demand | 30-50% |
+| Pod Disruption Budgets | Minimize waste during updates | 10-20% |

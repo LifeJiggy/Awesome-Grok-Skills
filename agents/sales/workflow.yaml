@@ -1,0 +1,135 @@
+name: sales-agent
+version: 1.0.0
+
+description: Sales automation agent for lead management, pipeline tracking, and forecasting
+
+triggers:
+  - new_lead
+  - lead_updated
+  - deal_stage_change
+  - meeting_scheduled
+  - proposal_sent
+  - contract_signed
+
+permissions:
+  - leads:read
+  - leads:write
+  - contacts:read
+  - contacts:write
+  - opportunities:read
+  - opportunities:write
+  - accounts:read
+  - accounts:write
+
+steps:
+  - name: lead_capture
+    description: Process new lead from any source
+    when: trigger == "new_lead"
+    actions:
+      - validate_lead_data
+      - enrich_lead_data
+      - score_lead
+      - assign_to_rep
+      - create_sequence
+  
+  - name: lead_nurturing
+    description: Nurture leads through engagement
+    when: trigger == "lead_updated"
+    actions:
+      - update_engagement_score
+      - trigger_workflow
+      - schedule_follow_up
+  
+  - name: opportunity_management
+    description: Manage sales opportunities
+    when: trigger == "deal_stage_change"
+    actions:
+      - update_forecast
+      - notify_manager
+      - trigger_tasks
+      - update_analytics
+  
+  - name: meeting_preparation
+    description: Prepare for meetings
+    when: trigger == "meeting_scheduled"
+    actions:
+      - research_account
+      - prepare_briefing
+      - generate_talking_points
+      - schedule_reminder
+  
+  - name: proposal_generation
+    description: Generate and send proposals
+    when: trigger == "proposal_sent"
+    actions:
+      - generate_quote
+      - create_proposal
+      - track_engagement
+      - schedule_follow_up
+  
+  - name: deal_closing
+    description: Handle contract signing and close
+    when: trigger == "contract_signed"
+    actions:
+      - update_closed_won
+      - create_account
+      - trigger_onboarding
+      - update_forecast
+      - send_welcome
+
+actions:
+  validate_lead_data:
+    type: validation
+    rules:
+      - email:required
+      - name:required
+      - company:recommended
+  
+  enrich_lead_data:
+    type: api_call
+    endpoint: /api/enrich
+    provider: clearbit
+  
+  score_lead:
+    type: ml_inference
+    model: lead-scoring-v2
+    features:
+      - company_size
+      - industry
+      - engagement_level
+  
+  assign_to_rep:
+    type: algorithm
+    algorithm: territory_assignment
+    criteria:
+      - region
+      - industry
+      - deal_size
+  
+  update_engagement_score:
+    type: rules_engine
+    rules: engagement_scoring
+  
+  generate_quote:
+    type: template_engine
+    template: quote_standard
+  
+  create_proposal:
+    type: template_engine
+    template: proposal_standard
+    output: pdf
+  
+  research_account:
+    type: api_call
+    endpoint: /api/company
+    sources:
+      - crunchbase
+      - linkedin
+      - news
+
+metrics:
+  lead_response_time: "< 5 minutes"
+  lead_conversion_rate: "15-20%"
+  average_deal_cycle: "45 days"
+  proposal_acceptance: "30%"
+  quota_attainment: "85%"
