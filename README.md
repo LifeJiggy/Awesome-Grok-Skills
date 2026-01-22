@@ -342,7 +342,7 @@ awesome-grok-skills/
 ```bash
 # Clone the repository
 git clone https://github.com/LifeJiggy/Awesome-Grok-Skills.git
-cd awesome-grok-skills
+cd Awesome-Grok-Skills
 
 # Run the setup script
 ./scripts/setup.sh

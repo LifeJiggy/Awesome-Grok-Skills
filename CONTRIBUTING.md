@@ -17,7 +17,7 @@ Welcome to the Awesome Grok Skills community! We're excited that you want to con
 ```bash
 # Fork the repository on GitHub
 # Then clone your fork
-git clone https://github.com/YOUR_USERNAME/awesome-grok-skills.git
+git clone https://github.com/LifeJiggy/Awesome-Grok-Skills.git
 cd awesome-grok-skills
 
 # Add upstream repository
