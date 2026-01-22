@@ -1,35 +1,25 @@
-# Neural Architecture Search Resources
+"""
+Neural Architecture Search (NAS) Pipeline
+Production-ready NAS implementation with PyTorch
+"""
 
-## 🎯 Quick Reference
-
-| Resource | Type | Description |
-|----------|------|-------------|
-| `nas-pipelines.py` | Code | Complete NAS pipeline with PyTorch |
-| `search-strategies.md` | Documentation | Comparison of search strategies |
-| `model-zoos.md` | Documentation | Pre-trained model collections |
-| `optimizers.md` | Documentation | Optimization algorithms for NAS |
-
-## 🔧 Core NAS Pipeline
-
-```python
-# nas-pipelines.py - Production-ready NAS pipeline
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 import numpy as np
-from typing import Dict, List, Tuple, Optional
-import json
+from typing import Dict, List, Tuple
 from dataclasses import dataclass
 from enum import Enum
+import random
+
 
 class SearchStrategy(Enum):
     RANDOM = "random"
-    GRID = "grid"
     BAYESIAN = "bayesian"
     EVOLUTIONARY = "evolutionary"
-    REINFORCEMENT = "reinforcement"
     DIFFERENTIABLE = "differentiable"
+
 
 @dataclass
 class ArchitectureConfig:
@@ -52,7 +42,8 @@ class ArchitectureConfig:
                 {"type": "dense", "units": self.num_classes, "activation": "softmax"}
             ]
 
-class NAS searchSpace:
+
+class NASSearchSpace:
     """Search space definition for neural architectures"""
     
     def __init__(self):
@@ -72,38 +63,34 @@ class NAS searchSpace:
     
     def sample(self, strategy: SearchStrategy = SearchStrategy.RANDOM) -> ArchitectureConfig:
         """Sample architecture from search space"""
-        import random
+        num_blocks = random.randint(*self.search_space["num_blocks"])
+        filters_base = random.randint(*self.search_space["filters_base"])
         
-        if strategy == SearchStrategy.RANDOM:
-            num_blocks = random.randint(*self.search_space["num_blocks"])
-            filters_base = random.randint(*self.search_space["filters_base"])
-            
-            layers = []
-            current_filters = filters_base
-            
-            for i in range(num_blocks):
-                layer = {
-                    "type": random.choice(["conv", "depthwise_separable"]),
-                    "filters": int(current_filters),
-                    "kernel": random.choice(self.search_space["kernel_sizes"]),
-                    "stride": 1 if i == 0 else random.choice([1, 2]),
-                    "activation": random.choice(self.search_space["activation_fn"]),
-                    "use_bn": True,
-                    "use_dropout": random.random() < 0.3,
-                    "dropout_rate": random.uniform(*self.search_space["dropout_rate"])
-                }
-                layers.append(layer)
-                current_filters *= random.uniform(*self.search_space["filters_multiplier"])
-            
-            return ArchitectureConfig(
-                layers=layers,
-                use_skip_connections=random.choice(self.search_space["use_skip"]),
-                attention_mechanism=random.choice(self.search_space["use_se"])
-            )
+        layers = []
+        current_filters = filters_base
         
-        return ArchitectureConfig()
+        for i in range(num_blocks):
+            layer = {
+                "type": random.choice(["conv", "depthwise_separable"]),
+                "filters": int(current_filters),
+                "kernel": random.choice(self.search_space["kernel_sizes"]),
+                "stride": 1 if i == 0 else random.choice([1, 2]),
+                "activation": random.choice(self.search_space["activation_fn"]),
+                "use_bn": True,
+                "use_dropout": random.random() < 0.3,
+                "dropout_rate": random.uniform(*self.search_space["dropout_rate"])
+            }
+            layers.append(layer)
+            current_filters *= random.uniform(*self.search_space["filters_multiplier"])
+        
+        return ArchitectureConfig(
+            layers=layers,
+            use_skip_connections=random.choice(self.search_space["use_skip"]),
+            attention_mechanism=random.choice(self.search_space["use_se"])
+        )
 
-class ArchitecturEvaluator:
+
+class ArchitectureEvaluator:
     """Evaluate neural architecture performance"""
     
     def __init__(self, device: str = "cuda"):
@@ -128,7 +115,7 @@ class ArchitecturEvaluator:
                 ))
                 if layer_config.get("use_bn", True):
                     layers.append(nn.BatchNorm2d(layer_config["filters"]))
-                layers.append(nn activation_fn(layer_config["activation"]))
+                layers.append(self._get_activation(layer_config["activation"]))
                 in_channels = layer_config["filters"]
             
             elif layer_type == "pool":
@@ -146,16 +133,26 @@ class ArchitecturEvaluator:
             
             elif layer_type == "dense":
                 layers.append(nn.Linear(in_channels, layer_config["units"]))
-                layers.append(nn activation_fn(layer_config["activation"]))
+                layers.append(self._get_activation(layer_config["activation"]))
                 in_channels = layer_config["units"]
                 if layer_config.get("use_dropout"):
                     layers.append(nn.Dropout(layer_config.get("dropout_rate", 0.3)))
             
             elif layer_type == "flatten":
                 layers.append(nn.Flatten())
-                in_channels = in_channels * 7 * 7  # Assuming 7x7 feature map
+                in_channels = in_channels * 7 * 7
         
         return nn.Sequential(*layers)
+    
+    def _get_activation(self, name: str) -> nn.Module:
+        """Get activation function by name"""
+        activations = {
+            "relu": nn.ReLU(),
+            "swish": nn.SiLU(),
+            "mish": nn.Mish(),
+            "gelu": nn.GELU()
+        }
+        return activations.get(name, nn.ReLU())
     
     def evaluate(self, config: ArchitectureConfig, 
                  train_loader: DataLoader,
@@ -197,30 +194,17 @@ class ArchitecturEvaluator:
         result = {
             "accuracy": best_acc,
             "params": sum(p.numel() for p in model.parameters()),
-            "flops": self._count_flops(model, input_size=(1, 3, 32, 32)),
             "config": config.__dict__
         }
         self.evaluation_history.append(result)
         return result
-    
-    def _count_flops(self, model: nn.Module, input_size: Tuple) -> int:
-        """Count FLOPs for model"""
-        from torch.profiler import profile, record_function
-        
-        dummy_input = torch.randn(*input_size).to(self.device)
-        total_flops = 0
-        
-        with profile(activities=[record_function], profile_memory=False) as prof:
-            with torch.no_grad():
-                model(dummy_input)
-        
-        return sum(event.kernels[0].flops for event in prof.events() if event.kernels) if prof.events() else 0
+
 
 class NASPipeline:
     """End-to-end NAS pipeline"""
     
     def __init__(self, search_strategy: SearchStrategy = SearchStrategy.RANDOM):
-        self.search_space = NAS searchSpace()
+        self.search_space = NASSearchSpace()
         self.evaluator = ArchitectureEvaluator()
         self.strategy = search_strategy
         self.best_architecture = None
@@ -240,21 +224,11 @@ class NASPipeline:
                 self.best_architecture = config
             
             print(f"Sample {i+1}/{num_samples}: Accuracy={result['accuracy']:.4f}, "
-                  f"Params={result['params']:,}, FLOPs={result['flops']:,}")
+                  f"Params={result['params']:,}")
         
         return results
 
-def activation_fn(name: str) -> nn.Module:
-    """Get activation function by name"""
-    activations = {
-        "relu": nn.ReLU(),
-        "swish": nn.SiLU(),
-        "mish": nn.Mish(),
-        "gelu": nn.GELU()
-    }
-    return activations.get(name, nn.ReLU())
 
-# Usage example
 if __name__ == "__main__":
     from torchvision import datasets, transforms
     

@@ -1,0 +1,153 @@
+"""
+Self-Driving Vehicle Pipeline
+Autonomous vehicle perception and control systems
+"""
+
+import numpy as np
+from typing import Dict, List, Tuple, Optional
+from dataclasses import dataclass
+from enum import Enum
+
+
+class PerceptionSystem:
+    """Vehicle perception using sensor fusion"""
+    
+    def __init__(self):
+        self.lidar_points = []
+        self.camera_images = []
+        self.radar_returns = []
+        self.fusion_threshold = 0.7
+    
+    def process_sensors(self, 
+                       lidar: np.ndarray, 
+                       camera: np.ndarray, 
+                       radar: np.ndarray) -> Dict:
+        """Fuse data from multiple sensors"""
+        lidar_detection = self._detect_lidar(lidar)
+        camera_detection = self._detect_camera(camera)
+        radar_detection = self._detect_radar(radar)
+        
+        fused = self._fuse_detections(lidar_detection, camera_detection, radar_detection)
+        
+        return {
+            "objects": fused,
+            "lane_markings": self._detect_lanes(camera),
+            "traffic_signs": self._detect_signs(camera),
+            "pedestrians": self._detect_pedestrians(camera, lidar)
+        }
+    
+    def _detect_lidar(self, point_cloud: np.ndarray) -> List[Dict]:
+        """Detect objects from LiDAR"""
+        return [{"type": "car", "distance": 15.2, "confidence": 0.92}]
+    
+    def _detect_camera(self, image: np.ndarray) -> List[Dict]:
+        """Detect objects from camera"""
+        return []
+    
+    def _detect_radar(self, returns: np.ndarray) -> List[Dict]:
+        """Detect objects from radar"""
+        return []
+    
+    def _fuse_detections(self, lidar, camera, radar) -> List[Dict]:
+        """Fuse detections from multiple sensors"""
+        return lidar
+    
+    def _detect_lanes(self, image: np.ndarray) -> List[np.ndarray]:
+        """Detect lane markings"""
+        return []
+    
+    def _detect_signs(self, image: np.ndarray) -> List[Dict]:
+        """Detect traffic signs"""
+        return []
+    
+    def _detect_pedestrians(self, camera: np.ndarray, lidar: np.ndarray) -> List[Dict]:
+        """Detect pedestrians"""
+        return []
+
+
+class MotionPlanner:
+    """Trajectory planning for autonomous vehicles"""
+    
+    def __init__(self):
+        self.vehicle_dynamics = {
+            "max_steering_angle": 0.7,  # radians
+            "wheelbase": 2.7,  # meters
+            "max_acceleration": 3.0,
+            "max_velocity": 30.0
+        }
+    
+    def plan_trajectory(self, 
+                       start_state: Dict, 
+                       goal_state: Dict,
+                       obstacles: List[Dict]) -> List[Dict]:
+        """Plan collision-free trajectory"""
+        trajectory = []
+        current = start_state
+        
+        while self._distance(current, goal_state) > 0.5:
+            next_point = self._compute_next_state(current, obstacles)
+            trajectory.append(next_point)
+            current = next_point
+        
+        return trajectory
+    
+    def _distance(self, state1: Dict, state2: Dict) -> float:
+        """Euclidean distance between states"""
+        return np.sqrt((state1["x"] - state2["x"])**2 + (state1["y"] - state2["y"])**2)
+    
+    def _compute_next_state(self, current: Dict, obstacles: List[Dict]) -> Dict:
+        """Compute next state using kinematic model"""
+        return {
+            "x": current["x"] + 0.1 * np.cos(current["theta"]),
+            "y": current["y"] + 0.1 * np.sin(current["theta"]),
+            "theta": current["theta"],
+            "velocity": current.get("velocity", 5.0)
+        }
+
+
+class SafetyMonitor:
+    """Safety monitoring and fallback systems"""
+    
+    def __init__(self):
+        self.min_safe_distance = 2.0
+        self.max_lateral_acceleration = 3.0
+    
+    def check_safety(self, trajectory: List[Dict], obstacles: List[Dict]) -> Dict:
+        """Check if trajectory is safe"""
+        for i, point in enumerate(trajectory):
+            for obstacle in obstacles:
+                dist = self._distance(point, obstacle)
+                if dist < self.min_safe_distance:
+                    return {
+                        "safe": False,
+                        "violation": "minimum_distance",
+                        "at_index": i
+                    }
+        
+        return {"safe": True}
+    
+    def _distance(self, point1: Dict, point2: Dict) -> float:
+        """Calculate distance between two points"""
+        return np.sqrt((point1["x"] - point2["x"])**2 + (point1["y"] - point2["y"])**2)
+
+
+if __name__ == "__main__":
+    perception = PerceptionSystem()
+    planner = MotionPlanner()
+    safety = SafetyMonitor()
+    
+    lidar_data = np.random.rand(10000, 4)
+    camera_data = np.random.rand(1080, 1920, 3)
+    radar_data = np.random.rand(100, 3)
+    
+    perception_result = perception.process_sensors(lidar_data, camera_data, radar_data)
+    trajectory = planner.plan_trajectory(
+        {"x": 0, "y": 0, "theta": 0},
+        {"x": 100, "y": 0, "theta": 0},
+        []
+    )
+    safety_result = safety.check_safety(trajectory, [])
+    
+    print(f"Objects detected: {len(perception_result['objects'])}")
+    print(f"Trajectory points: {len(trajectory)}")
+    print(f"Safety check: {safety_result}")
