@@ -219,8 +219,8 @@ class GraphQLExecutor:
     
     def execute_query(self,
                       query: str,
-                      variables: Dict = None,
-                      context: Dict = None) -> Dict:
+                      variables: Optional[Dict] = None,
+                      context: Optional[Dict] = None) -> Dict:
         """Execute GraphQL query"""
         return {
             'data': {
@@ -324,7 +324,7 @@ class GraphQLSecurity:
     def __init__(self):
         self.rules = {}
     
-    def analyze_security(self, schema: str, query: str) -> Dict:
+    def analyze_security(self, schema: str, query: Optional[str] = None) -> Dict:
         """Analyze GraphQL security"""
         return {
             'query': query,

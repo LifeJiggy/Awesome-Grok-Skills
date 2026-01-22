@@ -241,8 +241,8 @@ class SmartHomeAutomation:
                                    name: str,
                                    location: str,
                                    radius: float,
-                                   enter_actions: List[Dict],
-                                   exit_actions: List[Dict]) -> Dict:
+                              enter_actions: Optional[List[Dict]] = None,
+                              exit_actions: Optional[List[Dict]] = None) -> Dict:
         """Create geofence automation"""
         return {
             'id': f"geo_{len(self.automations)}",
@@ -376,7 +376,7 @@ class IoTProtocolManager:
             'channel': 25
         }
     
-    def get_mesh_network_status(self) -> Dict:
+    def get_mesh_network_status(self, protocol: str = "thread") -> Dict:
         """Get mesh network status"""
         return {
             'protocol': 'thread',

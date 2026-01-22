@@ -131,7 +131,7 @@ class SyntheticDataGenerator:
     
     def _random_uuid(self) -> str:
         """Generate random UUID"""
-        return str(hashlib.md4())
+        return hashlib.sha256(value.encode()).hexdigest()[:16]
     
     def _random_json(self) -> Dict:
         """Generate random JSON"""
@@ -190,7 +190,7 @@ class DataAnonymizer:
     
     def anonymize_record(self,
                          record: Dict,
-                         pii_fields: List[str] = None) -> Dict:
+                         pii_fields: Optional[List[str]] = None) -> Dict:
         """Anonymize entire record"""
         pii = pii_fields or self.pii_fields
         anonymized = {}
@@ -206,6 +206,7 @@ class DataAnonymizer:
     
     def pseudonymize(self, value: str) -> str:
         """Create pseudonym for value"""
+        import hashlib
         return hashlib.sha256(value.encode()).hexdigest()[:16]
     
     def generate_fake_identities(self,
