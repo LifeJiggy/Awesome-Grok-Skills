@@ -51,7 +51,7 @@ class Grant:
 @dataclass
 class Fund:
     id: str
-    name: string
+    name: str
     fund_type: str
     total_assets: float
     grants_distributed: float

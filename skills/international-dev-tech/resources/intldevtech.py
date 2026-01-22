@@ -52,8 +52,8 @@ class DevelopmentProject:
 @dataclass
 class CountryProfile:
     id: str
-    country_name: string
-    region: string
+    country_name: str
+    region: str
     population: int
     gdp_per_capita: float
     development_index: float

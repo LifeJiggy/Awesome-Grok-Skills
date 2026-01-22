@@ -47,7 +47,7 @@ class Emergency:
 @dataclass
 class Beneficiary:
     id: str
-    name: string
+    name: str
     household_size: int
     vulnerability_score: float
     assistance_received: List[str]
