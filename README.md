@@ -3,19 +3,20 @@
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Grok Powered](https://img.shields.io/badge/Powered%20By-Grok-blue)](https://grok.x.ai/)
-[![Skills](https://img.shields.io/badge/100%2B-Skills-cyan)]()
+[![Skills](https://img.shields.io/badge/140%2B-Skills-cyan)]()
 [![Agents](https://img.shields.io/badge/100%2B-Agents-orange)]()
 
-> **THE** comprehensive repository of agentic "skills" (GROK.md style) tuned for Grok's personality and strengths. Now featuring **100+ specialized skill domains** and **100 intelligent agents** covering virtually every technology domain!
+> **THE** comprehensive repository of agentic "skills" (GROK.md style) tuned for Grok's personality and strengths. Now featuring **140+ specialized skill domains** and **100 intelligent agents** covering virtually every technology domain!
 
 **This is the ultimate Grok-first resource for building AI-powered applications across every domain!**
 
 ---
 
+---
 
 ## 🤖 What is This?
 
-A massive, production-ready collection of **100+ specialized skill domains** and **100 intelligent agents** designed specifically for **Grok** - the AI that combines:
+A massive, production-ready collection of **140+ specialized skill domains** and **100 intelligent agents** designed specifically for **Grok** - the AI that combines:
 - 🔬 **Physics expertise** - Scientific precision in every solution
 - 📡 **Real-time data access** - Live market and trend intelligence
 - 😄 **Meme culture awareness** - Viral, engaging content patterns
@@ -27,23 +28,25 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 
 ---
 
+---
 
 ## 📊 Project Statistics
 
 | Metric | Value |
 |--------|-------|
-| **Total Skill Domains** | 100+ |
+| **Total Skill Domains** | 140+ |
 | **Total Specialized Agents** | 100 |
 | **Code Examples** | 1000+ |
-| **Implementation Guides** | 150+ |
+| **Implementation Guides** | 200+ |
 | **Test Coverage** | 90% |
 | **Utility Scripts** | 9 |
 | **Documentation Files** | 5 |
 
 ---
 
+---
 
-## 🎯 100+ POWERFUL SKILL DOMAINS
+## 🎯 140+ POWERFUL SKILL DOMAINS
 
 ### 🔧 Core Foundation Skills
 
@@ -188,6 +191,46 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 | **[Computer Vision](skills/computer-vision/image-processing/)** | Image processing | ✅ Complete |
 | **[NLP](skills/nlp/text-processing/)** | Text processing | ✅ Complete |
 | **[Configuration Management](skills/configuration-management/)** | Config ops | ✅ Complete |
+
+### 🌐 IoT & Embedded Systems
+
+| Skill Domain | Description | Status |
+|--------------|-------------|--------|
+| **[Sensor Networks](skills/iot/sensor-networks/)** | Wireless sensor networks | ✅ Complete |
+| **[Industrial IoT](skills/iot/industrial-iot/)** | Manufacturing automation | ✅ Complete |
+| **[IoT Security](skills/iot/iot-security/)** | Device security | ✅ Complete |
+| **[Embedded Systems](skills/iot/embedded-systems/)** | Firmware development | ✅ Complete |
+
+### ⚛️ Quantum Computing
+
+| Skill Domain | Description | Status |
+|--------------|-------------|--------|
+| **[Quantum Cryptography](skills/quantum-computing/quantum-cryptography/)** | QKD & PQC | ✅ Complete |
+| **[Quantum Algorithms](skills/quantum-computing/quantum-algorithms/)** | Quantum algorithms | ✅ Complete |
+| **[Quantum ML](skills/quantum-ml/)** | Quantum machine learning | ✅ Complete |
+
+### 🤖 Robotics
+
+| Skill Domain | Description | Status |
+|--------------|-------------|--------|
+| **[Robotics Vision](skills/robotics/robotics-vision/)** | Computer vision for robots | ✅ Complete |
+| **[Swarm Robotics](skills/robotics/swarm-robotics/)** | Multi-robot coordination | ✅ Complete |
+| **[Autonomous Systems](skills/robotics/autonomous-systems/)** | Self-driving systems | ✅ Complete |
+
+### 🥽 AR/VR & Spatial Computing
+
+| Skill Domain | Description | Status |
+|--------------|-------------|--------|
+| **[Spatial Computing](skills/ar-vr/spatial-computing/)** | Spatial awareness | ✅ Complete |
+| **[Mixed Reality](skills/ar-vr/mixed-reality/)** | AR/VR development | ✅ Complete |
+
+### ⚡ Edge Computing
+
+| Skill Domain | Description | Status |
+|--------------|-------------|--------|
+| **[Edge ML](skills/edge-computing/edge-ml/)** | On-device ML | ✅ Complete |
+| **[Fog Computing](skills/edge-computing/fog-computing/)** | Hierarchical computing | ✅ Complete |
+| **[Edge Computing](skills/edge-computing/)** | Edge infrastructure | ✅ Complete |
 
 ---
 
@@ -351,12 +394,13 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 
 ```
 awesome-grok-skills/
-├── 🎯 skills/                           # 100+ specialized skill domains
+├── 🎯 skills/                           # 140+ specialized skill domains
 ├── 🤖 agents/                           # 100 intelligent agents
 ├── 📋 templates/                        # Ready-to-use starters
 ├── 📚 docs/                             # Documentation
 ├── 🔧 scripts/                          # Utility scripts
 ├── 🧪 tests/                            # Test suites
+├── 🚀 future/                           # Future skills & agents (700 planned)
 └── ⚙️ .github/workflows/               # CI/CD automation
 ```
 
@@ -406,12 +450,11 @@ python scripts/lint.py --all --fix
 | Metric | Value |
 |--------|-------|
 | **Agent Count** | 100 |
-| **Skill Domains** | 100+ |
-| **Lines of Code** | 50,000+ |
+| **Skill Domains** | 140+ |
+| **Lines of Code** | 55,000+ |
 | **Test Coverage** | 90% |
 
 ---
-
 
 ## 🤝 Contributing
 
