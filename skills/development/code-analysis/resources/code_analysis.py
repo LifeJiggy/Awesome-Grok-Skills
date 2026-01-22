@@ -299,7 +299,7 @@ class CodeQualityDashboard:
 
 
 if __name__ == "__main__":
-    dashboard = CodeQualityAnalyzer()
+    dashboard = CodeQualityDashboard()
     
     sample_code = '''
 def example_function(x, y):

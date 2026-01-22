@@ -112,8 +112,8 @@ class PropertyAnalyzer:
                                     investment_goals: Dict) -> Dict:
         """Analyze investment potential"""
         return {
-            'property_id': property_data            'cap_rate.get('id'),
-': 5.5,
+            'property_id': property_data.get('id'),
+            'cap_rate': 5.5,
             'cash_on_cash_return': 8.2,
             'noi': 22000,
             'rent_estimation': 3500,
@@ -223,7 +223,7 @@ class MarketAnalyzer:
     
     def analyze_market(self, 
                       location: str,
-                      property_type: PropertyType = None) -> Dict:
+                      property_type: Optional[PropertyType] = None) -> Dict:
         """Analyze real estate market"""
         return {
             'location': location,

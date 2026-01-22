@@ -3,10 +3,10 @@
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Grok Powered](https://img.shields.io/badge/Powered%20By-Grok-blue)](https://grok.x.ai/)
-[![Skills](https://img.shields.io/badge/30%2B-Skills-cyan)]()
-[![Agents](https://img.shields.io/badge/25%2B-Agents-orange)]()
+[![Skills](https://img.shields.io/badge/50%2B-Skills-cyan)]()
+[![Agents](https://img.shields.io/badge/50%2B-Agents-orange)]()
 
-> **THE** comprehensive repository of agentic "skills" (GROK.md style) tuned for Grok's personality and strengths. Now featuring 30+ specialized skill domains and 25+ intelligent agents covering virtually every technology domain!
+> **THE** comprehensive repository of agentic "skills" (GROK.md style) tuned for Grok's personality and strengths. Now featuring **50+ specialized skill domains** and **50+ intelligent agents** covering virtually every technology domain!
 
 **This is the ultimate Grok-first resource for building AI-powered applications across every domain!**
 
@@ -14,7 +14,7 @@
 
 ## 🤖 What is This?
 
-A massive, production-ready collection of **30+ specialized skill domains** and **25+ intelligent agents** designed specifically for **Grok** - the AI that combines:
+A massive, production-ready collection of **50+ specialized skill domains** and **50+ intelligent agents** designed specifically for **Grok** - the AI that combines:
 - 🔬 **Physics expertise** - Scientific precision in every solution
 - 📡 **Real-time data access** - Live market and trend intelligence
 - 😄 **Meme culture awareness** - Viral, engaging content patterns
@@ -30,16 +30,16 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 
 | Metric | Value |
 |--------|-------|
-| **Total Skill Domains** | 30+ |
-| **Total Specialized Agents** | 25+ |
+| **Total Skill Domains** | 53 |
+| **Total Specialized Agents** | 58 |
 | **Code Examples** | 500+ |
-| **Implementation Guides** | 50+ |
+| **Implementation Guides** | 100+ |
 | **Performance Metrics** | 100+ |
 | **Test Coverage** | 88% |
 
 ---
 
-## 🎯 30+ POWERFUL SKILL DOMAINS
+## 🎯 50+ POWERFUL SKILL DOMAINS
 
 ### 🔧 Core Foundation Skills
 
@@ -55,64 +55,133 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 
 | Skill Domain | Description | Key Features | Status |
 |--------------|-------------|--------------|--------|
-| **[Neural Architecture Search](skills/ai-ml/neural-architecture-search/)** | AutoML and model optimization | Physics-inspired NAS, MLOps, Federated Learning | ✅ NEW |
-| **[Medical AI](skills/health-tech/medical-ai/)** | Healthcare ML solutions | Diagnostic AI, Clinical Decision Support | ✅ NEW |
-| **[Brain-Computer Interfaces](skills/neural-science/brain-computer-interfaces/)** | Neural signal processing | Real-time decoding, Adaptive BCI | ✅ NEW |
+| **[Neural Architecture Search](skills/ai-ml/neural-architecture-search/)** | AutoML and model optimization | Physics-inspired NAS, MLOps, Federated Learning | ✅ Complete |
+| **[Medical AI](skills/health-tech/medical-ai/)** | Healthcare ML solutions | Diagnostic AI, Clinical Decision Support | ✅ Complete |
+| **[Brain-Computer Interfaces](skills/neural-science/brain-computer-interfaces/)** | Neural signal processing | Real-time decoding, Adaptive BCI | ✅ Complete |
+| **[NLP](skills/nlp/)** | Natural Language Processing | Text analysis, LLMs, Transformers | ✅ NEW |
+| **[Quantum ML](skills/quantum-ml/)** | Quantum Machine Learning | Quantum neural networks, QML algorithms | ✅ NEW |
 
 ### 🌍 Data Science & Analytics
 
 | Skill Domain | Description | Key Features | Status |
 |--------------|-------------|--------------|--------|
-| **[Advanced Analytics](skills/data-science/advanced-analytics/)** | Statistical modeling & ML | Physics-inspired statistics, Stream processing | ✅ NEW |
-| **[Computational Materials](skills/materials-science/computational-materials/)** | Materials discovery via simulation | DFT calculations, ML material discovery | ✅ NEW |
+| **[Advanced Analytics](skills/data-science/advanced-analytics/)** | Statistical modeling & ML | Physics-inspired statistics, Stream processing | ✅ Complete |
+| **[Computational Materials](skills/materials-science/computational-materials/)** | Materials discovery via simulation | DFT calculations, ML material discovery | ✅ Complete |
+| **[Data Science](skills/data-science/)** | Data analysis & visualization | Pandas, NumPy, Statistical modeling | ✅ Complete |
 
 ### ⛓️ Blockchain & Web3
 
 | Skill Domain | Description | Key Features | Status |
 |--------------|-------------|--------------|--------|
-| **[Smart Contract Development](skills/blockchain/smart-contract-development/)** | Enterprise blockchain | Security-first, Gas optimization, DeFi | ✅ NEW |
-| **[Crypto-Web3 DeFi](skills/crypto-web3/defi-patterns/)** | DeFi patterns & templates | Solidity templates, Security audits | ✅ Existing |
-| **[NFT Marketplace](skills/crypto-web3/nft-marketplace/)** | NFT platform development | ERC721 standards, Marketplace logic | ✅ Existing |
-| **[Token Analytics](skills/crypto-web3/token-analytics/)** | On-chain analytics | Market data APIs, Sentiment analysis | ✅ Existing |
+| **[Smart Contract Development](skills/blockchain/smart-contract-development/)** | Enterprise blockchain | Security-first, Gas optimization, DeFi | ✅ Complete |
+| **[Crypto-Web3 DeFi](skills/crypto-web3/defi-patterns/)** | DeFi patterns & templates | Solidity templates, Security audits | ✅ Complete |
+| **[NFT Marketplace](skills/crypto-web3/nft-marketplace/)** | NFT platform development | ERC721 standards, Marketplace logic | ✅ Complete |
+| **[Token Analytics](skills/crypto-web3/token-analytics/)** | On-chain analytics | Market data APIs, Sentiment analysis | ✅ Complete |
+| **[Blockchain](skills/blockchain/)** | Blockchain fundamentals | Distributed ledger, Consensus, Smart contracts | ✅ Complete |
 
 ### ☁️ Cloud & Infrastructure
 
 | Skill Domain | Description | Key Features | Status |
 |--------------|-------------|--------------|--------|
-| **[Cloud-Native](skills/cloud/cloud-native/)** | Kubernetes & microservices | Service mesh, Serverless, Istio | ✅ NEW |
-| **[Infrastructure as Code](skills/devops/infrastructure-as-code/)** | Terraform & automation | Terraform modules, GitOps, Cost optimization | ✅ NEW |
-| **[Edge Computing](skills/edge-computing/distributed-systems/)** | Global distributed systems | Physics-based latency optimization, CDN | ✅ NEW |
+| **[Cloud-Native](skills/cloud/cloud-native/)** | Kubernetes & microservices | Service mesh, Serverless, Istio | ✅ Complete |
+| **[Infrastructure as Code](skills/devops/infrastructure-as-code/)** | Terraform & automation | Terraform modules, GitOps, Cost optimization | ✅ Complete |
+| **[Edge Computing](skills/edge-computing/distributed-systems/)** | Global distributed systems | Physics-based latency optimization, CDN | ✅ Complete |
+| **[Cloud Architecture](skills/cloud-architecture/)** | Enterprise cloud design | Multi-cloud, Architecture patterns, Best practices | ✅ Complete |
 
 ### 🔐 Security & Compliance
 
 | Skill Domain | Description | Key Features | Status |
 |--------------|-------------|--------------|--------|
-| **[Zero-Trust Security](skills/cybersecurity/zero-trust-security/)** | Enterprise security | Identity-first, Continuous verification | ✅ NEW |
-| **[Contract Automation](skills/legal-tech/contract-automation/)** | Legal tech automation | Contract analysis, Compliance checking | ✅ NEW |
+| **[Zero-Trust Security](skills/cybersecurity/zero-trust-security/)** | Enterprise security | Identity-first, Continuous verification | ✅ Complete |
+| **[Contract Automation](skills/legal-tech/contract-automation/)** | Legal tech automation | Contract analysis, Compliance checking | ✅ Complete |
+| **[Cybersecurity](skills/cybersecurity/)** | Security fundamentals | Threat modeling, Security patterns, Best practices | ✅ Complete |
 
 ### 🎮 Gaming & Entertainment
 
 | Skill Domain | Description | Key Features | Status |
 |--------------|-------------|--------------|--------|
-| **[Spatial Computing](skills/ar-vr/spatial-computing/)** | AR/VR development | XR interaction, Haptic feedback, SLAM | ✅ NEW |
-| **[Self-Driving Vehicles](skills/autonomous-transport/self-driving-vehicles/)** | Autonomous systems | Perception, Motion planning, Safety | ✅ NEW |
-| **[Autonomous Systems](skills/robotics/autonomous-systems/)** | Robotics & control | Motion planning, Sensor fusion, Control | ✅ NEW |
+| **[Spatial Computing](skills/ar-vr/spatial-computing/)** | AR/VR development | XR interaction, Haptic feedback, SLAM | ✅ Complete |
+| **[Self-Driving Vehicles](skills/autonomous-transport/self-driving-vehicles/)** | Autonomous systems | Perception, Motion planning, Safety | ✅ Complete |
+| **[Autonomous Systems](skills/robotics/autonomous-systems/)** | Robotics & control | Motion planning, Sensor fusion, Control | ✅ Complete |
 
 ### 🌿 Sustainability & Climate
 
 | Skill Domain | Description | Key Features | Status |
 |--------------|-------------|--------------|--------|
-| **[Environmental Modeling](skills/climate-tech/environmental-modeling/)** | Climate simulation | Carbon tracking, Renewable optimization | ✅ NEW |
-| **[Green Computing](skills/sustainability/green-computing/)** | Sustainable tech | Energy optimization, Carbon accounting | ✅ NEW |
+| **[Environmental Modeling](skills/climate-tech/environmental-modeling/)** | Climate simulation | Carbon tracking, Renewable optimization | ✅ Complete |
+| **[Green Computing](skills/sustainability/green-computing/)** | Sustainable tech | Energy optimization, Carbon accounting | ✅ Complete |
+| **[Sustainability](skills/sustainability/)** | Green technology | ESG metrics, Carbon footprint, Sustainable development | ✅ Complete |
 
 ### 🚀 Advanced Technologies
 
 | Skill Domain | Description | Key Features | Status |
 |--------------|-------------|--------------|--------|
-| **[Quantum Computing](skills/quantum/quantum-computing/)** | Quantum algorithms | VQE, QAOA, Cryptography | ✅ NEW |
-| **[Embedded Systems](skills/iot/embedded-systems/)** | IoT & firmware | RTOS, Real-time systems, Low-power | ✅ NEW |
-| **[Aerospace Engineering](skills/space-tech/aerospace-engineering/)** | Space technology | Orbital mechanics, Satellite systems | ✅ NEW |
-| **[Digital Banking](skills/fintech/digital-banking/)** | FinTech solutions | Payment processing, Core banking | ✅ NEW |
+| **[Quantum Computing](skills/quantum/quantum-computing/)** | Quantum algorithms | VQE, QAOA, Cryptography | ✅ Complete |
+| **[Embedded Systems](skills/iot/embedded-systems/)** | IoT & firmware | RTOS, Real-time systems, Low-power | ✅ Complete |
+| **[Aerospace Engineering](skills/space-tech/aerospace-engineering/)** | Space technology | Orbital mechanics, Satellite systems | ✅ Complete |
+| **[Digital Banking](skills/fintech/digital-banking/)** | FinTech solutions | Payment processing, Core banking | ✅ Complete |
+| **[Space Tech](skills/space-tech/)** | Space exploration | Satellite, Orbital mechanics, Space systems | ✅ Complete |
+| **[Robotics](skills/robotics/)** | Robotics engineering | Control systems, Sensor fusion, Motion planning | ✅ Complete |
+| **[IoT](skills/iot/)** | Internet of Things | Sensors, Connectivity, Edge computing | ✅ Complete |
+
+### 🏥 Healthcare & Life Sciences
+
+| Skill Domain | Description | Key Features | Status |
+|--------------|-------------|--------------|--------|
+| **[Healthcare](skills/healthcare/)** | Healthcare solutions | Patient management, Medical imaging, Telemedicine | ✅ Complete |
+| **[Health Tech](skills/health-tech/)** | Health technology | Wearables, Remote monitoring, Digital therapeutics | ✅ Complete |
+| **[Bioinformatics](skills/bioinformatics/)** | Computational biology | Genomics, Proteomics, Drug discovery | ✅ Complete |
+
+### 🏦 Finance & Business
+
+| Skill Domain | Description | Key Features | Status |
+|--------------|-------------|--------------|--------|
+| **[FinTech](skills/fintech/)** | Financial technology | Payments, Banking, RegTech, InsurTech | ✅ Complete |
+| **[Insurance Tech](skills/insurance-tech/)** | Insurance technology | Underwriting, Claims processing, Fraud detection | ✅ NEW |
+
+### 📚 Education & HR
+
+| Skill Domain | Description | Key Features | Status |
+|--------------|-------------|--------------|--------|
+| **[EdTech](skills/ed-tech/)** | Education technology | LMS, Adaptive learning, Student analytics | ✅ NEW |
+| **[HR Tech](skills/hr-tech/)** | HR technology | Talent acquisition, Workforce analytics, Employee engagement | ✅ NEW |
+
+### 🎨 Creative & Media
+
+| Skill Domain | Description | Key Features | Status |
+|--------------|-------------|--------------|--------|
+| **[Art Tech](skills/art-tech/)** | Art & creative technology | NFTs, Generative art, Digital authentication | ✅ NEW |
+| **[Music Tech](skills/music-tech/)** | Music technology | AI generation, Streaming analytics, Audio mastering | ✅ NEW |
+| **[Fashion Tech](skills/fashion-tech/)** | Wearable technology | Smart textiles, Wearables, Virtual fashion | ✅ NEW |
+
+### 🏛️ Governance & Public Sector
+
+| Skill Domain | Description | Key Features | Status |
+|--------------|-------------|--------------|--------|
+| **[Legal Reg Tech](skills/legal-reg-tech/)** | Legal & regulatory | Document automation, Contract analysis, Compliance | ✅ NEW |
+| **[Governance Tech](skills/governance-tech/)** | Digital governance | Citizen services, Digital identity, Public administration | ✅ NEW |
+| **[Public Policy Tech](skills/public-policy-tech/)** | Policy technology | Impact analysis, Stakeholder engagement, Policy modeling | ✅ NEW |
+| **[Social Impact Tech](skills/social-impact-tech/)** | Social impact | Impact measurement, Fundraising, Program evaluation | ✅ NEW |
+| **[Philanthropic Tech](skills/philanthropic-tech/)** | Philanthropy | Donor management, Grants, Impact investing | ✅ NEW |
+| **[International Dev Tech](skills/international-dev-tech/)** | International development | SDG tracking, Project management, Aid distribution | ✅ NEW |
+| **[Humanitarian Tech](skills/humanitarian-tech/)** | Humanitarian technology | Emergency response, Refugee assistance, Disaster relief | ✅ NEW |
+| **[Journalism Tech](skills/journalism-tech/)** | Journalism technology | Content generation, Fact-checking, Analytics | ✅ NEW |
+
+### 🏙️ Urban & Environmental
+
+| Skill Domain | Description | Key Features | Status |
+|--------------|-------------|--------------|--------|
+| **[Smart Cities](skills/smart-cities/)** | Urban intelligence | Traffic management, Energy optimization, Public safety | ✅ NEW |
+| **[Ag Tech](skills/ag-tech/)** | Agricultural technology | Precision farming, IoT sensors, Drone monitoring | ✅ NEW |
+| **[Ocean Tech](skills/ocean-tech/)** | Ocean & marine | Fisheries, Ocean monitoring, Wave energy | ✅ NEW |
+| **[Food Tech](skills/food-tech/)** | Food technology | Food safety, Alternative proteins, Nutrition | ✅ NEW |
+
+### 🎭 Entertainment & Sports
+
+| Skill Domain | Description | Key Features | Status |
+|--------------|-------------|--------------|--------|
+| **[Sports Tech](skills/sports-tech/)** | Sports technology | Performance analytics, Injury prediction, Training optimization | ✅ NEW |
+| **[Theater Tech](skills/theater-tech/)** | Theater technology | Stage automation, Lighting, Virtual theater | ✅ NEW |
 
 ### 🌐 Web & Mobile Development
 
@@ -124,10 +193,13 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 | **[Expo React Native](skills/mobile/expo-react-native/)** | Cross-platform mobile | ✅ Complete |
 | **[Flutter Naija](skills/mobile/flutter-naija/)** | African market apps | ✅ Complete |
 | **[FastAPI Best Practices](skills/backend/fastapi-best-practices/)** | Python APIs | ✅ Complete |
+| **[Web Dev](skills/web-dev/)** | Full web development | ✅ Complete |
+| **[Mobile](skills/mobile/)** | Mobile development | ✅ Complete |
+| **[Backend](skills/backend/)** | Backend development | ✅ Complete |
 
 ---
 
-## 🤖 25+ INTELLIGENT AGENTS
+## 🤖 50+ INTELLIGENT AGENTS
 
 ### 🚀 Planning & Architecture
 
@@ -136,6 +208,8 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 | **[Full-Stack Planner](agents/full-stack-planner/)** | End-to-end project architecture | 🚀🚀🚀 |
 | **[Strategy Agent](agents/strategy/)** | Business intelligence & planning | 🚀🚀🚀 |
 | **[Innovation Lab](agents/innovation/)** | R&D optimization | 🚀🚀🚀 |
+| **[Product Agent](agents/product/)** | Product management & roadmap | 🚀🚀🚀 |
+| **[API Management](agents/api-management/)** | API design & governance | 🚀🚀 |
 
 ### 🎯 Code & Quality
 
@@ -153,6 +227,7 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 | **[Data Science Agent](agents/data-science/)** | Analytics & ML pipelines | 🚀🚀🚀 |
 | **[Research Agent](agents/research/)** | Automated research | 🚀🚀 |
 | **[Analytics Agent](agents/analytics/)** | Business analytics | 🚀🚀 |
+| **[Data Engineering](agents/data-engineering/)** | Data pipelines & architecture | 🚀🚀🚀 |
 
 ### 🛡️ Security & Compliance
 
@@ -162,6 +237,7 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 | **[Compliance Agent](agents/compliance/)** | Regulatory compliance | 🚀🚀 |
 | **[Ethics Compliance](agents/ethics/)** | AI ethics & bias detection | 🚀🚀 |
 | **[Legal Operations](agents/legal/)** | Contract management | 🚀🚀 |
+| **[IAM Agent](agents/iam/)** | Identity & Access Management | 🚀🚀 |
 
 ### 🎮 Operations & Growth
 
@@ -171,16 +247,17 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 | **[Monitoring Agent](agents/monitoring/)** | Infrastructure observability | 🚀🚀 |
 | **[Operations Agent](agents/operations/)** | Business process automation | 🚀🚀 |
 | **[Integration Agent](agents/integration/)** | System integration | 🚀🚀 |
+| **[Customer Success](agents/customer-success/)** | Customer lifecycle management | 🚀🚀 |
+| **[Sales Agent](agents/sales/)** | Revenue optimization | 🚀🚀 |
+| **[Support Agent](agents/support/)** | Customer service automation | 🚀🚀 |
+| **[Marketing Agent](agents/marketing/)** | Growth automation | 🚀🚀 |
+| **[Social Media](agents/social/)** | Engagement optimization | 🚀🚀 |
 
 ### 👥 HR & People
 
 | Agent | Capabilities | Complexity |
 |-------|--------------|------------|
 | **[HR Agent](agents/hr/)** | Talent management | 🚀🚀 |
-| **[Sales Agent](agents/sales/)** | Revenue optimization | 🚀🚀 |
-| **[Support Agent](agents/support/)** | Customer service automation | 🚀🚀 |
-| **[Marketing Agent](agents/marketing/)** | Growth automation | 🚀🚀 |
-| **[Social Media](agents/social/)** | Engagement optimization | 🚀🚀 |
 
 ### 🎲 Specialized Domains
 
@@ -193,7 +270,7 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 | **[Sustainability Agent](agents/sustainability/)** | Environmental management | 🚀🚀 |
 | **[Indie Hacker](agents/indie-hacker/)** | Startup automation | 🚀🚀 |
 | **[Productivity Agent](agents/productivity/)** | Workflow optimization | 🚀🚀 |
-| **[Autonomous Vehicles](agents/mobile/mobile-performance-optimizer/)** | Automotive AI | 🚀🚀🚀 |
+| **[Real Estate](agents/real-estate/)** | Real estate analytics | 🚀🚀 |
 
 ### 🔧 Technical Specialists
 
@@ -209,6 +286,18 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 | **[E-commerce Agent](agents/ecommerce/)** | Online retail |
 | **[Education Agent](agents/education/)** | Learning systems |
 | **[Research Agent](agents/research/)** | Scientific discovery |
+| **[Blockchain Agent](agents/blockchain/)** | Blockchain development |
+| **[Cloud Architecture](agents/cloud-architecture/)** | Cloud design & implementation |
+| **[IoT Agent](agents/iot/)** | IoT solutions |
+| **[ML Ops Agent](agents/ml-ops/)** | MLOps pipelines |
+| **[NetOps Agent](agents/netops/)** | Network operations |
+
+### 🚗 Mobile & Automotive
+
+| Agent | Capabilities | Complexity |
+|-------|--------------|------------|
+| **[Mobile Performance Optimizer](agents/mobile/)** | Mobile optimization | 🚀🚀 |
+| **[Web Performance Optimizer](agents/web-dev/web-performance-optimizer/)** | Web optimization | 🚀🚀 |
 
 ---
 
@@ -216,7 +305,7 @@ Every skill and agent is engineered to leverage Grok's unique strengths with phy
 
 ```
 awesome-grok-skills/
-├── 🎯 skills/                           # 30+ specialized skill domains
+├── 🎯 skills/                           # 50+ specialized skill domains
 │   ├── ai-ml/                          # AI & Machine Learning
 │   │   └── neural-architecture-search/
 │   ├── ar-vr/                          # AR/VR & Spatial Computing
@@ -229,6 +318,7 @@ awesome-grok-skills/
 │   │   └── environmental-modeling/
 │   ├── cloud/                          # Cloud Computing
 │   │   └── cloud-native/
+│   ├── cloud-architecture/             # Cloud Architecture
 │   ├── core/                           # Foundation Skills
 │   │   ├── tdd/
 │   │   ├── real-time-research/
@@ -252,7 +342,8 @@ awesome-grok-skills/
 │   ├── health-tech/                   # HealthTech
 │   │   └── medical-ai/
 │   ├── iot/                           # IoT
-│   │   └── embedded-systems/
+│   │   ├── embedded-systems/
+│   │   └── iot/
 │   ├── legal-tech/                    # LegalTech
 │   │   └── contract-automation/
 │   ├── materials-science/             # Materials Science
@@ -262,8 +353,10 @@ awesome-grok-skills/
 │   │   └── flutter-naija/
 │   ├── neural-science/                # Neural Science
 │   │   └── brain-computer-interfaces/
+│   ├── nlp/                           # NLP
 │   ├── quantum/                       # Quantum Computing
 │   │   └── quantum-computing/
+│   ├── quantum-ml/                    # Quantum ML
 │   ├── robotics/                      # Robotics
 │   │   └── autonomous-systems/
 │   ├── space-tech/                    # Space Technology
@@ -274,19 +367,46 @@ awesome-grok-skills/
 │   │   ├── nextjs-fullstack/
 │   │   ├── tailwind-shadcn/
 │   │   └── supabase-auth/
-│   └── backend/                       # Backend
-│       ├── fastapi-best-practices/
-│       └── rust-cli-patterners/
+│   ├── backend/                       # Backend
+│   │   ├── fastapi-best-practices/
+│   │   └── rust-cli-patterners/
+│   ├── healthcare/                    # Healthcare
+│   ├── bioinformatics/                # Bioinformatics
+│   ├── ag-tech/                       # Agricultural Technology
+│   ├── ocean-tech/                    # Ocean Technology
+│   ├── smart-cities/                  # Smart Cities
+│   ├── food-tech/                     # Food Technology
+│   ├── fashion-tech/                  # Fashion Technology
+│   ├── sports-tech/                   # Sports Technology
+│   ├── art-tech/                      # Art Technology
+│   ├── music-tech/                    # Music Technology
+│   ├── theater-tech/                  # Theater Technology
+│   ├── journalism-tech/               # Journalism Technology
+│   ├── insurance-tech/                # Insurance Technology
+│   ├── ed-tech/                       # Education Technology
+│   ├── hr-tech/                       # HR Technology
+│   ├── legal-reg-tech/                # Legal & Regulatory
+│   ├── governance-tech/               # Governance Technology
+│   ├── public-policy-tech/            # Public Policy
+│   ├── social-impact-tech/            # Social Impact
+│   ├── philanthropic-tech/            # Philanthropy
+│   ├── international-dev-tech/        # International Development
+│   └── humanitarian-tech/             # Humanitarian Technology
 │
-├── 🤖 agents/                          # 25+ intelligent agents
+├── 🤖 agents/                          # 50+ intelligent agents
 │   ├── analytics/
 │   ├── ai-ml/
+│   ├── api-management/
 │   ├── automation/
 │   ├── backend/
+│   ├── blockchain/
+│   ├── cloud-architecture/
 │   ├── code-review-team/
 │   ├── compliance/
 │   ├── content/
 │   ├── crypto-web3/
+│   ├── customer-success/
+│   ├── data-engineering/
 │   ├── data-science/
 │   ├── design/
 │   ├── devops/
@@ -298,18 +418,24 @@ awesome-grok-skills/
 │   ├── gaming/
 │   ├── healthcare/
 │   ├── hr/
+│   ├── iam/
 │   ├── indie-hacker/
 │   ├── innovation/
 │   ├── integration/
+│   ├── iot/
 │   ├── legal/
 │   ├── marketing/
 │   ├── market-research-oracle/
-│   ├── mobile/mobile-performance-optimizer/
+│   ├── ml-ops/
+│   ├── mobile/
 │   ├── monitoring/
+│   ├── netops/
 │   ├── operations/
 │   ├── physics-simulation-engine/
 │   ├── productivity/
+│   ├── product/
 │   ├── quality/
+│   ├── real-estate/
 │   ├── research/
 │   ├── sales/
 │   ├── security/
@@ -323,14 +449,39 @@ awesome-grok-skills/
 ├── 📋 templates/                       # Ready-to-use starters
 │   ├── project-GROK.md
 │   ├── skill-template.md
+│   ├── agent-template.md
 │   └── global-skills-install.md
 │
 ├── 📚 docs/                            # Documentation
+│   ├── CONTRIBUTING.md
+│   ├── CODE_OF_CONDUCT.md
+│   ├── STYLE_GUIDE.md
+│   ├── TESTING_GUIDE.md
+│   └── DEPLOYMENT.md
+│
 ├── 🔧 scripts/                         # Utility scripts
 │   ├── setup.sh
 │   ├── run-comprehensive-tests.sh
-│   └── test-documentation.md
+│   ├── test-documentation.md
+│   ├── generate-skill.py
+│   ├── generate-agent.py
+│   ├── validate-structure.py
+│   └── sync-readme.py
+│
+├── 📊 notebooks/                       # Example notebooks
+│   ├── introduction.ipynb
+│   ├── skill-showcase.ipynb
+│   └── agent-demonstration.ipynb
+│
+├── 🧪 tests/                           # Test suites
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
+│
 └── ⚙️ .github/workflows/              # CI/CD automation
+    ├── ci.yml
+    ├── tests.yml
+    └── docs.yml
 ```
 
 ---
@@ -373,6 +524,12 @@ grok --skill autonomous-transport/self-driving-vehicles --project ./autonomous-s
 
 # Start with a project template
 grok --template project-GROK.md --project ./my-startup
+
+# Use NLP skill for text analysis
+grok --skill nlp --project ./text-analysis
+
+# Implement smart city solutions
+grok --skill smart-cities --project ./urban-app
 ```
 
 ---
@@ -480,6 +637,33 @@ Climate simulation and sustainability
 └── ESG reporting
 ```
 
+### 🏙️ **Smart Cities** - Urban Intelligence
+```
+Urban technology and management
+├── Traffic optimization
+├── Energy management
+├── Public safety
+└── Environmental monitoring
+```
+
+### 🤖 **NLP** - Natural Language Processing
+```
+Text analysis and understanding
+├── Sentiment analysis
+├── Named entity recognition
+├── Language models
+└── Text generation
+```
+
+### 🌊 **Ag Tech** - Agricultural Innovation
+```
+Precision farming and agriculture
+├── IoT sensors
+├── Drone monitoring
+├── Crop optimization
+└── Yield prediction
+```
+
 ---
 
 ## 🎯 Use Cases by Domain
@@ -520,11 +704,39 @@ Climate simulation and sustainability
 - Safety validation
 - Fleet management
 
+### 🏙️ Smart Cities
+- Urban planning
+- Traffic management
+- Energy optimization
+- Public services
+
+### 🌍 Sustainability
+- Carbon tracking
+- ESG reporting
+- Renewable energy
+- Climate modeling
+
+---
+
+## 📚 Documentation
+
+### Core Documentation
+- **[CONTRIBUTING.md](docs/CONTRIBUTING.md)** - How to contribute
+- **[CODE_OF_CONDUCT.md](docs/CODE_OF_CONDUCT.md)** - Community guidelines
+- **[STYLE_GUIDE.md](docs/STYLE_GUIDE.md)** - Code style and patterns
+- **[TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** - Testing standards
+- **[DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Deployment guidelines
+
+### Templates
+- **[project-GROK.md](templates/project-GROK.md)** - Project template
+- **[skill-template.md](templates/skill-template.md)** - Skill template
+- **[agent-template.md](templates/agent-template.md)** - Agent template
+
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+We welcome contributions! See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for details.
 
 ### How to Contribute
 
@@ -542,6 +754,8 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 - 🏭 **Industrial IoT** - Manufacturing, robotics
 - 🌱 **Sustainability** - Climate tech, green computing
 - 🧠 **BCI skills** - Neural interfaces, brain tech
+- 🏙️ **Smart Cities** - Urban technology, IoT
+- 🌍 **Climate Tech** - Environmental monitoring, carbon tracking
 
 ---
 

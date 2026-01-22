@@ -142,7 +142,7 @@ class BinaryAnalyzer:
             if section.name == '.text' and 'x' in section.permissions:
                 protections['nx'] = True
             if section.name == '.got' or section.name == '.got.plt':
-                protections['relro'] = 'partial'
+                protections['relro'] = True
         
         protections['aslr'] = True
         protections['canary'] = True

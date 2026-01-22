@@ -49,7 +49,7 @@ class ContentGenerator:
                         content_type: ContentType,
                         tone: Tone,
                         target_audience: str,
-                        keywords: List[str] = None) -> Dict:
+                        keywords: Optional[List[str]] = None) -> Dict:
         """Generate content piece"""
         content = {
             'title': self._generate_title(topic, content_type),
