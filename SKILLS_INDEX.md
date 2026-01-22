@@ -1,4 +1,4 @@
-# Awesome Grok Skills - Skills Index (100+ Skills)
+# Awesome Grok Skills - Skills Index (140+ Skills)
 
 ## Complete Skills List
 
@@ -132,6 +132,32 @@
 101. Event-Driven Architecture
 102. Domain-Driven Design
 
+### IoT (4 skills)
+103. Sensor Networks
+104. Industrial IoT
+105. IoT Security
+106. Embedded Systems
+
+### Quantum Computing (3 skills)
+107. Quantum Cryptography
+108. Quantum Algorithms
+109. Quantum Machine Learning
+
+### Robotics (3 skills)
+110. Robotics Vision
+111. Swarm Robotics
+112. Autonomous Systems
+
+### AR/VR (3 skills)
+113. Spatial Computing
+114. Mixed Reality
+115. Extended Reality
+
+### Edge Computing (3 skills)
+116. Edge ML
+117. Fog Computing
+118. Edge Computing
+
 ## Skill Structure
 
 Each skill contains:
@@ -154,6 +180,11 @@ Each skill contains:
 - **Data Engineering**: Pipelines, Spark, quality
 - **SRE**: Reliability, observability, incidents
 - **Architecture**: Patterns and system design
+- **IoT**: Sensor networks, industrial IoT, security
+- **Quantum Computing**: Cryptography, algorithms, ML
+- **Robotics**: Vision, swarm, autonomous systems
+- **AR/VR**: Spatial computing, mixed reality
+- **Edge Computing**: Edge ML, fog computing
 
 ## Contributing
 
