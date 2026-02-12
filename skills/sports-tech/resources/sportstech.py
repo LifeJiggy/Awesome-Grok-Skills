@@ -4,11 +4,10 @@ SportsTech - Sports Technology Implementation
 Performance analytics, training, and fan engagement.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-import json
 import random
 
 class Sport(Enum):

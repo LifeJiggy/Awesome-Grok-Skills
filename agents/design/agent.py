@@ -3,9 +3,7 @@ Design Agent
 UI/UX design and design system management
 """
 
-from typing import Dict, List, Optional
-from dataclasses import dataclass
-from enum import Enum
+from typing import Dict, List
 from datetime import datetime
 
 

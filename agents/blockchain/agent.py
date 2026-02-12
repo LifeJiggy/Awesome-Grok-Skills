@@ -3,7 +3,7 @@ Blockchain/Web3 Agent
 Blockchain and decentralized application management
 """
 
-from typing import Dict, List, Optional
+from typing import Dict
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime

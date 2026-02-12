@@ -5,7 +5,6 @@ Validate the repository structure for Awesome Grok Skills.
 This script checks that all skills and agents follow the required structure.
 """
 
-import os
 import sys
 from pathlib import Path
 from dataclasses import dataclass

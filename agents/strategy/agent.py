@@ -4,11 +4,10 @@ Grok Strategy Agent
 Specialized agent for strategic planning, business analysis, and decision making.
 """
 
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
+from typing import Dict, List, Any
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-import json
 from collections import defaultdict
 
 class StrategicPriority(Enum):

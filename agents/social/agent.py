@@ -8,7 +8,6 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-import json
 import hashlib
 from collections import defaultdict
 
@@ -177,7 +176,6 @@ class EngagementManager:
         )
         self.engagements.append(engagement)
         
-        post_engagement_count = len([e for e in self.engagements if e.post_id == post_id])
         return engagement
     
     def _analyze_sentiment(self, text: str) -> str:

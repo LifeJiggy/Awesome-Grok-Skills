@@ -4,11 +4,10 @@ FashionTech - Wearable Technology Implementation
 Smart textiles, wearables, and digital fashion.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-import json
 import random
 
 class GarmentType(Enum):

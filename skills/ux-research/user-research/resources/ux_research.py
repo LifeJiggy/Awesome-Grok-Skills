@@ -3,10 +3,9 @@ UX Research Module
 User research, usability testing, and persona development
 """
 
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
+from typing import Dict, List, Optional
+from dataclasses import dataclass
 from enum import Enum
-from datetime import datetime
 
 
 class ResearchMethod(Enum):

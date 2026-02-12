@@ -4,10 +4,9 @@ Grok Physics Simulation Engine Agent
 Specialized agent for physics-based simulations, modeling, and computational physics.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
 from enum import Enum
-import math
 
 class PhysicsDomain(Enum):
     CLASSICAL_MECHANICS = "classical_mechanics"

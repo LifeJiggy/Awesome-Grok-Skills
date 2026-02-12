@@ -1,7 +1,6 @@
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from enum import Enum
 from dataclasses import dataclass
-from datetime import datetime
 import re
 import hashlib
 import secrets
@@ -68,7 +67,7 @@ class CodeAnalyzer:
                     line=1,
                     function="main",
                     description=f"Potential {vuln_type} vulnerability detected",
-                    remediation=f"Review use of pattern and implement safe alternatives",
+                    remediation="Review use of pattern and implement safe alternatives",
                     references=["CWE-78", "OWASP-A03:2021"]
                 ))
         
@@ -338,7 +337,6 @@ class CryptographyManager:
                   data: str,
                   algorithm: str = "sha256") -> Dict:
         """Hash data using secure algorithm"""
-        import hashlib
         if algorithm.startswith('sha'):
             hasher = hashlib.new(algorithm)
             hasher.update(data.encode())
@@ -403,8 +401,7 @@ class CryptographyManager:
                      algorithm: str = "aes-256-gcm") -> Dict:
         """Generate cryptographic key"""
         import os
-        from cryptography.hazmat.primitives import hashes
-        from cryptography.hazmat.primitives.asymmetric import rsa, ec
+        from cryptography.hazmat.primitives.asymmetric import rsa
         from cryptography.hazmat.backends import default_backend
         
         if algorithm == "aes-256-gcm":

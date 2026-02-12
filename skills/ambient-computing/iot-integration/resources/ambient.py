@@ -7,7 +7,6 @@ from typing import Dict, List, Optional, Callable
 from dataclasses import dataclass, field
 from enum import Enum
 from datetime import datetime
-import asyncio
 
 
 class DeviceType(Enum):

@@ -3,10 +3,8 @@ Sustainability/Green IT Module
 Energy efficiency and carbon footprint tracking
 """
 
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
+from typing import Dict, List
 from enum import Enum
-from datetime import datetime
 
 
 class CarbonScope(Enum):

@@ -4,7 +4,7 @@ Test configuration for Awesome Grok Skills.
 
 import pytest
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 import sys
 
 # Add project root to path

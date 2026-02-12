@@ -7,7 +7,6 @@ This script sets up the development environment and creates necessary symlinks.
 
 import os
 import sys
-import shutil
 from pathlib import Path
 
 

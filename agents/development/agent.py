@@ -3,11 +3,9 @@ Development Agent
 Software development and code analysis
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
-from datetime import datetime
-import ast
 
 
 class IssueSeverity(Enum):
@@ -401,7 +399,7 @@ class CodeGenerationEngine:
                           class_name: str,
                           test_cases: List[Dict]) -> str:
         """Generate unit tests"""
-        code = f"import unittest\n\n\n"
+        code = "import unittest\n\n\n"
         code += f"class Test{class_name}(unittest.TestCase):\n\n"
         
         for test_case in test_cases:
@@ -418,7 +416,7 @@ class CodeGenerationEngine:
     
     def generate_documentation(self, source_code: str) -> str:
         """Generate documentation from source code"""
-        doc = f"# Auto-generated Documentation\n\n"
+        doc = "# Auto-generated Documentation\n\n"
         
         if 'class ' in source_code:
             classes = self._extract_classes(source_code)
@@ -569,11 +567,17 @@ class DevelopmentDashboard:
         return ""
 
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for the Development Agent."""
+    print("\n" + "="*60)
+    print("  Development Agent")
+    print("  Software development and code analysis")
+    print("="*60 + "\n")
+
     dashboard = DevelopmentDashboard()
-    
+
     project_results = dashboard.analyze_project('/path/to/project')
-    
+
     print("Project Analysis Summary:")
     print(f"  Total files: {project_results['summary']['total_files']}")
     print(f"  Total issues: {project_results['total_issues']}")
@@ -581,7 +585,7 @@ if __name__ == "__main__":
     print(f"  High: {project_results['issues_by_severity']['high']}")
     print(f"  Complexity score: {project_results['summary']['complexity_score']}")
     print(f"  Maintainability: {project_results['summary']['maintainability_score']}")
-    
+
     source_code = '''
 def calculate_temp(x, y):
     if x > 0:
@@ -589,17 +593,21 @@ def calculate_temp(x, y):
         password = "secret123"
     return temp
 '''
-    
+
     code_results = dashboard.analyze_code(source_code)
-    print(f"\nCode Analysis:")
+    print("\nCode Analysis:")
     print(f"  Issues found: {len(code_results['static_analysis']['issues'])}")
     print(f"  Complexity: {code_results['static_analysis']['complexity']}")
     print(f"  Refactoring suggestions: {len(code_results['refactoring'])}")
-    
+
     class_code = dashboard.generate_code('class', {
         'name': 'UserManager',
         'attributes': ['user_id', 'username', 'email'],
         'methods': ['create_user', 'delete_user', 'get_user']
     })
-    
+
     print(f"\nGenerated Class:\n{class_code}")
+
+
+if __name__ == "__main__":
+    main()

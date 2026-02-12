@@ -3,7 +3,7 @@ Full-Stack Planner Agent
 Complete project planning and architecture
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime, timedelta
@@ -361,26 +361,32 @@ class SprintPlanner:
         return {"error": "Sprint not found"}
 
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for the Full-Stack Planner agent."""
+    print("\n" + "="*60)
+    print("  Full-Stack Planner Agent")
+    print("  Complete project planning and architecture")
+    print("="*60 + "\n")
+
     planner = ProjectPlanner()
     project_id = planner.create_project("E-commerce Platform", "Full-featured e-commerce", ArchitecturePattern.MICROSERVICES)
     planner.add_phase(project_id, ProjectPhase.DISCOVERY, ["User research", "Requirements"], 2)
     planner.add_phase(project_id, ProjectPhase.DESIGN, ["UI/UX", "Architecture"], 3)
     planner.add_phase(project_id, ProjectPhase.DEVELOPMENT, ["Frontend", "Backend", "Integration"], 8)
     timeline = planner.estimate_timeline(project_id, team_size=3)
-    
+
     architect = ArchitectureDesigner()
     architect.add_component("API Gateway", "gateway", [])
     architect.add_component("User Service", "service", ["API Gateway"])
     design = architect.design_architecture(ArchitecturePattern.MICROSERVICES)
-    
+
     tech = TechStackRecommender()
     stack = tech.recommend_stack("web_application", "medium")
-    
+
     risk = RiskAssessor()
     risks = risk.assess_risks({"name": "Test"})
     risk_summary = risk.get_risk_summary()
-    
+
     sprint = SprintPlanner()
     stories = [
         {"id": 1, "title": "User login", "complexity": "medium"},
@@ -389,10 +395,16 @@ if __name__ == "__main__":
     ]
     stories = sprint.assign_story_points(stories)
     sprint_plan = sprint.create_sprint(1, stories, 2)
-    
+
     print(f"Project: {project_id}")
+    print(f"Project Name: E-commerce Platform")
     print(f"Timeline: {timeline['optimized_weeks']} weeks")
     print(f"Architecture: {design['pattern']}")
     print(f"Backend: {stack['stack']['backend'][0]}")
     print(f"High priority risks: {risk_summary['high_priority']}")
     print(f"Sprint points: {sprint_plan['total_points']}")
+    print()
+
+
+if __name__ == "__main__":
+    main()

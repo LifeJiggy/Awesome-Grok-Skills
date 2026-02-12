@@ -4,11 +4,9 @@ Grok Bioinformatics Module
 Biological sequence analysis, protein structure prediction, and genomic computations.
 """
 
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Any, Tuple
 from dataclasses import dataclass
 import numpy as np
-from collections import Counter
-from abc import ABC, abstractmethod
 
 @dataclass
 class Sequence:

@@ -1,8 +1,10 @@
 """Customer Retention Agent - Churn Prevention and Retention."""
 
-from dataclasses import dataclass
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import Dict, Any, Optional
+
+
+class Config:
+    pass
 
 
 class CustomerRetentionAgent:

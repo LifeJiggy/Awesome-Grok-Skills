@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
@@ -219,7 +219,7 @@ class AnsibleManager:
         return {
             'role': name,
             'directories': ['tasks', 'handlers', 'templates', 'files', 'vars', 'defaults', 'meta'],
-            'tasks_main': f'tasks/main.yml',
+            'tasks_main': 'tasks/main.yml',
             'handlers_main': 'handlers/main.yml',
             'defaults_main': 'defaults/main.yml'
         }

@@ -4,7 +4,6 @@ Unit tests for skill template and basic functionality.
 
 import pytest
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 import sys
 
 # Add project root to path

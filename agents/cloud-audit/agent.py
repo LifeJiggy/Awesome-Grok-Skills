@@ -1,8 +1,10 @@
 """Cloud Audit Agent - Cloud Security and Compliance Audits."""
 
-from dataclasses import dataclass
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import Dict, List, Any, Optional
+
+
+class Config:
+    pass
 
 
 class CloudAuditAgent:

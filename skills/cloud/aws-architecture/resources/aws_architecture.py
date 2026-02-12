@@ -144,7 +144,7 @@ class AWSServicesManager:
             'handler': handler,
             'memory_size': memory_size,
             'timeout': timeout,
-            'role': f"arn:aws:iam::123456789:role/lambda-role",
+            'role': "arn:aws:iam::123456789:role/lambda-role",
             'code': {'zip_file': f"{function_name}.zip"},
             'environment': {'variables': {}},
             'vpc_config': None,

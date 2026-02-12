@@ -6,7 +6,6 @@ MongoDB, Cassandra, Redis, and document databases
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from enum import Enum
-from datetime import datetime
 
 
 class NoSQLType(Enum):
@@ -344,7 +343,7 @@ if __name__ == "__main__":
     
     redis = RedisManager()
     redis.set_key('user:1', {'name': 'John'}, 3600)
-    print(f"Redis key set")
+    print("Redis key set")
     
     es = ElasticsearchManager()
     search = es.search('products', {'query': {'match': {'name': 'laptop'}}})

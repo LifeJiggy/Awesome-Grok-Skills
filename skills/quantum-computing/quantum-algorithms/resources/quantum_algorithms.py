@@ -1,9 +1,8 @@
-from typing import Dict, List, Optional, Any, Tuple, Callable
+from typing import Dict, List, Tuple, Callable
 from dataclasses import dataclass
 from enum import Enum
 import math
 import random
-import time
 
 
 class GateType(Enum):

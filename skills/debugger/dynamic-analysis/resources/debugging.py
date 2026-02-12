@@ -3,11 +3,10 @@ Dynamic Analysis Module
 Dynamic program analysis and debugging tools
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-import json
 
 
 class TraceEvent(Enum):

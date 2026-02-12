@@ -1,9 +1,8 @@
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Any, Tuple
 from dataclasses import dataclass
 from enum import Enum
 import math
 import random
-import time
 
 
 class CameraType(Enum):

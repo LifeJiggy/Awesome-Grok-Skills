@@ -1,8 +1,11 @@
 """CDN Optimization Agent - Content Delivery and Edge."""
 
-from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
-from datetime import datetime
+from typing import Dict, Any, Optional
+from enum import Enum
+
+
+class Config:
+    pass
 
 
 class CDNProvider(Enum):

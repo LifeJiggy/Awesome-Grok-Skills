@@ -4,7 +4,7 @@ Quantum algorithms and simulations
 """
 
 import numpy as np
-from typing import Dict, List, Optional, Tuple, ComplexFloat
+from typing import Dict, List, Tuple
 from dataclasses import dataclass
 from enum import Enum
 from math import sqrt, pi

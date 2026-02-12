@@ -3,7 +3,7 @@ Flutter Naija Development
 Flutter with Nigerian context and localization
 """
 
-from typing import Dict, List, Optional
+from typing import Dict
 from dataclasses import dataclass
 from enum import Enum
 

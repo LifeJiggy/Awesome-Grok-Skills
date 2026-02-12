@@ -3,8 +3,7 @@ Marketing Agent
 Marketing automation and campaign management
 """
 
-from typing import Dict, List, Optional
-from dataclasses import dataclass
+from typing import Dict, List
 from enum import Enum
 from datetime import datetime, timedelta
 
@@ -311,7 +310,6 @@ class SEOAnalyzer:
                        keyword: str,
                        content: str) -> Dict:
         """Analyze keyword in content"""
-        import re
         content_lower = content.lower()
         keyword_lower = keyword.lower()
         

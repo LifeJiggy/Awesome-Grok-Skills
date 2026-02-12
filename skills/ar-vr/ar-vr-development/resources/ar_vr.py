@@ -3,10 +3,9 @@ AR/VR Development Module
 Augmented and virtual reality applications
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
-from datetime import datetime
 
 
 class XRPlatform(Enum):

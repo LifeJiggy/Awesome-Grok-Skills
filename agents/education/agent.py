@@ -3,8 +3,7 @@ Education Agent
 Learning management and educational content
 """
 
-from typing import Dict, List, Optional
-from dataclasses import dataclass
+from typing import Dict, List
 from enum import Enum
 from datetime import datetime, timedelta
 

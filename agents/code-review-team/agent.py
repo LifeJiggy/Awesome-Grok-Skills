@@ -3,7 +3,7 @@ Code Review Team Agent
 Automated code review and quality assurance
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
@@ -279,7 +279,7 @@ class ReviewReporter:
         
         total_score = sum(r.score for r in results) / len(results) if results else 0
         
-        lines.append(f"## Summary")
+        lines.append("## Summary")
         lines.append(f"- **Total Files Reviewed**: {len(results)}")
         lines.append(f"- **Average Score**: {total_score:.1f}/100")
         lines.append(f"- **Total Issues**: {sum(len(r.issues) for r in results)}")

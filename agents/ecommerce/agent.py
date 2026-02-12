@@ -3,10 +3,9 @@ Ecommerce Agent
 E-commerce operations and management
 """
 
-from typing import Dict, List, Optional
-from dataclasses import dataclass
+from typing import Dict, List
 from enum import Enum
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 class ProductStatus(Enum):

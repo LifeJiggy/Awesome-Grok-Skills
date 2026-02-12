@@ -1,7 +1,6 @@
 from typing import Dict, List, Optional
 from enum import Enum
 from dataclasses import dataclass
-from datetime import datetime
 
 
 class AzureServiceType(Enum):

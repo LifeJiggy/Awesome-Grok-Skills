@@ -6,7 +6,6 @@ Property analysis and transaction assistance
 from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
-from datetime import datetime
 
 
 class PropertyType(Enum):

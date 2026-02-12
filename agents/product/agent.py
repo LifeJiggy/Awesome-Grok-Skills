@@ -85,7 +85,7 @@ class ProductStrategyManager:
             'customer_segments': [
                 {'segment': 'Enterprise', 'needs': ['Security', 'Scale', 'Support'], 'willingness': 'high'},
                 {'segment': 'SMB', 'needs': ['Ease of use', 'Price', 'Speed'], 'willingness': 'medium'},
-                {'segment': 'Consumer', 'needs': ['Simplicity', 'Mobile', 'Free tier'}, 'willingness': 'low'}
+                {'segment': 'Consumer', 'needs': ['Simplicity', 'Mobile', 'Free tier'], 'willingness': 'low'}
             ],
             'competitive_landscape': {
                 'leader': 'Competitor A (30%)',

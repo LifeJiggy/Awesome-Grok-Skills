@@ -8,9 +8,7 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-import json
 import re
-from collections import defaultdict
 
 class TestType(Enum):
     UNIT = "unit"
@@ -134,17 +132,6 @@ class TestGenerator:
     
     def generate_unit_tests(self, code: str, language: str = "python") -> List[str]:
         """Generate unit tests for code."""
-        tests = []
-        
-        functions = self._extract_functions(code, language)
-        
-        for func in functions:
-            test_name = f"test_{func['name']}"
-            test_code = self._generate_test_for_function(func, language)
-            tests.append(test_code)
-        
-        return tests
-    
     def _extract_functions(self, code: str, language: str) -> List[Dict]:
         """Extract function definitions from code."""
         functions = []
@@ -520,11 +507,3 @@ def main():
         name="Login Tests",
         description="Test user login functionality",
         test_ids=[t.id for t in tests],
-        target="auth-service"
-    )
-    
-    dashboard = agent.get_quality_dashboard()
-    print(f"Dashboard: {dashboard}")
-
-if __name__ == "__main__":
-    main()

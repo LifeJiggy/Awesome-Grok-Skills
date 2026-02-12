@@ -1,8 +1,10 @@
 """Competitive Intelligence Agent - Market and Competitor Analysis."""
 
-from dataclasses import dataclass
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import Dict, List, Any, Optional
+
+
+class Config:
+    pass
 
 
 class CompetitiveIntelAgent:

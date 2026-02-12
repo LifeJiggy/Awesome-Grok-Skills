@@ -4,7 +4,7 @@ Orbital mechanics and space mission planning
 """
 
 import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime, timedelta

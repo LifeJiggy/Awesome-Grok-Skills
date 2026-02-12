@@ -1,0 +1,26 @@
+# Research Agent
+
+Grok Research Agent
+
+## Quick Start
+
+```python
+from agents.research.agent import ResearchAgent
+
+agent = ResearchAgent()
+result = agent.run()
+print(result)
+```
+
+## Run the Agent
+
+```bash
+python agents/research/agent.py
+```
+
+## Files
+
+- `agent.py` - Main implementation
+- `GROK.md` - Agent instructions
+- `ARCHITECTURE.md` - System architecture
+- `README.md` - This file

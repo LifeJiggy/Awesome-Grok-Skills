@@ -5,10 +5,9 @@ Specialized agent for customer support, ticket management, and service automatio
 """
 
 from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-import json
 import uuid
 from collections import defaultdict
 

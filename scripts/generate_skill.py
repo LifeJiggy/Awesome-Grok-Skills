@@ -7,7 +7,6 @@ Usage:
 """
 
 import argparse
-import os
 import sys
 from pathlib import Path
 from string import Template
@@ -427,7 +426,7 @@ def create_skill_directory(slug: str, path: Path) -> Path:
     
     # Create __init__.py
     init_file = resources_path / "__init__.py"
-    init_file.write_text(f'"""$slug skill resources."""\n')
+    init_file.write_text('"""$slug skill resources."""\n')
     
     return skill_path
 
@@ -547,11 +546,11 @@ def main():
     
     print(f"\n✅ Skill '{name}' created successfully!")
     print(f"   Location: {skill_path}")
-    print(f"\n📝 Next steps:")
+    print("\n📝 Next steps:")
     print(f"   1. Edit {skill_path / 'GROK.md'} to add detailed documentation")
     print(f"   2. Implement functionality in {skill_path / 'resources' / f'{module}.py'}")
-    print(f"   3. Add tests in tests/unit/test_skills/")
-    print(f"   4. Run: python -m pytest tests/ -v")
+    print("   3. Add tests in tests/unit/test_skills/")
+    print("   4. Run: python -m pytest tests/ -v")
     
     return 0
 

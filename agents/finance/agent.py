@@ -3,7 +3,7 @@ Finance Agent
 Financial analysis and operations automation
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime, timedelta

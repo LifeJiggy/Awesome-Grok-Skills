@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
@@ -347,11 +347,11 @@ class DeFiIntegration:
         return {
             'protocol': 'Uniswap V3',
             'integration_type': 'Swap',
-            'code': f'''
+            'code': '''
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 
-contract SwapContract {{
+contract SwapContract {
     ISwapRouter public constant swapRouter = ISwapRouter(0xE592427A0AEce92De3Edee1F18E0157C05861564);
     
     function swapExactInputSingle(
@@ -360,8 +360,8 @@ contract SwapContract {{
         uint256 amountIn,
         uint256 amountOutMinimum,
         uint24 fee
-    ) external returns (uint256 amountOut) {{
-        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({{
+    ) external returns (uint256 amountOut) {
+        ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams({
             tokenIn: tokenIn,
             tokenOut: tokenOut,
             fee: fee,
@@ -370,11 +370,11 @@ contract SwapContract {{
             amountIn: amountIn,
             amountOutMinimum: amountOutMinimum,
             sqrtPriceLimitX96: 0
-        }});
+        });
         
         amountOut = swapRouter.exactInputSingle(params);
-    }}
-}}
+    }
+}
 ''',
             'functions': ['swapExactInputSingle', 'swapExactOutputSingle', 'multicall'],
             'security_considerations': [
@@ -572,10 +572,10 @@ if __name__ == "__main__":
     defi = DeFiIntegration()
     
     uniswap = defi.integrate_uniswap("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2")
-    print(f"DeFi: Uniswap integration configured")
+    print("DeFi: Uniswap integration configured")
     
     aave = defi.integrate_aave("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48")
     print(f"DeFi: Aave integration with {len(aave['actions'])} actions")
     
     oracle = defi.integrate_oracle_price_feed("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48")
-    print(f"Oracle: Chainlink price feed configured")
+    print("Oracle: Chainlink price feed configured")

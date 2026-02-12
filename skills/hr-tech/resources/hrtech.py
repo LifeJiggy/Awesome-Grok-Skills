@@ -4,11 +4,10 @@ HRTech - Human Resources Technology Implementation
 Talent management, workforce analytics, and employee experience.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-import json
 import random
 
 class JobType(Enum):

@@ -73,7 +73,7 @@ class GCPServicesManager:
             disks=["projects/my-project/zones/{zone}/disks/boot-disk".format(zone=zone)],
             network_interfaces=[{
                 'network': 'projects/my-project/global/networks/default',
-                'subnetwork': f"projects/my-project/regions/us-central1/subnetworks/default",
+                'subnetwork': "projects/my-project/regions/us-central1/subnetworks/default",
                 'access_configs': [{'name': 'external-nat', 'type': 'ONE_TO_ONE_NAT'}]
             }]
         )
@@ -121,7 +121,7 @@ class GCPServicesManager:
             'id': f"{name}.appspot.com",
             'time_created': datetime.now().isoformat(),
             'updated': datetime.now().isoformat(),
-            'encryption': {'default_kms_key': f"projects/my-project/keyRings/kr/cryptoKeys/key-1"},
+            'encryption': {'default_kms_key': "projects/my-project/keyRings/kr/cryptoKeys/key-1"},
             'versioning': {'enabled': False},
             'lifecycle': {'rules': []},
             'public_access_prevention': 'enforced',

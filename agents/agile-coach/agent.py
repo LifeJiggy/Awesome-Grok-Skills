@@ -1,9 +1,8 @@
 """Agile Coach Agent - Team Guidance and Methodology."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
 from enum import Enum
-from datetime import datetime
 
 
 class CeremonyType(Enum):

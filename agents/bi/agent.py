@@ -3,7 +3,7 @@ Business Intelligence (BI) Agent
 BI reporting and analytics
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime

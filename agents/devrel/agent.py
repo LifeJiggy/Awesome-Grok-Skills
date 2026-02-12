@@ -1,8 +1,10 @@
 """DevRel Agent - Developer Relations and Community."""
 
-from dataclasses import dataclass
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import Dict, Any, Optional
+
+
+class Config:
+    pass
 
 
 class DevRelAgent:

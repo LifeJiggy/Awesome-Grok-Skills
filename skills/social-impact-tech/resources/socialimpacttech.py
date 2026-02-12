@@ -4,11 +4,10 @@ SocialImpactTech - Social Impact Technology Implementation
 Impact measurement, fundraising, and volunteer management.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-import json
 import random
 
 class ImpactArea(Enum):

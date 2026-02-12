@@ -3,11 +3,9 @@ Edge AI Module
 On-device machine learning and optimization
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
-from datetime import datetime
-import json
 
 
 class ModelFramework(Enum):

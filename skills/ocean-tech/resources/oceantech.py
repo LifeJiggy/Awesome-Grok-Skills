@@ -4,13 +4,11 @@ OceanTech - Ocean & Marine Technology Implementation
 Ocean exploration, fisheries management, and marine ecosystem monitoring.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-import json
 import random
-import math
 
 class MarineZone(Enum):
     LITTORAL = "littoral"

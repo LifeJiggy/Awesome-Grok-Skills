@@ -4,7 +4,7 @@ IoT and real-time embedded systems
 """
 
 import time
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
 from collections import deque

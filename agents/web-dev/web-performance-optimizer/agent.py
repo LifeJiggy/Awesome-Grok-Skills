@@ -4,11 +4,9 @@ Grok Web Dev Agent
 Specialized agent for web development, frontend/backend tasks, and full-stack solutions.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
-from datetime import datetime
 from enum import Enum
-import json
 import hashlib
 
 class Framework(Enum):

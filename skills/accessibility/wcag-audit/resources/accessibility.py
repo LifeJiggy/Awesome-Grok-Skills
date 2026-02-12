@@ -3,7 +3,7 @@ Accessibility Module
 WCAG compliance and accessibility auditing
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
@@ -183,7 +183,7 @@ class ARIAValidator:
                         issues.append({
                             'element': match,
                             'issue': f'Unknown role: {role}',
-                            'fix': f'Remove role or use valid ARIA role'
+                            'fix': 'Remove role or use valid ARIA role'
                         })
         
         return issues

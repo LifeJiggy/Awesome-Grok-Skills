@@ -3,11 +3,10 @@ Reverse Engineering Agent
 Binary analysis and reverse engineering
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
-import struct
 
 
 class ArchType(Enum):
@@ -480,7 +479,7 @@ class EncryptionAnalyzer:
                     'decoded': decoded_str,
                     'valid': True
                 })
-            except:
+            except Exception:
                 decoded.append({
                     'encoded': encoded,
                     'decoded': '',

@@ -3,7 +3,7 @@ API Management Agent
 API design, monitoring, and gateway management
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime

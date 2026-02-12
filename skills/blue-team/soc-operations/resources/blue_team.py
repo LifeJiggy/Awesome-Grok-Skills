@@ -3,7 +3,7 @@ Blue Team Security Module
 Defensive security and SOC operations
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime

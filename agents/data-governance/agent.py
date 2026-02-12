@@ -1,8 +1,10 @@
 """Data Governance Agent - Data Policy and Compliance."""
 
-from dataclasses import dataclass
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import Dict, List, Any, Optional
+
+
+class Config:
+    pass
 
 
 class DataGovernanceAgent:

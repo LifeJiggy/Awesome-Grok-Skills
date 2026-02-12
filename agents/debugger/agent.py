@@ -6,8 +6,6 @@ Software debugging and analysis
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from enum import Enum
-from datetime import datetime
-import re
 
 
 class BreakpointType(Enum):
@@ -182,7 +180,7 @@ class DebuggerEngine:
         try:
             locals_dict = self._get_locals()
             return eval(condition, {"__builtins__": {}}, locals_dict)
-        except:
+        except Exception:
             return True
     
     def _get_current_frame(self) -> DebugFrame:
@@ -446,12 +444,12 @@ class CrashAnalyzer:
     
     def generate_poc(self, crash_info: Dict) -> str:
         """Generate proof of concept exploit"""
-        poc = f"""
+        poc = """
 #!/usr/bin/env python3
 import struct
 
 def exploit():
-    # Crash address: {{crash_info.get('crash_address', 0x41414141):#x}}
+    # Crash address: {crash_info.get('crash_address', 0x41414141):#x}
     padding = b'A' * 100
     eip = struct.pack('<I', 0x41414141)
     nops = b'\\x90' * 20
@@ -461,7 +459,7 @@ def exploit():
     with open('poc_payload.bin', 'wb') as f:
         f.write(payload)
     
-    print(f"Generated POC payload: {{len(payload)}} bytes")
+    print(f"Generated POC payload: {len(payload)} bytes")
     return payload
 
 if __name__ == "__main__":
@@ -498,7 +496,7 @@ class DebuggerDashboard:
                 pid = 12345
                 self.debugger.attach_to_process(pid)
                 session['status'] = 'attached'
-            except:
+            except Exception:
                 session['status'] = 'error'
         elif mode == 'run':
             session['status'] = 'running'

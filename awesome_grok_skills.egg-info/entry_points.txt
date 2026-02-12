@@ -1,0 +1,2 @@
+[console_scripts]
+grok = awesome_grok_skills.cli:main

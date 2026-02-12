@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
@@ -182,7 +182,7 @@ class DeFiManager:
             'net_profit': opportunity,
             'execution_steps': [
                 f'Buy {asset} on exchange with lower price',
-                f'Transfer to exchange with higher price',
+                'Transfer to exchange with higher price',
                 f'Sell {asset} on exchange with higher price'
             ],
             'considerations': [

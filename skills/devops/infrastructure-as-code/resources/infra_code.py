@@ -3,10 +3,8 @@ Infrastructure as Code Pipeline
 Terraform and cloud infrastructure automation
 """
 
-import yaml
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
-from datetime import datetime
 
 
 @dataclass

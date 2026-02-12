@@ -3,11 +3,10 @@ Supabase Authentication Pipeline
 Supabase auth and database patterns
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
-import hashlib
 
 
 class AuthProvider(Enum):

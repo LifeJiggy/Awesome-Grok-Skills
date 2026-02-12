@@ -3,10 +3,8 @@ NLP Module
 Natural language processing and text analysis
 """
 
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass
+from typing import Dict, List, Tuple
 from enum import Enum
-from datetime import datetime
 
 
 class TaskType(Enum):

@@ -3,10 +3,9 @@ Computer Vision Module
 Image processing and analysis
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
-from datetime import datetime
 
 
 class ImageFormat(Enum):

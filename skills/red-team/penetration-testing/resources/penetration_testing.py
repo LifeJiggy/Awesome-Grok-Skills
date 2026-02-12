@@ -411,7 +411,7 @@ if __name__ == "__main__":
     
     exploit = ExploitationFramework()
     shell = exploit.generate_reverse_shell("10.10.10.5", 4444)
-    print(f"Reverse shell payload generated")
+    print("Reverse shell payload generated")
     
     report = ReportGenerator()
-    print(f"Report generator ready")
+    print("Report generator ready")

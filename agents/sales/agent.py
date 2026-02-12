@@ -4,11 +4,10 @@ Grok Sales Agent
 Specialized agent for sales automation, lead management, and revenue optimization.
 """
 
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
+from typing import Dict, List, Any
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-import json
 import uuid
 from collections import defaultdict
 

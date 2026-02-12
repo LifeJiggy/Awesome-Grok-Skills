@@ -4,11 +4,10 @@ GovTech - Governance Technology Implementation
 Digital government, citizen services, and public administration.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-import json
 import random
 
 class ServiceCategory(Enum):

@@ -4,8 +4,7 @@ Legal tech and smart contract automation
 """
 
 import hashlib
-import json
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum

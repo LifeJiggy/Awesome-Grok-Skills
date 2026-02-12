@@ -215,7 +215,7 @@ class DataAnonymizer:
         identities = []
         for i in range(count):
             identities.append({
-                'id': self.pseudonymize(f"user"),
+                'id': self.pseudonymize("user"),
                 'fake_{i}_name': self._random_name(),
                 'fake_email': self._random_email(),
                 'fake_phone': self._random_phone(),

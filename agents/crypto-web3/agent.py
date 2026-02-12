@@ -3,8 +3,7 @@ Crypto/Web3 Agent
 Blockchain and cryptocurrency operations
 """
 
-from typing import Dict, List, Optional
-from dataclasses import dataclass
+from typing import Dict, List
 from enum import Enum
 from datetime import datetime
 

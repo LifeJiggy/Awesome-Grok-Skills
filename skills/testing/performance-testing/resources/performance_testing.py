@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
@@ -374,7 +374,7 @@ class ''' + class_name + ''' extends Simulation {'''
       .header("Content-Type", "application/json"))'''
         
         for injection in simulation.get('injections', []):
-            scala += f'''
+            scala += '''
   setUp('''
             for i, scenario in enumerate(simulation.get('scenarios', [])):
                 if i > 0:

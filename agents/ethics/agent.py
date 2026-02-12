@@ -3,10 +3,9 @@ Ethics Agent
 AI ethics and bias detection
 """
 
-from typing import Dict, List, Optional
-from dataclasses import dataclass
+from typing import Dict, List
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class BiasType(Enum):
@@ -82,7 +81,7 @@ class BiasDetector:
             if score > 0.1:
                 recommendations.append(f"Review {attr} representation in training data")
                 recommendations.append(f"Consider re-sampling to balance {attr} groups")
-                recommendations.append(f"Apply fairness constraints during training")
+                recommendations.append("Apply fairness constraints during training")
         return recommendations
 
 

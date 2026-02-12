@@ -5,7 +5,6 @@ Sync README.md with actual repository structure.
 This script updates the README with current skills and agents.
 """
 
-import os
 import sys
 from pathlib import Path
 from datetime import datetime
@@ -96,7 +95,7 @@ def update_readme_stats(root: Path, readme_path: Path) -> None:
     )
     
     readme_path.write_text(readme_content)
-    print(f"✅ Updated README with {len(skills)} skills and {len(agents)} agents")
+    print(f" Updated README with {len(skills)} skills and {len(agents)} agents")
 
 
 def generate_skills_table(skills: list) -> str:
@@ -108,7 +107,7 @@ def generate_skills_table(skills: list) -> str:
         name = skill["name"]
         slug = skill["slug"]
         desc = skill["description"]
-        table += f"| **[{name}](skills/{slug}/)** | {desc} | ✅ Complete |\n"
+        table += f"| **[{name}](skills/{slug}/)** | {desc} |  Complete |\n"
     
     return table
 
@@ -122,7 +121,7 @@ def generate_agents_table(agents: list) -> str:
         name = agent["name"]
         slug = agent["slug"]
         desc = agent["description"]
-        table += f"| **[{name}](agents/{slug}/)** | {desc} | ✅ Active |\n"
+        table += f"| **[{name}](agents/{slug}/)** | {desc} |  Active |\n"
     
     return table
 
@@ -136,14 +135,14 @@ def main():
         print_error("README.md not found")
         return 1
     
-    print("🔄 Syncing README with repository structure...\n")
+    print(" Syncing README with repository structure...\n")
     
     # Get counts
     skills = get_skills_list(root)
     agents = get_agents_list(root)
     
-    print(f"📚 Found {len(skills)} skills")
-    print(f"🤖 Found {len(agents)} agents")
+    print(f" Found {len(skills)} skills")
+    print(f" Found {len(agents)} agents")
     
     # Update README
     update_readme_stats(root, readme_path)
@@ -159,14 +158,14 @@ def main():
     
     report_path = root / "repository_stats.json"
     report_path.write_text(json.dumps(report, indent=2))
-    print(f"📊 Statistics saved to: {report_path}")
+    print(f" Statistics saved to: {report_path}")
     
-    print("\n✅ README sync complete!")
+    print("\n README sync complete!")
     return 0
 
 
 def print_error(text: str) -> None:
-    print(f"❌ {text}")
+    print(f" {text}")
 
 
 if __name__ == "__main__":

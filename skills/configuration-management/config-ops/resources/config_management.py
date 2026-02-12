@@ -3,7 +3,7 @@ Configuration Management Module
 Infrastructure and application configuration
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime

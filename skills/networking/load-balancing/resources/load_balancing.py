@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
@@ -380,7 +380,7 @@ class HAProxyConfiguration:
                       backends: List[Dict],
                       global_settings: Dict = None) -> str:
         """Generate HAProxy configuration file"""
-        config = f'''global
+        config = '''global
     log 127.0.0.1 local0 info
     maxconn 50000
     tune.ssl.default-dh-param 2048

@@ -8,8 +8,6 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-import json
-import re
 from collections import defaultdict
 
 class SourceType(Enum):
@@ -177,7 +175,7 @@ class ResearchSynthesizer:
                 
                 strong_evidence = evidence_strengths.get('strong', [])
                 moderate_evidence = evidence_strengths.get('moderate', [])
-                weak_evidence = evidence_strengths.get('weak', [])
+                _weak_evidence = evidence_strengths.get('weak', [])
                 
                 answer = {
                     'question': question.question,

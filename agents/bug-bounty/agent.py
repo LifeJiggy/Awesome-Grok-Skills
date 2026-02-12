@@ -1,9 +1,8 @@
 """Bug Bounty Agent - Vulnerability Management and Research."""
 
-from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
+from dataclasses import dataclass
+from typing import Dict, Any, Optional
 from enum import Enum
-from datetime import datetime
 
 
 class Severity(Enum):

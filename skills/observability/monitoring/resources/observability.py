@@ -3,7 +3,7 @@ Observability Module
 Metrics, logs, traces, and monitoring
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime

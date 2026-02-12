@@ -1,9 +1,8 @@
 """Affiliate Marketing Agent - Partner Management and Optimization."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
 from enum import Enum
-from datetime import datetime
 
 
 class PartnerTier(Enum):

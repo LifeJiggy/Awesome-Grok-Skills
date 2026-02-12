@@ -4,10 +4,7 @@ Quantum algorithms and Qiskit integration
 """
 
 from typing import Dict, List, Optional
-from dataclasses import dataclass
 from enum import Enum
-from datetime import datetime
-import math
 
 
 class QuantumGate(Enum):
@@ -64,8 +61,8 @@ class QuantumCircuit:
             if len(qubits) == 1:
                 circuit_str += f"──{gate['gate']}──\n"
             else:
-                circuit_str += f"──●──\n"
-                circuit_str += f"──X──\n"
+                circuit_str += "──●──\n"
+                circuit_str += "──X──\n"
         for m in self.measurements:
             circuit_str += f"──M──→ c[{m['cbit']}]\n"
         return circuit_str

@@ -1,8 +1,10 @@
 """Crisis Management Agent - Crisis Response and Recovery."""
 
-from dataclasses import dataclass
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import Dict, List, Any, Optional
+
+
+class Config:
+    pass
 
 
 class CrisisManagementAgent:

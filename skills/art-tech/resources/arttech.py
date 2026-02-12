@@ -4,11 +4,10 @@ ArtTech - Art & Creative Technology Implementation
 Digital art, NFT marketplaces, and AI-powered creativity.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-import json
 import random
 import hashlib
 

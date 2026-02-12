@@ -8,9 +8,8 @@ Usage:
 
 import argparse
 import time
-import sys
 from pathlib import Path
-from typing import Callable, Any
+from typing import Callable
 
 
 def benchmark_function(func: Callable, *args, **kwargs) -> tuple:

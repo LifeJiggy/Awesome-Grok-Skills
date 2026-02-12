@@ -3,7 +3,7 @@ IoT Agent
 Internet of Things device and edge management
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime

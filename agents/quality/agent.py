@@ -3,7 +3,7 @@ Quality Agent
 QA testing and quality assurance automation
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime

@@ -4,11 +4,10 @@ Grok Sustainability Agent
 Specialized agent for sustainability tracking, environmental impact analysis, and green initiatives.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-import json
 from collections import defaultdict
 
 class SustainabilityCategory(Enum):
@@ -444,10 +443,14 @@ class SustainabilityReporter:
     
     def _get_letter_grade(self, score: float) -> str:
         """Convert score to letter grade."""
-        if score >= 90: return 'A'
-        elif score >= 80: return 'B'
-        elif score >= 70: return 'C'
-        elif score >= 60: return 'D'
+        if score >= 90:
+            return 'A'
+        elif score >= 80:
+            return 'B'
+        elif score >= 70:
+            return 'C'
+        elif score >= 60:
+            return 'D'
         return 'F'
 
 class SustainabilityAgent:

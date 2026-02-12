@@ -204,7 +204,7 @@ class DataCleaner:
                 for row in data:
                     if row.get(col) is not None:
                         row[f"{col}_{row[col]}"] = 1
-                del row[col] if row.get(col) else None
+                if row.get(col): del row[col]
             elif method == "label":
                 mapping = {val: i for i, val in enumerate(unique_values)}
                 encodings[f"{col}_mapping"] = mapping

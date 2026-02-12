@@ -4,13 +4,11 @@ MusicTech - Music Technology Implementation
 Music production, streaming, and AI-powered audio.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-import json
 import random
-import math
 
 class Genre(Enum):
     POP = "pop"

@@ -3,10 +3,9 @@ Backend Agent
 Backend development and API automation
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 from dataclasses import dataclass
 from enum import Enum
-from datetime import datetime
 
 
 class APIFramework(Enum):

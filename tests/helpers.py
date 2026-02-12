@@ -2,10 +2,8 @@
 Test utilities for Awesome Grok Skills.
 """
 
-import pytest
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-import json
+from typing import Any, Dict, List
 
 
 class TestHelpers:

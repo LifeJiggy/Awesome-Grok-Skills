@@ -98,7 +98,7 @@ class ContentGenerator:
         sections = [
             f"## What is {topic}?\n\n{topic} is an important concept that affects everyone in {audience}.\n\n",
             f"## Why Does It Matter?\n\nUnderstanding {topic} can make a significant difference in your success.\n\n",
-            f"## Key Benefits\n\n- Benefit 1: Improved outcomes\n- Benefit 2: Time savings\n- Benefit 3: Cost efficiency\n\n",
+            "## Key Benefits\n\n- Benefit 1: Improved outcomes\n- Benefit 2: Time savings\n- Benefit 3: Cost efficiency\n\n",
             f"## How to Get Started\n\nGetting started with {topic} is easier than you think. Follow these steps:\n\n1. Research the basics\n2. Practice consistently\n3. Track your progress\n4. Refine your approach\n\n",
             f"## Common Mistakes to Avoid\n\nMany people make these errors when dealing with {topic}:\n\n- Mistake 1: Skipping fundamentals\n- Mistake 2: Inconsistent practice\n- Mistake 3: Not measuring results\n\n"
         ]
@@ -247,7 +247,7 @@ class ContentCalendar:
                 {'day': 'Tuesday', 'type': 'social', 'topic': f'Tip {week*3 + 1}'},
                 {'day': 'Wednesday', 'type': 'blog', 'topic': f'Topic {week*2 + 2}'},
                 {'day': 'Thursday', 'type': 'video', 'topic': f'Tutorial {week + 1}'},
-                {'day': 'Friday', 'type': 'social', 'topic': f'Weekly roundup'},
+                {'day': 'Friday', 'type': 'social', 'topic': 'Weekly roundup'},
                 {'day': 'Sunday', 'type': 'email', 'topic': f'Newsletter {week + 1}'}
             ]
             

@@ -1,8 +1,11 @@
 """Cloud Migration Agent - Workload Migration to Cloud."""
 
-from dataclasses import dataclass
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import Dict, List, Any, Optional
+from enum import Enum
+
+
+class Config:
+    pass
 
 
 class MigrationStrategy(Enum):

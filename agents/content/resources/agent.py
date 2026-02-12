@@ -3,10 +3,9 @@ Content Agent
 Content creation and management automation
 """
 
-from typing import Dict, List, Optional
-from dataclasses import dataclass
+from typing import Dict, List
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class ContentType(Enum):

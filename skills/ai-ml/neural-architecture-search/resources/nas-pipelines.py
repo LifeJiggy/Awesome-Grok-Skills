@@ -7,8 +7,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-import numpy as np
-from typing import Dict, List, Tuple
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 import random

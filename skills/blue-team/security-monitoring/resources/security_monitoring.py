@@ -1,8 +1,7 @@
 from typing import Dict, List, Optional
 from enum import Enum
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-import json
+from datetime import datetime
 
 
 class AlertSeverity(Enum):
@@ -234,7 +233,7 @@ class SIEMAnalyzer:
                 created_at=datetime.now(),
                 events=[e.id for e in data_exfiltration],
                 affected_assets=[e.source_ip for e in data_exfiltration if e.source_ip],
-                description=f"Detected large data upload events",
+                description="Detected large data upload events",
                 investigation_notes=[],
                 remediation="Investigate source, block transfer if unauthorized",
                 assigned_to=None,

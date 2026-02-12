@@ -4,7 +4,6 @@ Game development and operations
 """
 
 from typing import Dict, List, Optional
-from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
 
@@ -224,10 +223,11 @@ class LeaderboardManager:
             key=lambda x: x["score"], reverse=True
         )
         
-        position = next(
-            (i + 1 for i, p in enumerate(self.leaderboards[leaderboard_type])
-            if p["player_id"] == player_id
-        )
+        position = None
+        for i, p in enumerate(self.leaderboards[leaderboard_type]):
+            if p["player_id"] == player_id:
+                position = i + 1
+                break
         
         return {"leaderboard": leaderboard_type, "position": position, "score": score}
     

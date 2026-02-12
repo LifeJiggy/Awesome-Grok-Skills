@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
 import time
-import json
 
 
 class WorkflowStatus(Enum):
@@ -332,7 +331,7 @@ class FileAutomation:
                         os.remove(os.path.join(path, filename))
                     results["processed"] += 1
                     results["files"].append(filename)
-                except Exception as e:
+                except Exception:
                     results["failed"] += 1
         except Exception as e:
             results["error"] = str(e)

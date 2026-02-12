@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
@@ -152,7 +152,6 @@ hostname {hostname}
                          network_address: str,
                          required_hosts: int) -> Dict:
         """Calculate optimal subnet"""
-        import math
         
         if required_hosts <= 2:
             prefix = 30

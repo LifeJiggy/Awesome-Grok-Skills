@@ -3,8 +3,7 @@ Medical AI Pipeline
 Healthcare AI and diagnostic systems
 """
 
-import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum

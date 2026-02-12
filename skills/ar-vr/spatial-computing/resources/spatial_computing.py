@@ -4,9 +4,8 @@ AR/VR applications with real-time 3D rendering
 """
 
 import numpy as np
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List
 from dataclasses import dataclass
-import json
 
 
 @dataclass

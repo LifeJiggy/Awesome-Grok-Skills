@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
@@ -108,7 +108,7 @@ jobs:
     def generate_gitlab_ci(self,
                            name: str) -> str:
         """Generate GitLab CI configuration"""
-        ci = f"""stages:
+        ci = """stages:
   - build
   - test
   - deploy
@@ -417,13 +417,13 @@ if __name__ == "__main__":
     print(f"Pipeline created: {pipeline.name} with {len(pipeline.stages)} stages")
     
     github_workflow = builder.generate_github_actions("CI/CD")
-    print(f"GitHub Actions workflow generated")
+    print("GitHub Actions workflow generated")
     
     gitlab_ci = builder.generate_gitlab_ci("CI/CD")
-    print(f"GitLab CI configuration generated")
+    print("GitLab CI configuration generated")
     
     azure = builder.generate_azure_pipelines("BuildPipeline")
-    print(f"Azure Pipelines configuration generated")
+    print("Azure Pipelines configuration generated")
     
     build = BuildAutomation()
     result = build.run_build(pipeline, "abc123")

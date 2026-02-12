@@ -5,10 +5,9 @@ Specialized agent for productivity optimization, task management, and workflow a
 """
 
 from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
-import json
 import uuid
 
 class Priority(Enum):

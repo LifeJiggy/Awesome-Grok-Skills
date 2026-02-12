@@ -3,8 +3,7 @@ Smart Contract Development Pipeline
 Solidity smart contract templates and utilities
 """
 
-import hashlib
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
 

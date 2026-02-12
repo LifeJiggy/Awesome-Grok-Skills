@@ -1,21 +1,31 @@
 """Indie Hacker Agent for startup productivity"""
-from typing import Dict, List
 from datetime import datetime
 
+
 class IndieHackerTools:
-    def __init__(self): self.projects = {}; self.tasks = {}
-    def add_project(self, name: str, status: str = "planning"): 
+    def __init__(self):
+        self.projects = {}
+        self.tasks = {}
+
+    def add_project(self, name: str, status: str = "planning"):
         self.projects[name] = {"name": status, "progress": 0, "revenue": 0}
         return self.projects[name]
-    def track_mvp_progress(self, project: str, task: str, hours: float): 
-        if project not in self.tasks: self.tasks[project] = []
+
+    def track_mvp_progress(self, project: str, task: str, hours: float):
+        if project not in self.tasks:
+            self.tasks[project] = []
         self.tasks[project].append({"task": task, "hours": hours, "date": datetime.now()})
-        if project in self.projects: self.projects[project]["progress"] += 5
+        if project in self.projects:
+            self.projects[project]["progress"] += 5
         return {"task": task, "hours": hours}
-    def calculate_runway(self, monthly_burn: float, cash: float): 
-        return {"months": int(cash/monthly_burn), "daily_burn": monthly_burn/30}
-    def get_saas_metrics(self, mrr: float, churn: float): 
-        return {"mrr": mrr, "churn_rate": churn, "ltv_mrr": mrr/(churn/100) if churn > 0 else float('inf')}
+
+    def calculate_runway(self, monthly_burn: float, cash: float):
+        return {"months": int(cash / monthly_burn), "daily_burn": monthly_burn / 30}
+
+    def get_saas_metrics(self, mrr: float, churn: float):
+        ltv_mrr = mrr / (churn / 100) if churn > 0 else float('inf')
+        return {"mrr": mrr, "churn_rate": churn, "ltv_mrr": ltv_mrr}
+
 
 if __name__ == "__main__":
     ih = IndieHackerTools()

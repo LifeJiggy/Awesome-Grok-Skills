@@ -3,8 +3,7 @@ Climate Modeling Pipeline
 Environmental simulation and carbon tracking
 """
 
-import numpy as np
-from typing import Dict, List, Tuple
+from typing import Dict, List
 from dataclasses import dataclass
 from datetime import datetime
 

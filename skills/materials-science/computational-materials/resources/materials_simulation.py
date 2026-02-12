@@ -6,7 +6,6 @@ Materials science simulation and discovery
 import numpy as np
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
-from dataclasses import field
 from datetime import datetime
 
 

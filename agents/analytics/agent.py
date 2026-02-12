@@ -3,10 +3,9 @@ Analytics Agent
 Data analytics and reporting automation
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List
 from dataclasses import dataclass
 from enum import Enum
-import json
 from datetime import datetime, timedelta
 
 
