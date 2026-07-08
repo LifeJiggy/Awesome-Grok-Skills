@@ -1,61 +1,82 @@
-# Hunting Agent Architecture
+# Hunting Agent — System Architecture
 
-## Overview
+## 1. Executive Summary
 
-This document describes the architecture for the Hunting Agent.
+The Hunting Agent is a comprehensive threat hunting platform providing IOC management, hypothesis-driven hunting, log analysis, network forensics, detection engineering, alert management, and threat intelligence correlation. It is designed for security operations centers (SOC) and threat hunting teams.
 
-## System Components
+---
 
-```
-┌─────────────────────────────────────────┐
-│         Hunting Agent                    │
-├─────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────────┐  │
-│  │ Component 1 │  │   Component 2   │  │
-│  └─────────────┘  └─────────────────┘  │
-│  ┌─────────────┐  ┌─────────────────┐  │
-│  │ Component 3 │  │   Component 4   │  │
-│  └─────────────┘  └─────────────────┘  │
-└─────────────────────────────────────────┘
-```
-
-## Data Flow
+## 2. High-Level Architecture
 
 ```
-Input → Processing → Output
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         HUNTING AGENT                                     │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
+│  │    IOC       │  │     Log      │  │   Network    │  │ Detection  │  │
+│  │   Manager    │  │   Analyzer   │  │   Analyzer   │  │   Engine   │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                  │
+│  │    Hunt      │  │    Alert     │  │  Threat      │                  │
+│  │ Orchestrator │  │   Manager    │  │   Intel      │                  │
+│  └──────────────┘  └──────────────┘  └──────────────┘                  │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │    Data Models (IOC, Hunt, LogEntry, Flow, Sigma, Alert, Actor)  │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Key Components
+---
 
-### 1. Core Processing
+## 3. Component Deep Dives
 
-Description of core processing logic.
+### 3.1 IOC Manager
+Indicator of Compromise lifecycle management with STIX export.
 
-### 2. Configuration Management
+### 3.2 Log Analyzer
+Log ingestion, anomaly detection, and volume analysis.
 
-How configuration is handled.
+### 3.3 Network Analyzer
+Flow analysis, JA3 fingerprinting, lateral movement detection.
 
-### 3. Integration Layer
+### 3.4 Detection Engine
+Sigma rule management and log matching.
 
-How the agent integrates with external systems.
+### 3.5 Hunt Orchestrator
+Hypothesis-driven hunting with phase tracking and reporting.
 
-## Configuration
+### 3.6 Alert Manager
+Alert lifecycle management with assignment and resolution.
 
-```yaml
-config:
-  option1: value1
-  option2: value2
+### 3.7 Threat Intel Correlator
+Threat actor profiles and IOC correlation.
+
+---
+
+## 4. MITRE ATT&CK Mapping
+
+```
+Reconnaissance → Initial Access → Execution → Persistence
+      ↓                                        ↓
+Resource Development              Privilege Escalation
+                                        ↓
+                              Defense Evasion ← Credential Access
+                                        ↓
+                    Discovery → Lateral Movement → Collection
+                                        ↓
+                    C2 ←←←←←←←←←←←←←←←←←←←←← Exfiltration
+                                        ↓
+                                      Impact
 ```
 
-## Performance
+---
 
-| Metric | Value |
-|--------|-------|
-| Response Time | TBD |
-| Throughput | TBD |
+## 5. Detection Rule Lifecycle
 
-## Security Considerations
+```
+  Draft → Tested → Deployed → Tuning → Retired
+```
 
-- Authentication requirements
-- Authorization rules
-- Data protection measures
+**Effectiveness Score:** min(matches / 10, 1.0)

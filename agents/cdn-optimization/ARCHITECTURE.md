@@ -1,61 +1,1051 @@
-# CdnOptimization Agent Architecture
+# CDN Optimization Agent — System Architecture
 
-## Overview
+## 1. Overview
 
-This document describes the architecture for the CdnOptimization Agent.
-
-## System Components
-
-```
-┌─────────────────────────────────────────┐
-│         CdnOptimization Agent                    │
-├─────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────────┐  │
-│  │ Component 1 │  │   Component 2   │  │
-│  └─────────────┘  └─────────────────┘  │
-│  ┌─────────────┐  ┌─────────────────┐  │
-│  │ Component 3 │  │   Component 4   │  │
-│  └─────────────┘  └─────────────────┘  │
-└─────────────────────────────────────────┘
-```
-
-## Data Flow
+The CDN Optimization Agent is a comprehensive system for managing, optimizing, and
+monitoring Content Delivery Networks across multiple providers. It automates cache
+policy configuration, edge function deployment, origin shielding, security hardening,
+performance analysis, cost optimization, and multi-provider migration.
 
 ```
-Input → Processing → Output
+┌─────────────────────────────────────────────────────────────────────┐
+│                     CDN Optimization Agent                         │
+│                                                                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────────┐   │
+│  │  Cache    │  │  Edge    │  │ Security │  │  Performance     │   │
+│  │  Policy   │  │ Function │  │ Gateway  │  │  Analytics       │   │
+│  │  Engine   │  │ Runtime  │  │          │  │  Engine          │   │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────────┬─────────┘   │
+│       │              │              │                  │             │
+│  ┌────┴──────────────┴──────────────┴──────────────────┴─────────┐  │
+│  │                   Configuration Manager                       │  │
+│  └────┬──────────────┬──────────────┬──────────────────┬─────────┘  │
+│       │              │              │                  │             │
+│  ┌────┴─────┐  ┌─────┴────┐  ┌─────┴─────┐  ┌───────┴────────┐   │
+│  │ Origin   │  │ Cost     │  │ CDN       │  │  Log Analytics │   │
+│  │ Shield   │  │ Optimizer│  │ Migration │  │  Engine        │   │
+│  │ Manager  │  │          │  │ Framework │  │                │   │
+│  └──────────┘  └──────────┘  └───────────┘  └────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+         │              │              │                  │
+         ▼              ▼              ▼                  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    CDN Provider Abstraction Layer                   │
+│                                                                     │
+│  Cloudflare │ AWS CloudFront │ Fastly │ Akamai │ Azure │ GCP │ ... │
+└─────────────────────────────────────────────────────────────────────┘
+         │              │              │                  │
+         ▼              ▼              ▼                  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                       Edge Network                                  │
+│                                                                     │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐  │
+│  │ Edge    │  │ Edge    │  │ Edge    │  │ Shield  │  │ Origin  │  │
+│  │ POP 1   │  │ POP 2   │  │ POP 3   │  │ Tier 1  │  │ Server  │  │
+│  │ (US-E)  │  │ (EU-W)  │  │ (AP-SE) │  │ (US-E)  │  │ (US-C)  │  │
+│  └─────────┘  └─────────┘  └─────────┘  └─────────┘  └─────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
-## Key Components
+## 2. Edge Network Topology
 
-### 1. Core Processing
+### 2.1 Multi-Tier Cache Architecture
 
-Description of core processing logic.
-
-### 2. Configuration Management
-
-How configuration is handled.
-
-### 3. Integration Layer
-
-How the agent integrates with external systems.
-
-## Configuration
-
-```yaml
-config:
-  option1: value1
-  option2: value2
+```
+User Request
+     │
+     ▼
+┌─────────────┐     Miss     ┌─────────────┐     Miss     ┌─────────────┐
+│  Edge Cache  │ ──────────► │  Shield Cache │ ──────────► │   Origin    │
+│  (L1 - POP) │ ◄────────── │  (L2 - Region)│ ◄────────── │   Server    │
+│              │     Hit      │              │     Hit      │             │
+└─────────────┘              └─────────────┘              └─────────────┘
+     │                             │                             │
+     ▼                             ▼                             ▼
+  ~50ms latency              ~80ms latency               ~200ms latency
+  (closest POP)              (regional shield)           (origin DC)
 ```
 
-## Performance
+### 2.2 Global Distribution Map
 
-| Metric | Value |
-|--------|-------|
-| Response Time | TBD |
-| Throughput | TBD |
+```
+                    ┌──────────────────────────────────┐
+                    │         Global Edge Network       │
+                    └──────────────────────────────────┘
+                                      │
+            ┌─────────────────────────┼─────────────────────────┐
+            │                         │                         │
+            ▼                         ▼                         ▼
+    ┌───────────────┐       ┌───────────────┐       ┌───────────────┐
+    │   Americas    │       │    Europe     │       │  Asia-Pacific │
+    │   12 POPs     │       │    8 POPs     │       │    6 POPs     │
+    └───────┬───────┘       └───────┬───────┘       └───────┬───────┘
+            │                       │                       │
+     ┌──────┴──────┐         ┌──────┴──────┐         ┌──────┴──────┐
+     │             │         │             │         │             │
+     ▼             ▼         ▼             ▼         ▼             ▼
+  ┌──────┐    ┌──────┐  ┌──────┐    ┌──────┐  ┌──────┐    ┌──────┐
+  │US-E  │    │US-W  │  │EU-W  │    │EU-C  │  │AP-SE │    │AP-NE │
+  │4 POPs│    │3 POPs│  │3 POPs│    │2 POPs│  │3 POPs│    │3 POPs│
+  └──────┘    └──────┘  └──────┘    └──────┘  └──────┘    └──────┘
+```
 
-## Security Considerations
+## 3. Component Deep Dives
 
-- Authentication requirements
-- Authorization rules
-- Data protection measures
+### 3.1 Cache Policy Engine
+
+The Cache Policy Engine is responsible for generating, evaluating, and maintaining
+optimal cache rules across all configured domains.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  Cache Policy Engine                      │
+│                                                           │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────┐  │
+│  │  Content     │  │  Traffic     │  │  Rule          │  │
+│  │  Classifier  │  │  Analyzer    │  │  Generator     │  │
+│  └──────┬──────┘  └──────┬───────┘  └───────┬────────┘  │
+│         │                 │                   │           │
+│         ▼                 ▼                   ▼           │
+│  ┌─────────────────────────────────────────────────────┐ │
+│  │              Rule Evaluation Pipeline                │ │
+│  │                                                      │ │
+│  │  1. Content-type matching                            │ │
+│  │  2. TTL calculation (traffic-weighted)               │ │
+│  │  3. Bypass pattern detection                         │ │
+│  │  4. Vary header selection                            │ │
+│  │  5. Stale-while-revalidate policy                   │ │
+│  │  6. Stale-if-error fallback                          │ │
+│  │  7. Priority ordering                                │ │
+│  │  8. Conflict resolution                              │ │
+│  └─────────────────────────────────────────────────────┘ │
+│                         │                                 │
+│                         ▼                                 │
+│  ┌─────────────────────────────────────────────────────┐ │
+│  │              Optimization Targets                    │ │
+│  │                                                      │ │
+│  │  Hit Rate Target:     ≥ 85%                         │ │
+│  │  Origin Load Target:  ≤ 20%                         │ │
+│  │  Freshness Target:    Content-dependent             │ │
+│  │  Bandwidth Saved:     ≥ 60%                         │ │
+│  └─────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Key Design Decisions:**
+
+- Rules are evaluated in priority order (lower number = higher priority)
+- First matching rule wins; subsequent rules are skipped
+- TTL calculation considers both content type and traffic pattern
+- Stale-while-revalidate is recommended for HTML content to reduce latency
+- Immutable caching is recommended for fingerprinted static assets
+
+### 3.2 Origin Shield Orchestrator
+
+The Origin Shield Orchestrator manages the tiered caching hierarchy between
+edge POPs and origin servers, reducing origin load and improving cache efficiency.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                 Origin Shield Orchestrator                    │
+│                                                               │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────┐  │
+│  │  Tier        │  │  Health      │  │  Warmup            │  │
+│  │  Manager     │  │  Monitor     │  │  Controller        │  │
+│  └──────┬──────┘  └──────┬───────┘  └───────┬────────────┘  │
+│         │                 │                   │               │
+│         ▼                 ▼                   ▼               │
+│  ┌───────────────────────────────────────────────────────┐   │
+│  │              Shield Tier Selection                     │   │
+│  │                                                        │   │
+│  │  NONE ─── No shielding (direct to origin)             │   │
+│  │  SINGLE ── Single regional shield                     │   │
+│  │  MULTI_TIER ── Multi-region shield with fallback      │   │
+│  │  HIERARCHICAL ── Full hierarchy: L1 → L2 → Origin     │   │
+│  │                                                        │   │
+│  │  Load Reduction: 0% ── 60% ── 85% ── 95%             │   │
+│  │  Latency Overhead: 0ms ── 5ms ── 12ms ── 20ms         │   │
+│  └───────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 3.3 Edge Function Runtime
+
+Edge functions execute custom logic at CDN edge locations, enabling request
+modification, authentication, rate limiting, bot detection, and more.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  Edge Function Runtime                       │
+│                                                               │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────┐  │
+│  │  Function    │  │  Route       │  │  Execution         │  │
+│  │  Registry    │  │  Matcher     │  │  Sandbox           │  │
+│  └──────┬──────┘  └──────┬───────┘  └───────┬────────────┘  │
+│         │                 │                   │               │
+│         ▼                 ▼                   ▼               │
+│  ┌───────────────────────────────────────────────────────┐   │
+│  │              Function Types                            │   │
+│  │                                                        │   │
+│  │  REQUEST_MODIFIER ─── Modify incoming request headers  │   │
+│  │  RESPONSE_MODIFIER ── Transform response before cache  │   │
+│  │  AUTHENTICATOR ────── Validate tokens at edge          │   │
+│  │  RATE_LIMITER ─────── Throttle at edge                 │   │
+│  │  BOT_DETECTOR ─────── Identify & block bots           │   │
+│  │  IMAGE_OPTIMIZER ──── Format conversion (WebP/AVIF)    │   │
+│  │  A_B_TESTER ────────── Traffic splitting at edge       │   │
+│  │  GEO_REDIRECT ─────── Location-based redirects        │   │
+│  │                                                        │   │
+│  │  Runtime Constraints:                                  │   │
+│  │  ┌──────────────────────────────────────────────┐     │   │
+│  │  │ Max Execution: 30-50ms depending on type     │     │   │
+│  │  │ Max Memory: 128MB                            │     │   │
+│  │  │ Streaming: supported for image/response      │     │   │
+│  │  │ Access: headers, geo, TLS info               │     │   │
+│  │  └──────────────────────────────────────────────┘     │   │
+│  └───────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 3.4 Security Gateway
+
+The Security Gateway provides defense-in-depth through multiple security layers.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   Security Gateway                           │
+│                                                               │
+│  Request Flow:                                                │
+│                                                               │
+│  Client ──► [IP Rules] ──► [Rate Limit] ──► [WAF] ──► ...   │
+│                                                               │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────┐  │
+│  │  WAF Engine  │  │  Bot Mgmt    │  │  DDoS Protection   │  │
+│  │  ─ SQLi      │  │  ─ Fingerprint│  │  ─ L3/L4          │  │
+│  │  ─ XSS       │  │  ─ Challenge │  │  ─ L7              │  │
+│  │  ─ Path Trav │  │  ─ Score     │  │  ─ Adaptive        │  │
+│  └──────────────┘  └──────────────┘  └────────────────────┘  │
+│                                                               │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────┐  │
+│  │  TLS        │  │  Header      │  │  Access Rules       │  │
+│  │  Termination│  │  Hardening   │  │  ─ Geo Blocking     │  │
+│  │  ─ 1.2/1.3  │  │  ─ HSTS      │  │  ─ IP Allow/Deny    │  │
+│  │  ─ OCSP     │  │  ─ CSP       │  │  ─ ASN Rules        │  │
+│  │  ─ 0-RTT    │  │  ─ X-Frame   │  │                     │  │
+│  └──────────────┘  └──────────────┘  └────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 3.5 Performance Analytics Engine
+
+Real-time and historical performance analysis across all CDN metrics.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              Performance Analytics Engine                     │
+│                                                               │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────┐  │
+│  │  Core Web   │  │  CDN Metrics │  │  Origin Metrics    │  │
+│  │  Vitals     │  │  Aggregator  │  │  Collector         │  │
+│  │  ─ TTFB     │  │  ─ Hit Rate  │  │  ─ Response Time   │  │
+│  │  ─ FCP      │  │  ─ Bandwidth │  │  ─ Error Rate      │  │
+│  │  ─ LCP      │  │  ─ Errors    │  │  ─ Throughput      │  │
+│  │  ─ TTI      │  │  ─ Latency   │  │  ─ Health Status   │  │
+│  │  ─ TBT      │  │              │  │                    │  │
+│  │  ─ CLS      │  │              │  │                    │  │
+│  │  ─ FID      │  │              │  │                    │  │
+│  └──────────────┘  └──────────────┘  └────────────────────┘  │
+│                         │                                     │
+│                         ▼                                     │
+│  ┌───────────────────────────────────────────────────────┐   │
+│  │              Analysis Pipeline                          │   │
+│  │                                                        │   │
+│  │  1. Collect raw metrics from all sources              │   │
+│  │  2. Normalize and aggregate (p50, p90, p95, p99)     │   │
+│  │  3. Compare against SLA targets                       │   │
+│  │  4. Detect anomalies and trends                       │   │
+│  │  5. Generate actionable recommendations              │   │
+│  │  6. Produce performance score and grade               │   │
+│  └───────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 4. Data Flow Diagrams
+
+### 4.1 Request Lifecycle
+
+```
+Client Request
+      │
+      ▼
+┌──────────────┐
+│  DNS Resolve │ ─── CDN Provider DNS (Anycast)
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│  TLS         │ ─── Terminate at Edge (TLS 1.2/1.3)
+│  Termination │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│  Security    │ ─── WAF, Rate Limit, Bot Detection
+│  Processing  │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│  Edge Funcs  │ ─── Request Modifier, Auth, A/B Test
+│  (Pre-Cache) │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐     Hit      ┌──────────────┐
+│  Edge Cache  │ ──────────►  │  Response    │ ───► Client
+│  Lookup      │ ◄──────────  │  Delivery    │
+└──────┬───────┘     ──       └──────────────┘
+       │ Miss
+       ▼
+┌──────────────┐     Hit      ┌──────────────┐
+│  Shield      │ ──────────►  │  Cache &     │ ───► Edge ───► Client
+│  Cache       │              │  Forward     │
+└──────┬───────┘              └──────────────┘
+       │ Miss
+       ▼
+┌──────────────┐
+│  Origin      │ ─── Backend Server
+│  Fetch       │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│  Edge Funcs  │ ─── Response Modifier, Image Optimizer
+│  (Post-Cache)│
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│  Cache       │ ─── Store with TTL, Surrogate Keys
+│  Store       │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│  Response    │ ─── Compress (Brotli/Gzip), Headers
+│  Optimization│
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│  Deliver     │ ───► Client
+└──────────────┘
+```
+
+### 4.2 Cache Flow Decision Tree
+
+```
+Incoming Request
+      │
+      ▼
+┌─────────────────┐     YES     ┌──────────────┐
+│ Cache-Key Match  │ ──────────►│  HIT: Serve  │
+│ in Edge Cache?   │            │  from Edge   │
+└────────┬────────┘            └──────────────┘
+         │ NO
+         ▼
+┌─────────────────┐     YES     ┌──────────────┐
+│ Bypass Pattern   │ ──────────►│  BYPASS:     │
+│ Matched?         │            │  Go to Origin│
+└────────┬────────┘            └──────────────┘
+         │ NO
+         ▼
+┌─────────────────┐     YES     ┌──────────────┐
+│ Shield Cache     │ ──────────►│  HIT: Serve  │
+│ Available?       │            │  from Shield │
+└────────┬────────┘            └──────────────┘
+         │ NO
+         ▼
+┌─────────────────┐     YES     ┌──────────────┐
+│ Origin Healthy?  │ ──────────►│  FETCH:      │
+│                  │            │  From Origin │
+└────────┬────────┘            └──────┬───────┘
+         │ NO                         │
+         ▼                            ▼
+┌─────────────────┐     ┌──────────────────┐
+│ Serve Stale     │     │ Cache Response   │
+│ (if configured) │     │ at Edge & Shield │
+└─────────────────┘     └──────────────────┘
+```
+
+### 4.3 Cache Purge Flow
+
+```
+Purge Request
+      │
+      ▼
+┌──────────────────┐
+│  Validate Request │
+│  ─ Domain check   │
+│  ─ Method check   │
+│  ─ Target check   │
+└────────┬─────────┘
+         │ Valid
+         ▼
+┌──────────────────┐
+│  Select Purge    │
+│  Method:         │
+│  ─ URL: purge    │
+│    specific URLs │
+│  ─ Tag: purge by │
+│    surrogate key │
+│  ─ Prefix: purge │
+│    by path prefix│
+│  ─ Wildcard:     │
+│    pattern match │
+│  ─ All: full     │
+│    purge         │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│  Execute on CDN  │
+│  Provider API    │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│  Verify Purge    │
+│  ─ Check status  │
+│  ─ Confirm clear │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│  Log & Report    │
+└──────────────────┘
+```
+
+## 5. Design Patterns
+
+### 5.1 Chain of Responsibility (Edge Processing)
+
+Edge functions form a processing chain where each function can modify the
+request or response and pass it to the next handler.
+
+```
+Request ──► [Auth] ──► [Rate Limit] ──► [Bot Detect] ──► [Cache] ──► Origin
+
+Each handler:
+  1. Inspects request
+  2. Takes action (allow/block/modify)
+  3. Passes to next handler or short-circuits
+```
+
+### 5.2 Cache-Aside Pattern
+
+```
+Application ──► Check Cache ──► HIT ──► Return Cached
+                    │
+                    │ MISS
+                    ▼
+              Fetch from Origin ──► Store in Cache ──► Return
+```
+
+### 5.3 Circuit Breaker (Origin Protection)
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   Circuit Breaker States                  │
+│                                                           │
+│  CLOSED ───(failures > threshold)───► OPEN               │
+│    ▲                                      │               │
+│    │                               (timeout)              │
+│    │                                      ▼               │
+│    └───(success)──────────── HALF-OPEN ──┘               │
+│                                                           │
+│  CLOSED: Normal operation, requests pass through         │
+│  OPEN: Requests blocked, fallback/stale served           │
+│  HALF-OPEN: Limited requests to test origin recovery     │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 5.4 Retry with Backoff
+
+```
+Attempt 1 ──► Fail ──► Wait 1s ──► Attempt 2 ──► Fail ──► Wait 2s
+     │
+     └──► Attempt 3 ──► Fail ──► Wait 4s ──► Attempt 4 ──► Fail
+                                                              │
+                                                              ▼
+                                                    Circuit Open / Error
+```
+
+### 5.5 Bulkhead (Rate Limiting)
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   Bulkhead Pattern                        │
+│                                                           │
+│  Total Pool: 10,000 concurrent connections               │
+│                                                           │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐   │
+│  │ General  │ │ API      │ │ Auth     │ │ Static   │   │
+│  │ 7,000    │ │ 2,000    │ │ 500      │ │ 500      │   │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘   │
+│                                                           │
+│  Each pool isolated: exhaustion in one doesn't affect    │
+│  capacity in others.                                      │
+└─────────────────────────────────────────────────────────┘
+```
+
+## 6. Tech Stack
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                      Tech Stack                          │
+│                                                           │
+│  Core Language:                                          │
+│  ─ Python 3.10+ (type hints, dataclasses, enums)        │
+│                                                           │
+│  CDN Provider APIs:                                      │
+│  ─ Cloudflare API v4                                     │
+│  ─ AWS CloudFront API                                    │
+│  ─ Fastly API v2                                         │
+│  ─ Akamai Edgegrid                                       │
+│  ─ Azure CDN Management API                              │
+│  ─ Google Cloud CDN                                      │
+│  ─ KeyCDN API                                            │
+│  ─ StackPath API                                         │
+│  ─ CDN77 API                                             │
+│  ─ Edgecast API                                          │
+│                                                           │
+│  Observability:                                          │
+│  ─ Structured logging (Python logging)                   │
+│  ─ Prometheus metrics                                    │
+│  ─ Grafana dashboards                                    │
+│  ─ OpenTelemetry tracing                                 │
+│                                                           │
+│  Security:                                               │
+│  ─ TLS 1.2/1.3                                           │
+│  ─ WAF rule engine                                       │
+│  ─ Bot detection                                         │
+│  ─ DDoS mitigation                                       │
+│                                                           │
+│  Edge Runtime:                                           │
+│  ─ JavaScript/TypeScript (Cloudflare Workers)            │
+│  ─ VCL (Fastly)                                          │
+│  ─ EdgeWorkers (Akamai)                                  │
+│  ─ Azure Functions (Edge)                                │
+│                                                           │
+│  Data Storage:                                           │
+│  ─ In-memory caches (analytics)                          │
+│  ─ SQLite (configuration persistence)                    │
+│  ─ JSON (rule export/import)                             │
+│                                                           │
+│  Testing:                                                │
+│  ─ pytest (unit tests)                                   │
+│  ─ httpx (API mocking)                                   │
+│  ─ synthetic monitoring (RUM)                            │
+└─────────────────────────────────────────────────────────┘
+```
+
+## 7. Security Architecture
+
+### 7.1 TLS Configuration
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   TLS Architecture                        │
+│                                                           │
+│  Client ──► Edge: TLS Termination                       │
+│                                                           │
+│  Supported Versions:                                     │
+│  ─ TLS 1.2 (minimum)                                    │
+│  ─ TLS 1.3 (preferred)                                  │
+│                                                           │
+│  Features:                                               │
+│  ─ OCSP Stapling (faster handshakes)                    │
+│  ─ 0-RTT Early Data (with replay protection)            │
+│  ─ HSTS (31536000s, includeSubDomains, preload)        │
+│  ─ Origin Pull (TLS between CDN and origin)             │
+│                                                           │
+│  Cipher Suites (TLS 1.3):                               │
+│  ─ TLS_AES_128_GCM_SHA256                               │
+│  ─ TLS_AES_256_GCM_SHA384                               │
+│  ─ TLS_CHACHA20_POLY1305_SHA256                         │
+│                                                           │
+│  Certificate Management:                                 │
+│  ─ Universal SSL (free, shared)                          │
+│  ─ Advanced SSL (dedicated IP)                           │
+│  ─ Custom SSL (bring your own cert)                      │
+│  ─ Auto-renewal via ACME                                 │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 7.2 WAF Rule Processing
+
+```
+Request ──► WAF Engine
+              │
+              ├─► SQL Injection Detection
+              │     ─ Pattern matching on query strings
+              │     ─ Union-based, blind, time-based
+              │
+              ├─► XSS Detection
+              │     ─ Script tag injection
+              │     ─ Event handler injection
+              │     ─ DOM-based patterns
+              │
+              ├─► Path Traversal Detection
+              │     ─ Directory traversal patterns
+              │     ─ Null byte injection
+              │     ─ Unicode normalization
+              │
+              ├─► Bot Detection
+              │     ─ User-agent analysis
+              │     ─ JavaScript fingerprinting
+              │     ─ Behavioral analysis
+              │
+              └─► Custom Rules
+                    ─ Regex-based matching
+                    ─ Rate-based triggers
+                    ─ Geo-based rules
+```
+
+### 7.3 DDoS Protection Layers
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                 DDoS Protection Stack                     │
+│                                                           │
+│  Layer 3/4 (Network):                                   │
+│  ─ Volumetric attack mitigation                         │
+│  ─ SYN flood protection                                 │
+│  ─ UDP amplification blocking                           │
+│  ─ IP reputation filtering                              │
+│                                                           │
+│  Layer 7 (Application):                                 │
+│  ─ HTTP flood protection                                │
+│  ─ Slowloris detection                                  │
+│  ─ Challenge-response (CAPTCHA, JS challenge)           │
+│  ─ Behavioral analysis                                  │
+│                                                           │
+│  Adaptive Mitigation:                                   │
+│  ─ Auto-scaling thresholds                              │
+│  ─ Learning mode → Active mode transition               │
+│  ─ Per-path sensitivity tuning                          │
+│  ─ False positive monitoring                            │
+└─────────────────────────────────────────────────────────┘
+```
+
+## 8. Scalability Architecture
+
+### 8.1 Edge Compute Scaling
+
+```
+┌─────────────────────────────────────────────────────────┐
+│               Edge Compute Scaling Model                  │
+│                                                           │
+│  Request Volume ──► Auto-scale ──► Edge Functions       │
+│                                                           │
+│  Scale Factors:                                          │
+│  ─ Geographic distribution (26+ POPs)                   │
+│  ─ Per-POP isolation (bulkhead)                         │
+│  ─ Cold start: <5ms (V8 isolates)                       │
+│  ─ Warm execution: <1ms overhead                        │
+│                                                           │
+│  Resource Limits:                                        │
+│  ─ CPU: 50ms per request                                │
+│  ─ Memory: 128MB per invocation                         │
+│  ─ Storage: 128KB KV store per account                  │
+│  ─ Subrequests: 50 per invocation                       │
+│                                                           │
+│  Concurrency:                                            │
+│  ─ Unlimited per POP                                    │
+│  ─ Global rate: provider-dependent                      │
+│  ─ Circuit breaker on origin connections                │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 8.2 Global Distribution
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              Global Distribution Strategy                 │
+│                                                           │
+│  DNS Resolution:                                         │
+│  ─ Anycast BGP routing                                  │
+│  ─ GeoDNS with failover                                 │
+│  ─ Health-checked endpoints                             │
+│                                                           │
+│  Traffic Routing:                                        │
+│  ─ Latency-based (closest healthy POP)                  │
+│  ─ Geo-based (country/region rules)                     │
+│  ─ Weighted (A/B testing, canary)                       │
+│                                                           │
+│  Failover:                                               │
+│  ─ Automatic (health check failure)                     │
+│  ─ Manual (operator override)                           │
+│  ─ Cascading (region → global)                          │
+└─────────────────────────────────────────────────────────┘
+```
+
+## 9. Monitoring & Observability
+
+### 9.1 Real User Monitoring (RUM)
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                 RUM Pipeline                              │
+│                                                           │
+│  Browser ──► Performance API ──► Edge Collector          │
+│                                                           │
+│  Metrics Collected:                                      │
+│  ─ Core Web Vitals (LCP, FID, CLS, TTFB, FCP)         │
+│  ─ Navigation Timing (DNS, TCP, TLS, TTFB)             │
+│  ─ Resource Timing (per-resource breakdown)             │
+│  ─ Custom timing marks                                   │
+│                                                           │
+│  Aggregation:                                            │
+│  ─ Per-page, per-CDN-POP, per-country                   │
+│  ─ p50, p90, p95, p99 percentiles                       │
+│  ─ Histograms for distribution analysis                  │
+│  ─ Time-series for trend detection                       │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 9.2 Synthetic Monitoring
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              Synthetic Monitoring                         │
+│                                                           │
+│  Probes:                                                 │
+│  ─ HTTP health checks (every 30s)                       │
+│  ─ SSL certificate expiry (daily)                       │
+│  ─ DNS resolution (per-POP)                             │
+│  ─ Full page load (every 5min)                          │
+│                                                           │
+│  Alert Thresholds:                                       │
+│  ─ Response time > 2x baseline → Warning                │
+│  ─ Error rate > 1% → Critical                           │
+│  ─ SSL cert < 30 days → Warning                         │
+│  ─ Origin unreachable → Critical                        │
+│                                                           │
+│  Notification Channels:                                  │
+│  ─ Email                                                 │
+│  ─ Slack/Teams                                           │
+│  ─ PagerDuty                                             │
+│  ─ Webhook                                               │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 9.3 Log Analytics
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                Log Analytics Engine                       │
+│                                                           │
+│  Log Sources:                                            │
+│  ─ CDN access logs (request/response)                   │
+│  ─ WAF event logs (blocked/challenged)                  │
+│  ─ Edge function logs (execution/error)                 │
+│  ─ Origin server logs                                   │
+│                                                           │
+│  Analysis Capabilities:                                  │
+│  ─ Real-time anomaly detection                          │
+│  ─ Traffic pattern analysis                             │
+│  ─ Security event correlation                           │
+│  ─ Cost attribution per domain/path                     │
+│                                                           │
+│  Anomaly Types Detected:                                │
+│  ─ Traffic spikes (DDoS, flash crowd)                   │
+│  ─ Error bursts (origin failure)                        │
+│  ─ Cache poisoning attempts                             │
+│  ─ Suspicious bot activity                              │
+│  ─ Geographic anomalies                                 │
+│  ─ Performance degradation                              │
+└─────────────────────────────────────────────────────────┘
+```
+
+## 10. Deployment Architecture
+
+### 10.1 Infrastructure as Code
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              IaC Deployment Pipeline                      │
+│                                                           │
+│  Source (Git) ──► Validate ──► Plan ──► Apply ──► Verify │
+│                                                           │
+│  Configuration Artifacts:                                │
+│  ─ cache_rules.json (cache policies)                    │
+│  ─ edge_functions/ (JS/TS source)                       │
+│  ─ security_rules.json (WAF, rate limits)               │
+│  ─ ssl_config.json (TLS settings)                       │
+│  ─ dns_config.json (DNS records)                        │
+│                                                           │
+│  Validation:                                             │
+│  ─ Schema validation (JSON Schema)                      │
+│  ─ Business rules (TTL limits, pattern syntax)          │
+│  ─ Security audit (no open redirects, no CORS bypass)   │
+│  ─ Dry-run deployment                                   │
+│                                                           │
+│  Rollback:                                               │
+│  ─ Automatic on error detection                         │
+│  ─ Manual via CLI                                       │
+│  ─ Configuration versioning (last 10 versions)          │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 10.2 GitOps for Edge Configs
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                GitOps Workflow                             │
+│                                                           │
+│  Developer ──► Push to Git ──► CI Pipeline               │
+│                                    │                     │
+│                          ┌─────────┴─────────┐          │
+│                          ▼                   ▼          │
+│                    ┌──────────┐       ┌──────────┐     │
+│                    │ Validate │       │ Test     │     │
+│                    │ Configs  │       │ Edge Func│     │
+│                    └────┬─────┘       └────┬─────┘     │
+│                         │                   │          │
+│                         └─────────┬─────────┘          │
+│                                   ▼                     │
+│                          ┌──────────────┐              │
+│                          │  Deploy to   │              │
+│                          │  CDN Provider│              │
+│                          └──────────────┘              │
+└─────────────────────────────────────────────────────────┘
+```
+
+## 11. Database Schemas
+
+### 11.1 Cache Rules Schema
+
+```sql
+CREATE TABLE cache_rules (
+    rule_id       TEXT PRIMARY KEY,
+    domain        TEXT NOT NULL,
+    pattern       TEXT NOT NULL,
+    strategy      TEXT NOT NULL,
+    ttl           INTEGER NOT NULL,
+    edge_ttl      INTEGER,
+    browser_ttl   INTEGER,
+    bypass_json   TEXT,
+    vary_json     TEXT,
+    priority      INTEGER DEFAULT 100,
+    enabled       BOOLEAN DEFAULT TRUE,
+    created_at    TEXT NOT NULL,
+    updated_at    TEXT NOT NULL
+);
+
+CREATE INDEX idx_cache_rules_domain ON cache_rules(domain);
+CREATE INDEX idx_cache_rules_priority ON cache_rules(domain, priority);
+```
+
+### 11.2 Edge Functions Schema
+
+```sql
+CREATE TABLE edge_functions (
+    function_id   TEXT PRIMARY KEY,
+    domain        TEXT NOT NULL,
+    name          TEXT NOT NULL,
+    func_type     TEXT NOT NULL,
+    code          TEXT NOT NULL,
+    routes_json   TEXT NOT NULL,
+    runtime       TEXT DEFAULT 'javascript',
+    version       INTEGER DEFAULT 1,
+    status        TEXT DEFAULT 'draft',
+    env_vars_json TEXT,
+    deployed_at   TEXT,
+    exec_count    INTEGER DEFAULT 0,
+    avg_exec_ms   REAL DEFAULT 0.0,
+    error_rate    REAL DEFAULT 0.0
+);
+
+CREATE INDEX idx_edge_functions_domain ON edge_functions(domain);
+```
+
+### 11.3 Security Rules Schema
+
+```sql
+CREATE TABLE security_rules (
+    rule_id       TEXT PRIMARY KEY,
+    domain        TEXT NOT NULL,
+    rule_type     TEXT NOT NULL,
+    action        TEXT NOT NULL,
+    conditions    TEXT NOT NULL,
+    priority      INTEGER DEFAULT 100,
+    enabled       BOOLEAN DEFAULT TRUE,
+    description   TEXT,
+    match_count   INTEGER DEFAULT 0,
+    last_triggered TEXT
+);
+
+CREATE INDEX idx_security_rules_domain ON security_rules(domain);
+CREATE INDEX idx_security_rules_type ON security_rules(domain, rule_type);
+```
+
+### 11.4 Analytics Schema
+
+```sql
+CREATE TABLE analytics_snapshots (
+    snapshot_id   TEXT PRIMARY KEY,
+    domain        TEXT NOT NULL,
+    timestamp     TEXT NOT NULL,
+    total_requests INTEGER,
+    total_bandwidth INTEGER,
+    cache_hit_rate REAL,
+    avg_ttfb_ms   REAL,
+    p95_ttfb_ms   REAL,
+    error_rate    REAL,
+    status_json   TEXT,
+    countries_json TEXT,
+    paths_json    TEXT
+);
+
+CREATE INDEX idx_analytics_domain_time ON analytics_snapshots(domain, timestamp);
+```
+
+### 11.5 Deployment History Schema
+
+```sql
+CREATE TABLE deployments (
+    deployment_id TEXT PRIMARY KEY,
+    domain        TEXT NOT NULL,
+    provider      TEXT NOT NULL,
+    status        TEXT NOT NULL,
+    config_snapshot TEXT NOT NULL,
+    started_at    TEXT NOT NULL,
+    completed_at  TEXT,
+    rollback_id   TEXT,
+    notes         TEXT
+);
+
+CREATE INDEX idx_deployments_domain ON deployments(domain, started_at DESC);
+```
+
+## 12. Performance Benchmarks & SLA Targets
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              Performance Benchmarks                       │
+│                                                           │
+│  Metric                  Target        Measurement       │
+│  ─────────────────────   ──────────    ────────────────  │
+│  Cache Hit Rate          ≥ 85%         requests served    │
+│                                         from cache        │
+│  TTFB (p50)              ≤ 200ms       time to first byte │
+│  TTFB (p95)              ≤ 500ms       time to first byte │
+│  LCP (p50)               ≤ 2500ms      largest contentful│
+│                                         paint             │
+│  CLS (p50)               ≤ 0.1         cumulative layout │
+│                                         shift             │
+│  FCP (p50)               ≤ 1800ms      first contentful  │
+│                                         paint             │
+│  Origin Load             ≤ 20%         origin requests / │
+│                                         total requests    │
+│  Error Rate              ≤ 0.1%        5xx responses /   │
+│                                         total requests    │
+│  Purge Propagation       ≤ 30s         time to clear all  │
+│                                         edge POPs         │
+│  Edge Function Exec      ≤ 50ms        cold start + exec  │
+│  SSL Handshake           ≤ 50ms        TLS negotiation    │
+│  DNS Resolution          ≤ 50ms        CDN DNS lookup     │
+│                                                           │
+│  Availability SLA:                                       │
+│  ─ Standard: 99.9% (8.76h downtime/year)                │
+│  ─ Business: 99.99% (52.6min downtime/year)             │
+│  ─ Enterprise: 99.999% (5.26min downtime/year)          │
+│                                                           │
+│  Bandwidth SLA:                                          │
+│  ─ Standard: 10 Gbps burst per domain                   │
+│  ─ Business: 50 Gbps burst per domain                   │
+│  ─ Enterprise: 100+ Gbps burst per domain               │
+└─────────────────────────────────────────────────────────┘
+```
+
+## 13. Cost Optimization Model
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              Cost Optimization Framework                  │
+│                                                           │
+│  Cost Components:                                        │
+│  ─ Bandwidth (per GB)                                   │
+│  ─ Requests (per million)                               │
+│  ─ Edge compute (per ms)                                │
+│  ─ Security add-ons (monthly)                           │
+│  ─ SSL certificates (monthly)                           │
+│  ─ Origin shield (per GB)                               │
+│  ─ Storage (per GB/month)                               │
+│                                                           │
+│  Optimization Levers:                                    │
+│  ─ Increase cache hit rate → reduce bandwidth           │
+│  ─ Enable compression → reduce bandwidth                │
+│  ─ Move to cheaper provider → reduce per-GB cost        │
+│  ─ Negotiate volume discounts → reduce rates            │
+│  ─ Right-size edge compute → reduce compute cost        │
+│  ─ Remove unused features → reduce add-on cost          │
+│                                                           │
+│  Provider Comparison (per GB):                           │
+│  ─ Cloudflare:  $0.00 (Pro plan)                        │
+│  ─ GCP CDN:     $0.02                                   │
+│  ─ KeyCDN:      $0.04                                   │
+│  ─ CDN77:       $0.049                                  │
+│  ─ Edgecast:    $0.06                                   │
+│  ─ StackPath:   $0.07                                   │
+│  ─ Azure CDN:   $0.081                                  │
+│  ─ CloudFront:  $0.085                                  │
+│  ─ Fastly:      $0.12                                   │
+└─────────────────────────────────────────────────────────┘
+```
+
+## 14. Migration Framework
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                CDN Migration Framework                    │
+│                                                           │
+│  Phase 1: Assessment (4-8 hours)                        │
+│  ─ Audit source configuration                           │
+│  ─ Document all rules and functions                     │
+│  ─ Baseline performance metrics                         │
+│  ─ Identify incompatibilities                           │
+│                                                           │
+│  Phase 2: Preparation (8-16 hours)                      │
+│  ─ Map rules to target provider format                  │
+│  ─ Deploy SSL certificate on target                     │
+│  ─ Configure edge functions on target                   │
+│  ─ Set up origin shielding                              │
+│                                                           │
+│  Phase 3: Parallel Testing (24-48 hours)                │
+│  ─ Run dual-stack (both providers active)               │
+│  ─ Compare hit rates and latency                        │
+│  ─ Verify security rules                                │
+│  ─ Test edge function execution                         │
+│                                                           │
+│  Phase 4: Cutover (1-4 hours)                           │
+│  ─ Update DNS TTL to 300s                               │
+│  ─ Switch DNS to target provider                        │
+│  ─ Monitor error rates                                  │
+│  ─ Verify cache behavior                                │
+│                                                           │
+│  Phase 5: Stabilization (24-72 hours)                   │
+│  ─ Monitor performance metrics                          │
+│  ─ Adjust cache rules if needed                         │
+│  ─ Verify security posture                              │
+│  ─ Decommission source provider                         │
+│                                                           │
+│  Rollback Triggers:                                      │
+│  ─ Error rate > 5% for > 5 minutes                     │
+│  ─ TTFB p95 > 2x baseline for > 10 minutes            │
+│  ─ Cache hit rate < 50% for > 15 minutes               │
+│  ─ Security incident detected                           │
+└─────────────────────────────────────────────────────────┘
+```

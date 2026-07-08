@@ -1,61 +1,108 @@
-# Hr Agent Architecture
+# HR Agent — System Architecture
 
-## Overview
+## 1. Executive Summary
 
-This document describes the architecture for the Hr Agent.
+The HR Agent is a comprehensive human resources management platform covering the full employee lifecycle — from recruitment through offboarding. It provides tools for employee management, recruitment pipeline tracking, performance reviews, compensation analysis, engagement surveys, compliance tracking, training management, leave management, and organizational structure.
 
-## System Components
+---
 
-```
-┌─────────────────────────────────────────┐
-│         Hr Agent                    │
-├─────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────────┐  │
-│  │ Component 1 │  │   Component 2   │  │
-│  └─────────────┘  └─────────────────┘  │
-│  ┌─────────────┐  ┌─────────────────┐  │
-│  │ Component 3 │  │   Component 4   │  │
-│  └─────────────┘  └─────────────────┘  │
-└─────────────────────────────────────────┘
-```
-
-## Data Flow
+## 2. High-Level Architecture
 
 ```
-Input → Processing → Output
+┌──────────────────────────────────────────────────────────────────────────┐
+│                           HR AGENT                                        │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
+│  │  Employee    │  │ Recruitment  │  │ Performance  │  │Compensation│  │
+│  │  Manager     │  │  Pipeline    │  │   Manager    │  │ Analyzer   │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
+│  │  Engagement  │  │    Leave     │  │  Compliance  │  │ Training   │  │
+│  │  Analyzer    │  │   Manager    │  │   Tracker    │  │  Manager   │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘  │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    Org Chart Manager                              │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │    Data Models (Employee, Candidate, Review, Goal, Leave)        │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Key Components
+---
 
-### 1. Core Processing
+## 3. Component Deep Dives
 
-Description of core processing logic.
+### 3.1 Employee Manager
+Full employee lifecycle: hire, manage, terminate, search.
 
-### 2. Configuration Management
+### 3.2 Recruitment Pipeline
+Applicant tracking with stage-based funnel management.
 
-How configuration is handled.
+### 3.3 Performance Manager
+Review cycles, goal tracking, competency ratings.
 
-### 3. Integration Layer
+### 3.4 Compensation Analyzer
+Salary analysis, benchmarking, pay equity checks.
 
-How the agent integrates with external systems.
+### 3.5 Engagement Analyzer
+Survey creation, response collection, department analysis.
 
-## Configuration
+### 3.6 Leave Manager
+Request submission, approval workflow, balance tracking.
 
-```yaml
-config:
-  option1: value1
-  option2: value2
+### 3.7 Compliance Tracker
+Requirement tracking, expiration alerts, compliance reporting.
+
+### 3.8 Training Manager
+Program creation, assignment, completion tracking.
+
+### 3.9 Org Chart Manager
+Hierarchical structure, team trees, depth calculation.
+
+---
+
+## 4. Employee Lifecycle Flow
+
+```
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Recruit  │ ─► │  Hire    │ ─► │ Develop  │ ─► │ Retain   │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+       │               │               │               │
+  Job posting     Onboarding     Training         Engagement
+  Interviews      Paperwork      Reviews          Surveys
+  Offer           Orientation    Goals            Compensation
+                  Compliance     Mentoring        Promotions
+                                                        │
+                                                        ▼
+                                                   ┌──────────┐
+                                                   │  Exit    │
+                                                   └──────────┘
 ```
 
-## Performance
+---
 
-| Metric | Value |
-|--------|-------|
-| Response Time | TBD |
-| Throughput | TBD |
+## 5. Key Metrics
 
-## Security Considerations
+| Metric | Description |
+|--------|-------------|
+| Time to Fill | Days from opening to hire |
+| Cost per Hire | Total recruitment cost / hires |
+| Turnover Rate | Terminations / avg headcount |
+| Engagement Score | Survey average (1-5) |
+| Training Completion | Completed / assigned |
+| Compliance Rate | Compliant / total requirements |
+| Pay Equity Ratio | Comp vs benchmark |
 
-- Authentication requirements
-- Authorization rules
-- Data protection measures
+---
+
+## 6. Security & Compliance
+
+- Employee PII protected (SSN, DOB, address)
+- Audit trail for all data access
+- Role-based access control
+- Data retention policies
+- GDPR/CCPA compliance support

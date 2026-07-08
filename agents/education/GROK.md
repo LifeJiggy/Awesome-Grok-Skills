@@ -1,495 +1,468 @@
 ---
-name: "Education & Learning Agent"
-version: "1.0.0"
-description: "Intelligent educational content creation and personalized learning systems"
+name: "Education Agent"
+version: "2.0.0"
+description: "Comprehensive learning management platform covering course creation, learner progress tracking, adaptive assessments, quiz grading, certification, spaced repetition, learning path optimization, gamification, and educational analytics"
 author: "Awesome Grok Skills"
 license: "MIT"
-tags: ["education", "learning", "personalization", "content"]
+tags: ["education", "learning", "courses", "assessments", "quizzes", "certification", "lms", "adaptive-learning", "gamification", "analytics"]
 category: "education"
 personality: "knowledge-mentor"
-use_cases: ["course creation", "student assessment", "learning paths"]
+use_cases:
+  - "course creation and publishing"
+  - "learner enrollment and progress tracking"
+  - "adaptive quiz assessments and grading"
+  - "certificate issuance and verification"
+  - "spaced repetition for retention"
+  - "personalized learning paths"
+  - "gamification and engagement"
+  - "educational analytics and reporting"
+  - "at-risk learner identification"
 ---
 
-# Education & Learning Agent 🎓
+# Education Agent
 
-> Create personalized educational experiences that adapt to each learner's unique needs and pace
+> Adaptive learning platform that personalizes education for every learner.
 
-## 🎯 Why This Matters for Grok
+## Agent Identity
 
-Grok's physics expertise and real-time data access create perfect conditions for adaptive learning:
+The Education Agent is a knowledge mentor that creates personalized learning
+experiences. It adapts content difficulty, optimizes learning paths, tracks
+progress with precision, and uses science-backed techniques like spaced
+repetition and gamification to maximize knowledge retention.
 
-- **Personalized Learning Paths** 🧠: AI-powered curriculum adaptation
-- **Real-time Assessment** 📊: Immediate feedback and course correction
-- **Multi-modal Content** 🎨: Visual, auditory, and kinesthetic approaches
-- **Knowledge Retention** 💡: Spaced repetition and memory optimization
+**Core Personality**: Patient, adaptive, evidence-based. Every recommendation
+is grounded in learning science. Celebrates progress while pushing growth.
 
-## 🛠️ Core Capabilities
+## Core Principles
 
-### 1. Content Generation
-```yaml
-content_creation:
-  lesson_plans: ai_generated
-  assessments: adaptive_difficulty
-  interactive_elements: gamified
-  multimedia: auto_generated
-  accessibility: wcag_compliant
-```
+1. **Learner-Centric**: Every decision optimizes for learner outcomes.
+2. **Adaptive Difficulty**: Content matches the learner's current level.
+3. **Science-Backed**: Use spaced repetition, retrieval practice, and
+   interleaving backed by cognitive science.
+4. **Measurable Outcomes**: Track everything — progress, engagement, mastery.
+5. **Inclusive Design**: Support all learning styles and accessibility needs.
 
-### 2. Student Analytics
-```yaml
-learning_analytics:
-  progress_tracking: real_time
-  learning_style_detection: behavioral
-  knowledge_gaps: automatic_identification
-  engagement_metrics: comprehensive
-  prediction_models: dropout_risk
-```
+---
 
-### 3. Adaptive Learning
-```yaml
-personalization:
-  difficulty_adjustment: dynamic
-  learning_pace: individualized
-  content_recommendation: ml_based
-  feedback_timing: optimized
-  motivation_strategies: personalized
-```
+## Capabilities
 
-## 🧠 Learning Science Implementation
+### 1. Course Creation & Management
 
-### Cognitive Load Management
 ```python
-class CognitiveLoadManager:
-    def __init__(self):
-        self.intrinsic_load_threshold = 0.7
-        self.extraneous_load_threshold = 0.3
-        
-    def assess_cognitive_load(self, content_complexity, student_profile):
-        """Calculate optimal cognitive load for individual student"""
-        base_complexity = content_complexity
-        
-        # Adjust for prior knowledge
-        prior_knowledge_factor = 1 - (student_profile['prior_knowledge'] * 0.3)
-        
-        # Adjust for working memory capacity
-        memory_factor = student_profile['working_memory_capacity'] / 10
-        
-        # Adjust for learning style match
-        style_factor = self.calculate_style_match(content_complexity['style'], 
-                                              student_profile['preferred_style'])
-        
-        total_load = base_complexity * prior_knowledge_factor / memory_factor * style_factor
-        
-        return {
-            'intrinsic_load': min(total_load, 1.0),
-            'recommendation': self.get_load_recommendation(total_load)
-        }
-    
-    def get_load_recommendation(self, load):
-        if load > 0.8:
-            return "break_content - use scaffolding"
-        elif load > 0.6:
-            return "add_examples - reduce complexity"
-        elif load < 0.3:
-            return "increase_challenge - add complexity"
-        else:
-            return "optimal_level - maintain pace"
+from agents.education.agent import (
+    EducationAgent, LessonType, DifficultyLevel, CourseStatus
+)
+
+agent = EducationAgent()
+
+# Create a structured course
+result = agent.create_course_with_content(
+    title="Python Programming Masterclass",
+    description="From zero to professional developer",
+    instructor_id="inst_001",
+    modules_data=[
+        {
+            "title": "Getting Started",
+            "description": "Python basics",
+            "lessons": [
+                {"title": "What is Python?", "type": "video", "duration": 15},
+                {"title": "Installing Python", "type": "text", "duration": 10},
+                {"title": "Your First Program", "type": "interactive", "duration": 20},
+            ],
+        },
+        {
+            "title": "Data Types",
+            "lessons": [
+                {"title": "Variables", "type": "video", "duration": 20},
+                {"title": "Lists and Tuples", "type": "text", "duration": 15},
+            ],
+        },
+    ],
+)
+# {"course_id": "course_xxx", "title": "...", "modules": 2, "status": "published"}
 ```
 
-### Spaced Repetition Algorithm
+**Supported Lesson Types**: Video, Text, Interactive, Quiz, Assignment,
+Discussion, Lab, Podcast, Document, Live Session.
+
+**Difficulty Levels**: Beginner, Intermediate, Advanced, Expert.
+
+### 2. Learner Enrollment & Progress
+
 ```python
-import numpy as np
-from datetime import datetime, timedelta
+# Create learner profile
+profile = agent.learner_manager.create_learner_profile(
+    name="Alice Johnson",
+    email="alice@example.com",
+    preferred_style=LearningStyle.VISUAL,
+)
 
-class SpacedRepetition:
-    def __init__(self):
-        self.forgetting_curve = lambda t, strength: np.exp(-t / strength)
-        
-    def calculate_next_review(self, item, response_quality, last_review):
-        """Calculate optimal next review time based on forgetting curve"""
-        
-        # Update memory strength based on response
-        current_strength = item.get('memory_strength', 1.0)
-        
-        if response_quality >= 4:  # Easy recall
-            new_strength = current_strength * 2.5
-        elif response_quality >= 3:  # Good recall
-            new_strength = current_strength * 2.0
-        elif response_quality >= 2:  # Hard but recalled
-            new_strength = current_strength * 1.3
-        else:  # Failed recall
-            new_strength = max(0.5, current_strength * 0.5)
-        
-        # Calculate interval until forgetting threshold (80% retention)
-        forgetting_threshold = 0.2
-        optimal_interval = -np.log(forgetting_threshold) * new_strength
-        
-        next_review = last_review + timedelta(days=optimal_interval)
-        
-        return {
-            'next_review': next_review,
-            'memory_strength': new_strength,
-            'retention_probability': self.forgetting_curve(optimal_interval, new_strength)
-        }
+# Enroll in course
+enrollment = agent.learner_manager.enroll_learner(course.course_id, profile.learner_id)
+
+# Track progress
+agent.learner_manager.update_progress(enrollment.enrollment_id, lesson1.lesson_id)
+agent.learner_manager.update_progress(enrollment.enrollment_id, lesson2.lesson_id)
+agent.learner_manager.record_time_spent(enrollment.enrollment_id, minutes=30)
+
+# Get dashboard
+dashboard = agent.learner_manager.get_learner_dashboard(profile.learner_id)
+# {"completed": 2, "in_progress": 1, "total_time_hours": 4.5, "points": 150}
 ```
 
-## 📊 Adaptive Assessment Engine
+### 3. Adaptive Quiz Assessments
 
-### Dynamic Difficulty Adjustment
 ```python
-class AdaptiveAssessment:
-    def __init__(self):
-        self.difficulty_levels = {
-            'beginner': {'min_score': 0, 'max_score': 60},
-            'intermediate': {'min_score': 40, 'max_score': 80},
-            'advanced': {'min_score': 70, 'max_score': 100},
-            'expert': {'min_score': 85, 'max_score': 100}
-        }
-    
-    def generate_adaptive_question(self, student_profile, topic):
-        """Generate question with appropriate difficulty"""
-        
-        current_level = student_profile.get('current_level', 'beginner')
-        recent_performance = student_profile.get('recent_performance', [])
-        
-        # Calculate target difficulty
-        base_difficulty = self.get_level_difficulty(current_level)
-        
-        # Adjust based on recent performance
-        performance_adjustment = self.calculate_performance_adjustment(recent_performance)
-        
-        target_difficulty = base_difficulty + performance_adjustment
-        target_difficulty = max(0.1, min(1.0, target_difficulty))
-        
-        return {
-            'question': self.generate_question(topic, target_difficulty),
-            'difficulty': target_difficulty,
-            'estimated_time': self.estimate_completion_time(target_difficulty),
-            'supports': self.identify_needed_supports(target_difficulty, student_profile)
-        }
-    
-    def analyze_response(self, question, student_response, time_taken):
-        """Analyze student response and update profile"""
-        
-        correctness = self.check_answer(question, student_response)
-        response_quality = self.assess_response_quality(question, student_response)
-        
-        performance_factors = {
-            'correctness': correctness,
-            'response_quality': response_quality,
-            'time_efficiency': self.calculate_time_efficiency(question, time_taken),
-            'confidence_level': self.extract_confidence_level(student_response)
-        }
-        
-        overall_score = self.calculate_overall_score(performance_factors)
-        
-        # Update student profile
-        new_level = self.adjust_difficulty_level(overall_score, student_profile)
-        
-        return {
-            'score': overall_score,
-            'feedback': self.generate_feedback(performance_factors),
-            'next_difficulty': new_level,
-            'learning_objectives': self.identify_learning_objectives(question, performance_factors)
-        }
+# Create quiz
+quiz = agent.quiz_engine.create_quiz(
+    title="Python Basics Quiz",
+    course_id=course.course_id,
+    passing_score=70,
+    time_limit_minutes=30,
+    max_attempts=3,
+)
+
+# Add questions
+agent.quiz_engine.add_question(
+    quiz.quiz_id,
+    "What keyword defines a function in Python?",
+    ["func", "define", "def", "function"],
+    correct_index=2,
+    points=10,
+    explanation="The 'def' keyword defines a function in Python.",
+)
+
+# Grade submission
+attempt = agent.quiz_engine.grade_quiz(
+    quiz.quiz_id, profile.learner_id, {"q_1": 2}
+)
+print(f"Score: {attempt.percentage}%, Passed: {attempt.passed}")
+
+# Analytics
+analytics = agent.quiz_engine.get_quiz_analytics(quiz.quiz_id)
+# {"average_score": 82.5, "pass_rate": 75.0, "question_stats": {...}}
 ```
 
-## 🎨 Multi-Modal Content Generation
+### 4. Certification
 
-### Visual Learning Content
 ```python
-class VisualContentGenerator:
-    def __init__(self):
-        self.visual_types = ['diagram', 'infographic', 'animation', 'video', 'interactive']
-        
-    def generate_visual_explanation(self, concept, learning_style):
-        """Generate visual content based on concept and learning style"""
-        
-        content_plan = self.analyze_concept_structure(concept)
-        
-        if learning_style == 'visual_spatial':
-            return self.create_diagram_sequence(concept)
-        elif learning_style == 'kinesthetic':
-            return self.create_interactive_simulation(concept)
-        elif learning_style == 'reading_writing':
-            return self.create_structured_outline(concept)
-        else:  # auditory
-            return self.create_audio_explanation(concept)
-    
-    def create_diagram_sequence(self, concept):
-        """Create step-by-step visual diagrams"""
-        return {
-            'type': 'diagram_sequence',
-            'steps': [
-                {
-                    'step': 1,
-                    'visual': 'concept_outline.png',
-                    'explanation': 'Starting point and main components'
-                },
-                {
-                    'step': 2,
-                    'visual': 'relationships.png',
-                    'explanation': 'How components connect and interact'
-                },
-                {
-                    'step': 3,
-                    'visual': 'examples.png',
-                    'explanation': 'Real-world applications and examples'
-                }
-            ]
-        }
+# Issue certificate
+cert = agent.cert_manager.issue_certificate(
+    learner_id=profile.learner_id,
+    course_id=course.course_id,
+    learner_name="Alice Johnson",
+    course_name="Python Programming Masterclass",
+    instructor_name="Dr. Smith",
+    final_grade=92.5,
+)
+
+# Verify
+verification = agent.cert_manager.verify_certificate(cert.certificate_number)
+# {"valid": True, "learner_name": "Alice Johnson", "course_name": "..."}
+
+# Get all certificates
+certs = agent.cert_manager.get_learner_certificates(profile.learner_id)
 ```
 
-### Interactive Learning Activities
+### 5. Spaced Repetition
+
 ```python
-class InteractiveActivityGenerator:
-    def __init__(self):
-        self.activity_types = {
-            'simulation': 'physics_sandbox',
-            'game': 'learning_game',
-            'collaboration': 'group_project',
-            'creation': 'build_something'
-        }
-    
-    def create_physics_simulation(self, topic, difficulty):
-        """Create interactive physics simulation for learning"""
-        
-        if topic == 'orbital_mechanics':
-            return {
-                'type': 'orbital_simulation',
-                'parameters': {
-                    'gravity': 'adjustable',
-                    'initial_velocity': 'student_controlled',
-                    'mass_objects': 'modifiable'
-                },
-                'learning_objectives': [
-                    'understand_gravitational_force',
-                    'predict_orbital_paths',
-                    'analyze_energy_conservation'
-                ],
-                'assessment_points': [
-                    'correct_orbital_prediction',
-                    'energy_calculation_accuracy',
-                    'troubleshooting_errors'
-                ]
-            }
-        
-        elif topic == 'wave_properties':
-            return {
-                'type': 'wave_interactive',
-                'parameters': {
-                    'frequency': 'adjustable',
-                    'amplitude': 'adjustable',
-                    'medium_properties': 'modifiable'
-                },
-                'experiments': [
-                    'wave_interference',
-                    'doppler_effect',
-                    'standing_waves'
-                ]
-            }
+# Add item to SRS
+item = agent.spaced_repetition.add_item(profile.learner_id, content_id="lesson_001")
+
+# Record review with quality (0-5)
+agent.spaced_repetition.record_review(item.item_id, quality=4)  # Easy recall
+agent.spaced_repetition.record_review(item.item_id, quality=3)  # Good recall
+
+# Get due items for review
+due = agent.spaced_repetition.get_due_items(profile.learner_id)
+print(f"Items due for review: {len(due)}")
+
+# Retention stats
+stats = agent.spaced_repetition.get_retention_stats(profile.learner_id)
+# {"total_items": 25, "due_for_review": 5, "average_memory_strength": 3.2}
 ```
 
-## 📈 Learning Analytics Dashboard
+### 6. Learning Path Optimization
 
-### Real-Time Progress Tracking
-```javascript
-const LearningAnalytics = {
-  studentMetrics: {
-    engagement: {
-      time_on_platform: "2.5 hours/day",
-      lessons_completed: 87,
-      interaction_rate: "94%",
-      help_requests: 12
-    },
-    performance: {
-      average_score: 83,
-      improvement_rate: "+15%",
-      mastery_level: "intermediate",
-      struggling_topics: ["quantum_mechanics", "thermodynamics"]
-    },
-    behavior: {
-      preferred_time: "evening",
-      learning_style: "visual_kinesthetic",
-      session_duration: "45 minutes",
-      break_frequency: "every 20 minutes"
-    }
-  },
-  
-  generateInsights: function(studentData) {
-    const insights = [];
-    
-    // Learning pattern analysis
-    if (studentData.engagement.time_on_platform > 3) {
-      insights.push({
-        type: "engagement",
-        level: "positive",
-        message: "High engagement detected - consider advanced content"
-      });
-    }
-    
-    // Performance trend analysis
-    if (studentData.performance.improvement_rate > 10) {
-      insights.push({
-        type: "performance",
-        level: "positive", 
-        message: "Rapid improvement - current method is working well"
-      });
-    }
-    
-    // Struggle identification
-    if (studentData.performance.struggling_topics.length > 2) {
-      insights.push({
-        type: "intervention",
-        level: "warning",
-        message: "Multiple challenging topics - recommend additional support"
-      });
-    }
-    
-    return insights;
-  }
-};
-```
-
-### Predictive Analytics
 ```python
-class LearningPredictor:
-    def __init__(self):
-        self.risk_factors = {
-            'engagement_decline': 0.3,
-            'performance_drop': 0.4,
-            'missed_deadlines': 0.2,
-            'reduced_interaction': 0.1
-        }
-    
-    def predict_dropout_risk(self, student_data, historical_patterns):
-        """Predict likelihood of course dropout"""
-        
-        current_metrics = self.extract_metrics(student_data)
-        
-        # Calculate risk score
-        risk_score = 0
-        
-        # Engagement trends
-        engagement_trend = self.calculate_trend(student_data['engagement_history'])
-        if engagement_trend < -0.2:  # 20% decline
-            risk_score += 0.3
-        
-        # Performance trends
-        performance_trend = self.calculate_trend(student_data['performance_history'])
-        if performance_trend < -0.15:  # 15% decline
-            risk_score += 0.4
-        
-        # Deadline adherence
-        missed_rate = student_data['missed_deadlines'] / student_data['total_deadlines']
-        risk_score += missed_rate * 0.2
-        
-        # Social interaction
-        interaction_decline = student_data['interaction_decline_rate']
-        risk_score += interaction_decline * 0.1
-        
-        # Compare with historical patterns
-        similar_students = self.find_similar_students(student_data, historical_patterns)
-        historical_risk = self.calculate_historical_risk(similar_students)
-        
-        # Combine current and historical risk
-        total_risk = (risk_score * 0.6) + (historical_risk * 0.4)
-        
-        return {
-            'risk_score': min(total_risk, 1.0),
-            'risk_level': self.categorize_risk(total_risk),
-            'intervention_recommendations': self.recommend_interventions(risk_score, current_metrics),
-            'early_warning_signs': self.identify_early_warnings(student_data)
-        }
+# Create personalized learning path
+path = agent.path_optimizer.create_learning_path(
+    learner_id=profile.learner_id,
+    course_id=course.course_id,
+    learner_profile=profile,
+)
+print(f"Estimated duration: {path.estimated_duration_hours} hours")
+print(f"Checkpoints: {len(path.checkpoints)}")
+
+# Optimize for learning style
+agent.path_optimizer.optimize_for_style(path.path_id, LearningStyle.KINESTHETIC)
 ```
 
-## 🎯 Personalized Learning Paths
+### 7. Gamification
 
-### Curriculum Optimization
 ```python
-class LearningPathOptimizer:
-    def __init__(self):
-        self.learning_objectives = {
-            'foundational': ['basic_concepts', 'terminology', 'core_principles'],
-            'application': ['problem_solving', 'practical_examples', 'real_world_applications'],
-            'synthesis': ['critical_thinking', 'integration', 'creative_application'],
-            'mastery': ['teaching_others', 'advanced_topics', 'research_projects']
-        }
-    
-    def create_personalized_path(self, student_profile, course_outcomes):
-        """Generate optimized learning path for individual student"""
-        
-        current_knowledge = student_profile['assessed_knowledge']
-        learning_goals = student_profile['learning_goals']
-        time_constraints = student_profile['available_time']
-        learning_style = student_profile['preferred_style']
-        
-        # Identify knowledge gaps
-        gaps = self.identify_knowledge_gaps(current_knowledge, course_outcomes)
-        
-        # Prioritize based on prerequisite structure
-        prioritized_gaps = self.prioritize_learning_items(gaps, course_outcomes)
-        
-        # Create learning sequence
-        learning_sequence = self.create_optimal_sequence(
-            prioritized_gaps, 
-            learning_style, 
-            time_constraints
-        )
-        
-        # Generate adaptive checkpoints
-        checkpoints = self.insert_adaptive_checkpoints(learning_sequence)
-        
-        return {
-            'learning_path': learning_sequence,
-            'estimated_duration': self.calculate_total_time(learning_sequence),
-            'checkpoints': checkpoints,
-            'flexibility_options': self.identify_alternative_paths(learning_sequence),
-            'success_metrics': self.define_success_metrics(course_outcomes)
-        }
+# Create achievements
+agent.gamification.create_achievement(
+    name="First Steps",
+    description="Complete your first lesson",
+    points=50,
+    criteria={"lessons_completed": 1},
+    rarity="common",
+)
+
+# Award achievement
+agent.gamification.award_achievement(profile.learner_id, "ach_001")
+
+# Add points
+agent.gamification.add_points(profile.learner_id, 25, GamificationAction.QUIZ_PASSED)
+
+# Leaderboard
+board = agent.gamification.get_leaderboard(top_n=10)
+# [{"rank": 1, "learner_id": "...", "points": 500}, ...]
 ```
 
-## 🚀 Implementation Roadmap
+### 8. Analytics & Reporting
 
-### Phase 1: Foundation (Week 1-2)
-- [ ] Student profiling system
-- [ ] Content import and categorization
-- [ ] Basic assessment engine
-- [ ] Analytics dashboard setup
+```python
+# Course analytics
+course_stats = agent.analytics.get_course_analytics(course.course_id)
+# {"total_enrollments": 150, "completion_rate": 65.3, "average_progress": 72.1}
 
-### Phase 2: Intelligence (Week 3-4)
-- [ ] Adaptive algorithms implementation
-- [ ] Personalized content generation
-- [ ] Real-time feedback systems
-- [ ] Progress prediction models
+# Learner analytics
+learner_stats = agent.analytics.get_learner_analytics(profile.learner_id)
+# {"completed_courses": 3, "total_time_hours": 45.2, "average_progress": 85.0}
 
-### Phase 3: Advanced Features (Week 5-6)
-- [ ] Multi-modal content creation
-- [ ] Collaborative learning tools
-- [ ] Advanced analytics
-- [ ] Mobile optimization
+# Platform overview
+platform = agent.analytics.get_platform_overview()
+# {"total_courses": 50, "total_learners": 5000, "overall_completion_rate": 62.5}
 
-## 📊 Success Metrics
-
-### Educational Outcomes
-```yaml
-success_indicators:
-  learning_efficiency:
-    time_to_mastery: "-30% improvement"
-    retention_rate: "+45% improvement"
-    engagement_level: "+60% increase"
-    
-  accessibility:
-    diverse_learning_styles: "100% supported"
-    special_needs_accommodation: "full"
-    language_support: "multilingual"
-    
-  scalability:
-    concurrent_students: "10,000+"
-    content_library: "50,000+ items"
-    real_time_processing: "<100ms"
+# At-risk identification
+at_risk = agent.analytics.identify_at_risk_learners(threshold_days=14)
+# [{"learner_id": "...", "days_inactive": 21, "progress": 45.0}]
 ```
 
 ---
 
-*Revolutionize education with AI-powered personalization that adapts to every learner's unique journey and maximizes their potential.* 🎓✨
+## Operational Guidelines
+
+### Course Design Checklist
+
+1. Define clear learning objectives (Bloom's taxonomy levels)
+2. Structure content into logical modules
+3. Mix lesson types (video + text + interactive)
+4. Keep lessons under 20 minutes for engagement
+5. Include assessments after each module
+6. Set appropriate passing scores (70%+ recommended)
+7. Add supplementary resources (PDFs, links, code samples)
+8. Test the full learner journey before publishing
+
+### Assessment Best Practices
+
+- Use multiple question types per quiz
+- Include explanations for correct answers
+- Set reasonable time limits (not too tight)
+- Limit attempts to 3 to prevent guessing
+- Randomize question order to reduce cheating
+- Review question analytics to improve weak items
+
+### Spaced Repetition Tuning
+
+- Quality 4-5: Material is well-known → extend interval
+- Quality 3: Remembered with effort → maintain interval
+- Quality 0-2: Forgotten → reset to 1 day
+- Review due items daily for best retention
+- Target 80%+ retention probability
+
+### Gamification Strategy
+
+- Award points for consistent activity (streaks)
+- Create achievements for milestones (1st lesson, 10 quizzes, etc.)
+- Use rarity tiers to create aspiration
+- Update leaderboards frequently to maintain motivation
+- Balance extrinsic rewards with intrinsic motivation
+
+---
+
+## Method Signatures
+
+### CourseManager
+
+```python
+def create_course(self, title, description, instructor_id, ...) -> Course
+def update_course(self, course_id, updates) -> Optional[Course]
+def get_course(self, course_id) -> Optional[Course]
+def delete_course(self, course_id) -> bool
+def add_module(self, course_id, title, description="", order=0) -> Optional[Module]
+def add_lesson(self, module_id, title, content, lesson_type=LessonType.TEXT, ...) -> Optional[Lesson]
+def publish_course(self, course_id) -> bool
+def archive_course(self, course_id) -> bool
+def get_course_details(self, course_id) -> Optional[Dict]
+def get_course_catalog(self, category=None, difficulty=None, published_only=True) -> List[Dict]
+```
+
+### LearnerManager
+
+```python
+def create_learner_profile(self, name, email, preferred_style=...) -> LearnerProfile
+def enroll_learner(self, course_id, learner_id) -> Optional[Enrollment]
+def update_progress(self, enrollment_id, lesson_id, completed=True) -> Optional[Enrollment]
+def record_time_spent(self, enrollment_id, minutes) -> None
+def get_enrollment(self, enrollment_id) -> Optional[Enrollment]
+def get_learner_enrollments(self, learner_id) -> List[Enrollment]
+def get_learner_dashboard(self, learner_id) -> Dict
+```
+
+### QuizEngine
+
+```python
+def create_quiz(self, title, course_id, passing_score=70, ...) -> Quiz
+def add_question(self, quiz_id, question_text, options, correct_index, ...) -> Optional[str]
+def grade_quiz(self, quiz_id, learner_id, answers) -> Optional[QuizAttempt]
+def get_quiz_results(self, quiz_id, learner_id) -> List[QuizAttempt]
+def get_quiz_analytics(self, quiz_id) -> Dict
+```
+
+### CertificationManager
+
+```python
+def issue_certificate(self, learner_id, course_id, learner_name, ...) -> Certificate
+def verify_certificate(self, certificate_number) -> Dict
+def revoke_certificate(self, certificate_id, reason="") -> bool
+def get_learner_certificates(self, learner_id) -> List[Certificate]
+```
+
+### SpacedRepetitionEngine
+
+```python
+def add_item(self, learner_id, content_id) -> SpacedRepetitionItem
+def record_review(self, item_id, quality) -> Optional[SpacedRepetitionItem]
+def get_due_items(self, learner_id) -> List[SpacedRepetitionItem]
+def get_retention_stats(self, learner_id) -> Dict
+```
+
+### LearningPathOptimizer
+
+```python
+def create_learning_path(self, learner_id, course_id, learner_profile=None) -> Optional[LearningPath]
+def get_path(self, path_id) -> Optional[LearningPath]
+def optimize_for_style(self, path_id, learning_style) -> Optional[LearningPath]
+```
+
+### GamificationEngine
+
+```python
+def create_achievement(self, name, description, points, criteria, rarity="common") -> Achievement
+def award_achievement(self, learner_id, achievement_id) -> bool
+def add_points(self, learner_id, points, action) -> None
+def get_leaderboard(self, top_n=10) -> List[Dict]
+def get_learner_achievements(self, learner_id) -> List[Dict]
+def get_learner_points(self, learner_id) -> int
+```
+
+### AnalyticsReporting
+
+```python
+def get_course_analytics(self, course_id) -> Dict
+def get_learner_analytics(self, learner_id) -> Dict
+def get_platform_overview(self) -> Dict
+def identify_at_risk_learners(self, threshold_days=7) -> List[Dict]
+```
+
+---
+
+## Usage Patterns
+
+### Pattern 1: Full Course Launch
+
+```python
+agent = EducationAgent()
+result = agent.create_course_with_content(
+    title="Data Science 101",
+    description="Introduction to data science",
+    instructor_id="inst_002",
+    modules_data=[...],
+)
+# Course auto-published
+```
+
+### Pattern 2: Learner Journey
+
+```python
+profile = agent.learner_manager.create_learner_profile("Bob", "bob@example.com")
+enrollment = agent.learner_manager.enroll_learner(course_id, profile.learner_id)
+# ... learner completes lessons ...
+agent.learner_manager.update_progress(enrollment.id, lesson_id)
+# ... learner completes all lessons ...
+cert = agent.cert_manager.issue_certificate(profile.learner_id, course_id, "Bob", "Data Science 101", "Dr. Jones")
+```
+
+### Pattern 3: At-Risk Intervention
+
+```python
+at_risk = agent.analytics.identify_at_risk_learners(threshold_days=14)
+for learner in at_risk:
+    send_intervention_email(learner["learner_id"], learner["course_id"])
+```
+
+---
+
+## Data Models Reference
+
+| Model | Purpose | Key Fields |
+|-------|---------|-----------|
+| Course | Course container | id, title, instructor, modules, status, price |
+| Module | Content grouping | id, title, order, lessons |
+| Lesson | Individual content | id, type, content, duration, difficulty |
+| Quiz | Assessment | id, questions, passing_score, time_limit |
+| QuizAttempt | Grading result | id, answers, score, percentage, passed |
+| Enrollment | Learner-course link | id, status, progress, time_spent |
+| Certificate | Completion proof | id, number, issued_at, status |
+| LearnerProfile | Learner data | id, name, style, skills, points |
+| LearningPath | Personalized path | id, modules_order, checkpoints |
+| SpacedRepetitionItem | SRS card | id, interval, ease_factor, next_review |
+| Achievement | Gamification badge | id, name, points, rarity |
+| EngagementMetrics | Activity data | sessions, time, completions |
+
+---
+
+## Troubleshooting
+
+| Issue | Cause | Resolution |
+|-------|-------|-----------|
+| Course won't publish | Validation errors | Run `validate()` and fix issues |
+| Progress not updating | Enrollment not found | Verify enrollment_id is correct |
+| Quiz won't grade | Max attempts reached | Check `max_attempts` setting |
+| Certificate invalid | Expired or revoked | Check `certificate_number` and status |
+| SRS items not appearing | No items added | Call `add_item()` before `get_due_items()` |
+| At-risk list empty | All learners active | Lower `threshold_days` parameter |
+| Gamification points 0 | No achievements awarded | Award achievements via `award_achievement()` |
+
+---
+
+## Integration Points
+
+| System | Protocol | Purpose |
+|--------|----------|---------|
+| Moodle | LTI | LMS integration |
+| Canvas | LTI | LMS integration |
+| Vimeo | REST API | Video hosting |
+| Stripe | REST API | Payment for courses |
+| SendGrid | REST API | Learner notifications |
+| Google Analytics | GA4 | Learning analytics |
+| Proctorio | API | Exam proctoring |
+
+---
+
+## Checklist
+
+- [ ] Course objectives defined with Bloom's taxonomy levels
+- [ ] Modules structured logically (easy → hard)
+- [ ] Mix of lesson types for engagement
+- [ ] Assessments included after each module
+- [ ] Passing scores set appropriately
+- [ ] Certificate template configured
+- [ ] Spaced repetition items added for key concepts
+- [ ] Gamification achievements created
+- [ ] Analytics dashboards configured
+- [ ] At-risk learner monitoring enabled

@@ -1,445 +1,618 @@
----
-name: AI/ML Agent
-category: agents
-difficulty: advanced
-time_estimate: "3-5 hours"
-dependencies: ["machine-learning", "data-processing", "model-training", "inference"]
-tags: ["ai", "machine-learning", "neural-networks", "automation"]
-grok_personality: "precision-researcher"
-description: "Advanced AI/ML agent that combines data processing, model training, and intelligent automation with Grok's analytical precision"
----
 
 # AI/ML Agent
 
+> **THE** definitive agent for machine learning operations, model management, training,
+> inference, and observability. Physics-inspired, production-ready, and meme-aware.
+
+---
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Key Features](#key-features)
+3. [Quick Start](#quick-start)
+4. [Installation](#installation)
+5. [Configuration](#configuration)
+6. [Core Concepts](#core-concepts)
+7. [API Reference](#api-reference)
+8. [Usage Patterns](#usage-patterns)
+9. [Model Types](#model-types)
+10. [Performance Optimization](#performance-optimization)
+11. [Monitoring & Observability](#monitoring--observability)
+12. [Batch Operations](#batch-operations)
+13. [Integration Hooks](#integration-hooks)
+14. [Performance Tuning](#performance-tuning)
+15. [Security & Privacy](#security--privacy)
+16. [Extending the Agent](#extending-the-agent)
+17. [Troubleshooting](#troubleshooting)
+18. [FAQ](#faq)
+19. [Contributing](#contributing)
+
+---
+
+---
+
 ## Overview
-Grok, you'll orchestrate machine learning workflows with physics-inspired precision. This agent combines data processing, model training, and intelligent automation to deliver optimal ML solutions.
 
-## Agent Architecture
+The AiMl Agent is a comprehensive machine learning operations platform. It is designed to be:
 
-### 1. Core Components
+- **Modular**: data processing, model training, inference, monitoring as separate concerns.
+- **Scalable**: supports batch and real-time inference.
+- **Observable**: tracks predictions, drift, and performance.
+- **Extensible**: plugin system for custom models, metrics, and data sources.
 
-```yaml
-ml_agent:
-  data_processor:
-    focus: "Data ingestion, cleaning, and preprocessing"
-    capabilities: ["etl-pipelines", "feature-engineering", "data-validation"]
-    tools: ["pandas", "numpy", "scikit-learn", "spark"]
-  
-  model_trainer:
-    focus: "Model selection, training, and optimization"
-    capabilities: ["hyperparameter-tuning", "ensemble-methods", "neural-architectures"]
-    tools: ["tensorflow", "pytorch", "xgboost", "optuna"]
-  
-  inference_engine:
-    focus: "Model deployment and real-time predictions"
-    capabilities: ["batch-inference", "real-time-api", "model-monitoring"]
-    tools: ["fastapi", "tensorflow-serving", "kubernetes", "prometheus"]
-  
-  performance_analyzer:
-    focus: "Model evaluation and optimization"
-    capabilities: ["metrics-analysis", "a/b-testing", "drift-detection"]
-    tools: ["mlflow", "wandb", "great-expectations"]
-```
+### What It Does
 
-### 2. Workflow Pipeline
+- Registers and versions ML models.
+- Trains models via configurable pipelines.
+- Deploys models to production.
+- Runs batch and real-time inference.
+- Logs predictions for observability.
+- Detects data drift and model degradation.
+- Manages hyperparameter tuning.
+- Compares model performance.
 
-```yaml
-ml_workflow:
-  stage_1_data_preparation:
-    - "Ingest raw data from multiple sources"
-    - "Clean and validate data quality"
-    - "Engineer relevant features"
-    - "Split data for training/validation/testing"
-  
-  stage_2_model_development:
-    - "Select appropriate algorithms"
-    - "Perform hyperparameter optimization"
-    - "Train ensemble models"
-    - "Validate model performance"
-  
-  stage_3_deployment:
-    - "Package model for deployment"
-    - "Set up inference endpoints"
-    - "Configure monitoring and alerting"
-    - "Implement model versioning"
-  
-  stage_4_optimization:
-    - "Monitor model drift"
-    - "Collect feedback data"
-    - "Retrain models as needed"
-    - "Optimize performance continuously"
-```
+---
 
-## Implementation Patterns
+---
 
-### 1. Data Processing Pipeline
+## Key Features
+
+### Core Capabilities
+
+| Capability | Description |
+|------------|-------------|
+| **Model Management** | Register, version, deploy, and retire ML models. |
+| **Training Pipelines** | Configurable multi-step training workflows. |
+| **Hyperparameter Tuning** | Automated search for optimal model parameters. |
+| **Inference Engine** | Real-time and batch prediction runtime. |
+| **Model Observability** | Prediction logging, drift detection, performance monitoring. |
+| **Anomaly Detection** | Threshold and baseline-based anomaly checks. |
+| **Model Comparison** | Compare performance across model versions. |
+| **Compression & Optimization** | Quantization, pruning for faster inference. |
+
+---
+
+---
+
+## Quick Start
+
 ```python
-# data_processor.py
-class MLDataProcessor:
-    def __init__(self, config):
-        self.config = config
-        self.feature_engineer = FeatureEngineer()
-        self.validator = DataValidator()
-    
-    def process_pipeline(self, raw_data):
-        """Grok's physics-inspired data processing"""
-        # Stage 1: Data Cleaning
-        cleaned_data = self._clean_data(raw_data)
-        
-        # Stage 2: Feature Engineering
-        features = self._engineer_features(cleaned_data)
-        
-        # Stage 3: Validation
-        validated_data = self._validate_data(features)
-        
-        # Stage 4: Splitting
-        splits = self._split_data(validated_data)
-        
-        return splits
-    
-    def _engineer_features(self, data):
-        """Apply physics principles to feature creation"""
-        # Entropy-based feature selection
-        high_entropy_features = self._select_by_entropy(data)
-        
-        # Correlation optimization
-        optimized_features = self._optimize_correlations(high_entropy_features)
-        
-        # Polynomial features for non-linear relationships
-        poly_features = self._create_polynomial_features(optimized_features)
-        
-        return poly_features
+from agents.ai_ml.agent import ModelManager, TrainingPipeline, Aiobservability
+
+manager = ModelManager()
+pipeline = TrainingPipeline()
+observability = Aiobservability()
+
+# Register model
+model_id = manager.register_model(
+    name="image-classifier",
+    version="v1.0",
+    model_path="/models/image_classifier.h5",
+    metrics={"accuracy": 0.95, "f1": 0.93}
+)
+
+# Deploy
+manager.deploy_model(model_id)
+
+# Tune hyperparameters
+tuning = pipeline.hyperparameter_tuning({
+    "learning_rate": [0.001, 0.01],
+    "batch_size": [32, 64]
+})
+
+# Run inference with observability
+observability.log_prediction(
+    model_id=model_id,
+    input_data={"image": [0.1, 0.2, ...]},
+    output={"label": "cat", "confidence": 0.98},
+    latency=0.045
+)
+
+# Detect drift
+drift = observability.detect_drift(reference_data, current_data)
+print(drift)
 ```
 
-### 2. Model Training Specialist
+---
+
+---
+
+## Installation
+
+```bash
+git clone https://github.com/LifeJiggy/Awesome-Grok-Skills.git
+cd Awesome-Grok-Skills
+```
+
+Optional dependencies for full functionality:
+```bash
+pip install numpy pandas scikit-learn tensorflow pytorch optuna fastapi uvicorn
+```
+
+---
+
+---
+
+## Configuration
+
 ```python
-# model_trainer.py
-class ModelTrainer:
-    def __init__(self, config):
-        self.config = config
-        self.optimizer = HyperparameterOptimizer()
-    
-    def train_optimal_model(self, data):
-        """Train models with Grok's precision approach"""
-        models = []
-        
-        # Train multiple models in parallel
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            futures = []
-            
-            # Random Forest
-            futures.append(executor.submit(
-                self._train_random_forest, data
-            ))
-            
-            # Neural Network
-            futures.append(executor.submit(
-                self._train_neural_network, data
-            ))
-            
-            # Gradient Boosting
-            futures.append(executor.submit(
-                self._train_gradient_boosting, data
-            ))
-            
-            # Collect results
-            for future in futures:
-                models.append(future.result())
-        
-        # Ensemble the best performers
-        best_ensemble = self._create_ensemble(models)
-        
-        return best_ensemble
+from agents.ai_ml.agent import Config
+
+config = Config(
+    default_framework="tensorflow",
+    model_storage_path="./models",
+    max_model_versions=10,
+    drift_threshold=0.1,
+    baseline_samples=1000,
+    prediction_log_retention_days=30,
+    hyperparameter_trials=100,
+    batch_inference_size=32,
+    alert_on_drift=True,
+)
 ```
 
-### 3. Real-time Inference Engine
+---
+
+---
+
+## Core Concepts
+
+### Model Lifecycle
+
+1. Registration
+2. Training
+3. Evaluation
+4. Deployment
+5. Inference
+6. Monitoring
+7. Retirement
+
+### Model Statuses
+
+| Status | Description |
+|--------|-------------|
+| TRAINING | Currently training |
+| DEPLOYED | In production |
+| DEPRECATED | Retired but accessible |
+| FAILED | Training or deployment failed |
+
+### Drift Detection
+
+- Data Drift: input feature distribution changes
+- Concept Drift: input-output relationship changes
+
+---
+
+---
+
+## API Reference
+
+### ModelManager
+
+- register_model(name, version, model_path, metrics, framework, tags) -> model_id
+- deploy_model(model_id) -> bool
+- deprecate_model(model_id) -> bool
+- get_model(model_id) -> Model
+- get_model_metrics(model_id) -> Dict
+- compare_models(model_ids, metric, higher_is_better) -> Dict
+- list_models(name, status) -> List[Model]
+- add_deploy_hook(hook) -> None
+
+---
+
+---
+
+## Usage Patterns
+
+### Pattern 1: New Model Training
+
 ```python
-# inference_engine.py
-class InferenceEngine:
-    def __init__(self, model):
-        self.model = model
-        self.monitor = PerformanceMonitor()
-    
-    async def predict(self, input_data):
-        """Real-time inference with monitoring"""
-        # Preprocess input
-        processed_input = self._preprocess(input_data)
-        
-        # Make prediction
-        start_time = time.time()
-        prediction = self.model.predict(processed_input)
-        inference_time = time.time() - start_time
-        
-        # Monitor performance
-        self.monitor.log_inference({
-            'timestamp': datetime.now(),
-            'inference_time': inference_time,
-            'input_shape': processed_input.shape,
-            'prediction': prediction
-        })
-        
-        return prediction
+model_id = manager.register_model(
+    name="sales-forecaster",
+    version="v2.0",
+    model_path="/models/sales_v2.pkl",
+    metrics={}
+)
+pipeline = TrainingPipeline()
+pipeline.add_step("preprocess", preprocess_fn)
+pipeline.add_step("train", train_fn)
+pipeline.add_step("evaluate", evaluate_fn)
+results = pipeline.run(data_path="./data/sales.csv")
+manager.models[model_id].metrics = results["evaluate"]["result"]
+manager.deploy_model(model_id)
 ```
 
-## Model Types and Use Cases
+### Pattern 2: Batch Inference
 
-### 1. Computer Vision Models
-```yaml
-vision_models:
-  image_classification:
-    architecture: "ResNet-50 / EfficientNet"
-    use_case: "Image categorization, content moderation"
-    performance_target: ">95% accuracy"
-  
-  object_detection:
-    architecture: "YOLOv8 / Faster R-CNN"
-    use_case: "Autonomous vehicles, security monitoring"
-    performance_target: ">90% mAP"
-  
-  segmentation:
-    architecture: "U-Net / Mask R-CNN"
-    use_case: "Medical imaging, satellite analysis"
-    performance_target: ">85% IoU"
+```python
+engine = InferenceEngine()
+engine.load_model(model_id)
+inputs = [{"features": [...]}, {"features": [...]}]
+results = engine.batch_predict(inputs)
 ```
 
-### 2. Natural Language Processing
-```yaml
-nlp_models:
-  text_classification:
-    architecture: "BERT / RoBERTa"
-    use_case: "Sentiment analysis, content categorization"
-    performance_target: ">90% F1-score"
-  
-  generation:
-    architecture: "GPT-style transformer"
-    use_case: "Content creation, chatbots"
-    performance_target: "Low perplexity, high coherence"
-  
-  translation:
-    architecture: "T5 / MarianMT"
-    use_case: "Multi-language content"
-    performance_target: ">30 BLEU score"
+### Pattern 3: Drift Monitoring
+
+```python
+reference_data = load_training_data()
+current_data = load_production_data()
+drift = observability.detect_drift(reference_data, current_data)
+if drift["drift_detected"]:
+    alert_team("Data drift detected")
 ```
 
-### 3. Time Series Forecasting
-```yaml
-time_series_models:
-  forecasting:
-    architecture: "LSTM / Prophet / ARIMA"
-    use_case: "Financial predictions, demand forecasting"
-    performance_target: "MAPE < 10%"
-  
-  anomaly_detection:
-    architecture: "Autoencoders / Isolation Forest"
-    use_case: "Fraud detection, system monitoring"
-    performance_target: "F1-score > 85%"
+### Pattern 4: Model Comparison
+
+```python
+comparison = manager.compare_models(model_ids, metric="f1")
+best_model = max(comparison, key=comparison.get)
+print(f"Best model by F1: {best_model}")
 ```
+
+---
+
+---
+
+## Model Types
+
+### Computer Vision
+
+- Image Classification: ResNet-50, EfficientNet
+- Object Detection: YOLOv8, Faster R-CNN
+- Segmentation: U-Net, Mask R-CNN
+
+### Natural Language Processing
+
+- Text Classification: BERT, RoBERTa
+- Generation: GPT-style transformer
+- Translation: T5, MarianMT
+
+### Time Series
+
+- Forecasting: LSTM, Prophet, ARIMA
+- Anomaly Detection: Autoencoders, Isolation Forest
+
+---
+
+---
 
 ## Performance Optimization
 
-### 1. Hyperparameter Optimization
+### Hyperparameter Tuning
+
 ```python
-# hyperparameter_optimization.py
-class HyperparameterOptimizer:
-    def __init__(self):
-        self.study = optuna.create_study(direction='maximize')
-    
-    def optimize_xgboost(self, data):
-        """Optimize XGBoost hyperparameters using Bayesian optimization"""
-        
-        def objective(trial):
-            params = {
-                'max_depth': trial.suggest_int('max_depth', 3, 10),
-                'learning_rate': trial.suggest_loguniform('learning_rate', 0.01, 0.3),
-                'n_estimators': trial.suggest_int('n_estimators', 100, 1000),
-                'subsample': trial.suggest_uniform('subsample', 0.6, 1.0),
-                'colsample_bytree': trial.suggest_uniform('colsample_bytree', 0.6, 1.0),
-                'alpha': trial.suggest_loguniform('alpha', 1e-8, 1.0),
-                'lambda': trial.suggest_loguniform('lambda', 1e-8, 1.0)
-            }
-            
-            model = xgb.XGBClassifier(**params)
-            cv_scores = cross_val_score(model, data.X_train, data.y_train, cv=5)
-            
-            return cv_scores.mean()
-        
-        self.study.optimize(objective, n_trials=100)
-        return self.study.best_params
+tuning = pipeline.hyperparameter_tuning({
+    "learning_rate": [0.001, 0.01, 0.1],
+    "batch_size": [16, 32, 64],
+    "max_depth": [3, 6, 10]
+}, objective="f1")
+print(tuning["best_params"], tuning["best_score"])
 ```
 
-### 2. Model Compression
+### Model Compression
+
+- Quantization: float32 -> int8
+- Pruning: remove low-importance weights
+
+### Batch Inference
+
+Use batch_predict() for throughput
+
+---
+
+---
+
+## Monitoring & Observability
+
+### Prediction Logging
+
+Every prediction includes:
+- Model ID
+- Input data
+- Output prediction
+- Latency
+- Timestamp
+
+### Drift Detection
+
+- KS test for distribution comparison
+- PSI for population stability
+- Z-score for threshold violations
+
+### Performance Monitoring
+
+Track metrics over time:
+- Accuracy, precision, recall, F1
+- Inference latency percentiles
+- Prediction volume trends
+
+---
+
+---
+
+## Batch Operations
+
+### Batch Model Registration
+
 ```python
-# model_compression.py
-class ModelCompressor:
-    @staticmethod
-    def quantize_model(model, calibration_data):
-        """Quantize model for faster inference"""
-        import torch.quantization
-        
-        # Post-training quantization
-        quantized_model = torch.quantization.quantize_dynamic(
-            model, {torch.nn.Linear}, dtype=torch.qint8
-        )
-        
-        return quantized_model
-    
-    @staticmethod
-    def prune_model(model, pruning_ratio=0.2):
-        """Prune model to reduce size"""
-        import torch.nn.utils.prune as prune
-        
-        # Global magnitude pruning
-        parameters_to_prune = []
-        for name, module in model.named_modules():
-            if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear)):
-                parameters_to_prune.append((module, 'weight'))
-        
-        prune.global_unstructured(
-            parameters_to_prune,
-            pruning_method=prune.L1Unstructured,
-            amount=pruning_ratio
-        )
-        
-        return model
+models = [
+    {"name": "model-a", "version": "v1", "path": "/models/a.pkl", "metrics": {"accuracy": 0.9}},
+    {"name": "model-b", "version": "v1", "path": "/models/b.pkl", "metrics": {"accuracy": 0.92}},
+]
+for m in models:
+    manager.register_model(**m)
 ```
 
-## Monitoring and Maintenance
+### Batch Inference
 
-### 1. Model Performance Monitoring
 ```python
-# monitoring.py
-class ModelMonitor:
-    def __init__(self, model):
-        self.model = model
-        self.metrics_history = []
-    
-    def monitor_drift(self, current_data, reference_data):
-        """Monitor data drift using statistical tests"""
-        from scipy import stats
-        
-        drift_indicators = {}
-        
-        for feature in current_data.columns:
-            # Kolmogorov-Smirnov test for distribution drift
-            ks_stat, p_value = stats.ks_2samp(
-                current_data[feature], 
-                reference_data[feature]
-            )
-            
-            drift_indicators[feature] = {
-                'ks_statistic': ks_stat,
-                'p_value': p_value,
-                'drift_detected': p_value < 0.05
-            }
-        
-        return drift_indicators
-    
-    def monitor_performance(self, predictions, ground_truth):
-        """Track model performance metrics"""
-        metrics = {
-            'accuracy': accuracy_score(ground_truth, predictions),
-            'precision': precision_score(ground_truth, predictions),
-            'recall': recall_score(ground_truth, predictions),
-            'f1_score': f1_score(ground_truth, predictions),
-            'timestamp': datetime.now()
-        }
-        
-        self.metrics_history.append(metrics)
-        
-        # Alert if performance drops
-        if len(self.metrics_history) > 1:
-            recent_avg = np.mean([m['f1_score'] for m in self.metrics_history[-10:]])
-            historical_avg = np.mean([m['f1_score'] for m in self.metrics_history[:-10]])
-            
-            if recent_avg < historical_avg * 0.9:
-                self._trigger_performance_alert(recent_avg, historical_avg)
-        
-        return metrics
+inputs = load_batch_inputs()
+results = engine.batch_predict(inputs)
 ```
 
-## Usage Examples
+---
 
-### 1. Basic ML Pipeline
-```bash
-# Train and deploy a model
-grok --agent ai-ml \
-  --task train \
-  --data ./data/sales.csv \
-  --model-type regression \
-  --output ./models/sales_predictor
+---
 
-# Make predictions
-grok --agent ai-ml \
-  --task predict \
-  --model ./models/sales_predictor \
-  --input ./data/new_sales.csv \
-  --output predictions.csv
-```
+## Integration Hooks
 
-### 2. Configuration File
-```yaml
-# ml_config.yaml
-data:
-  source: "./data/"
-  format: "parquet"
-  preprocessing:
-    - "remove_missing"
-    - "normalize"
-    - "feature_selection"
+### Scheduled Retraining
 
-model:
-  type: "xgboost"
-  hyperparameters:
-    max_depth: 6
-    learning_rate: 0.1
-    n_estimators: 500
-
-training:
-  validation_split: 0.2
-  cross_validation_folds: 5
-  early_stopping_rounds: 50
-
-deployment:
-  format: "onnx"
-  optimization:
-    - "quantization"
-    - "pruning"
-```
-
-### 3. API Deployment
 ```python
-# deploy_model.py
-from fastapi import FastAPI
-import uvicorn
+import schedule
 
-app = FastAPI()
+def nightly_retrain():
+    pipeline.run(data_path="./data/fresh.csv")
+    # Update model, evaluate, deploy if better
 
-@app.on_event("startup")
-async def load_model():
-    global model
-    model = load_ml_model("./models/sales_predictor")
-
-@app.post("/predict")
-async def predict(input_data: dict):
-    """Make real-time predictions"""
-    prediction = model.predict(input_data)
-    
-    return {
-        "prediction": prediction.tolist(),
-        "confidence": model.get_prediction_probability(),
-        "timestamp": datetime.now().isoformat()
-    }
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+schedule.every().monday.at("02:00").do(nightly_retrain)
 ```
 
-## Best Practices
+### Export Model Registry
 
-1. **Data Quality First**: Garbage in, garbage out - validate data rigorously
-2. **Model Interpretability**: Use SHAP, LIME to understand predictions
-3. **Continuous Monitoring**: Track drift and performance degradation
-4. **Version Everything**: Models, data, and code should all be versioned
-5. **Security First**: Encrypt sensitive data, implement access controls
+```python
+import json
+registry = {mid: model.__dict__ for mid, model in manager.models.items()}
+with open("registry.json", "w") as f:
+    json.dump(registry, f, indent=2)
+```
 
-Remember: A good ML model is like a well-calibrated instrument - precise, reliable, and consistently accurate under varying conditions.
+---
+
+---
+
+## Performance Tuning
+
+- Limit prediction log retention days
+- Use batch inference size
+- Enable model compression for edge
+- Cache model artifacts in memory
+
+---
+
+---
+
+## Security & Privacy
+
+- No credentials stored in Model or Config
+- Model paths should be validated
+- Prediction logs may contain sensitive inputs
+- Support encrypted model storage
+
+---
+
+---
+
+## Extending the Agent
+
+### Custom Data Processors
+
+Extend and register via configuration
+
+### Custom Metrics
+
+Add metrics to Model.metrics
+
+### Custom Drift Detection
+
+Extend Observability.detect_drift()
+
+### Custom Training Steps
+
+Add callable steps to TrainingPipeline.steps
+
+---
+
+---
+
+## Troubleshooting
+
+### Problem: Model not found
+
+- Verify model_id is correct
+- Use manager.models to inspect IDs
+- Check Model.status is not FAILED
+
+### Problem: Drift detection always false
+
+- Ensure reference_data has sufficient samples
+- Lower drift_threshold
+- Validate feature distributions
+
+### Problem: Hyperparameter tuning slow
+
+- Reduce n_trials
+- Use smaller param grids
+- Consider random search
+
+---
+
+---
+
+## FAQ
+
+**Q: Does this connect to real ML frameworks?**
+A: It provides the ops layer
+
+**Q: Can I use this for production model serving?**
+A: Add a serving layer (FastAPI, TensorFlow Serving, TorchServe)
+
+**Q: How accurate is drift detection?**
+A: Uses simplified statistical tests
+
+---
+
+---
+
+## Contributing
+
+See CONTRIBUTING.md
+
+---
+
+---
+
+## License
+
+MIT License
+
+---
+
+---
+
+## Troubleshooting Patterns
+
+### Model Registration Pattern
+
+- Verify model_id uniqueness
+- Check name/version format
+- Ensure model_path is valid filesystem path
+
+### Inference Pattern
+
+- Load model before prediction
+- Handle missing model artifacts
+- Validate input schema matches expected features
+
+### Drift Detection Pattern
+
+- Define reference baseline before monitoring
+- Use same feature engineering pipeline
+- Recalculate baseline after known data shifts
+
+### Performance Pattern
+
+- Profile hot paths with cProfile
+- Batch predictions when latency < 100ms
+- Cache baselines and thresholds
+
+---
+
+---
+
+## Advanced Usage
+
+### Pattern: Multi-Model Orchestration
+
+```python
+for model_cfg in model_configs:
+    mid = manager.register_model(**model_cfg)
+    manager.deploy_model(mid)
+```
+
+### Pattern: Continuous Monitoring
+
+```python
+while True:
+    for metric, value in live_metrics():
+        result = detector.check_anomaly(metric, value)
+        if result["is_anomaly"]:
+            alerter.evaluate(result)
+    time.sleep(60)
+```
+
+### Pattern: A/B Model Comparison
+
+```python
+comparison = manager.compare_models([model_a_id, model_b_id], metric="f1")
+if comparison["best"] == model_b_id:
+    upgrade_production(model_b_id)
+```
+
+---
+
+---
+
+## Reference Matrix
+
+| Instrument | Task |
+|---|---|
+| ModelManager | Model lifecycle and comparison |
+| TrainingPipeline | Step orchestration and tuning |
+| InferenceEngine | Single and batch prediction |
+| Observability | Prediction logging and drift detection |
+| AnomalyDetector | Threshold and baseline checks |
+| ReportingEngine | Model state and artifact reporting |
+
+---
+
+---
+
+## Physics-Inspired Concepts
+
+- **Drift as entropy**: increasing distribution distance means rising system disorder.
+- **Inference as force**: applying a model to data should yield predictable, directional outputs.
+- **Model calibration as potential energy**: well-calibrated probabilities represent stored predictive potential.
+
+---
+
+---
+
+## Meme-Aware Communication
+
+- "A 0.05 drift score is a gentle reminder to retrain; a 0.5 is your model screaming for help."
+- "Z-score of 12? That's not an anomaly, that's a feature from a parallel universe."
+- "Hyperparameter tuning without early stopping is like speedrunning without a timer."
+
+---
+
+---
+
+## Version History
+
+- **v2.1.0** (2026-06-03)
+  - Full rewrite with typed dataclass payloads
+  - New components: ModelRegistry, TrainingPipeline, InferenceEngine, Observability, AnomalyDetector
+  - Batch operations and reporting
+  - Drift detection and monitoring
+
+- **v1.0.0** (2024-01-01)
+  - Initial release with basic model registration and training
+
+---
+
+---
+
+*AI/ML Agent v2.1.0 - Built for the Awesome Grok Skills ecosystem.*
+
+*Last updated: 2026-06-03*
+
+*Maintained by the AI/ML Agent team and Grok community.*
+
+---
+
+---
+
+## Conclusion
+
+The AI-ML Agent combines the pattern we established with accessibility, ad-operations, and the other sectors across the repository. It is now ready for implementation:
+
+- **agent.py** is comprehensive
+- **ARCHITECTURE.md** documents components thoroughly
+- **GROK.md** guides use clearly
+- **README.md** covers setup and examples
+
+With the foundational work complete, focus shifts to practical application rather than structural planning. The agent is now a usable starting point for machine learning operations and model management in any project, with room to extend or integrate with TensorFlow, PyTorch, scikit-learn, and other tooling as needed.

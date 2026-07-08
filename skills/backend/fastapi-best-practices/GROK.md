@@ -80,7 +80,7 @@ from app.models import user
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getlogger(__name__)
 
 # Create FastAPI app
 app = FastAPI(

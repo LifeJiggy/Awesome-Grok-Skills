@@ -1,599 +1,379 @@
 ---
-name: Market Research Oracle Agent
-category: agents
-difficulty: advanced
-time_estimate: "3-5 hours"
-dependencies: ["real-time-research", "data-analysis", "sentiment-analysis", "trend-prediction"]
-tags: ["market-research", "validation", "real-time-data", "business-intelligence", "trend-analysis"]
-grok_personality: "data-driven-oracle"
-description: "Real-time market validation agent using Grok's X/Twitter access and advanced data analysis for business intelligence"
+name: "Market Research Oracle Agent"
+version: "2.0.0"
+description: "Comprehensive market research, survey design, data collection, trend analysis, competitive landscape mapping, and forecasting"
+author: "Awesome Grok Skills"
+license: "MIT"
+tags: ["market-research", "surveys", "trends", "competitive-analysis", "forecasting", "sentiment"]
+category: "research"
+personality: "data-driven-oracle"
+use_cases:
+  - "market research"
+  - "survey design"
+  - "trend analysis"
+  - "competitive landscape"
+  - "forecasting"
+  - "sentiment analysis"
+  - "market sizing"
 ---
 
 # Market Research Oracle Agent
 
-## Overview
-Grok, you'll leverage your real-time data access and analytical prowess to provide comprehensive market research and validation. This agent combines social media monitoring, trend analysis, and competitive intelligence to deliver actionable business insights with your signature data-driven approach.
+> Deep market intelligence powered by multi-source data fusion, statistical analysis, and structured research methodologies.
 
-## Agent Capabilities
+## Identity
 
-### 1. Real-Time Market Intelligence
-- Social media sentiment analysis
-- Trend detection and tracking
-- Competitor monitoring
-- Market opportunity identification
-- Demand validation
-- Risk assessment
+**Role**: Chief Research Analyst and Market Intelligence Lead  
+**Mindset**: Evidence-based insights, systematic analysis, rigorous methodology  
+**Approach**: Every claim backed by data, every recommendation supported by analysis.
 
-### 2. Multi-Source Data Fusion
-- X/Twitter data mining
-- News sentiment analysis
-- Market data integration
-- Search trend analysis
-- Financial market correlation
-- Consumer behavior patterns
+---
 
-## Agent Architecture
+## Core Principles
 
-### 1. Data Collection Module
+1. **Data-Driven**: All conclusions derived from collected data, not assumptions
+2. **Multi-Source Validation**: Cross-reference findings across multiple data sources
+3. **Statistical Rigor**: Use appropriate statistical methods with confidence intervals
+4. **Actionable Insights**: Every finding translates to a concrete recommendation
+5. **Timeliness**: Prioritize fresh data and real-time signals
+6. **Objectivity**: Present balanced views including counter-evidence
+
+---
+
+## Capabilities
+
+### 1. Survey Design and Analysis
+
+Build surveys with multiple question types and analyze responses automatically.
+
 ```python
-# data_collector.py
-class MarketDataCollector:
-    def __init__(self, config):
-        self.config = config
-        self.sources = self._initialize_sources()
-        self.data_pipeline = DataPipeline()
-    
-    def _initialize_sources(self):
-        """Initialize Grok's native data access points"""
-        return {
-            'twitter': TwitterDataCollector(self.config.twitter),
-            'news': NewsDataCollector(self.config.news),
-            'market': MarketDataCollector(self.config.market),
-            'search': SearchTrendCollector(self.config.search),
-            'social': SocialMediaAggregator(self.config.social)
-        }
-    
-    async def collect_market_data(self, topic, time_window='7d'):
-        """Grok's comprehensive market data collection"""
-        collection_tasks = []
-        
-        # Parallel data collection from all sources
-        for source_name, collector in self.sources.items():
-            task = asyncio.create_task(
-                collector.collect_data(topic, time_window)
-            )
-            collection_tasks.append((source_name, task))
-        
-        # Collect and process results
-        market_data = {}
-        for source_name, task in collection_tasks:
-            try:
-                data = await task
-                market_data[source_name] = self._preprocess_data(data, source_name)
-            except Exception as e:
-                market_data[source_name] = {
-                    'error': str(e),
-                    'data': None
-                }
-        
-        return market_data
+from agents.market_research_oracle.agent import SurveyBuilder, SurveyQuestionType
+
+builder = SurveyBuilder()
+
+# Create survey
+survey = builder.create_survey(
+    title="Customer Satisfaction 2025",
+    description="Annual satisfaction survey",
+    target_responses=500
+)
+
+# Add questions
+builder.add_question(survey.survey_id, "Overall satisfaction?", SurveyQuestionType.RATING)
+builder.add_question(survey.survey_id, "How likely to recommend us?", SurveyQuestionType.NET_PROMOTER)
+builder.add_question(survey.survey_id, "Which features do you use?", SurveyQuestionType.MULTIPLE_CHOICE, ["Dashboard", "Reports", "API"])
+
+# Collect responses
+builder.submit_response(survey.survey_id, "user_1", {"q1": 8, "q2": 9, "q3": "Dashboard"})
+builder.submit_response(survey.survey_id, "user_2", {"q1": 6, "q2": 7, "q3": "Reports"})
+
+# Analyze
+analysis = builder.analyze_survey(survey.survey_id)
+# {'total_responses': 2, 'questions': {q1: {'mean': 7.0}, q2: {'nps_score': 100.0}}}
 ```
 
-### 2. Sentiment Analysis Engine
+**Question Types**:
+| Type | Analysis |
+|------|----------|
+| RATING | mean, min, max, count |
+| NET_PROMOTER | NPS score (promoters - detractors) |
+| MULTIPLE_CHOICE | frequency distribution |
+| LIKERT | agreement distribution |
+| OPEN_ENDED | raw responses |
+| BINARY | yes/no ratio |
+
+---
+
+### 2. Multi-Source Data Collection
+
+Aggregate data from diverse sources with reliability weighting.
+
 ```python
-# sentiment_analyzer.py
-class SentimentAnalyzer:
-    def __init__(self):
-        self.models = self._load_sentiment_models()
-        self.physics_sentiment = PhysicsBasedSentiment()
-    
-    def analyze_market_sentiment(self, market_data):
-        """Grok's physics-inspired sentiment analysis"""
-        sentiment_results = {}
-        
-        for source, data in market_data.items():
-            if data.get('error'):
-                continue
-            
-            # Multi-dimensional sentiment analysis
-            sentiment_results[source] = {
-                'overall_sentiment': self._calculate_overall_sentiment(data),
-                'sentiment_distribution': self._analyze_sentiment_distribution(data),
-                'sentiment_velocity': self._calculate_sentiment_velocity(data),
-                'sentiment_volatility': self._calculate_sentiment_volatility(data),
-                'key_drivers': self._identify_sentiment_drivers(data)
-            }
-        
-        # Cross-source sentiment correlation
-        aggregated_sentiment = self._aggregate_sentiments(sentiment_results)
-        
-        return {
-            'source_sentiments': sentiment_results,
-            'aggregated_sentiment': aggregated_sentiment,
-            'confidence_score': self._calculate_confidence(sentiment_results)
-        }
-    
-    def _calculate_sentiment_velocity(self, data):
-        """Calculate rate of sentiment change - Grok's physics approach"""
-        time_series = self._extract_time_series(data)
-        
-        if len(time_series) < 2:
-            return 0.0
-        
-        # Calculate sentiment momentum
-        sentiment_values = [point['sentiment'] for point in time_series]
-        time_stamps = [point['timestamp'] for point in time_series]
-        
-        # Linear regression for velocity
-        velocity = self._linear_regression_slope(time_stamps, sentiment_values)
-        
-        # Normalize to [-1, 1] scale
-        return np.tanh(velocity * 100)  # Scaling factor for sensitivity
-    
-    def _calculate_sentiment_volatility(self, data):
-        """Calculate sentiment volatility as market uncertainty measure"""
-        sentiment_values = self._extract_sentiment_values(data)
-        
-        if len(sentiment_values) < 2:
-            return 0.0
-        
-        # Standard deviation as volatility measure
-        volatility = np.std(sentiment_values)
-        
-        # Normalize to [0, 1] scale
-        return min(volatility / 2.0, 1.0)
+from agents.market_research_oracle.agent import DataCollector, DataSource
+
+collector = DataCollector()
+
+# Register sources
+collector.register_source("twitter", DataSource.SOCIAL_MEDIA, reliability=0.85)
+collector.register_source("gartner", DataSource.PROPRIETARY, reliability=0.95)
+
+# Collect data
+collector.collect("twitter", "AI productivity", [
+    {"text": "Love AI tools!", "sentiment_score": 0.9, "keywords": ["AI", "productivity"]},
+    {"text": "AI is overhyped", "sentiment_score": 0.2, "keywords": ["AI", "skepticism"]},
+])
+
+# Aggregate sentiment
+sentiment = collector.aggregate_sentiment("AI productivity")
+# {'label': 'positive', 'score': 0.55, 'volume': 2, 'keywords': ['AI']}
 ```
 
-### 3. Trend Detection System
+---
+
+### 3. Trend Detection
+
+Identify emerging, growing, and declining trends from time-series data.
+
 ```python
-# trend_detector.py
-class TrendDetector:
-    def __init__(self):
-        self.physics_models = PhysicsBasedTrending()
-        self.ml_models = self._load_ml_models()
-    
-    def detect_trends(self, market_data, sentiment_analysis):
-        """Grok's advanced trend detection combining physics and ML"""
-        trends = {
-            'emerging_trends': [],
-            'established_trends': [],
-            'declining_trends': [],
-            'viral_patterns': [],
-            'market_shifts': []
-        }
-        
-        # Physics-based trend detection
-        physics_trends = self._physics_trend_detection(market_data)
-        
-        # Machine learning trend detection
-        ml_trends = self._ml_trend_detection(market_data)
-        
-        # Combine and validate trends
-        combined_trends = self._combine_trend_sources(physics_trends, ml_trends)
-        
-        # Categorize trends
-        for trend in combined_trends:
-            trend_category = self._categorize_trend(trend, sentiment_analysis)
-            trends[trend_category].append(trend)
-        
-        # Calculate trend strength and momentum
-        for category in trends:
-            for trend in trends[category]:
-                trend['strength'] = self._calculate_trend_strength(trend)
-                trend['momentum'] = self._calculate_trend_momentum(trend)
-        
-        return trends
-    
-    def _physics_trend_detection(self, market_data):
-        """Use physics principles to detect emerging patterns"""
-        trends = []
-        
-        # Apply wave function analysis for cyclical patterns
-        for source, data in market_data.items():
-            if 'volume' in data:
-                # Fourier analysis for periodicity
-                frequencies = self._fourier_analysis(data['volume'])
-                
-                # Detect significant frequencies (trends)
-                significant_freqs = self._find_significant_frequencies(frequencies)
-                
-                for freq in significant_freqs:
-                    if freq['amplitude'] > self._trend_threshold:
-                        trends.append({
-                            'type': 'cyclical_trend',
-                            'frequency': freq['frequency'],
-                            'amplitude': freq['amplitude'],
-                            'phase': freq['phase'],
-                            'source': source,
-                            'physics_model': 'wave_function'
-                        })
-        
-        return trends
+from agents.market_research_oracle.agent import TrendAnalyzer
+
+analyzer = TrendAnalyzer()
+
+# Add data points
+analyzer.add_data_point("ai_adoption", datetime(2025, 1, 1), 100)
+analyzer.add_data_point("ai_adoption", datetime(2025, 2, 1), 125)
+analyzer.add_data_point("ai_adoption", datetime(2025, 3, 1), 155)
+analyzer.add_data_point("ai_adoption", datetime(2025, 4, 1), 190)
+analyzer.add_data_point("ai_adoption", datetime(2025, 5, 1), 230)
+
+# Detect trends
+trends = analyzer.detect_trends("ai_adoption")
+# [{'trend_type': 'GROWTH', 'growth_rate': 24.5, 'confidence': 0.87}]
 ```
 
-### 4. Competitive Intelligence Module
+**Trend Types**:
+| Type | Signal |
+|------|--------|
+| GROWTH | Strong positive slope (>10%) |
+| EMERGING | Moderate positive slope (2-10%) |
+| MATURING | Near-zero slope (-2% to 2%) |
+| DECLINING | Strong negative slope (<-10%) |
+| STABLE | Moderate negative slope (-10% to -2%) |
+
+---
+
+### 4. Competitive Landscape Analysis
+
+Map competitors, generate SWOT analyses, and assess threats.
+
 ```python
-# competitive_intelligence.py
-class CompetitiveIntelligence:
-    def __init__(self):
-        self.competitor_db = CompetitorDatabase()
-        self.benchmark_analyzer = BenchmarkAnalyzer()
-    
-    def analyze_competitive_landscape(self, topic, market_data):
-        """Grok's comprehensive competitive analysis"""
-        competitors = self._identify_competitors(topic, market_data)
-        
-        competitive_analysis = {
-            'competitors': [],
-            'market_positioning': {},
-            'competitive_gaps': [],
-            'opportunity_windows': []
-        }
-        
-        for competitor in competitors:
-            analysis = self._analyze_competitor(competitor, market_data)
-            competitive_analysis['competitors'].append(analysis)
-        
-        # Market positioning analysis
-        competitive_analysis['market_positioning'] = self._analyze_positioning(
-            competitive_analysis['competitors']
-        )
-        
-        # Identify gaps and opportunities
-        competitive_analysis['competitive_gaps'] = self._identify_gaps(
-            competitive_analysis['competitors']
-        )
-        
-        competitive_analysis['opportunity_windows'] = self._identify_opportunities(
-            competitive_analysis['competitive_gaps'],
-            market_data
-        )
-        
-        return competitive_analysis
-    
-    def _analyze_competitor(self, competitor, market_data):
-        """Detailed competitor analysis"""
-        return {
-            'name': competitor['name'],
-            'market_share': self._estimate_market_share(competitor, market_data),
-            'sentiment_score': self._calculate_competitor_sentiment(competitor, market_data),
-            'growth_trajectory': self._calculate_growth_trajectory(competitor, market_data),
-            'strengths': self._identify_strengths(competitor, market_data),
-            'weaknesses': self._identify_weaknesses(competitor, market_data),
-            'strategic_moves': self._detect_strategic_moves(competitor, market_data),
-            'threat_level': self._assess_threat_level(competitor)
-        }
+from agents.market_research_oracle.agent import CompetitiveLandscape, CompetitivePosition
+
+landscape = CompetitiveLandscape()
+
+# Add competitors
+landscape.add_competitor(
+    name="MarketLeader Inc",
+    market_share=0.35,
+    strengths=["Brand recognition", "Distribution network"],
+    weaknesses=["Slow innovation", "High prices"],
+    position=CompetitivePosition.LEADER
+)
+
+landscape.add_competitor(
+    name="DisruptorCo",
+    market_share=0.08,
+    strengths=["Innovation speed", "Low cost"],
+    weaknesses=["Limited distribution"],
+    position=CompetitivePosition.EMERGING
+)
+
+# Generate SWOT
+swot = landscape.generate_swot(competitor_id)
+# {'competitor': 'MarketLeader Inc', 'strengths': [...], 'threats': [...]}
+
+# Threat assessment
+threats = landscape.get_threat_assessment()
+# {'threats': [{'competitor': 'MarketLeader Inc', 'threat_level': 5}]}
 ```
 
-## Validation Framework
+---
 
-### 1. Market Validation Engine
+### 5. Statistical Forecasting
+
+Generate forecasts using established statistical methods.
+
 ```python
-# market_validator.py
-class MarketValidator:
-    def __init__(self):
-        self.validation_models = self._load_validation_models()
-        self.market_indicators = MarketIndicators()
-    
-    def validate_market_opportunity(self, idea, market_data, sentiment_analysis):
-        """Grok's comprehensive market validation"""
-        validation_results = {
-            'overall_score': 0,
-            'validation_dimensions': {},
-            'risk_assessment': {},
-            'recommendations': [],
-            'confidence_interval': {}
-        }
-        
-        # Multi-dimensional validation
-        dimensions = [
-            'demand_validation',
-            'competitive_landscape',
-            'market_timing',
-            'profitability_potential',
-            'scalability_assessment',
-            'risk_evaluation'
-        ]
-        
-        for dimension in dimensions:
-            score = self._validate_dimension(dimension, idea, market_data, sentiment_analysis)
-            validation_results['validation_dimensions'][dimension] = score
-        
-        # Calculate overall score
-        validation_results['overall_score'] = self._calculate_weighted_score(
-            validation_results['validation_dimensions']
-        )
-        
-        # Risk assessment
-        validation_results['risk_assessment'] = self._assess_risks(
-            idea, market_data, validation_results
-        )
-        
-        # Generate recommendations
-        validation_results['recommendations'] = self._generate_recommendations(
-            validation_results
-        )
-        
-        return validation_results
-    
-    def _validate_dimension(self, dimension, idea, market_data, sentiment_analysis):
-        """Validate specific market dimension"""
-        validators = {
-            'demand_validation': self._validate_demand,
-            'competitive_landscape': self._validate_competition,
-            'market_timing': self._validate_timing,
-            'profitability_potential': self._validate_profitability,
-            'scalability_assessment': self._validate_scalability,
-            'risk_evaluation': self._validate_risks
-        }
-        
-        return validators[dimension](idea, market_data, sentiment_analysis)
-    
-    def _validate_demand(self, idea, market_data, sentiment_analysis):
-        """Validate market demand using Grok's real-time analysis"""
-        demand_signals = {
-            'search_volume': self._get_search_volume(idea.keywords),
-            'social_mentions': self._count_social_mentions(idea.keywords, market_data),
-            'sentiment_score': sentiment_analysis['aggregated_sentiment']['overall'],
-            'growth_rate': self._calculate_interest_growth(idea.keywords, market_data),
-            'market_size': self._estimate_market_size(idea, market_data)
-        }
-        
-        # Apply physics-based demand modeling
-        demand_score = self._demand_physics_model(demand_signals)
-        
-        return {
-            'score': demand_score,
-            'signals': demand_signals,
-            'confidence': self._calculate_demand_confidence(demand_signals)
-        }
+from agents.market_research_oracle.agent import ForecastEngine, ForecastMethod
+
+engine = ForecastEngine()
+
+# Moving average forecast
+result = engine.moving_average("revenue", [100, 110, 115, 120, 125], window=3)
+# predicted_values: [111.7, 115.0, 120.0]
+
+# Exponential smoothing
+result = engine.exponential_smoothing("users", [1000, 1200, 1400, 1650], alpha=0.3)
+
+# Linear regression
+result = engine.linear_regression("mrr", [5000, 7500, 10000, 13000])
+# predicted_values: [..., 16500.0]  # next period
 ```
 
-## Usage Examples
+---
 
-### 1. Quick Market Validation
-```bash
-# Validate a startup idea
-grok --agent market-research-oracle \
-  --idea "AI-powered calendar assistant" \
-  --target-market "professionals" \
-  --time-window "30d" \
-  --output validation-report.json
+### 6. Market Sizing
 
-# Analyze market trends
-grok --agent market-research-oracle \
-  --trend-analysis "AI productivity tools" \
-  --competitors "motion,notion,clickup" \
-  --depth comprehensive
-```
+Estimate market opportunity using TAM/SAM/SOM framework.
 
-### 2. Competitive Analysis
 ```python
-# Example: Competitive analysis request
-competitive_request = {
-    'product_category': 'AI productivity tools',
-    'target_audience': 'knowledge workers',
-    'analysis_depth': 'comprehensive',
-    'time_horizon': '12 months'
-}
+from agents.market_research_oracle.agent import MarketSizeEstimator
 
-# Run competitive analysis
-analysis = await market_research_agent.competitive_analysis(competitive_request)
+estimator = MarketSizeEstimator()
 
-# Results include:
-# - Market positioning map
-# - SWOT analysis for each competitor
-# - Strategic recommendations
-# - Opportunity identification
+# Initial estimate
+size = estimator.estimate(
+    segment="Enterprise SaaS",
+    total_addressable=80_000_000_000,  # $80B TAM
+    serviceable_percentage=0.25,        # 25% SAM
+    obtainable_percentage=0.05,         # 5% SOM
+    growth_rate=15.0                    # 15% CAGR
+)
+# TAM: $80B, SAM: $20B, SOM: $1B
+
+# Forward projections
+projections = estimator.project_forward("Enterprise SaaS", years=5)
+# Year 1: TAM=$92B, Year 2: TAM=$105.8B, ...
 ```
 
-### 3. Real-Time Monitoring
+---
+
+### 7. Report Generation
+
+Compile research into structured, actionable reports.
+
 ```python
-# Continuous market monitoring
-monitor_config = {
-    'keywords': ['AI calendar', 'smart scheduling', 'productivity AI'],
-    'competitors': ['Motion', 'Reclaim.ai', 'Clockwise'],
-    'alert_thresholds': {
-        'sentiment_shift': 0.3,
-        'volume_spike': 2.0,
-        'new_competitor': 1
-    }
-}
+from agents.market_research_oracle.agent import ReportGenerator
 
-# Start monitoring
-monitor = MarketMonitor(monitor_config)
-monitor.start_real_time_monitoring()
+gen = ReportGenerator()
+
+report = gen.generate_report(
+    title="Q2 2025 Market Analysis: AI Productivity Tools",
+    executive_summary="The AI productivity market shows 24.5% YoY growth with strong emerging trends.",
+    findings=[
+        "Market growing at 24.5% CAGR",
+        "3 key competitors dominate 60% share",
+        "Customer NPS averaging 72",
+    ],
+    recommendations=[
+        "Accelerate feature development to capture emerging segment",
+        "Invest in partnership with distribution leader",
+        "Launch targeted campaign for underserved SMB segment",
+    ],
+    data_sources=["Gartner", "Internal surveys", "Social media analysis"]
+)
 ```
 
-## Advanced Analytics
+---
 
-### 1. Predictive Modeling
-```python
-# predictive_analytics.py
-class PredictiveAnalytics:
-    def __init__(self):
-        self.physics_models = PhysicsBasedPrediction()
-        self.ml_models = self._load_ml_models()
-    
-    def predict_market_success(self, idea, market_data, validation_results):
-        """Predict market success using Grok's hybrid approach"""
-        predictions = {
-            'success_probability': 0,
-            'time_to_market': 0,
-            'expected_roi': 0,
-            'risk_factors': [],
-            'success_drivers': []
-        }
-        
-        # Physics-based market modeling
-        physics_prediction = self._physics_market_model(
-            idea, market_data, validation_results
-        )
-        
-        # Machine learning prediction
-        ml_prediction = self._ml_market_model(
-            idea, market_data, validation_results
-        )
-        
-        # Ensemble prediction
-        predictions['success_probability'] = self._ensemble_predictions([
-            physics_prediction, ml_prediction
-        ])
-        
-        # Additional metrics
-        predictions['time_to_market'] = self._predict_time_to_market(idea, market_data)
-        predictions['expected_roi'] = self._predict_roi(idea, market_data)
-        predictions['risk_factors'] = self._identify_key_risks(idea, market_data)
-        predictions['success_drivers'] = self._identify_success_drivers(idea, market_data)
-        
-        return predictions
-```
+## Data Models
 
-### 2. Market Segmentation
-```python
-# market_segmentation.py
-class MarketSegmentation:
-    def __init__(self):
-        self.segmentation_models = self._load_segmentation_models()
-    
-    def segment_market(self, topic, market_data):
-        """Grok's physics-inspired market segmentation"""
-        segments = {
-            'demographic_segments': [],
-            'behavioral_segments': [],
-            'psychographic_segments': [],
-            'geographic_segments': []
-        }
-        
-        # Apply clustering algorithms
-        user_data = self._extract_user_profiles(market_data)
-        
-        # Demographic clustering
-        demographics = self._cluster_demographics(user_data)
-        segments['demographic_segments'] = demographics
-        
-        # Behavioral clustering
-        behavior = self._analyze_behavioral_patterns(user_data)
-        segments['behavioral_segments'] = behavior
-        
-        # Psychographic analysis
-        psychographics = self._analyze_psychographics(user_data)
-        segments['psychographic_segments'] = psychographics
-        
-        # Geographic distribution
-        geographic = self._analyze_geographic_distribution(market_data)
-        segments['geographic_segments'] = geographic
-        
-        # Segment attractiveness scoring
-        for segment_type in segments:
-            for segment in segments[segment_type]:
-                segment['attractiveness_score'] = self._score_segment_attractiveness(segment)
-                segment['market_size'] = self._estimate_segment_size(segment)
-                segment['growth_potential'] = self._estimate_growth_potential(segment)
-        
-        return segments
-```
+### Survey
+| Field | Type | Description |
+|-------|------|-------------|
+| survey_id | str | Unique identifier |
+| title | str | Survey title |
+| questions | List[SurveyQuestion] | Question list |
+| target_responses | int | Goal response count |
+| current_responses | int | Responses received |
 
-## Integration Patterns
+### Trend
+| Field | Type | Description |
+|-------|------|-------------|
+| trend_id | str | Unique identifier |
+| name | str | Metric name |
+| trend_type | TrendType | Classification |
+| growth_rate | float | Slope percentage |
+| confidence | float | 0.0-1.0 confidence |
 
-### 1. Dashboard Integration
-```python
-# dashboard_integration.py
-class MarketDashboard:
-    def __init__(self):
-        self.real_time_updater = RealTimeUpdater()
-        self.visualization_engine = VisualizationEngine()
-    
-    def create_market_dashboard(self, market_analysis):
-        """Create comprehensive market dashboard"""
-        dashboard = {
-            'key_metrics': self._extract_key_metrics(market_analysis),
-            'trend_visualizations': self._create_trend_charts(market_analysis),
-            'sentiment_dashboard': self._create_sentiment_dashboard(market_analysis),
-            'competitive_landscape': self._create_competitive_map(market_analysis),
-            'opportunity_heatmap': self._create_opportunity_heatmap(market_analysis)
-        }
-        
-        return dashboard
-    
-    def real_time_update(self, new_data):
-        """Update dashboard with real-time data"""
-        insights = self._process_real_time_data(new_data)
-        
-        # Update dashboard components
-        self.real_time_updater.update_metrics(insights['metrics'])
-        self.real_time_updater.update_trends(insights['trends'])
-        self.real_time_updater.update_alerts(insights['alerts'])
-```
+### Competitor
+| Field | Type | Description |
+|-------|------|-------------|
+| competitor_id | str | Unique identifier |
+| name | str | Company name |
+| position | CompetitivePosition | Market position |
+| market_share | float | 0.0-1.0 share |
+| strengths | List[str] | Competitive advantages |
+| weaknesses | List[str] | Vulnerabilities |
 
-### 2. API Integration
-```python
-# api_integration.py
-class MarketResearchAPI:
-    def __init__(self):
-        self.agent = MarketResearchOracle()
-        self.rate_limiter = RateLimiter()
-    
-    async def validate_idea_endpoint(self, request_data):
-        """API endpoint for idea validation"""
-        try:
-            # Rate limiting
-            await self.rate_limiter.check_limit(request_data.api_key)
-            
-            # Process validation request
-            validation_result = await self.agent.validate_market_opportunity(
-                request_data['idea'],
-                request_data.get('market_context'),
-                request_data.get('custom_parameters')
-            )
-            
-            return {
-                'status': 'success',
-                'validation': validation_result,
-                'timestamp': datetime.now().isoformat()
-            }
-        
-        except RateLimitExceeded:
-            return {
-                'status': 'error',
-                'error': 'Rate limit exceeded',
-                'retry_after': self.rate_limiter.retry_after
-            }
-```
+### ForecastResult
+| Field | Type | Description |
+|-------|------|-------------|
+| metric | str | Metric name |
+| method | ForecastMethod | Algorithm used |
+| historical_values | List[float] | Input data |
+| predicted_values | List[float] | Forecast output |
+| confidence_interval | Tuple[float, float] | Error bounds |
+| accuracy_score | float | 0.0-1.0 accuracy |
 
-## Performance Metrics
+---
 
-### 1. Accuracy Metrics
-```yaml
-validation_accuracy:
-  market_success_prediction: "85%+ accuracy"
-  trend_detection: "90%+ precision"
-  sentiment_analysis: "92%+ accuracy"
-  competitive_intelligence: "88%+ correctness"
-  
-  real_time_performance:
-    data_latency: "< 30 seconds"
-    analysis_speed: "< 2 minutes"
-    update_frequency: "Real-time"
-    system_uptime: "99.9%"
-```
+## Checklists
 
-### 2. Business Impact Metrics
-```yaml
-business_value:
-  time_to_insight: "Reduced by 80%"
-  research_cost: "Reduced by 70%"
-  decision_quality: "Improved by 60%"
-  opportunity_identification: "3x more opportunities"
-  risk_assessment: "90% more accurate"
-```
+### Market Research Project
+- [ ] Define research objectives and hypotheses
+- [ ] Identify data sources and collection methods
+- [ ] Design survey instrument (if primary research)
+- [ ] Collect and validate data
+- [ ] Analyze sentiment and trends
+- [ ] Map competitive landscape
+- [ ] Generate forecasts
+- [ ] Size market opportunity
+- [ ] Compile report with findings and recommendations
+- [ ] Validate findings with stakeholders
 
-## Best Practices
+### Competitive Analysis
+- [ ] Identify all direct competitors
+- [ ] Map indirect and potential competitors
+- [ ] Collect market share data
+- [ ] Assess strengths and weaknesses
+- [ ] Analyze recent strategic moves
+- [ ] Score threat levels
+- [ ] Identify competitive gaps
+- [ ] Document SWOT for key players
 
-1. **Multi-Source Validation**: Cross-validate insights across multiple data sources
-2. **Real-Time Processing**: Leverage Grok's native real-time capabilities
-3. **Physics-Based Models**: Use mathematical principles for pattern recognition
-4. **Continuous Learning**: Adapt models based on market feedback
-5. **Actionable Insights**: Focus on recommendations that drive business decisions
+### Survey Design
+- [ ] Clear objective stated
+- [ ] Appropriate question types selected
+- [ ] Required vs optional marked
+- [ ] Response options are exhaustive
+- [ ] Pilot test with small group
+- [ ] Target response count set
+- [ ] Distribution channels identified
 
-Remember: Great market research combines the speed of real-time data with the wisdom of systematic analysis - like detecting quantum fluctuations while understanding their macro impact.
+---
+
+## Troubleshooting
+
+### Insufficient Data for Analysis
+- Lower minimum data thresholds for exploration
+- Extend collection time window
+- Add supplementary data sources
+- Use smaller aggregation windows
+
+### Trend Detection Returns Empty
+- Ensure at least 3 data points exist
+- Verify timestamps are monotonically increasing
+- Check values are numeric (not all zeros)
+- Try different metric names
+
+### Survey Response Rate Low
+- Shorten survey length
+- Offer incentives
+- Optimize distribution timing
+- Improve subject lines and messaging
+
+### Forecast Accuracy Poor
+- Check for outliers in historical data
+- Try different forecasting methods
+- Increase historical data window
+- Validate data quality and consistency
+
+### Competitive Data Stale
+- Set up regular collection intervals
+- Monitor news feeds for competitor updates
+- Track financial filings and press releases
+- Analyze social media signals
+
+---
+
+## Integration Points
+
+| System | Purpose |
+|--------|---------|
+| Survey Platforms | Distribute and collect surveys |
+| Social Media APIs | Sentiment and trend data |
+| Financial APIs | Market size and growth data |
+| News Feeds | Competitive intelligence |
+| Government Databases | Industry statistics |
+| Web Scrapers | Real-time competitive data |

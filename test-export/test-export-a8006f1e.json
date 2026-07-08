@@ -1,0 +1,52 @@
+{
+  "exported_at": "2026-07-07T09:32:11.327437",
+  "format": "json",
+  "test_plans": 1,
+  "test_suites": 1,
+  "executions": 1,
+  "bug_reports": 1,
+  "metrics": [
+    {
+      "name": "test_cases_generated",
+      "value": 3,
+      "unit": "count",
+      "category": "generation",
+      "timestamp": "2026-07-07T09:32:11.033608"
+    },
+    {
+      "name": "test_cases_generated",
+      "value": 3,
+      "unit": "count",
+      "category": "generation",
+      "timestamp": "2026-07-07T09:32:11.034122"
+    },
+    {
+      "name": "test_cases_generated",
+      "value": 2,
+      "unit": "count",
+      "category": "generation",
+      "timestamp": "2026-07-07T09:32:11.034493"
+    },
+    {
+      "name": "code_coverage_analyzed",
+      "value": 92.19171379465882,
+      "unit": "percent",
+      "category": "quality",
+      "timestamp": "2026-07-07T09:32:11.319313"
+    },
+    {
+      "name": "performance_test_completed",
+      "value": 1,
+      "unit": "count",
+      "category": "performance",
+      "timestamp": "2026-07-07T09:32:11.319933"
+    },
+    {
+      "name": "security_scan_completed",
+      "value": 1,
+      "unit": "count",
+      "category": "security",
+      "timestamp": "2026-07-07T09:32:11.320916"
+    }
+  ]
+}

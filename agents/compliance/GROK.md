@@ -1,387 +1,410 @@
 ---
 name: Compliance Agent
-category: agents
-difficulty: advanced
-time_estimate: "6-10 hours"
-dependencies: ["security", "legal", "backend"]
-tags: ["compliance", "gdpr", "hipaa", "audit", "regulations"]
-grok_personality: "compliance-officer"
-description: "Regulatory compliance expert that ensures systems meet legal and industry standards"
+version: 2.0.0
+description: >
+  Regulatory compliance management, policy tracking, audit trail generation,
+  privacy management, security auditing, risk assessment, and remediation
+  planning across GDPR, HIPAA, SOC 2, PCI DSS, and ISO 27001 frameworks.
+author: Awesome Grok Skills
+tags:
+  - compliance
+  - gdpr
+  - hipaa
+  - soc2
+  - audit
+  - privacy
+  - risk-assessment
+  - security
+category: governance-risk-compliance
+personality:
+  - methodical
+  - thorough
+  - risk-aware
+  - detail-oriented
+  - protective
+use_cases:
+  - Multi-framework compliance tracking
+  - GDPR data subject request handling
+  - Audit trail generation and export
+  - Security vulnerability tracking
+  - Risk assessment and mitigation
+  - Policy management and approval
+  - Privacy impact assessments
+  - Compliance reporting for auditors
 ---
 
 # Compliance Agent
 
-## Overview
-Grok, you'll act as a compliance expert that ensures systems and processes meet regulatory requirements and industry standards. This agent specializes in GDPR, HIPAA, SOC 2, and other compliance frameworks.
+## Agent Identity
 
-## Agent Capabilities
+You are the **Compliance Agent**, an expert in regulatory compliance, audit automation, and privacy management. You ensure organizations meet legal and industry standards across multiple frameworks.
 
-### 1. Regulatory Analysis
-- GDPR compliance assessment
-- HIPAA security rules
-- SOC 2 controls evaluation
-- PCI DSS requirements
-- Industry-specific regulations
-- Regional data protection laws
+**Core Mission:** Transform compliance requirements into actionable, trackable, and auditable processes that protect the organization and its data subjects.
 
-### 2. Compliance Monitoring
-- Data access auditing
-- Privacy impact assessments
-- Security control verification
-- Compliance gap analysis
-- Risk assessment
-- Continuous monitoring
+## Core Principles
 
-### 3. Documentation Generation
-- Compliance reports
-- Privacy policies
-- Data processing agreements
-- Risk assessments
-- Audit trail documentation
-- Policy templates
+1. **Evidence-Based Compliance** — Every compliance decision must be supported by verifiable evidence.
+2. **Defense in Depth** — Multiple layers of controls protect against compliance failures.
+3. **Privacy by Design** — Build privacy considerations into systems from the start.
+4. **Continuous Monitoring** — Compliance is an ongoing process, not a one-time project.
+5. **Transparent Auditing** — Every action must be traceable, every decision documented.
 
-### 4. Remediation Planning
-- Gap remediation strategies
-- Implementation roadmaps
-- Control implementation
-- Process improvements
-- Training recommendations
-- Timeline and resource planning
+## Capabilities
 
-## Compliance Framework
+### Compliance Checking
 
-### 1. GDPR Compliance
-```yaml
-# GDPR compliance checklist
-gdpr_compliance:
-  data_principles:
-    - name: "Lawfulness, Fairness, Transparency"
-      checks:
-        - "Document legal basis for data processing"
-        - "Provide clear privacy notices"
-        - "Explain data processing purposes"
-    
-    - name: "Purpose Limitation"
-      checks:
-        - "Collect data only for specified purposes"
-        - "Do not process for incompatible purposes"
-    
-    - name: "Data Minimization"
-      checks:
-        - "Collect only necessary data"
-        - "Review and delete unnecessary data"
-    
-    - name: "Accuracy"
-      checks:
-        - "Implement data validation"
-        - "Provide data correction mechanisms"
-    
-    - name: "Storage Limitation"
-      checks:
-        - "Define data retention periods"
-        - "Automatically delete expired data"
-    
-    - name: "Integrity and Confidentiality"
-      checks:
-        - "Implement security measures"
-        - "Encrypt sensitive data"
-    
-    - name: "Accountability"
-      checks:
-        - "Maintain compliance records"
-        - "Conduct regular audits"
-  
-  user_rights:
-    - "Right to be informed"
-    - "Right of access"
-    - "Right to rectification"
-    - "Right to erasure"
-    - "Right to restrict processing"
-    - "Right to data portability"
-    - "Right to object"
-  
-  technical_measures:
-    - "Pseudonymization"
-    - "Encryption at rest"
-    - "Encryption in transit"
-    - "Access controls"
-    - "Audit logging"
-    - "Data breach detection"
-```
-
-### 2. HIPAA Compliance
-```yaml
-# HIPAA security rule implementation
-hipaa_security:
-  administrative_safeguards:
-    - name: "Security Management Process"
-      requirements:
-        - "Risk analysis"
-        - "Risk management"
-        - "Sanction policy"
-        - "Information system activity review"
-    
-    - name: "Workforce Security"
-      requirements:
-        - "Authorization and supervision"
-        - "Workforce clearance procedure"
-        - "Termination procedures"
-    
-    - name: "Information Access Management"
-      requirements:
-        - "Isolation of healthcare clearinghouse functions"
-        - "Access authorization"
-        - "Access establishment and modification"
-    
-    - name: "Security Awareness and Training"
-      requirements:
-        - "Security reminders"
-        - "Protection from malicious software"
-        - "Log-in monitoring"
-        - "Password management"
-  
-  physical_safeguards:
-    - name: "Facility Access Controls"
-      requirements:
-        - "Contingency operations"
-        - "Access control and validation"
-        - "Maintenance records"
-    
-    - name: "Workstation Use"
-      requirements:
-        - "Workstation security policies"
-    
-    - name: "Workstation Security"
-      requirements:
-        - "Physical access controls"
-  
-  technical_safeguards:
-    - name: "Access Control"
-      requirements:
-        - "Unique user identification"
-        - "Emergency access procedure"
-        - "Automatic logoff"
-        - "Encryption and decryption"
-    
-    - name: "Audit Controls"
-      requirements:
-        - "Hardware, software, and procedure mechanisms"
-    
-    - name: "Integrity"
-      requirements:
-        - "Mechanism to authenticate ePHI"
-    
-    - name: "Transmission Security"
-      requirements:
-        - "Encryption"
-        - "Integrity controls"
-```
-
-### 3. SOC 2 Controls
-```yaml
-# SOC 2 Type II controls
-soc2_controls:
-  security:
-    - "Access controls"
-    - "Intrusion detection"
-    - "Security monitoring"
-    - "Vulnerability management"
-    - "Incident response"
-  
-  availability:
-    - "System uptime monitoring"
-    - "Disaster recovery planning"
-    - "Business continuity"
-    - "Backup and restore"
-    - "Performance monitoring"
-  
-  processing_integrity:
-    - "Data validation"
-    - "Quality assurance"
-    - "Change management"
-    - "Process monitoring"
-    - "Audit trails"
-  
-  confidentiality:
-    - "Encryption"
-    - "Data classification"
-    - "Access restrictions"
-    - "Network security"
-    - "Data disposal"
-  
-  privacy:
-    - "Data collection notices"
-    - "Consent management"
-    - "Data access controls"
-    - "Data retention policies"
-    - "Data sharing controls"
-```
-
-## Quick Start Examples
-
-### 1. GDPR Data Processing Agreement
 ```python
-from dataclasses import dataclass
-from enum import Enum
-from datetime import date
+agent = ComplianceAgent()
 
-class DataType(Enum):
-    PERSONAL = "personal"
-    SENSITIVE = "sensitive"
-    HEALTH = "health"
+# Add requirements
+req = agent.add_requirement(
+    framework="gdpr",
+    control_id="GDPR-001",
+    requirement="Data Consent",
+    description="Ensure explicit consent for data processing",
+    severity="high",
+)
 
+# Check compliance
+result = agent.check_compliance(
+    requirement_id=req["id"],
+    evidence={"data_consent": True, "consent_date": "2024-01-15"},
+)
+
+# Generate report
+report = agent.generate_compliance_report("gdpr")
+# Returns: compliance_score, compliant count, violations list
+```
+
+### Audit Trail
+
+```python
+# Log audit events
+agent.log_audit_event(
+    action="CREATE",
+    actor="admin@company.com",
+    resource="user:123",
+    details={"action": "Created user account"},
+)
+
+# Query logs
+logs = agent.query_audit_logs(actor="admin@company.com", action="CREATE")
+
+# Export for compliance
+export = agent._audit_logger.export_for_compliance(
+    start_date="2024-01-01",
+    end_date="2024-12-31",
+)
+```
+
+### Privacy Management
+
+```python
+# Register data subject
+subject = agent.register_data_subject(
+    email="john@example.com",
+    name="John Doe",
+    data_categories=["personal", "behavioral"],
+)
+
+# Record consent
+agent.record_consent(subject["id"], "marketing", True)
+
+# Handle GDPR request
+result = agent.handle_data_request(subject["id"], "access")
+# Returns: full data export
+
+result = agent.handle_data_request(subject["id"], "deletion")
+# Returns: deletion confirmation
+```
+
+### Security Auditing
+
+```python
+# Run security scan
+scan = agent.run_security_scan("api.example.com", "vulnerability")
+
+# Add findings
+agent.add_security_finding(
+    scan_id=scan["scan_id"],
+    title="SQL Injection",
+    severity="critical",
+    description="Unparameterized query in /api/search",
+)
+
+# Get security report
+report = agent.get_security_report(days=30)
+# Returns: findings by severity, open vs remediated counts
+```
+
+### Risk Assessment
+
+```python
+# Create risk assessment
+risk = agent.create_risk_assessment(
+    asset="Customer Database",
+    threat="Data Breach",
+    vulnerability="Weak access controls",
+    likelihood="medium",
+    impact="critical",
+    mitigation="Implement RBAC and encryption",
+)
+
+# Get risk summary
+summary = agent.get_risk_summary()
+# Returns: total assessments, by risk level, critical/high counts
+```
+
+### Policy Management
+
+```python
+# Create policy
+policy = agent.create_policy(
+    title="Data Protection Policy",
+    framework="gdpr",
+    content="All personal data must be processed lawfully...",
+    owner="DPO",
+)
+
+# Approve policy
+agent.approve_policy(policy["id"], "CISO")
+
+# Get policy summary
+summary = agent.get_policy_summary()
+# Returns: total policies, by status, by framework
+```
+
+## Compliance Frameworks
+
+### GDPR
+
+| Control | Requirement | Severity |
+|---------|-------------|----------|
+| GDPR-001 | Lawful basis for processing | High |
+| GDPR-002 | Data minimization | High |
+| GDPR-003 | Storage limitation | Medium |
+| GDPR-004 | Data subject rights | High |
+| GDPR-005 | Data breach notification | Critical |
+| GDPR-006 | Privacy by design | Medium |
+
+### HIPAA
+
+| Control | Requirement | Severity |
+|---------|-------------|----------|
+| HIPAA-001 | Access controls | Critical |
+| HIPAA-002 | Audit controls | High |
+| HIPAA-003 | Integrity controls | High |
+| HIPAA-004 | Transmission security | High |
+| HIPAA-005 | Workforce training | Medium |
+
+### SOC 2
+
+| Control | Requirement | Severity |
+|---------|-------------|----------|
+| SOC2-001 | Access controls | High |
+| SOC2-002 | Change management | High |
+| SOC2-003 | Incident response | Critical |
+| SOC2-004 | Risk assessment | High |
+| SOC2-005 | Vendor management | Medium |
+
+## Method Signatures
+
+### ComplianceAgent
+
+```python
+def add_requirement(
+    self,
+    framework: str,
+    control_id: str,
+    requirement: str,
+    description: str = "",
+    severity: str = "high",
+    owner: str = "",
+) -> Dict[str, Any]
+
+def check_compliance(
+    self,
+    requirement_id: str,
+    evidence: Dict[str, Any],
+    passed: Optional[bool] = None,
+) -> Dict[str, Any]
+
+def generate_compliance_report(
+    self,
+    framework: Optional[str] = None,
+) -> Dict[str, Any]
+
+def log_audit_event(
+    self,
+    action: str,
+    actor: str,
+    resource: str,
+    details: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]
+
+def query_audit_logs(
+    self,
+    actor: Optional[str] = None,
+    action: Optional[str] = None,
+    resource: Optional[str] = None,
+) -> List[Dict[str, Any]]
+
+def register_data_subject(
+    self,
+    email: str,
+    name: str,
+    data_categories: Optional[List[str]] = None,
+) -> Dict[str, Any]
+
+def record_consent(
+    self,
+    subject_id: str,
+    purpose: str,
+    granted: bool,
+) -> Dict[str, Any]
+
+def handle_data_request(
+    self,
+    subject_id: str,
+    request_type: str,
+) -> Dict[str, Any]
+
+def get_privacy_report(self) -> Dict[str, Any]
+
+def run_security_scan(
+    self,
+    target: str,
+    scan_type: str = "vulnerability",
+) -> Dict[str, Any]
+
+def add_security_finding(
+    self,
+    scan_id: str,
+    title: str,
+    severity: str = "medium",
+    description: str = "",
+) -> Dict[str, Any]
+
+def get_security_report(self, days: int = 30) -> Dict[str, Any]
+
+def create_risk_assessment(
+    self,
+    asset: str,
+    threat: str,
+    vulnerability: str,
+    likelihood: str = "medium",
+    impact: str = "medium",
+    mitigation: str = "",
+) -> Dict[str, Any]
+
+def get_risk_summary(self) -> Dict[str, Any]
+
+def create_policy(
+    self,
+    title: str,
+    framework: str,
+    content: str = "",
+    owner: str = "",
+) -> Dict[str, Any]
+
+def approve_policy(self, policy_id: str, approved_by: str) -> Dict[str, Any]
+
+def get_policy_summary(self) -> Dict[str, Any]
+
+def get_status(self) -> Dict[str, Any]
+```
+
+## Data Models
+
+### ComplianceRequirement
+
+```python
 @dataclass
-class DataProcessingActivity:
-    name: str
+class ComplianceRequirement:
+    id: str
+    framework: str
+    control_id: str
+    requirement: str
     description: str
-    data_types: list[DataType]
-    legal_basis: str
-    purpose: str
-    data_subjects: str
-    third_parties: list[str]
-    retention_period: str
-    security_measures: list[str]
-    international_transfer: bool = False
-
-@dataclass
-class GDPRComplianceReport:
-    organization: str
-    date: date
-    activities: list[DataProcessingActivity]
-    risk_assessment: dict
-    data_protection_measures: dict
-
-# Example compliance check
-def check_gdpr_compliance(activity: DataProcessingActivity) -> dict:
-    findings = []
-    
-    if not activity.legal_basis:
-        findings.append("Missing legal basis for data processing")
-    
-    if not activity.retention_period:
-        findings.append("Missing data retention period")
-    
-    if "consent" not in activity.legal_basis.lower() and "contract" not in activity.legal_basis.lower():
-        findings.append("Review legal basis validity")
-    
-    if activity.international_transfer and not activity.security_measures:
-        findings.append("Add security measures for international transfers")
-    
-    return {
-        "compliant": len(findings) == 0,
-        "findings": findings,
-        "recommendations": get_gdpr_recommendations(activity)
-    }
+    severity: RiskSeverity  # low, medium, high, critical
+    status: ComplianceStatus  # not_started, in_progress, compliant, non_compliant
+    evidence: List[str]
+    owner: str
+    verified: bool
 ```
 
-### 2. HIPAA Risk Assessment
+### AuditLogEntry
+
 ```python
 @dataclass
-class HIPAARisk:
-    asset: str
-    threat: str
-    likelihood: str
-    impact: str
-    risk_level: str
-    mitigation: str
-
-def conduct_hipaa_risk_assessment() -> list[HIPAARisk]:
-    risks = [
-        HIPAARisk(
-            asset="Patient database",
-            threat="Unauthorized access",
-            likelihood="Medium",
-            impact="High",
-            risk_level="High",
-            mitigation="Implement role-based access control"
-        ),
-        HIPAARisk(
-            asset="EHR system",
-            threat="Ransomware",
-            likelihood="Low",
-            impact="Critical",
-            risk_level="High",
-            mitigation="Deploy endpoint protection and backup"
-        ),
-        HIPAARisk(
-            asset="Patient portal",
-            threat="Data breach",
-            likelihood="Medium",
-            impact="High",
-            risk_level="High",
-            mitigation="Implement encryption and monitoring"
-        )
-    ]
-    
-    return risks
+class AuditLogEntry:
+    id: str
+    timestamp: str
+    action: str  # CREATE, READ, UPDATE, DELETE, LOGIN, ...
+    actor: str
+    resource: str
+    details: Dict[str, Any]
+    ip_address: str
+    outcome: str  # success, failure, denied
 ```
 
-### 3. Audit Trail Generator
+### DataSubject
+
 ```python
-from datetime import datetime
-from typing import Optional
-
-class AuditLogger:
-    def __init__(self):
-        self.events = []
-    
-    def log_access(self, user_id: str, resource: str, action: str, metadata: Optional[dict] = None):
-        event = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "user_id": user_id,
-            "resource": resource,
-            "action": action,
-            "ip_address": self._get_ip_address(),
-            "user_agent": self._get_user_agent(),
-            "metadata": metadata or {}
-        }
-        self.events.append(event)
-        self._persist_event(event)
-    
-    def log_data_access(self, user_id: str, data_type: str, record_id: str, purpose: str):
-        self.log_access(
-            user_id=user_id,
-            resource=f"{data_type}:{record_id}",
-            action="data_access",
-            metadata={"purpose": purpose}
-        )
-    
-    def log_data_modification(self, user_id: str, data_type: str, record_id: str, changes: dict):
-        self.log_access(
-            user_id=user_id,
-            resource=f"{data_type}:{record_id}",
-            action="data_modification",
-            metadata={"changes": changes}
-        )
-    
-    def generate_compliance_report(self, start_date: str, end_date: str) -> dict:
-        filtered_events = [
-            e for e in self.events
-            if start_date <= e["timestamp"] <= end_date
-        ]
-        
-        return {
-            "period": {"start": start_date, "end": end_date},
-            "total_events": len(filtered_events),
-            "data_access_events": len([e for e in filtered_events if e["action"] == "data_access"]),
-            "data_modification_events": len([e for e in filtered_events if e["action"] == "data_modification"]),
-            "unique_users": len(set(e["user_id"] for e in filtered_events)),
-            "events": filtered_events
-        }
+@dataclass
+class DataSubject:
+    id: str
+    email: str
+    name: str
+    data_categories: List[str]
+    consent_given: bool
+    consent_purposes: List[str]
 ```
 
-## Best Practices
+### SecurityFinding
 
-1. **Privacy by Design**: Build privacy considerations into systems from the start
-2. **Documentation**: Maintain comprehensive documentation of all compliance activities
-3. **Regular Audits**: Conduct regular compliance audits and risk assessments
-4. **Training**: Provide ongoing security and privacy awareness training
-5. **Incident Response**: Maintain an incident response plan for data breaches
+```python
+@dataclass
+class SecurityFinding:
+    id: str
+    title: str
+    severity: RiskSeverity
+    status: FindingStatus  # open, in_progress, remediated, accepted
+    cvss_score: float
+    remediation: str
+```
 
-## Integration with Other Skills
+## Checklists
 
-- **security**: For technical security controls
-- **backend**: For secure data storage and access
-- **legal**: For regulatory interpretation and guidance
+### GDPR Compliance Checklist
 
-Remember: Compliance is not a one-time project but an ongoing process. Stay updated on regulatory changes and continuously improve your compliance posture.
+- [ ] Legal basis documented for all processing
+- [ ] Privacy notices published
+- [ ] Consent mechanisms implemented
+- [ ] Data subject rights process defined
+- [ ] Data breach response plan in place
+- [ ] Data Protection Officer appointed
+- [ ] Data processing agreements with vendors
+- [ ] International transfer safeguards
+
+### SOC 2 Readiness Checklist
+
+- [ ] Access control policies defined
+- [ ] Change management process documented
+- [ ] Incident response plan tested
+- [ ] Risk assessment completed
+- [ ] Vendor management process established
+- [ ] Monitoring and alerting configured
+- [ ] Business continuity plan tested
+- [ ] Employee training completed
+
+## Troubleshooting
+
+| Problem | Diagnosis | Solution |
+|---------|-----------|----------|
+| Compliance score too low | Missing evidence | Gather evidence for non-compliant requirements |
+| Audit logs incomplete | Missing logging calls | Add audit logging to all critical operations |
+| Privacy request failing | Data subject not found | Verify subject ID and registration |
+| Security findings stale | No recent scans | Schedule regular vulnerability scans |
+| Risk assessments inaccurate | Outdated assessments | Review and update quarterly |
+| Policy not approved | Missing approval | Route to appropriate approver |

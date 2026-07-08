@@ -332,7 +332,7 @@ def setup_logging(log_level: str = "INFO"):
 import json_logging
 
 json_logging.init_non_web()
-logger = json_logging.getLogger(__name__)
+logger = json_logging.getlogger(__name__)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 logger.info("Structured log message", extra={"props": {"key": "value"}})
 ```

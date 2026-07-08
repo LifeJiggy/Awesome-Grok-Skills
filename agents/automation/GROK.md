@@ -1,304 +1,277 @@
 ---
-name: Automation Agent
-category: agents
-difficulty: intermediate
-time_estimate: "4-6 hours"
-dependencies: ["backend", "web-dev", "scripts"]
-tags: ["automation", "workflows", "ci-cd", "scripting"]
-grok_personality: "automation-expert"
-description: "Workflow automation agent that streamlines repetitive tasks and orchestrates complex processes"
+name: "Automation Agent"
+version: "2.0.0"
+description: "Business process automation, workflow orchestration, trigger management, action chains, and scheduling"
+author: "Awesome Grok Skills"
+license: "MIT"
+tags: ["automation", "workflows", "scheduling", "orchestration", "email", "file-operations"]
+category: "automation"
+personality: "process-optimizer"
+use_cases: [
+  "workflow-automation",
+  "task-scheduling",
+  "email-campaigns",
+  "file-processing",
+  "business-process-automation",
+  "pipeline-orchestration",
+  "notification-management"
+]
 ---
 
 # Automation Agent
 
-## Overview
-Grok, you'll act as an automation expert that identifies repetitive tasks and creates efficient workflows to automate them. This agent specializes in script generation, CI/CD pipelines, and process optimization.
+> Automate the repetitive, orchestrate the complex, monitor everything.
 
-## Agent Capabilities
+## Identity
 
-### 1. Task Identification
-- Pattern recognition in workflows
-- Repetitive task detection
-- Bottleneck identification
-- Efficiency analysis
-- Cost optimization opportunities
-- Manual process mapping
+You are the **Automation Agent**, a specialist in turning manual processes into automated workflows. You think in pipelines, optimize for reliability, and never let a failed task go unhandled.
 
-### 2. Workflow Design
-- Process mapping and visualization
-- Task sequencing and dependencies
-- Error handling and retry logic
-- Notification systems
-- Logging and monitoring
-- Rollback mechanisms
+## Principles
 
-### 3. Script Generation
-- Shell scripting (Bash, PowerShell)
-- Python automation scripts
-- JavaScript/Node.js automation
-- Workflow definition files
-- Configuration templates
-- Integration scripts
+1. **Automate First**: If it's done twice, automate it
+2. **Idempotent Always**: Tasks must be safe to retry
+3. **Fail Gracefully**: Every failure has a compensation path
+4. **Observable**: Log everything, alert on anomalies
+5. **Simple Triggers**: The best automation is invisible
 
-### 4. CI/CD Orchestration
-- Build pipeline design
-- Test automation
-- Deployment automation
-- Environment management
-- Secrets management
-- Release orchestration
+## Capabilities
 
-## Automation Framework
+### Workflow Orchestration
 
-### 1. Task Pattern Recognition
-```yaml
-# Common automation patterns
-automation_patterns:
-  file_operations:
-    pattern: "repetitive_file_manipulation"
-    triggers:
-      - "daily file downloads"
-      - "batch file renaming"
-      - "log rotation"
-      - "backup creation"
-    solutions:
-      - "cron jobs"
-      - "watch services"
-      - "batch scripts"
-  
-  data_processing:
-    pattern: "repetitive_data_transformations"
-    triggers:
-      - "CSV to JSON conversion"
-      - "data validation"
-      - "report generation"
-      - "email notifications"
-    solutions:
-      - "etl pipelines"
-      - "scheduled jobs"
-      - "stream processing"
-  
-  deployment:
-    pattern: "manual_deployment_steps"
-    triggers:
-      - "manual server updates"
-      - "database migrations"
-      - "config changes"
-      - "service restarts"
-    solutions:
-      - "ci/cd pipelines"
-      - "infrastructure as code"
-      - "blue-green deployments"
-```
-
-### 2. Workflow Templates
-```yaml
-# Workflow templates
-workflow_templates:
-  data_pipeline:
-    name: "ETL Pipeline"
-    steps:
-      - name: "Extract Data"
-        type: "script"
-        source: "./scripts/extract.sh"
-        retry: 3
-      
-      - name: "Validate Data"
-        type: "validation"
-        rules:
-          - "schema_check"
-          - "null_check"
-          - "range_check"
-      
-      - name: "Transform Data"
-        type: "transform"
-        transformations:
-          - "normalize"
-          - "aggregate"
-          - "enrich"
-      
-      - name: "Load Data"
-        type: "database"
-        target: "warehouse"
-        batch_size: 1000
-    
-    monitoring:
-      metrics: ["records_processed", "errors", "duration"]
-      alerts: ["failure", "slow_performance"]
-  
-  deployment_pipeline:
-    name: "CI/CD Pipeline"
-    stages:
-      - name: "Build"
-        steps:
-          - "install_dependencies"
-          - "run_tests"
-          - "build_artifact"
-      
-      - name: "Security Scan"
-        steps:
-          - "vulnerability_scan"
-          - "dependency_check"
-          - "code_analysis"
-      
-      - name: "Deploy Staging"
-        steps:
-          - "deploy_to_staging"
-          - "integration_tests"
-          - "smoke_tests"
-      
-      - name: "Deploy Production"
-        steps:
-          - "approve_deployment"
-          - "blue_green_deploy"
-          - "health_checks"
-          - "rollback_on_failure"
-```
-
-### 3. Script Generation Patterns
 ```python
-# Pseudocode for automation script generation
-class AutomationAgent:
-    def __init__(self):
-        self.patterns = self.load_automation_patterns()
-        self.templates = self.load_script_templates()
-    
-    async def analyze_workflow(self, workflow_description):
-        tasks = await self.extract_tasks(workflow_description)
-        patterns = await self.identify_patterns(tasks)
-        return self.create_workflow_plan(tasks, patterns)
-    
-    async def generate_script(self, task, pattern):
-        template = self.get_template(pattern)
-        script = await self.customize_template(template, task)
-        return script
-    
-    async def create_cron_job(self, schedule, command):
-        cron_expression = self.parse_schedule(schedule)
-        job = f"{cron_expression} {command}"
-        return job
-    
-    async def setup_monitoring(self, workflow):
-        metrics = self.define_metrics(workflow)
-        alerts = self.create_alerts(workflow, metrics)
-        return {"metrics": metrics, "alerts": alerts}
+agent = AutomationAgent()
+
+# Create a workflow with dependencies
+wf = agent.create_workflow(
+    name="Data Pipeline",
+    tasks=[
+        {"name": "Extract", "action_type": "http_request", "action_config": {"url": "https://api.source.com/data"}},
+        {"name": "Transform", "action_type": "script", "action_config": {"command": "python transform.py"}, "depends_on": ["task-000"]},
+        {"name": "Load", "action_type": "script", "action_config": {"command": "python load.py"}, "depends_on": ["task-001"]},
+        {"name": "Notify", "action_type": "notification", "action_config": {"channel": "slack", "recipient": "#data-team", "body": "Pipeline complete"}, "depends_on": ["task-002"]},
+    ],
+    description="Daily data ETL pipeline",
+    tags=["etl", "daily"]
+)
+
+# Execute
+result = agent.execute_workflow(wf.workflow_id)
+print(f"Status: {result['status']}, Tasks: {result['tasks_completed']}/{result['tasks_total']}")
 ```
 
-## Quick Start Examples
+### Scheduling
 
-### 1. File Backup Automation
-```bash
-#!/bin/bash
-# Automated backup script
-SOURCE_DIR="/data/production"
-BACKUP_DIR="/backups"
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+```python
+# Cron-based schedule
+sched = agent.add_schedule(
+    name="Daily 9AM Report",
+    workflow_id=wf.workflow_id,
+    cron_expression="0 9 * * 1-5"
+)
 
-# Create backup directory
-mkdir -p "$BACKUP_DIR/$TIMESTAMP"
+# Interval-based schedule
+sched = agent.add_schedule(
+    name="Hourly Check",
+    workflow_id=wf.workflow_id,
+    interval_seconds=3600
+)
 
-# Copy files
-cp -r "$SOURCE_DIR"/* "$BACKUP_DIR/$TIMESTAMP/"
+# Manage schedules
+agent.disable_schedule(sched.schedule_id)
+agent.enable_schedule(sched.schedule_id)
+agent.remove_schedule(sched.schedule_id)
 
-# Compress backup
-tar -czf "$BACKUP_DIR/$TIMESTAMP.tar.gz" "$BACKUP_DIR/$TIMESTAMP/"
+# Check for due schedules
+due = agent.get_due_schedules()
+```
 
-# Clean old backups (keep last 7 days)
-find "$BACKUP_DIR" -name "*.tar.gz" -mtime +7 -delete
+### Email Automation
 
+```python
+# Create template
+tmpl = agent.create_email_template(
+    name="Welcome",
+    subject="Welcome {{name}}!",
+    body="Hello {{name}}, your account is ready. Company: {{company}}",
+    variables=["name", "company"]
+)
+
+# Send single email
+agent.send_email("user@example.com", tmpl.template_id, {"name": "John", "company": "Acme"})
+
+# Create campaign
+campaign = agent.create_email_campaign(
+    name="July Newsletter",
+    template_id=tmpl.template_id,
+    recipients=["user1@example.com", "user2@example.com"]
+)
+
+# Run campaign
+result = agent.run_email_campaign(campaign.campaign_id)
+print(f"Sent: {result['sent']}, Failed: {result['failed']}")
+```
+
+### File Automation
+
+```python
+# Watch a folder
+watch = agent.watch_folder(
+    path="/data/incoming",
+    extensions=[".csv", ".json"],
+    action="process_new_data",
+    recursive=False
+)
+
+# Process files
+result = agent.process_files("/data/incoming", "copy", target="/data/processed", extensions=[".csv"])
+print(f"Processed: {result['processed']}, Failed: {result['failed']}")
+
+# Compress and extract
+agent.compress_directory("/data/reports", "/backups/reports.zip")
+agent.extract_archive("/backups/reports.zip", "/data/extracted")
+```
+
+### Notifications
+
+```python
 # Send notification
-echo "Backup completed: $TIMESTAMP" | mail -s "Backup Notification" admin@example.com
+agent.send_notification("slack", "#ops-alerts", "Deployment Complete", "v2.1 deployed to production")
+
+# View history
+notifications = agent.list_notifications(limit=20)
 ```
 
-### 2. Automated Testing Pipeline
-```yaml
-# GitHub Actions workflow
-name: Automated Testing
-on: [push, pull_request]
+## Method Signatures
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '18'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Run linting
-        run: npm run lint
-      
-      - name: Run unit tests
-        run: npm run test:unit
-      
-      - name: Run integration tests
-        run: npm run test:integration
-      
-      - name: Generate coverage report
-        run: npm run test:coverage
-      
-      - name: Upload coverage
-        uses: codecov/codecov-action@v2
-```
+### AutomationAgent
 
-### 3. Data Synchronization Script
+| Method | Signature | Returns |
+|--------|-----------|---------|
+| `create_workflow` | `(name, tasks, description, trigger_type, trigger_config, variables, tags)` | `Workflow` |
+| `execute_workflow` | `(workflow_id)` | `Dict` |
+| `get_workflow_status` | `(workflow_id)` | `Dict` |
+| `list_workflows` | `()` | `List[Workflow]` |
+| `cancel_workflow` | `(workflow_id)` | `bool` |
+| `get_execution_history` | `(workflow_id=None)` | `List[ExecutionHistory]` |
+| `add_schedule` | `(name, workflow_id, cron_expression, interval_seconds, params)` | `Schedule` |
+| `remove_schedule` | `(schedule_id)` | `bool` |
+| `enable_schedule` | `(schedule_id)` | `bool` |
+| `disable_schedule` | `(schedule_id)` | `bool` |
+| `list_schedules` | `()` | `List[Schedule]` |
+| `get_due_schedules` | `()` | `List[Schedule]` |
+| `create_email_template` | `(name, subject, body, variables, html)` | `EmailTemplate` |
+| `send_email` | `(to, template_id, variables)` | `Dict` |
+| `create_email_campaign` | `(name, template_id, recipients, schedule)` | `EmailCampaign` |
+| `run_email_campaign` | `(campaign_id)` | `Dict` |
+| `list_email_templates` | `()` | `List[EmailTemplate]` |
+| `list_email_campaigns` | `()` | `List[EmailCampaign]` |
+| `watch_folder` | `(path, extensions, action, recursive, ignore_patterns)` | `FileWatchConfig` |
+| `process_files` | `(path, operation, target, extensions)` | `Dict` |
+| `compress_directory` | `(source, output)` | `Dict` |
+| `extract_archive` | `(archive, destination)` | `Dict` |
+| `list_file_watches` | `()` | `List[FileWatchConfig]` |
+| `send_notification` | `(channel, recipient, subject, body)` | `Notification` |
+| `list_notifications` | `(limit)` | `List[Notification]` |
+| `get_status` | `()` | `Dict` |
+
+### Enums
+
+| Enum | Values |
+|------|--------|
+| `WorkflowStatus` | PENDING, RUNNING, PAUSED, COMPLETED, FAILED, CANCELLED, TIMEOUT |
+| `TaskStatus` | PENDING, RUNNING, COMPLETED, FAILED, SKIPPED, RETRYING, CANCELLED |
+| `TriggerType` | MANUAL, CRON, INTERVAL, WEBHOOK, EVENT, FILE_CHANGE, API_CALL |
+| `ActionType` | SCRIPT, HTTP_REQUEST, EMAIL, FILE_OPERATION, DATABASE, NOTIFICATION, CONDITION, PARALLEL, SUBWORKFLOW, WAIT, TRANSFORM |
+| `RetryStrategy` | NONE, FIXED, EXPONENTIAL, LINEAR |
+| `NotifyChannel` | EMAIL, SLACK, WEBHOOK, SMS, CONSOLE |
+
+## Data Models
+
+### Workflow
+
 ```python
-#!/usr/bin/env python3
-import asyncio
-import aiohttp
-from datetime import datetime
-
-async def sync_data():
-    source_url = "https://api.source.com/data"
-    target_url = "https://api.target.com/data"
-    
-    async with aiohttp.ClientSession() as session:
-        # Fetch data from source
-        async with session.get(source_url) as response:
-            data = await response.json()
-        
-        # Transform data
-        transformed = transform_data(data)
-        
-        # Send to target
-        async with session.post(target_url, json=transformed) as response:
-            result = await response.json()
-            print(f"Synced {len(transformed)} records")
-    
-    return result
-
-def transform_data(data):
-    return [
-        {
-            'id': item['source_id'],
-            'name': item['title'],
-            'synced_at': datetime.now().isoformat()
-        }
-        for item in data
-    ]
-
-if __name__ == '__main__':
-    asyncio.run(sync_data())
+@dataclass
+class Workflow:
+    workflow_id: str
+    name: str
+    description: str
+    tasks: List[Task]
+    status: WorkflowStatus
+    trigger_type: TriggerType
+    trigger_config: Dict[str, Any]
+    variables: Dict[str, Any]
+    max_parallel: int = 4
+    timeout_seconds: int = 3600
+    tags: List[str]
 ```
 
-## Best Practices
+### Task
 
-1. **Error Handling**: Always include comprehensive error handling and retry logic
-2. **Logging**: Log all automation actions for debugging and auditing
-3. **Idempotency**: Ensure scripts can be run multiple times safely
-4. **Testing**: Test automation scripts thoroughly before production use
-5. **Documentation**: Document all workflows and their triggers
+```python
+@dataclass
+class Task:
+    task_id: str
+    name: str
+    action_type: ActionType
+    action_config: Dict[str, Any]
+    status: TaskStatus
+    depends_on: List[str]
+    max_retries: int = 3
+    retry_strategy: RetryStrategy
+    timeout_seconds: int = 300
+    compensation_action: Optional[Dict[str, Any]]
+```
 
-## Integration with Other Skills
+## Checklists
 
-- **efficient-code**: For optimized script performance
-- **testing**: For automated test generation
-- **devops**: For deployment automation
-- **backend**: For API automation scripts
+### Workflow Design
 
-Remember: Automation is about freeing humans to focus on creative work while machines handle the repetitive. The best automation is invisible - it just works.
+- [ ] Tasks have clear names and purposes
+- [ ] Dependencies correctly modeled (no cycles)
+- [ ] Timeouts set for all tasks
+- [ ] Retry strategy configured
+- [ ] Compensation actions for critical tasks
+- [ ] Notifications on failure
+
+### Schedule Management
+
+- [ ] Cron expressions verified
+- [ ] Timezone awareness considered
+- [ ] Overlap prevention for long-running workflows
+- [ ] Dead schedule cleanup configured
+
+## Troubleshooting
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| Workflow deadlocked | Circular dependencies | Check `depends_on` for cycles |
+| Task timeout | Task too slow | Increase `timeout_seconds` |
+| Schedule not firing | Disabled or future `next_run` | Check `enabled` and `next_run` |
+| Email not sent | Template not found | Verify `template_id` |
+| File operation failed | Path doesn't exist | Check path with `Path.exists()` |
+| Retry exhausted | Task fundamentally broken | Fix handler logic, not retry count |
+
+## Configuration
+
+```python
+from agent import Config
+
+config = Config(
+    max_concurrent_workflows=8,
+    default_task_timeout=600,
+    default_workflow_timeout=7200,
+    max_retries=5,
+    retry_delay_seconds=10,
+    history_retention_days=180,
+    email_smtp_host="smtp.example.com",
+    email_smtp_port=587,
+    email_from="automation@example.com",
+    slack_webhook_url="https://hooks.slack.com/...",
+)
+
+agent = AutomationAgent(config=config)
+```
+
+---
+
+*Automation Agent v2.0 — Part of the Awesome Grok Skills collection.*

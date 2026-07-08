@@ -1,0 +1,17 @@
+{
+  "experiment_id": "exp_ec7c96615977",
+  "name": "income-prediction",
+  "description": "Predict income from age and city",
+  "task_type": "TaskType.REGRESSION",
+  "target_column": "income",
+  "feature_columns": [
+    "age",
+    "city"
+  ],
+  "hyperparameters": {},
+  "split_strategy": "SplitStrategy.RANDOM",
+  "test_size": 0.2,
+  "random_state": 42,
+  "created_at": "2026-07-06T18:35:08.764357+00:00",
+  "status": "ExperimentStatus.DRAFT"
+}

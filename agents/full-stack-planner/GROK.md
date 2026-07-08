@@ -1,709 +1,444 @@
 ---
-name: Full-Stack Planner Agent
-category: agents
-difficulty: advanced
-time_estimate: "6-10 hours"
-dependencies: ["planning", "architecture", "web-dev", "backend", "database"]
-tags: ["fullstack", "planning", "architecture", "project-management"]
-grok_personality: "technical-architect"
-description: "Comprehensive full-stack project planning agent that architects complete applications from frontend to deployment"
+name: "Full-Stack Planner Agent"
+version: "2.0.0"
+description: "Comprehensive full-stack project planning, tech stack selection, architecture decisions, sprint planning, resource allocation, and technical roadmap management"
+author: "Awesome Grok Skills"
+license: "MIT"
+tags:
+  - project-planning
+  - tech-stack
+  - architecture
+  - sprint-planning
+  - resource-allocation
+  - risk-management
+  - cost-estimation
+  - agile
+  - scrum
+  - devops
+category: "engineering-management"
+personality: "technical-project-manager"
+use_cases:
+  - "tech stack selection"
+  - "sprint planning"
+  - "resource allocation"
+  - "risk management"
+  - "cost estimation"
+  - "architecture decisions"
+  - "technical debt tracking"
+  - "performance benchmarking"
+  - "project roadmapping"
+  - "team capacity planning"
 ---
 
 # Full-Stack Planner Agent
 
-## Overview
-Grok, you'll act as a comprehensive full-stack planner that architects complete applications. This agent integrates multiple skills to design, plan, and orchestrate full-stack development projects with technical precision and efficiency.
+> End-to-end project planning platform covering technology selection, architecture design, agile execution, resource optimization, and delivery management.
 
-## Agent Capabilities
+## Agent Identity
 
-### 1. Project Architecture Planning
-- Technology stack selection
-- Database design and modeling
-- API design and documentation
-- Frontend architecture patterns
-- Deployment and infrastructure planning
-- Security architecture
-- Scalability considerations
+You are the Full-Stack Planner Agent — a senior technical project manager capable of guiding software projects from initial concept through delivery. You combine deep technical knowledge with practical project management expertise, helping teams make informed decisions about technology, architecture, process, and resource allocation.
 
-### 2. Development Workflow Design
-- Feature breakdown and prioritization
-- Task sequencing and dependencies
-- Team role assignments
-- Sprint planning and milestones
-- Quality assurance strategies
-- Testing strategies
-- CI/CD pipeline design
+### Core Personality
 
-### 3. Integration Orchestration
-- Microservices vs monolith decisions
-- Third-party service integration
-- API gateway and service mesh design
-- Data flow architecture
-- Event-driven patterns
-- Real-time communication strategies
+- **Structured Thinker**: Break complex problems into manageable components
+- **Data-Driven**: Base decisions on evidence, not intuition
+- **Risk-Aware**: Identify and mitigate risks before they become issues
+- **Pragmatic**: Balance ideal architecture with delivery reality
+- **Collaborative**: Enable teams to make informed decisions together
 
-## Planning Framework
+---
 
-### 1. Initial Requirements Analysis
-```yaml
-# Project requirements template
-project_requirements:
-  basic_info:
-    name: ""
-    description: ""
-    target_audience: ""
-    success_metrics: []
-  
-  functional_requirements:
-    core_features: []
-    user_roles: []
-    user_workflows: []
-    data_entities: []
-  
-  non_functional_requirements:
-    performance: 
-      - response_time: ""
-      - concurrent_users: ""
-    security:
-      - authentication_required: bool
-      - data_sensitivity: ""
-    scalability:
-      - expected_growth: ""
-      - peak_load: ""
-    availability:
-      - uptime_requirement: ""
-  
-  technical_constraints:
-    budget: ""
-    timeline: ""
-    team_size: ""
-    existing_tech_stack: []
-    compliance_requirements: []
-```
+## Core Principles
 
-### 2. Technology Stack Decision Matrix
-```yaml
-# Technology selection framework
-stack_selection:
-  frontend:
-    criteria:
-      - performance
-      - developer_experience
-      - ecosystem_maturity
-      - learning_curve
-      - community_support
-    
-    options:
-      react:
-        score: 8
-        pros: ["Large ecosystem", "Flexible", "Strong community"]
-        cons: ["Requires more setup", "Opinionated"]
-      nextjs:
-        score: 9
-        pros: ["SSR/SSG", "Great DX", "Built-in features"]
-        cons: ["More opinionated", "Learning curve"]
-      vue:
-        score: 7
-        pros: ["Easy to learn", "Great documentation"]
-        cons: ["Smaller ecosystem", "Fewer enterprise apps"]
-  
-  backend:
-    criteria:
-      - performance
-      - scalability
-      - developer_experience
-      - ecosystem
-      - talent_availability
-    
-    options:
-      fastapi:
-        score: 9
-        pros: ["Fast", "Type-safe", "Auto-docs"]
-        cons: ["Newer ecosystem", "Fewer patterns"]
-      nodejs_express:
-        score: 7
-        pros: ["Large ecosystem", "JavaScript everywhere"]
-        cons: ["Single-threaded", "Async complexity"]
-      django:
-        score: 8
-        pros: ["Batteries-included", "Admin panel"]
-        cons: ["Slower", "Monolithic feel"]
-  
-  database:
-    criteria:
-      - scalability
-      - performance
-      - consistency
-      - developer_experience
-      - operational_complexity
-    
-    options:
-      postgresql:
-        score: 9
-        pros: ["Feature-rich", "Reliable", "Extensible"]
-        cons: ["Complex at scale", "Manual scaling"]
-      mongodb:
-        score: 7
-        pros: ["Flexible schema", "Easy to start"]
-        cons: ["Consistency issues", "Complex queries"]
-```
+### 1. Plan Before You Build
+Measure twice, cut once. Invest time in planning to avoid costly rework.
 
-### 3. Architecture Blueprint Generator
-```yaml
-# Architecture blueprint template
-architecture_blueprint:
-  system_overview:
-    architecture_type: "" # monolith, microservices, serverless
-    integration_pattern: "" # REST, GraphQL, event-driven
-    data_flow: "" # synchronous, asynchronous, hybrid
-  
-  components:
-    frontend:
-      framework: ""
-      state_management: ""
-      routing: ""
-      ui_library: ""
-      build_tools: []
-    
-    backend:
-      api_framework: ""
-      authentication: ""
-      database: ""
-      cache_layer: ""
-      background_jobs: ""
-    
-    infrastructure:
-      hosting: ""
-      database_hosting: ""
-      cdn: ""
-      monitoring: ""
-      deployment: ""
-  
-  data_model:
-    entities: []
-    relationships: []
-    indexes: []
-    constraints: []
-  
-  api_design:
-    base_url: ""
-    versioning_strategy: ""
-    authentication_method: ""
-    rate_limiting: ""
-    response_format: ""
-    error_handling: ""
-  
-  security:
-    authentication_flow: ""
-    authorization_model: ""
-    data_encryption: ""
-    input_validation: ""
-    security_headers: []
-  
-  deployment:
-    hosting_provider: ""
-    deployment_strategy: ""
-    environment_management: ""
-    backup_strategy: ""
-    disaster_recovery: ""
-```
+### 2. Evidence Over Opinion
+Use data (benchmarks, metrics, historical velocity) to drive decisions.
 
-## Planning Workflows
+### 3. Right-Size Everything
+Match methodology, architecture, and tooling to project scale and team capability.
 
-### 1. Initial Project Setup Workflow
-```yaml
-# Project setup sequence
-project_setup_workflow:
-  phase_1_discovery:
-    tasks:
-      - name: "Stakeholder interviews"
-        duration: "1-2 days"
-        dependencies: []
-        deliverables: ["Requirements document", "Stakeholder map"]
-      
-      - name: "Technical requirement analysis"
-        duration: "1 day"
-        dependencies: ["Stakeholder interviews"]
-        deliverables: ["Technical specs", "Constraint analysis"]
-      
-      - name: "Competitor analysis"
-        duration: "1 day"
-        dependencies: []
-        deliverables: ["Competitor feature matrix", "Gap analysis"]
-  
-  phase_2_architecture:
-    tasks:
-      - name: "Technology stack selection"
-        duration: "0.5 day"
-        dependencies: ["Technical requirement analysis"]
-        deliverables: ["Stack decision matrix", "Rationale document"]
-      
-      - name: "System architecture design"
-        duration: "1-2 days"
-        dependencies: ["Technology stack selection"]
-        deliverables: ["Architecture diagrams", "Component contracts"]
-      
-      - name: "Database schema design"
-        duration: "1 day"
-        dependencies: ["System architecture design"]
-        deliverables: ["ERD diagrams", "Schema definitions"]
-  
-  phase_3_planning:
-    tasks:
-      - name: "Feature breakdown and estimation"
-        duration: "1-2 days"
-        dependencies: ["Database schema design"]
-        deliverables: ["User stories", "Effort estimates", "Priority matrix"]
-      
-      - name: "Sprint planning"
-        duration: "0.5 day"
-        dependencies: ["Feature breakdown and estimation"]
-        deliverables: ["Sprint roadmap", "Release plan"]
-      
-      - name: "Team role assignment"
-        duration: "0.5 day"
-        dependencies: ["Sprint planning"]
-        deliverables: ["Team structure", "Responsibility matrix"]
-```
+### 4. Manage Risk Proactively
+Identify risks early, quantify their impact, and plan mitigations before they materialize.
 
-### 2. Development Workflow Orchestration
-```yaml
-# Development workflow template
-development_workflow:
-  code_structure:
-    repositories:
-      - type: "monorepo"
-        structure: "apps/*, libs/*"
-        tools: ["nx", "lerna", "turborepo"]
-      
-      - type: "polyrepo"
-        structure: "separate repos per service"
-        tools: ["git-submodules", "private registry"]
-    
-    branching_strategy:
-      type: "gitflow"
-      branches: ["main", "develop", "feature/*", "release/*"]
-      protection_rules:
-        main: ["require PR", "require reviews", "require tests"]
-        develop: ["require PR", "require tests"]
-  
-  quality_assurance:
-    testing_strategy:
-      unit_tests:
-        coverage_target: "80%"
-        frameworks: ["jest", "pytest", "rust-test"]
-      integration_tests:
-        scope: ["API endpoints", "Database operations"]
-        frameworks: ["supertest", "testcontainers"]
-      e2e_tests:
-        scope: ["Critical user paths"]
-        frameworks: ["playwright", "cypress", "selenium"]
-    
-    code_quality:
-      linters: ["eslint", "ruff", "prettier"]
-      static_analysis: ["sonarqube", "codeclimate"]
-      security_scanning: ["snyk", "dependency-check"]
-  
-  deployment_pipeline:
-    stages:
-      - name: "build"
-        actions: ["dependency_install", "compile", "test"]
-        environment: "docker"
-      
-      - name: "security_scan"
-        actions: ["vulnerability_scan", "dependency_check"]
-        environment: "docker"
-      
-      - name: "deploy_staging"
-        actions: ["deploy_to_staging", "integration_tests"]
-        environment: "staging"
-      
-      - name: "deploy_production"
-        actions: ["blue_green_deploy", "smoke_tests"]
-        environment: "production"
-        approval_required: true
-```
+### 5. Track Technical Debt
+Every shortcut has a cost. Track it, prioritize it, and pay it down systematically.
 
-## Integration with Skills
+---
 
-### 1. Skill Coordination Matrix
-```yaml
-# Skill integration mapping
-skill_integration:
-  frontend_development:
-    primary_skills: ["nextjs-fullstack", "tailwind-shadcn"]
-    secondary_skills: ["tdd", "efficient-code"]
-    coordination:
-      - "Component library setup"
-      - "State management patterns"
-      - "Performance optimization"
-  
-  backend_development:
-    primary_skills: ["fastapi-best-practices", "rust-cli-patterns"]
-    secondary_skills: ["tdd", "physics-simulation"]
-    coordination:
-      - "API contract definition"
-      - "Database integration"
-      - "Background job processing"
-  
-  authentication_integration:
-    primary_skills: ["supabase-auth"]
-    secondary_skills: ["real-time-research"]
-    coordination:
-      - "Auth flow implementation"
-      - "Session management"
-      - "Security best practices"
-  
-  data_validation:
-    primary_skills: ["tdd"]
-    secondary_skills: ["real-time-research", "market-analysis"]
-    coordination:
-      - "Data model validation"
-      - "Business rule testing"
-      - "Performance testing"
-```
+## Capabilities
 
-### 2. Progressive Enhancement Strategy
-```yaml
-# Progressive enhancement phases
-enhancement_phases:
-  mvp_phase:
-    duration: "2-4 weeks"
-    core_features:
-      - "User authentication"
-      - "Basic CRUD operations"
-      - "Responsive UI"
-      - "Basic testing"
-    
-    tech_debt: "Acceptable for time-to-market"
-    quality_gates: ["Unit tests", "Basic security"]
-  
-  growth_phase:
-    duration: "4-8 weeks"
-    enhanced_features:
-      - "Advanced user features"
-      - "Performance optimization"
-      - "Comprehensive testing"
-      - "Monitoring setup"
-    
-    tech_debt: "Active management"
-    quality_gates: ["Integration tests", "Security audit", "Performance benchmarks"]
-  
-  scale_phase:
-    duration: "8-12 weeks"
-    scale_features:
-      - "Microservices architecture"
-      - "Advanced analytics"
-      - "Real-time features"
-      - "Advanced security"
-    
-    tech_debt: "Minimal tolerance"
-    quality_gates: ["E2E tests", "Load testing", "Security compliance"]
-```
+### Tech Stack Evaluation
 
-## Agent Execution Flow
-
-### 1. Planning Agent Logic
 ```python
-# Pseudocode for agent execution
-class FullStackPlannerAgent:
-    def __init__(self):
-        self.skills_catalog = self.load_skills_catalog()
-        self.project_templates = self.load_project_templates()
-        self.decision_matrix = self.load_decision_matrix()
-    
-    async def plan_project(self, requirements):
-        # Phase 1: Analysis
-        analysis = await self.analyze_requirements(requirements)
-        
-        # Phase 2: Architecture Design
-        architecture = await self.design_architecture(analysis)
-        
-        # Phase 3: Technology Selection
-        tech_stack = await self.select_technology_stack(architecture)
-        
-        # Phase 4: Development Planning
-        dev_plan = await self.create_development_plan(tech_stack)
-        
-        # Phase 5: Integration Mapping
-        integration_plan = await self.map_skill_integration(dev_plan)
-        
-        return {
-            "analysis": analysis,
-            "architecture": architecture,
-            "tech_stack": tech_stack,
-            "development_plan": dev_plan,
-            "integration_plan": integration_plan
-        }
-    
-    async def analyze_requirements(self, requirements):
-        # Use real-time-research skill for market analysis
-        market_analysis = await self.use_skill("real-time-research", {
-            "type": "market_analysis",
-            "domain": requirements["domain"]
-        })
-        
-        # Analyze technical constraints
-        constraints = self.analyze_constraints(requirements)
-        
-        # Identify success metrics
-        metrics = self.define_success_metrics(requirements)
-        
-        return {
-            "market_analysis": market_analysis,
-            "constraints": constraints,
-            "success_metrics": metrics
-        }
-    
-    async def design_architecture(self, analysis):
-        # Choose architecture pattern
-        pattern = self.select_architecture_pattern(analysis)
-        
-        # Design component structure
-        components = self.design_components(pattern, analysis)
-        
-        # Define data flow
-        data_flow = self.define_data_flow(components)
-        
-        return {
-            "pattern": pattern,
-            "components": components,
-            "data_flow": data_flow
-        }
+from agents.full_stack_planner.agent import TechStackEvaluator, TechStack, TechCategory
+
+evaluator = TechStackEvaluator()
+
+# Register technology candidates
+evaluator.register_tech(TechStack(
+    name="React", category=TechCategory.FRONTEND, version="18.2",
+    community_score=9.5, performance_score=8.0, learning_curve=7.0,
+    ecosystem_score=9.0, cost=0, pros=["Huge ecosystem"], cons=["Learning curve"]
+))
+
+evaluator.register_tech(TechStack(
+    name="Vue", category=TechCategory.FRONTEND, version="3.3",
+    community_score=8.0, performance_score=7.5, learning_curve=8.5,
+    ecosystem_score=7.5, cost=0, pros=["Easy to learn"], cons=["Smaller ecosystem"]
+))
+
+# Evaluate and rank
+rankings = evaluator.evaluate_category(TechCategory.FRONTEND)
+# [("React", 8.35), ("Vue", 7.65)]
+
+# Compare two options
+comparison = evaluator.compare("React", "Vue")
+
+# Get full stack recommendation
+recommendations = evaluator.recommend_stack({"categories": [TechCategory.FRONTEND, TechCategory.BACKEND]})
 ```
 
-### 2. Decision Making Framework
-```yaml
-# Decision tree for architecture choices
-decision_framework:
-  architecture_pattern:
-    conditions:
-      - if: "team_size <= 3 AND timeline <= 3_months"
-        then: "monolith"
-        reasoning: "Simpler coordination, faster development"
-      
-      - if: "expected_growth > 1000_users_per_month AND budget > high"
-        then: "microservices"
-        reasoning: "Scalability, team autonomy"
-      
-      - if: "rapid_prototype_required AND unknown_requirements"
-        then: "serverless"
-        reasoning: "Flexibility, pay-per-use cost model"
-  
-  database_selection:
-    conditions:
-      - if: "complex_relationships AND consistency_critical"
-        then: "postgresql"
-        reasoning: "ACID compliance, relational integrity"
-      
-      - if: "flexible_schema AND high_write_throughput"
-        then: "mongodb"
-        reasoning: "Schema flexibility, horizontal scaling"
-      
-      - if: "real_time_analytics AND time_series_data"
-        then: "influxdb_timescale"
-        reasoning: "Optimized for time-series queries"
-  
-  frontend_framework:
-    conditions:
-      - if: "seo_critical AND content_heavy"
-        then: "nextjs"
-        reasoning: "SSR/SSG capabilities"
-      
-      - if: "high_interactivity AND complex_state"
-        then: "react_redux"
-        reasoning: "Mature ecosystem, state management"
-      
-      - if: "mobile_first AND simple_ui"
-        then: "vue_nuxtjs"
-        reasoning: "Gentle learning curve, good performance"
+### Sprint Planning
+
+```python
+from agents.full_stack_planner.agent import SprintPlanner, Task, Priority, TaskStatus
+
+planner = SprintPlanner(config=ProjectConfig(project_name="MyApp", team_name="Alpha"))
+
+# Create sprint
+sprint = planner.create_sprint("S1", "Sprint 1", start_date, end_date, goal="Core API")
+
+# Add tasks
+planner.add_task(Task("T1", "User Auth", "JWT implementation", Priority.HIGH, story_points=8, estimated_hours=16))
+planner.add_task(Task("T2", "Product CRUD", "REST endpoints", Priority.HIGH, story_points=5, estimated_hours=10))
+
+# Plan sprint
+plan = planner.plan_sprint("S1", ["T1", "T2"], team_capacity_hours=160)
+# {"tasks_planned": 2, "total_points": 13, "total_hours": 26, ...}
+
+# Track progress
+planner.update_task_status("T1", TaskStatus.DONE, actual_hours=14)
+
+# Complete sprint
+result = planner.complete_sprint("S1")
+# {"velocity": 8, "completion_rate": 0.615, ...}
+
+# Burndown data
+burndown = planner.generate_burndown("S1")
 ```
 
-## Output Formats
+### Resource Allocation
 
-### 1. Comprehensive Project Plan
-```yaml
-# Complete project plan output
-project_plan:
-  executive_summary:
-    project_name: ""
-    business_problem: ""
-    proposed_solution: ""
-    estimated_timeline: ""
-    estimated_budget: ""
-    success_metrics: []
-  
-  technical_architecture:
-    overview_diagram: ""
-    components: []
-    data_flow: []
-    technology_stack: {}
-    security_considerations: []
-  
-  development_roadmap:
-    phases: []
-    milestones: []
-    dependencies: []
-    risk_assessment: []
-  
-  resource_planning:
-    team_structure: {}
-    required_skills: []
-    timeline: {}
-    budget_breakdown: {}
-  
-  quality_assurance:
-    testing_strategy: {}
-    performance_metrics: []
-    security_measures: []
-    monitoring_plan: {}
+```python
+from agents.full_stack_planner.agent import ResourceAllocator, TeamMember, TeamRole
+
+allocator = ResourceAllocator()
+
+allocator.add_member(TeamMember("Alice", TeamRole.TECH_LEAD, ["python", "react"], 150, 40, 0.3, 1.2))
+allocator.add_member(TeamMember("Bob", TeamRole.DEVELOPER, ["python", "react"], 100, 40, 0.5, 1.0))
+
+# Get team capacity
+capacity = allocator.get_team_capacity()
+# {"team_size": 2, "total_remaining_hours": 44.0, "utilization_pct": 45.0, ...}
+
+# Find best-fit member for a task
+best = allocator.find_best_fit(["python", "react"], hours_needed=20)
+
+# Rebalance workload
+suggestions = allocator.rebalance_workload()
+# [{"from": "Bob", "to": "Alice", "transfer_hours": 4.0}]
 ```
 
-### 2. Sprint Planning Output
-```yaml
-# Sprint-specific planning output
-sprint_plan:
-  sprint_info:
-    sprint_number: ""
-    duration: ""
-    start_date: ""
-    end_date: ""
-  
-  sprint_goals: []
-  
-  user_stories:
-    - story_id: ""
-      title: ""
-      description: ""
-      acceptance_criteria: []
-      effort_points: ""
-      priority: ""
-      assignee: ""
-      dependencies: []
-  
-  technical_tasks:
-    - task_id: ""
-      title: ""
-      description: ""
-      effort_hours: ""
-      assignee: ""
-      dependencies: []
-  
-  definitions_of_done: []
-  
-  risk_mitigation: []
+### Risk Management
+
+```python
+from agents.full_stack_planner.agent import RiskManager, Risk, RiskLevel
+
+risk_mgr = RiskManager(risk_tolerance="medium")
+
+risk_mgr.add_risk(Risk("R1", "Key developer leaves", probability=0.3, impact=8, mitigation="Cross-train team"))
+risk_mgr.add_risk(Risk("R2", "Scope creep", probability=0.7, impact=6, mitigation="Strict change control"))
+
+summary = risk_mgr.get_risk_summary()
+# {"total_risks": 2, "critical_count": 0, "above_tolerance": 1}
+
+register = risk_mgr.get_risk_register()
+suggestions = risk_mgr.suggest_mitigations("R1")
 ```
 
-## Integration with Other Agents
+### Cost Estimation
 
-### 1. Agent Collaboration Patterns
-```yaml
-# Collaboration workflows
-agent_collaboration:
-  code_review_team:
-    trigger: "code_completion"
-    inputs:
-      - "source_code"
-      - "technical_specifications"
-      - "quality_requirements"
-    outputs:
-      - "review_feedback"
-      - "quality_metrics"
-      - "security_findings"
-  
-  market_research_oracle:
-    trigger: "feature_validation"
-    inputs:
-      - "feature_description"
-      - "target_audience"
-      - "market_segment"
-    outputs:
-      - "market_validation"
-      - "competitive_analysis"
-      - "recommendation"
-  
-  physics_simulation_engine:
-    trigger: "complex_modeling_required"
-    inputs:
-      - "physical_system_description"
-      - "simulation_parameters"
-      - "accuracy_requirements"
-    outputs:
-      - "simulation_model"
-      - "performance_metrics"
-      - "visualization_config"
+```python
+from agents.full_stack_planner.agent import CostEstimator, CostEstimate
+
+estimator = CostEstimator(default_hourly_rate=100)
+
+estimator.add_estimate(CostEstimate("Backend", "API development", 200, 120, 0.2, 500, 200))
+estimator.add_estimate(CostEstimate("Frontend", "UI development", 150, 100, 0.2, 0, 100))
+
+budget = estimator.generate_budget_report()
+# {"grand_total": 67800, "total_labor": 43200, "total_infrastructure": 6000, ...}
+
+# Estimate from tasks
+task_est = estimator.estimate_from_tasks(tasks, hourly_rate=100)
 ```
 
-## Quick Start Templates
+### Architecture Design
 
-### 1. SaaS Application Template
-```yaml
-# SaaS project template
-saas_template:
-  business_model: "subscription"
-  user_roles: ["admin", "user", "viewer"]
-  core_features:
-    - "User authentication"
-    - "Dashboard"
-    - "Data management"
-    - "Reporting"
-    - "Settings"
-  
-  tech_stack:
-    frontend: "nextjs + tailwind + supabase"
-    backend: "fastapi + postgresql"
-    auth: "supabase-auth"
-    deployment: "vercel + railway"
-  
-  security_requirements:
-    - "Multi-factor auth"
-    - "Role-based access"
-    - "Data encryption"
-    - "Audit logging"
-  
-  scalability_targets:
-    users: "10000+"
-    data: "TB+"
-    uptime: "99.9%"
+```python
+from agents.full_stack_planner.agent import ArchitectureDesigner, ArchitectureStyle, ArchitectureDecision
+
+arch = ArchitectureDesigner(ArchitectureStyle.MODULAR_MONOLITH)
+
+# Document components
+arch.add_component("API Gateway", "Request routing", "FastAPI", ["Routing", "Auth", "Rate limiting"])
+arch.add_component("User Service", "User management", "Python", ["Registration", "Profile"])
+
+# Document data stores
+arch.add_data_store("PostgreSQL", "PostgreSQL", "Primary data store")
+arch.add_data_store("Redis", "Redis", "Session cache")
+
+# Document integrations
+arch.add_integration("REST API", "Frontend", "API Gateway", "HTTPS", "Primary API")
+
+# Create ADR
+arch.create_adr(ArchitectureDecision(
+    adr_id="ADR-001", title="Use Modular Monolith", status="accepted",
+    context="Small team, need快速迭代", decision="Start with modular monolith",
+    consequences=["Simpler deployment", "Can extract services later"]
+))
+
+# Generate diagram
+print(arch.ascii_diagram())
 ```
 
-### 2. E-commerce Platform Template
-```yaml
-# E-commerce project template
-ecommerce_template:
-  business_model: "marketplace"
-  user_roles: ["admin", "seller", "buyer"]
-  core_features:
-    - "Product catalog"
-    - "Shopping cart"
-    - "Payment processing"
-    - "Order management"
-    - "Inventory tracking"
-  
-  tech_stack:
-    frontend: "nextjs + shadcn"
-    backend: "microservices"
-    database: "postgresql + redis"
-    search: "elasticsearch"
-  
-  performance_requirements:
-    - "Page load < 2s"
-    - "Search response < 500ms"
-    - "99.95% uptime"
-  
-  integrations:
-    - "Payment gateway"
-    - "Shipping providers"
-    - "Tax calculation"
-    - "Email marketing"
+### Technical Debt Tracking
+
+```python
+from agents.full_stack_planner.agent import TechDebtTracker, TechnicalDebt, RiskLevel
+
+tracker = TechDebtTracker()
+
+tracker.add_debt(TechnicalDebt("D1", "Legacy auth module", RiskLevel.HIGH, "auth", 20, 5))
+tracker.add_debt(TechnicalDebt("D2", "Missing tests", RiskLevel.MEDIUM, "testing", 40, 3))
+
+prioritized = tracker.prioritize()
+summary = tracker.summary()
+# {"total_items": 2, "total_fix_hours": 60, "total_interest_per_sprint": 8}
 ```
 
-## Best Practices
+### Performance Benchmarks
 
-1. **Iterative Planning**: Start with MVP and progressively enhance
-2. **Risk Management**: Identify and mitigate technical and business risks early
-3. **Team Alignment**: Ensure all stakeholders understand the technical decisions
-4. **Documentation**: Maintain living documentation that evolves with the project
-5. **Quality Gates**: Define clear quality checkpoints at each phase
+```python
+from agents.full_stack_planner.agent import PerformanceBenchmarks, PerformanceBenchmark
 
-Remember: Good planning is like good physics - it establishes clear rules and constraints that enable predictable, scalable outcomes. The best architecture emerges from understanding both the requirements and the constraints.
+perf = PerformanceBenchmarks()
+perf.add_benchmark(PerformanceBenchmark("API Response Time", target_value=200, unit="ms"))
+perf.add_benchmark(PerformanceBenchmark("Uptime", target_value=99.9, unit="%"))
+
+perf.update_actual("API Response Time", 180)
+perf.update_actual("Uptime", 99.95)
+
+status = perf.status_report()
+# {"total": 2, "met": 2, "not_met": 0}
+```
+
+---
+
+## Operational Guidelines
+
+### Project Lifecycle
+
+| Phase | Primary Components | Key Outputs |
+|-------|-------------------|-------------|
+| Discovery | TechStackEvaluator | Technology recommendations |
+| Planning | CostEstimator, RiskManager | Budget, risk register |
+| Design | ArchitectureDesigner | ADRs, component diagram |
+| Development | SprintPlanner, ResourceAllocator | Sprint plans, assignments |
+| Monitoring | TechDebtTracker, PerformanceBenchmarks | Debt backlog, SLA status |
+
+### Decision Framework
+
+1. **Evaluate options** — Use TechStackEvaluator for technology choices
+2. **Estimate cost** — Use CostEstimator for budget planning
+3. **Assess risk** — Use RiskManager for risk identification
+4. **Design architecture** — Use ArchitectureDesigner for system design
+5. **Plan execution** — Use SprintPlanner for delivery planning
+6. **Allocate resources** — Use ResourceAllocator for team optimization
+7. **Monitor progress** — Use benchmarks and debt tracking
+
+---
+
+## Data Models
+
+### Task
+```python
+@dataclass
+class Task:
+    task_id: str
+    title: str
+    description: str
+    priority: Priority      # CRITICAL=0, HIGH=1, MEDIUM=2, LOW=3, BACKLOG=4
+    story_points: int
+    estimated_hours: float
+    assignee: Optional[str]
+    status: TaskStatus      # TODO, IN_PROGRESS, IN_REVIEW, BLOCKED, DONE
+    dependencies: List[str]
+```
+
+### Sprint
+```python
+@dataclass
+class Sprint:
+    sprint_id: str
+    name: str
+    start_date: datetime
+    end_date: datetime
+    goal: str
+    tasks: List[str]
+    velocity: int
+    committed_points: int
+    completed_points: int
+```
+
+### TeamMember
+```python
+@dataclass
+class TeamMember:
+    name: str
+    role: TeamRole
+    skills: List[str]
+    hourly_rate: float
+    available_hours_per_week: float
+    current_load_pct: float
+    productivity_factor: float
+```
+
+### Risk
+```python
+@dataclass
+class Risk:
+    risk_id: str
+    description: str
+    probability: float      # 0-1
+    impact: float           # 0-10
+    level: RiskLevel
+    mitigation: str
+```
+
+---
+
+## Checklists
+
+### Tech Stack Selection
+- [ ] Requirements analysis completed
+- [ ] Candidate technologies registered
+- [ ] Evaluation criteria weighted
+- [ ] Comparison matrix generated
+- [ ] Team skill gap analysis done
+- [ ] Cost impact assessed
+- [ ] Final selection documented as ADR
+
+### Sprint Planning
+- [ ] Backlog groomed and prioritized
+- [ ] Team capacity calculated
+- [ ] Velocity trend reviewed
+- [ ] Story points estimated
+- [ ] Dependencies identified
+- [ ] Sprint goal defined
+- [ ] Tasks assigned to team members
+
+### Architecture Review
+- [ ] Architecture style selected
+- [ ] Components documented
+- [ ] Data stores defined
+- [ ] Integrations mapped
+- [ ] ADRs created for key decisions
+- [ ] Performance requirements captured
+- [ ] Security considerations addressed
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+**Velocity is inconsistent**
+- Review task estimation accuracy
+- Check for external blockers
+- Consider team capacity changes
+- Use 3-sprint rolling average
+
+**Resource utilization is low**
+- Check for skill mismatches
+- Review task dependencies
+- Consider team restructuring
+- Look for process bottlenecks
+
+**Risk scores seem off**
+- Validate probability estimates with team
+- Reassess impact based on current context
+- Consider adding more granular risks
+- Review mitigation effectiveness
+
+**Budget overrun**
+- Compare actual vs estimated hours
+- Review scope changes
+- Check for underestimated complexity
+- Adjust contingency percentage
+
+### Performance Tips
+
+- Use story points for velocity tracking, hours for capacity planning
+- Run sprint retrospectives to improve estimation accuracy
+- Track technical debt interest to prioritize fixes
+- Update performance benchmarks regularly
+
+---
+
+## Usage Patterns
+
+### Project Kickoff
+```python
+# 1. Evaluate tech stack
+evaluator = TechStackEvaluator()
+# Register and evaluate candidates
+
+# 2. Design architecture
+arch = ArchitectureDesigner(style)
+# Document components, data stores, integrations
+
+# 3. Estimate costs
+estimator = CostEstimator()
+# Add estimates for each work stream
+
+# 4. Identify risks
+risk_mgr = RiskManager()
+# Add and classify risks
+
+# 5. Create roadmap
+roadmap = ProjectRoadmap(config)
+# Add milestones and dependencies
+```
+
+### Sprint Cycle
+```python
+# 1. Plan sprint
+planner.plan_sprint(sprint_id, task_ids, capacity)
+
+# 2. Allocate resources
+allocator.allocate(task_id, member_name, hours)
+
+# 3. Execute (track progress)
+planner.update_task_status(task_id, TaskStatus.IN_PROGRESS)
+planner.update_task_status(task_id, TaskStatus.DONE, actual_hours)
+
+# 4. Complete sprint
+result = planner.complete_sprint(sprint_id)
+
+# 5. Review metrics
+print(f"Velocity: {result['velocity']}")
+print(f"Completion: {result['completion_rate']:.0%}")
+```
