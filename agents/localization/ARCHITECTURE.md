@@ -66,7 +66,7 @@ The platform is designed for product teams managing large-scale translation proj
 │  │                  Terminology Management Layer                               │  │
 │  │                                                                            │  │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐                                  │  │
-│  │  │Glossary  │ │Termbase │ │Forbidden │                                  │  │
+│  │  │Glossary  │ │Termbase  │ │Forbidden │                                  │  │
 │  │  │Manager   │ │Enforce   │ │Terms     │                                  │  │
 │  │  └──────────┘ └──────────┘ └──────────┘                                  │  │
 │  └────────────────────────────────────────────────────────────────────────────┘  │
@@ -136,6 +136,21 @@ report = tm_engine.maintenance_report()
 # - utilization_rate: 45.0 (avg uses per entry)
 ```
 
+**TM Data Model:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| entry_id | str | Unique identifier |
+| source_text | str | Source text |
+| target_text | str | Translation |
+| source_language | str | Source language code |
+| target_language | str | Target language code |
+| domain | str | Content domain |
+| approved | bool | Entry approved |
+| usage_count | int | Times leveraged |
+| created_at | datetime | Creation timestamp |
+| updated_at | datetime | Last update timestamp |
+
 ### i18n Engineering Engine
 
 Handles locale configuration, pseudo-localization, and locale-aware formatting.
@@ -150,7 +165,7 @@ locale: "es-ES"
   time_format: "HH:mm"
   number_format: "1.234,56"
   currency_code: "EUR"
-  currency_symbol: "\u20ac"
+  currency_symbol: "€"
   decimal_separator: ","
   thousands_separator: "."
   first_day_of_week: 1 (Monday)
@@ -180,10 +195,11 @@ Purpose: Test UI layout with longer, expanded text before real translations exis
 | Locale | Number | Currency | Date | First Day |
 |--------|--------|----------|------|-----------|
 | en-US | 1,234.56 | $1,234.56 | 12/31/2026 | Sunday |
-| es-ES | 1.234,56 | 1.234,56 \u20ac | 31/12/2026 | Monday |
-| de-DE | 1.234,56 | 1.234,56 \u20ac | 31.12.2026 | Monday |
-| ja-JP | 1,234.56 | \u00a51,234 | 2026/12/31 | Sunday |
-| ar-SA | \u0661\u066c\u0662\u0664\u066b\u0665\u0666 | \u0661\u066c\u0662\u0664\u066b\u0665\u0666 \u0631.\u0633 | 31/12/2026 | Saturday |
+| es-ES | 1.234,56 | 1.234,56 € | 31/12/2026 | Monday |
+| de-DE | 1.234,56 | 1.234,56 € | 31.12.2026 | Monday |
+| ja-JP | 1,234.56 | ¥1,234 | 2026/12/31 | Sunday |
+| ar-SA | ١٬٢٣٤٫٥٦ | ١٬٢٣٤٫٥٦ ر.س | 31/12/2026 | Saturday |
+| zh-CN | 1,234.56 | ¥1,234.56 | 2026/12/31 | Monday |
 
 ### Cultural Adaptation Engine
 
@@ -218,6 +234,7 @@ guide = StyleGuide(
 | zh | numerology | Avoid number 4, prefer 8 |
 | ar | religious | Avoid pork/alcohol references |
 | br | informality | "Voce" acceptable in most contexts |
+| ko | hierarchy | Respect age/status in language |
 
 ### Quality Assurance Engine
 
@@ -248,6 +265,24 @@ HIGH issues     → Require fix before review
 MEDIUM issues   → Fix before launch
 LOW issues      → Track for next cycle
 ```
+
+### Terminology Management
+
+Enforces consistent terminology across all translations.
+
+**Glossary Entry Model:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| term_id | str | Unique identifier |
+| source_term | str | Term in source language |
+| target_term | str | Approved translation |
+| source_language | str | Source language code |
+| target_language | str | Target language code |
+| category | str | Term category |
+| definition | str | Clarifying definition |
+| context | str | Usage context |
+| forbidden | bool | Whether term is forbidden |
 
 ### Project Management
 
@@ -372,3 +407,50 @@ Translated units → QA Engine
 | Project status update | < 100ms |
 | Leverage analysis | < 200ms for 10K strings |
 | Missing key detection | < 100ms per locale pair |
+
+## Design Patterns
+
+### Cache-Aside Pattern
+TM entries are cached for fast lookup, with cache invalidation on updates.
+
+### Pipeline Pattern
+QA checks run as a pipeline of independent validators, each handling a specific check type.
+
+### Strategy Pattern
+Multiple fuzzy matching strategies can be swapped based on content type and language.
+
+### Observer Pattern
+Project phase transitions trigger notifications to team members and downstream systems.
+
+## Configuration Reference
+
+```yaml
+translation_memory:
+  max_entries: 1000000
+  fuzzy_threshold: 0.75
+  cache_size: 100000
+  maintenance_schedule: "weekly"
+
+i18n_engine:
+  default_source_language: "en"
+  pseudo_localization_enabled: true
+  rtl_languages: ["ar", "he", "fa", "ur"]
+  max_locale_configs: 100
+
+quality_assurance:
+  pass_rate_threshold: 95.0
+  auto_fix_enabled: true
+  max_batch_size: 10000
+  check_timeout_seconds: 300
+
+terminology:
+  enforcement_enabled: true
+  forbidden_term_alerts: true
+  max_terms_per_language: 50000
+
+project_management:
+  max_concurrent_projects: 100
+  max_languages_per_project: 50
+  deadline_reminder_days: [30, 14, 7, 3, 1]
+  progress_update_frequency: "daily"
+```

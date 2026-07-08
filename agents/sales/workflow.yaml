@@ -1,95 +1,592 @@
 name: sales-agent
-version: 1.0.0
+version: 2.0.0
+description: "Comprehensive sales automation agent for lead management, pipeline tracking, forecasting, and revenue optimization"
 
-description: Sales automation agent for lead management, pipeline tracking, and forecasting
+metadata:
+  category: "sales"
+  crm_integration: "salesforce"
+  last_updated: "2024-03-01"
+
+# =============================================================================
+# TRIGGERS
+# =============================================================================
 
 triggers:
+  # Lead Management
   - new_lead
   - lead_updated
+  - lead_scored
+  - lead_qualified
+  - lead_disqualified
+
+  # Opportunity Management
+  - deal_created
   - deal_stage_change
+  - deal_updated
+  - deal_won
+  - deal_lost
+
+  # Engagement
   - meeting_scheduled
+  - meeting_completed
+  - email_opened
+  - proposal_viewed
+  - contract_downloaded
+
+  # Sales Process
   - proposal_sent
+  - contract_sent
   - contract_signed
+  - payment_received
+
+  # Team Events
+  - rep_quota_update
+  - territory_change
+  - team_meeting
+
+  # External Events
+  - website_form_submission
+  - webinar_registration
+  - content_download
+  - pricing_page_visit
+
+# =============================================================================
+# PERMISSIONS
+# =============================================================================
 
 permissions:
+  # Lead Management
   - leads:read
   - leads:write
+  - leads:create
+  - leads:delete
+  - leads:assign
+
+  # Contact Management
   - contacts:read
   - contacts:write
+  - contacts:create
+
+  # Opportunity Management
   - opportunities:read
   - opportunities:write
+  - opportunities:create
+  - opportunities:close
+
+  # Account Management
   - accounts:read
   - accounts:write
+  - accounts:create
+
+  # Activities
+  - activities:read
+  - activities:write
+  - activities:create
+
+  # Reports
+  - reports:read
+  - reports:create
+  - dashboards:read
+
+  # Forecasts
+  - forecasts:read
+  - forecasts:write
+
+# =============================================================================
+# PIPELINE STAGES
+# =============================================================================
+
+pipeline:
+  stages:
+    - name: "prospecting"
+      description: "Initial lead identification and outreach"
+      probability: 10
+      sla: "24_hours"
+      required_activities:
+        - "initial_contact"
+        - "discovery_call"
+
+    - name: "qualification"
+      description: "Qualify lead based on BANT criteria"
+      probability: 25
+      sla: "48_hours"
+      required_activities:
+        - "qualification_call"
+        - "needs_analysis"
+      exit_criteria:
+        - "budget_confirmed"
+        - "authority_identified"
+        - "need_established"
+        - "timeline_defined"
+
+    - name: "needs_analysis"
+      description: "Deep dive into customer requirements"
+      probability: 40
+      sla: "5_days"
+      required_activities:
+        - "technical_discovery"
+        - "stakeholder_mapping"
+        - "pain_point_analysis"
+
+    - name: "proposal"
+      description: "Present solution proposal"
+      probability: 60
+      sla: "3_days"
+      required_activities:
+        - "proposal_presentation"
+        - "demo_delivery"
+        - "pricing_discussion"
+
+    - name: "negotiation"
+      description: "Negotiate terms and pricing"
+      probability: 75
+      sla: "7_days"
+      required_activities:
+        - "contract_review"
+        - "legal_approval"
+        - "final_pricing"
+
+    - name: "closed_won"
+      description: "Deal successfully closed"
+      probability: 100
+      required_activities:
+        - "contract_signed"
+        - "payment_received"
+
+    - name: "closed_lost"
+      description: "Deal lost"
+      probability: 0
+      required_activities:
+        - "loss_reason_documented"
+        - "competitor_noted"
+
+  lead_scoring:
+    demographic_scoring:
+      - name: "company_size"
+        values:
+          enterprise: 25
+          mid_market: 20
+          small_business: 15
+          startup: 10
+      - name: "industry"
+        values:
+          technology: 20
+          finance: 18
+          healthcare: 17
+          manufacturing: 15
+          retail: 12
+      - name: "job_title"
+        values:
+          c_level: 25
+          vp_director: 20
+          manager: 15
+          individual_contributor: 5
+
+    behavioral_scoring:
+      - name: "website_visits"
+        points_per_visit: 2
+        max_points: 20
+      - name: "email_engagement"
+        points_per_open: 1
+        points_per_click: 3
+        max_points: 15
+      - name: "content_downloads"
+        points_per_download: 5
+        max_points: 25
+      - name: "demo_requests"
+        points: 30
+      - name: "pricing_page_visits"
+        points_per_visit: 5
+        max_points: 15
+
+    qualification_thresholds:
+      mql: 40
+      sql: 70
+      hot_lead: 85
+
+# =============================================================================
+# WORKFLOW STEPS
+# =============================================================================
 
 steps:
+  # -------------------------------------------------------------------------
+  # Lead Management
+  # -------------------------------------------------------------------------
   - name: lead_capture
-    description: Process new lead from any source
+    description: "Process new lead from any source with validation and enrichment"
     when: trigger == "new_lead"
+    priority: "high"
+    timeout: "5m"
     actions:
       - validate_lead_data
+      - deduplicate_check
       - enrich_lead_data
       - score_lead
       - assign_to_rep
-      - create_sequence
-  
-  - name: lead_nurturing
-    description: Nurture leads through engagement
+      - create_onboarding_sequence
+      - notify_rep
+    sla:
+      response_time: "5_minutes"
+      first_contact: "1_hour"
+
+  - name: lead_enrichment
+    description: "Enrich lead data with third-party information"
     when: trigger == "lead_updated"
+    priority: "medium"
+    actions:
+      - fetch_company_data
+      - fetch_contact_data
+      - update_demographics
+      - recalculate_score
+    data_sources:
+      - clearbit
+      - zoominfo
+      - linkedin
+      - crunchbase
+
+  - name: lead_qualification
+    description: "Qualify leads using BANT and MEDDIC criteria"
+    when: trigger == "lead_scored"
+    priority: "high"
+    actions:
+      - evaluate_bant
+      - evaluate_meddic
+      - determine_readiness
+      - route_or_nurture
+    qualification_framework:
+      bant:
+        - budget: "confirmed_budget"
+        - authority: "decision_maker_identified"
+        - need: "pain_point_established"
+        - timeline: "purchase_timeline_defined"
+      meddic:
+        - metrics: "success_metrics_defined"
+        - economic_buyer: "identified"
+        - decision_criteria: "understood"
+        - decision_process: "mapped"
+        - identify_pain: "validated"
+        - champion: "identified"
+
+  - name: lead_nurturing
+    description: "Nurture leads through automated engagement sequences"
+    when: trigger == "lead_updated"
+    priority: "medium"
     actions:
       - update_engagement_score
-      - trigger_workflow
+      - trigger_sequence
       - schedule_follow_up
-  
+      - personalize_content
+    sequences:
+      - name: "new_lead"
+        duration: "14_days"
+        steps:
+          - day: 1
+            action: "welcome_email"
+          - day: 3
+            action: "value_proposition"
+          - day: 7
+            action: "case_study"
+          - day: 14
+            action: "demo_offer"
+      - name: "nurture"
+        duration: "30_days"
+        steps:
+          - day: 1
+            action: "educational_content"
+          - day: 7
+            action: "industry_insights"
+          - day: 14
+            action: "webinar_invite"
+          - day: 30
+            action: "consultation_offer"
+
+  # -------------------------------------------------------------------------
+  # Opportunity Management
+  # -------------------------------------------------------------------------
+  - name: opportunity_creation
+    description: "Create and initialize sales opportunity"
+    when: trigger == "deal_created"
+    priority: "high"
+    actions:
+      - create_opportunity
+      - assign_rep
+      - set_close_date
+      - initialize_forecast
+      - create_first_activity
+    data_fields:
+      - name
+      - account
+      - amount
+      - close_date
+      - stage
+      - rep
+
   - name: opportunity_management
-    description: Manage sales opportunities
+    description: "Manage sales opportunities through pipeline"
     when: trigger == "deal_stage_change"
+    priority: "high"
     actions:
       - update_forecast
       - notify_manager
       - trigger_tasks
       - update_analytics
-  
+      - log_stage_change
+    stage_requirements:
+      qualification:
+        - discovery_call_completed
+        - pain_points_identified
+        - budget_discussed
+      proposal:
+        - demo_completed
+        - stakeholders_mapped
+        - proposal_delivered
+      negotiation:
+        - terms_agreed
+        - legal_review
+        - final_approvals
+      closed_won:
+        - contract_signed
+        - payment_terms_set
+
+  - name: deal_scoring
+    description: "Score deals based on engagement and fit"
+    when: trigger == "deal_updated"
+    priority: "medium"
+    actions:
+      - calculate_win_probability
+      - assess_fit_score
+      - evaluate_engagement
+      - update_risk_flags
+    scoring_factors:
+      - stakeholder_engagement
+      - decision_timeline
+      - budget_alignment
+      - competitive_situation
+      - champion_strength
+
+  # -------------------------------------------------------------------------
+  # Meeting Management
+  # -------------------------------------------------------------------------
   - name: meeting_preparation
-    description: Prepare for meetings
+    description: "Prepare comprehensive meeting briefs"
     when: trigger == "meeting_scheduled"
+    priority: "high"
+    timeout: "10m"
     actions:
       - research_account
       - prepare_briefing
       - generate_talking_points
+      - create_agenda
       - schedule_reminder
-  
+      - share_with_attendees
+    research_sources:
+      - company_website
+      - linkedin_profiles
+      - news_articles
+      - financial_filings
+      - competitor_analysis
+
+  - name: meeting_follow_up
+    description: "Execute post-meeting follow-up actions"
+    when: trigger == "meeting_completed"
+    priority: "high"
+    actions:
+      - log_meeting_notes
+      - extract_action_items
+      - update_opportunity
+      - schedule_next_steps
+      - send_recap_email
+    follow_up_slas:
+      - recap_email: "2_hours"
+      - action_items: "24_hours"
+      - next_meeting: "5_business_days"
+
+  # -------------------------------------------------------------------------
+  # Proposal & Quote Management
+  # -------------------------------------------------------------------------
   - name: proposal_generation
-    description: Generate and send proposals
+    description: "Generate and send customized proposals"
     when: trigger == "proposal_sent"
+    priority: "high"
     actions:
       - generate_quote
       - create_proposal
+      - personalize_content
       - track_engagement
       - schedule_follow_up
-  
+      - set_expiration
+    proposal_components:
+      - executive_summary
+      - solution_overview
+      - pricing_table
+      - implementation_timeline
+      - case_studies
+      - terms_and_conditions
+
+  - name: proposal_tracking
+    description: "Track proposal engagement and optimize"
+    when: trigger == "proposal_viewed"
+    priority: "medium"
+    actions:
+      - log_view
+      - track_time_spent
+      - identify_section_interest
+      - trigger_alert
+      - update_score
+    tracking_metrics:
+      - views
+      - time_spent
+      - sections_viewed
+      - downloads
+      - shares
+
+  # -------------------------------------------------------------------------
+  # Contract Management
+  # -------------------------------------------------------------------------
+  - name: contract_management
+    description: "Manage contract creation and execution"
+    when: trigger == "contract_sent"
+    priority: "high"
+    actions:
+      - generate_contract
+      - route_for_signature
+      - track_status
+      - send_reminders
+      - manage_redlines
+    contract_types:
+      - standard
+      - enterprise
+      - custom
+    approval_requirements:
+      - standard: "sales_manager"
+      - enterprise: "vp_sales"
+      - custom: "legal"
+
   - name: deal_closing
-    description: Handle contract signing and close
+    description: "Handle deal closure and handoff"
     when: trigger == "contract_signed"
+    priority: "critical"
     actions:
       - update_closed_won
       - create_account
       - trigger_onboarding
       - update_forecast
       - send_welcome
+      - assign_csm
+      - celebrate_win
+    handoff_checklist:
+      - customer_contacts
+      - implementation_requirements
+      - success_criteria
+      - renewal_date
+
+  # -------------------------------------------------------------------------
+  # Forecasting & Reporting
+  # -------------------------------------------------------------------------
+  - name: forecast_update
+    description: "Update sales forecast based on pipeline changes"
+    when: trigger == "deal_stage_change"
+    priority: "high"
+    actions:
+      - calculate_weighted_forecast
+      - update_commit_forecast
+      - identify_gaps
+      - alert_managers
+    forecast_categories:
+      - commit: "deals_expected_to_close"
+      - best_case: "deals_with_good_probability"
+      - pipeline: "all_open_deals"
+      - upside: "potential_new_deals"
+
+  - name: reporting
+    description: "Generate sales performance reports"
+    schedule: "daily"
+    actions:
+      - generate_pipeline_report
+      - calculate_metrics
+      - identify_trends
+      - distribute_reports
+    reports:
+      - daily_pipeline
+      - weekly_forecast
+      - monthly_performance
+      - quarterly_business_review
+
+  # -------------------------------------------------------------------------
+  # Team Management
+  # -------------------------------------------------------------------------
+  - name: rep Coaching
+    description: "Provide coaching and development for sales reps"
+    when: trigger == "rep_quota_update"
+    priority: "medium"
+    actions:
+      - analyze_performance
+      - identify_gaps
+      - recommend_training
+      - schedule_coaching
+    coaching_areas:
+      - prospecting
+      - discovery
+      - demo_delivery
+      - negotiation
+      - closing
+
+  - name: territory_management
+    description: "Manage and optimize sales territories"
+    when: trigger == "territory_change"
+    priority: "medium"
+    actions:
+      - rebalance_workload
+      - reassign_leads
+      - update_forecast
+      - notify_reps
+    optimization_criteria:
+      - revenue_potential
+      - rep_capacity
+      - geographic_balance
+      - industry_expertise
+
+# =============================================================================
+# ACTION DEFINITIONS
+# =============================================================================
 
 actions:
+  # Lead Actions
   validate_lead_data:
     type: validation
     rules:
-      - email:required
-      - name:required
-      - company:recommended
-  
+      - email: "required|valid_email"
+      - name: "required|min_length:2"
+      - company: "recommended"
+      - phone: "optional|valid_phone"
+      - source: "required|in:web,referral,partner,cold_outbound"
+    error_handling:
+      - invalid_email: "reject"
+      - missing_name: "flag_for_review"
+
+  deduplicate_check:
+    type: database_lookup
+    table: leads
+    match_fields:
+      - email
+      - company + name
+    action_on_match:
+      - merge: "same_email"
+      - flag: "same_company_different_email"
+
   enrich_lead_data:
     type: api_call
     endpoint: /api/enrich
     provider: clearbit
-  
+    timeout: 10s
+    fallback: "skip_enrichment"
+    data_points:
+      - company_size
+      - industry
+      - revenue
+      - technologies
+      - social_profiles
+
   score_lead:
     type: ml_inference
     model: lead-scoring-v2
@@ -97,7 +594,13 @@ actions:
       - company_size
       - industry
       - engagement_level
-  
+      - website_behavior
+      - email_engagement
+    output:
+      - score: "0-100"
+      - tier: "hot|warm|cold"
+      - recommended_action: "call|email|nurture"
+
   assign_to_rep:
     type: algorithm
     algorithm: territory_assignment
@@ -105,31 +608,337 @@ actions:
       - region
       - industry
       - deal_size
-  
-  update_engagement_score:
-    type: rules_engine
-    rules: engagement_scoring
-  
-  generate_quote:
-    type: template_engine
-    template: quote_standard
-  
-  create_proposal:
-    type: template_engine
-    template: proposal_standard
-    output: pdf
-  
+      - rep_capacity
+    balancing:
+      - round_robin: "equal_distribution"
+      - capacity_based: "weighted_by_performance"
+      - expertise_based: "industry_matching"
+
+  # Opportunity Actions
+  update_forecast:
+    type: calculation
+    formula: weighted_forecast
+    method: probability_based
+    categories:
+      - commit: "> 80% probability"
+      - best_case: "50-80% probability"
+      - pipeline: "25-50% probability"
+      - upside: "< 25% probability"
+
+  # Meeting Actions
   research_account:
     type: api_call
-    endpoint: /api/company
+    endpoint: /api/company/research
     sources:
       - crunchbase
       - linkedin
       - news
+      - sec_filings
+    output:
+      - company_overview
+      - key_people
+      - recent_news
+      - financial_data
+      - technology_stack
+
+  prepare_briefing:
+    type: template_engine
+    template: meeting_brief
+    sections:
+      - account_summary
+      - stakeholder_map
+      - pain_points
+      - competitive_landscape
+      - recommended_approach
+
+  generate_talking_points:
+    type: ai_generation
+    prompt: |
+      Based on the account research and meeting objectives,
+      generate 5-7 talking points for this sales meeting.
+      Focus on customer pain points and our value proposition.
+
+  # Proposal Actions
+  generate_quote:
+    type: template_engine
+    template: quote_standard
+    variables:
+      - customer_name
+      - products
+      - pricing
+      - terms
+      - valid_until
+
+  create_proposal:
+    type: template_engine
+    template: proposal_standard
+    output: pdf
+    sections:
+      - cover_page
+      - executive_summary
+      - solution_overview
+      - pricing
+      - implementation
+      - case_studies
+      - team_introduction
+      - terms
+
+  # Contract Actions
+  generate_contract:
+    type: template_engine
+    template: contract_standard
+    variables:
+      - parties
+      - terms
+      - pricing
+      - sla
+      - liability
+      - termination
+    approval_routing:
+      - standard: "auto_approved"
+      - non_standard: "legal_review"
+      - high_value: "executive_approval"
+
+  # Notification Actions
+  notify_rep:
+    type: notification
+    channels: [email, mobile_push]
+    template: new_lead_notification
+    includes:
+      - lead_name
+      - company
+      - score
+      - recommended_action
+
+  notify_manager:
+    type: notification
+    channels: [email, slack]
+    template: opportunity_update
+    triggers:
+      - stage_change
+      - high_value_deal
+      - at_risk_deal
+
+# =============================================================================
+# NOTIFICATION TEMPLATES
+# =============================================================================
+
+notifications:
+  new_lead:
+    channel: [email, mobile_push]
+    recipients: [assigned_rep]
+    template: |
+      New Lead Assigned
+      
+      Name: {{lead_name}}
+      Company: {{company}}
+      Score: {{lead_score}}/100
+      Source: {{source}}
+      
+      Recommended Action: {{recommended_action}}
+      
+      [View Lead]({{lead_url}})
+
+  deal_stage_change:
+    channel: [email, slack]
+    recipients: [rep, manager]
+    template: |
+      Deal Stage Updated
+      
+      Opportunity: {{opportunity_name}}
+      Account: {{account_name}}
+      Stage: {{old_stage}} → {{new_stage}}
+      Amount: {{amount}}
+      Close Date: {{close_date}}
+      
+      [View Opportunity]({{opportunity_url}})
+
+  meeting_reminder:
+    channel: [email, calendar]
+    recipients: [rep, attendees]
+    template: |
+      Meeting Reminder
+      
+      Title: {{meeting_title}}
+      Time: {{meeting_time}}
+      Location: {{meeting_location}}
+      Attendees: {{attendees}}
+      
+      [View Briefing]({{briefing_url}})
+
+  proposal_viewed:
+    channel: [email, mobile_push]
+    recipients: [rep]
+    template: |
+      Proposal Engaged
+      
+      Contact: {{contact_name}}
+      Company: {{company}}
+      Time Spent: {{time_spent}}
+      Sections Viewed: {{sections_viewed}}
+      
+      [View Engagement]({{engagement_url}})
+
+  deal_closed:
+    channel: [email, slack, mobile_push]
+    recipients: [rep, manager, leadership]
+    template: |
+      DEAL CLOSED - WON!
+      
+      Account: {{account_name}}
+      Amount: {{amount}}
+      Rep: {{rep_name}}
+      Close Date: {{close_date}}
+      
+      Congratulations! 🎉
+
+# =============================================================================
+# METRICS & KPIs
+# =============================================================================
 
 metrics:
-  lead_response_time: "< 5 minutes"
-  lead_conversion_rate: "15-20%"
-  average_deal_cycle: "45 days"
-  proposal_acceptance: "30%"
-  quota_attainment: "85%"
+  lead_metrics:
+    - name: "lead_response_time"
+      target: "< 5 minutes"
+      alert_threshold: "> 10 minutes"
+    - name: "lead_to_mql_conversion"
+      target: "> 25%"
+      benchmark: "industry_average"
+    - name: "mql_to_sql_conversion"
+      target: "> 50%"
+      alert_threshold: "< 40%"
+    - name: "sql_to_opportunity_conversion"
+      target: "> 60%"
+      alert_threshold: "< 50%"
+
+  pipeline_metrics:
+    - name: "average_deal_size"
+      target: "> $50,000"
+      trend: "increasing"
+    - name: "sales_cycle_length"
+      target: "< 45 days"
+      alert_threshold: "> 60 days"
+    - name: "pipeline_coverage"
+      target: "> 3x"
+      minimum: "2x"
+    - name: "win_rate"
+      target: "> 25%"
+      benchmark: "industry_average"
+
+  activity_metrics:
+    - name: "calls_per_day"
+      target: "> 50"
+      minimum: "30"
+    - name: "emails_per_day"
+      target: "> 100"
+      minimum: "50"
+    - name: "meetings_per_week"
+      target: "> 10"
+      minimum: "5"
+    - name: "demos_per_week"
+      target: "> 5"
+      minimum: "3"
+
+  revenue_metrics:
+    - name: "quota_attainment"
+      target: "> 100%"
+      minimum_acceptable: "85%"
+    - name: "revenue_growth"
+      target: "> 20% YoY"
+      benchmark: "market_growth"
+    - name: "customer_acquisition_cost"
+      target: "< $10,000"
+      optimization_goal: "reduce_10%"
+    - name: "lifetime_value"
+      target: "> $100,000"
+      ltv_cac_ratio: "> 10"
+
+  forecast_metrics:
+    - name: "forecast_accuracy"
+      target: "> 90%"
+      alert_threshold: "< 80%"
+    - name: "commit_rate"
+      target: "> 90%"
+      alert_threshold: "< 80%"
+    - name: "best_case_conversion"
+      target: "> 50%"
+      benchmark: "industry_average"
+
+# =============================================================================
+# INTEGRATIONS
+# =============================================================================
+
+integrations:
+  crm:
+    system: "salesforce"
+    capabilities:
+      - lead_management
+      - opportunity_tracking
+      - contact_management
+      - reporting
+    sync_frequency: "real_time"
+
+  marketing_automation:
+    system: "hubspot"
+    capabilities:
+      - email_sequences
+      - lead_scoring
+      - campaign_tracking
+      - content_management
+    sync_frequency: "real_time"
+
+  communication:
+    systems:
+      - "gmail"
+      - "outlook"
+      - "slack"
+      - "zoom"
+    capabilities:
+      - email_tracking
+      - calendar_sync
+      - meeting_scheduling
+      - chat_integration
+
+  intelligence:
+    systems:
+      - "clearbit"
+      - "zoominfo"
+      - "linkedin_sales_navigator"
+    capabilities:
+      - company_research
+      - contact_enrichment
+      - intent_data
+      - technographic_data
+
+  analytics:
+    systems:
+      - "tableau"
+      - "looker"
+      - "power_bi"
+    capabilities:
+      - pipeline_analytics
+      - forecast_visualization
+      - rep_performance
+      - trend_analysis
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+
+changelog:
+  - version: "2.0.0"
+    date: "2024-03-01"
+    changes:
+      - "Added comprehensive pipeline management"
+      - "Enhanced lead scoring with ML"
+      - "Added MEDDIC qualification framework"
+      - "Improved forecasting capabilities"
+      - "Added team management features"
+
+  - version: "1.0.0"
+    date: "2024-01-01"
+    changes:
+      - "Initial release"
+      - "Basic lead management"
+      - "Opportunity tracking"
+      - "Simple forecasting"

@@ -55,28 +55,37 @@ The Legal Agent is a comprehensive legal operations platform that automates cont
 │  ┌────────────────────────────────────────────────────────────────────────────┐  │
 │  │                     IP Protection Layer                                     │  │
 │  │                                                                            │  │
-│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐                     │  │
-│  │  │Trademark │ │Portfolio │ │Expiration│ │License   │                     │  │
-│  │  │Manager   │ │Tracker   │ │Monitor   │ │Targets   │                     │  │
-│  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘                     │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │  │
+│  │  │Trademark │ │Portfolio │ │Expiration│ │License   │ │Prior     │       │  │
+│  │  │Manager   │ │Tracker   │ │Monitor   │ │Targets   │ │Art Search│       │  │
+│  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘       │  │
 │  └────────────────────────────────────────────────────────────────────────────┘  │
 │                                                                                   │
 │  ┌────────────────────────────────────────────────────────────────────────────┐  │
 │  │                   Risk Assessment Layer                                     │  │
 │  │                                                                            │  │
-│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐                     │  │
-│  │  │Risk      │ │Impact    │ │Mitigation│ │Register  │                     │  │
-│  │  │Identif.  │ │Scoring   │ │Tracking  │ │Report    │                     │  │
-│  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘                     │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │  │
+│  │  │Risk      │ │Impact    │ │Mitigation│ │Register  │ │Heat Map  │       │  │
+│  │  │Identif.  │ │Scoring   │ │Tracking  │ │Report    │ │Generator │       │  │
+│  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘       │  │
 │  └────────────────────────────────────────────────────────────────────────────┘  │
 │                                                                                   │
 │  ┌────────────────────────────────────────────────────────────────────────────┐  │
 │  │                  Document Automation Layer                                  │  │
 │  │                                                                            │  │
-│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐                                  │  │
-│  │  │Template  │ │Generation│ │Approval  │                                  │  │
-│  │  │Registry  │ │Engine    │ │Workflow  │                                  │  │
-│  │  └──────────┘ └──────────┘ └──────────┘                                  │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐                     │  │
+│  │  │Template  │ │Generation│ │Approval  │ │Version   │                     │  │
+│  │  │Registry  │ │Engine    │ │Workflow  │ │Control   │                     │  │
+│  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘                     │  │
+│  └────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────┐  │
+│  │                  Audit & Reporting Layer                                    │  │
+│  │                                                                            │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐                     │  │
+│  │  │Audit     │ │Compliance│ │Risk      │ │Dashboard │                     │  │
+│  │  │Trail     │ │Reports   │ │Reports   │ │& Alerts  │                     │  │
+│  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘                     │  │
 │  └────────────────────────────────────────────────────────────────────────────┘  │
 │                                                                                   │
 └──────────────────────────────────────────────────────────────────────────────────┘
@@ -121,6 +130,8 @@ DRAFT ──[submit]──→ UNDER_REVIEW ──[approve]──→ NEGOTIATION
 | License | Scope, restrictions, audit rights, renewal, warranties | $1K-$100K |
 | Data Processing | GDPR Article 28, sub-processors, breach notification, audit | Varies |
 | Service Level | Uptime SLA, penalty clauses, escalation, reporting | $10K-$500K |
+| Partnership | Revenue share, IP ownership, exclusivity, termination | Varies |
+| M&A | Due diligence, representations, indemnification, escrow | $1M+ |
 
 **Renewal Management Algorithm:**
 ```
@@ -138,12 +149,29 @@ For each active contract:
     → Mark as EXPIRED
 ```
 
+**Renewal Alert Schedule:**
+| Alert | Days Before | Action Required |
+|-------|-------------|-----------------|
+| Early Warning | 90 days | Review contract terms |
+| Notice Period | 60 days | Decide renewal intent |
+| Final Notice | 30 days | Execute renewal or termination |
+| Expiration | 0 days | Contract expires |
+
 **Clause Library:**
 - Pre-approved standard clauses with risk classification
 - Jurisdiction-specific variants (US, EU, UK, APAC)
 - Alternative clause suggestions for negotiation
 - Version control with last-reviewed timestamps
 - Search by category, jurisdiction, and risk level
+
+**Clause Risk Levels:**
+
+| Risk | Description | Review Required |
+|------|-------------|-----------------|
+| LOW | Standard, pre-approved language | Optional |
+| MEDIUM | Acceptable with modifications | Recommended |
+| HIGH | Requires legal review | Mandatory |
+| CRITICAL | Non-standard, significant exposure | Executive approval |
 
 ### Compliance Manager
 
@@ -159,6 +187,15 @@ total = len(requirements)
 score = (compliant × 100 + partial × 50) / total
 ```
 
+**Compliance Score Interpretation:**
+
+| Score | Level | Action |
+|-------|-------|--------|
+| 90-100 | EXCELLENT | Maintain current controls |
+| 70-89 | GOOD | Address identified gaps |
+| 50-69 | NEEDS IMPROVEMENT | Priority remediation required |
+| 0-49 | CRITICAL | Immediate action required |
+
 **Supported Regulation Categories:**
 | Category | Regulations | Key Requirements |
 |----------|-------------|-----------------|
@@ -168,6 +205,17 @@ score = (compliant × 100 + partial × 50) / total
 | HEALTH | HIPAA, HITECH | PHI protection, BAAs, minimum necessary |
 | ENVIRONMENTAL | ISO 14001, EPA | Emissions reporting, waste management |
 | LABOR | FLSA, OSHA, WARN | Wage/hour, workplace safety, layoff notice |
+
+**Regulation Details:**
+
+| Regulation | Jurisdiction | Penalties | Renewal |
+|------------|--------------|-----------|---------|
+| GDPR | EU | Up to 4% annual turnover | Ongoing |
+| CCPA | California | $2,500-$7,500 per violation | Ongoing |
+| SOC2 | Global (voluntary) | Loss of certification | Annual audit |
+| HIPAA | US | $100-$50,000 per violation | Ongoing |
+| PCI-DSS | Global | $5,000-$100,000/month | Annual assessment |
+| SOX | US | Fines + criminal penalties | Ongoing |
 
 **Gap Analysis Process:**
 ```
@@ -192,6 +240,15 @@ PLANNED → IN_PROGRESS → FINDINGS → REMEDIATION → CLOSED
     │                                  progress
 ```
 
+**Audit Types:**
+
+| Type | Frequency | Scope | External |
+|------|-----------|-------|----------|
+| INTERNAL | Quarterly | All controls | No |
+| EXTERNAL | Annual | Full compliance | Yes |
+| SURPRISE | Ad-hoc | Targeted | Yes |
+| CONTINUOUS | Real-time | Critical controls | No |
+
 ### IP Protection Manager
 
 Manages trademarks, copyrights, and intellectual property portfolio.
@@ -211,6 +268,24 @@ by_jurisdiction = groupby(trademarks, jurisdiction)
 expiring_6_months = count(tm for tm in trademarks if tm.expiration_date within 180 days)
 ```
 
+**IP Asset Types:**
+
+| Type | Protection | Duration | Renewal |
+|------|------------|----------|---------|
+| Trademark | Brand names, logos | 10 years (renewable) | Every 10 years |
+| Copyright | Creative works | Life + 70 years | Not renewable |
+| Patent | Inventions | 20 years | Not renewable |
+| Trade Secret | Confidential info | Indefinite | Ongoing protection |
+
+**Portfolio Health Indicators:**
+
+| Indicator | Healthy | Warning | Critical |
+|-----------|---------|---------|----------|
+| Expiring within 6 months | < 5% | 5-15% | > 15% |
+| Pending applications | < 10% | 10-25% | > 25% |
+| Jurisdiction coverage | > 90% | 70-90% | < 70% |
+| Opposition rate | < 5% | 5-15% | > 15% |
+
 ### Risk Assessment Engine
 
 Identifies, scores, and tracks legal risks with probability-impact methodology.
@@ -224,12 +299,37 @@ Impact: 0.0 (negligible) to 10.0 (catastrophic)
 ```
 
 **Risk Level Mapping:**
-| Score Range | Level | Response |
-|-------------|-------|----------|
-| 0.0 - 2.0 | LOW | Monitor quarterly |
-| 2.0 - 5.0 | MEDIUM | Review monthly |
-| 5.0 - 8.0 | HIGH | Active mitigation required |
-| 8.0 - 10.0 | CRITICAL | Immediate executive attention |
+| Score Range | Level | Response | Review Frequency |
+|-------------|-------|----------|------------------|
+| 0.0 - 2.0 | LOW | Monitor quarterly | Quarterly |
+| 2.0 - 5.0 | MEDIUM | Review monthly | Monthly |
+| 5.0 - 8.0 | HIGH | Active mitigation required | Weekly |
+| 8.0 - 10.0 | CRITICAL | Immediate executive attention | Daily |
+
+**Risk Categories:**
+
+| Category | Examples | Typical Impact |
+|----------|----------|----------------|
+| CONTRACTUAL | Breach, non-performance, disputes | Financial, operational |
+| REGULATORY | Non-compliance, fines, sanctions | Financial, reputational |
+| LITIGATION | Lawsuits, claims, arbitration | Financial, reputational |
+| IP | Infringement, theft, loss | Competitive, financial |
+| OPERATIONAL | Process failures, employee issues | Operational, financial |
+| STRATEGIC | Market changes, competition | Business, financial |
+
+**Risk Heat Map:**
+
+```
+Impact
+  10 │ CRITICAL │ CRITICAL │ CRITICAL │ CRITICAL │ CRITICAL │
+   8 │   HIGH   │ CRITICAL │ CRITICAL │ CRITICAL │ CRITICAL │
+   6 │   HIGH   │   HIGH   │ CRITICAL │ CRITICAL │ CRITICAL │
+   4 │  MEDIUM  │   HIGH   │   HIGH   │ CRITICAL │ CRITICAL │
+   2 │   LOW    │  MEDIUM  │  MEDIUM  │   HIGH   │   HIGH   │
+   0 │──────────┼──────────┼──────────┼──────────┼──────────│
+      0.0-0.2   0.2-0.4   0.4-0.6   0.6-0.8   0.8-1.0
+                        Probability
+```
 
 ### Document Automation Engine
 
@@ -244,6 +344,17 @@ Generates legal documents from templates with variable substitution and approval
 5. Approver signs off → APPROVED
 6. Publish or archive
 ```
+
+**Document Types:**
+
+| Type | Template Variables | Approval Required |
+|------|-------------------|-------------------|
+| NDA | party_a, party_b, duration, jurisdiction | Legal review |
+| SOW | deliverables, timeline, payment | Legal + Finance |
+| Privacy Policy | company, audience, data_types | Legal + DPO |
+| Terms of Service | company, service, jurisdiction | Legal |
+| Employment Agreement | employee, compensation, benefits | Legal + HR |
+| Vendor Agreement | vendor, scope, SLA | Legal + Procurement |
 
 ## Data Flow
 
@@ -300,6 +411,16 @@ New Contract/Regulation → Risk Factors Identified
 - Access logging for IP portfolio data
 - Separation of duties for contract approval workflows
 
+**Access Control Matrix:**
+
+| Role | Contracts | Compliance | IP | Risk | Documents |
+|------|-----------|------------|-----|------|-----------|
+| Legal Admin | Full | Full | Full | Full | Full |
+| Legal Counsel | Read/Write | Read/Write | Read | Read/Write | Read/Write |
+| Paralegal | Read | Read | Read | Read | Read/Write |
+| Business User | Read (own) | None | None | None | Read |
+| Auditor | Read | Read | Read | Read | Read |
+
 ## Scalability
 
 | Metric | Capacity |
@@ -311,6 +432,7 @@ New Contract/Regulation → Risk Factors Identified
 | Concurrent compliance assessments | 50+ |
 | Risk register entries | 5,000+ |
 | Document templates | 500+ |
+| Audit trail entries | 1,000,000+ |
 
 ## Performance Targets
 
@@ -323,3 +445,50 @@ New Contract/Regulation → Risk Factors Identified
 | Portfolio summary | < 150ms |
 | Renewal check (1K contracts) | < 500ms |
 | Gap analysis | < 300ms |
+
+## Design Patterns
+
+### State Machine
+Contract lifecycle uses explicit states with validated transitions, preventing illegal state changes.
+
+### Template Method
+Document generation uses templates with variable substitution, ensuring consistency and reducing errors.
+
+### Observer
+Compliance monitoring observes contract and regulation changes, triggering re-assessment when relevant.
+
+### Strategy
+Risk assessment uses interchangeable strategies (probability-impact, qualitative, quantitative) based on context.
+
+## Configuration Reference
+
+```yaml
+contracts:
+  default_jurisdiction: "US"
+  renewal_notice_days: 60
+  auto_renew_default: false
+  max_concurrent_negotiations: 50
+
+compliance:
+  assessment_frequency: "quarterly"
+  gap_analysis_depth: "full"
+  audit_retention_years: 7
+  require_evidence: true
+
+ip_protection:
+  expiration_warning_days: 180
+  monitoring_frequency: "weekly"
+  jurisdiction_coverage_threshold: 0.9
+
+risk_assessment:
+  review_frequency: "monthly"
+  escalation_threshold: 8.0
+  require_mitigation_plan: true
+  heat_map_granularity: 0.2
+
+documents:
+  require_approval: true
+  approval_timeout_days: 7
+  version_control: true
+  max_template_variables: 50
+```

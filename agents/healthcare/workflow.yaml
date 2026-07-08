@@ -1,95 +1,830 @@
 name: healthcare-agent
-version: 1.0.0
+version: 2.0.0
+description: "Comprehensive healthcare operations automation agent with clinical workflows, compliance, and patient management"
 
-description: Healthcare operations automation agent
+metadata:
+  category: "healthcare"
+  compliance:
+    - "HIPAA"
+    - "HITECH"
+    - "GDPR"
+  last_updated: "2024-03-01"
+
+# =============================================================================
+# TRIGGERS
+# =============================================================================
 
 triggers:
+  # Patient Lifecycle
   - patient_admission
+  - patient_registration
+  - patient_transfer
+  - patient_discharge
+  - patient_readmission
+
+  # Clinical Events
   - lab_results
   - imaging_study
+  - pathology_results
+  - vital_signs_alert
+  - clinical_note
+
+  # Medication Management
   - medication_order
+  - medication_administration
+  - medication_reconciliation
+  - pharmacy_review
+
+  # Care Coordination
   - discharge_planning
+  - referral_received
+  - care_plan_update
+  - care_team_change
+
+  # Compliance & Safety
+  - incident_report
+  - quality_measure
+  - infection_control
+  - fall_risk_assessment
+
+  # Financial
+  - insurance_verification
+  - prior_authorization
+  - claim_submission
+  - payment_posting
+
+# =============================================================================
+# PERMISSIONS
+# =============================================================================
 
 permissions:
+  # Patient Data Access
   - patient_records:read
   - patient_records:write
+  - patient_records:create
+  - patient_records:delete
+
+  # Clinical Data
   - lab_results:read
+  - lab_results:write
   - imaging:read
+  - imaging:write
   - medications:read
+  - medications:write
+  - medications:order
+
+  # Care Team
+  - care_team:read
+  - care_team:assign
+  - care_plan:read
+  - care_plan:write
+
+  # Compliance
+  - audit_log:read
+  - incident_reports:write
+  - quality_measures:read
+
+  # Financial
+  - insurance:read
+  - insurance:verify
+  - claims:read
+  - claims:write
+
+# =============================================================================
+# WORKFLOW STEPS
+# =============================================================================
 
 steps:
+  # -------------------------------------------------------------------------
+  # Patient Intake & Registration
+  # -------------------------------------------------------------------------
   - name: patient_intake
-    description: Process new patient admission
+    description: "Process new patient admission with comprehensive intake workflow"
     when: trigger == "patient_admission"
+    priority: "high"
+    timeout: "10m"
     actions:
       - verify_insurance
       - create_patient_record
       - assign_primary_care
       - alert_care_team
-  
-  - name: lab_analysis
-    description: Process and analyze lab results
-    when: trigger == "lab_results"
+      - check_bed_availability
+      - initiate_financial_counseling
+    rollback:
+      - cancel_admission
+      - notify_admissions_office
+    notifications:
+      - care_team
+      - floor_nurse
+      - case_manager
+
+  - name: patient_registration
+    description: "Register new patient with demographics and insurance"
+    when: trigger == "patient_registration"
+    priority: "high"
     actions:
+      - collect_demographics
+      - verify_identity
+      - collect_insurance_info
+      - create_mrn
+      - check_duplicate_records
+      - consent_documentation
+    validation:
+      - insurance_eligibility
+      - address_verification
+      - emergency_contact
+
+  # -------------------------------------------------------------------------
+  # Clinical Workflows
+  # -------------------------------------------------------------------------
+  - name: lab_analysis
+    description: "Process and analyze lab results with clinical decision support"
+    when: trigger == "lab_results"
+    priority: "critical"
+    timeout: "5m"
+    actions:
+      - receive_lab_results
       - normalize_results
+      - validate_results
       - flag_abnormal_values
+      - apply_clinical_rules
       - notify_ordering_physician
-  
+      - update_patient_record
+      - trigger_critical_alerts
+    rules_engine:
+      critical_values:
+        - "glucose < 40 or glucose > 500"
+        - "potassium < 3.0 or potassium > 6.0"
+        - "hemoglobin < 7.0"
+        - "platelets < 50000"
+    notifications:
+      - ordering_physician
+      - charge_nurse
+      - lab_director
+
   - name: imaging_review
-    description: Process medical imaging studies
+    description: "Process medical imaging studies with AI-assisted analysis"
     when: trigger == "imaging_study"
+    priority: "high"
+    timeout: "15m"
     actions:
       - verify_study_completeness
+      - check_dicom_metadata
       - run_ai_assessment
+      - prioritize_worklist
       - route_to_radiologist
-  
-  - name: medication_management
-    description: Manage medication orders
-    when: trigger == "medication_order"
+      - generate_preliminary_report
+    ai_assessment:
+      model: "medical-imaging-v2"
+      confidence_threshold: 0.85
+      fallback: "manual_review"
+    priorities:
+      - STAT: "immediate_review_required"
+      - Urgent: "within_4_hours"
+      - Routine: "within_24_hours"
+
+  - name: vital_signs_monitoring
+    description: "Monitor and alert on abnormal vital signs"
+    when: trigger == "vital_signs_alert"
+    priority: "critical"
+    timeout: "2m"
     actions:
+      - validate_vital_signs
+      - apply_early_warning_score
+      - escalate_if_needed
+      - notify_care_team
+      - document_intervention
+    early_warning_scores:
+      news2:
+        respiration_rate:
+          low_threshold: 8
+          high_threshold: 25
+        spo2:
+          low_threshold: 91
+        systolic_bp:
+          low_threshold: 90
+          high_threshold: 200
+        heart_rate:
+          low_threshold: 40
+          high_threshold: 130
+        temperature:
+          low_threshold: 35.0
+          high_threshold: 39.0
+        consciousness: "AVPU"
+
+  # -------------------------------------------------------------------------
+  # Medication Management
+  # -------------------------------------------------------------------------
+  - name: medication_management
+    description: "Manage medication orders with safety checks"
+    when: trigger == "medication_order"
+    priority: "critical"
+    timeout: "3m"
+    actions:
+      - validate_order
       - check_drug_interactions
       - check_allergies
+      - check_dose_range
+      - check_renal_adjustment
       - alert_pharmacy
-  
+      - document_order
+    safety_checks:
+      - drug_drug_interactions
+      - drug_food_interactions
+      - drug_allergy_interactions
+      - duplicate_therapy
+      - therapeutic_duplication
+      - weight_based_dosing
+    alerts:
+      critical_interaction: "immediate_pharmacy_contact"
+      major_interaction: "physician_notification"
+      moderate_interaction: "pharmacist_review"
+
+  - name: medication_administration
+    description: "Track medication administration with barcode verification"
+    when: trigger == "medication_administration"
+    priority: "high"
+    actions:
+      - verify_patient_identity
+      - verify_medication
+      - verify_dose
+      - verify_route
+      - verify_time
+      - document_administration
+      - monitor_response
+    verification:
+      patient_id: "barcode_scan"
+      medication: "barcode_scan"
+      nurse_id: "badge_scan"
+
+  - name: medication_reconciliation
+    description: "Reconcile medications during transitions of care"
+    when: trigger == "medication_reconciliation"
+    priority: "high"
+    actions:
+      - gather_medication_history
+      - compare_lists
+      - identify_discrepancies
+      - resolve_discrepancies
+      - update_medication_list
+      - communicate_changes
+    transitions:
+      - admission
+      - transfer
+      - discharge
+
+  # -------------------------------------------------------------------------
+  # Care Coordination
+  # -------------------------------------------------------------------------
   - name: discharge_planning
-    description: Coordinate patient discharge
+    description: "Coordinate comprehensive patient discharge"
     when: trigger == "discharge_planning"
+    priority: "high"
+    timeout: "30m"
     actions:
       - review_care_plan
+      - assess_discharge_readiness
+      - arrange_home_care
       - schedule_follow_appointments
-      - print_discharge_instructions
+      - prepare_discharge_instructions
+      - arrange_transportation
+      - coordinate_pharmacy
+      - print_discharge_summary
+    checklist:
+      - medications_reconciled
+      - follow_up_scheduled
+      - instructions_reviewed
+      - equipment_arranged
+      - transportation_confirmed
+      - patient_educated
+
+  - name: referral_management
+    description: "Process and track specialist referrals"
+    when: trigger == "referral_received"
+    priority: "medium"
+    actions:
+      - validate_referral
+      - check_prior_authorization
+      - match_specialist
+      - schedule_appointment
+      - send_medical_records
+      - confirm_appointment
+    tracking:
+      - referral_status
+      - authorization_status
+      - appointment_status
+
+  - name: care_plan_management
+    description: "Create and manage patient care plans"
+    when: trigger == "care_plan_update"
+    priority: "medium"
+    actions:
+      - assess_patient_needs
+      - define_goals
+      - select_interventions
+      - assign_responsibilities
+      - set_timeline
+      - document_plan
+      - communicate_to_team
+    components:
+      - diagnosis
+      - goals_of_care
+      - interventions
+      - medications
+      - therapies
+      - follow_up
+
+  # -------------------------------------------------------------------------
+  # Quality & Compliance
+  # -------------------------------------------------------------------------
+  - name: incident_reporting
+    description: "Process and track patient safety incidents"
+    when: trigger == "incident_report"
+    priority: "high"
+    actions:
+      - document_incident
+      - categorize_severity
+      - notify_risk_management
+      - initiate_investigation
+      - track_corrective_actions
+      - report_to_authorities
+    categories:
+      - patient_fall
+      - medication_error
+      - equipment_malfunction
+      - procedure_error
+      - communication_failure
+
+  - name: infection_control
+    description: "Monitor and prevent healthcare-associated infections"
+    when: trigger == "infection_control"
+    priority: "high"
+    actions:
+      - monitor_infection_rates
+      - identify_outbreaks
+      - implement_precautions
+      - track_isolation_status
+      - report_to_public_health
+    surveillance:
+      - catheter_associated_uti
+      - central_line_associated_bloodstream_infection
+      - surgical_site_infection
+      - ventilator_associated_pneumonia
+      - clostridium_difficile_infection
+
+  - name: quality_measures
+    description: "Track and report quality measures"
+    when: trigger == "quality_measure"
+    priority: "medium"
+    actions:
+      - collect_measure_data
+      - calculate_performance
+      - identify_gaps
+      - generate_reports
+      - recommend_improvements
+    measures:
+      - core_measures
+      - readmission_rates
+      - patient_satisfaction
+      - mortality_rates
+      - length_of_stay
+
+  # -------------------------------------------------------------------------
+  # Financial Workflows
+  # -------------------------------------------------------------------------
+  - name: insurance_verification
+    description: "Verify patient insurance eligibility and benefits"
+    when: trigger == "insurance_verification"
+    priority: "high"
+    actions:
+      - verify_eligibility
+      - check_benefits
+      - determine_copay
+      - verify_prior_authorization
+      - document_coverage
+    integrations:
+      - clearinghouse
+      - payer_portals
+      - eligibility_apis
+
+  - name: prior_authorization
+    description: "Manage prior authorization requests"
+    when: trigger == "prior_authorization"
+    priority: "medium"
+    timeout: "24h"
+    actions:
+      - gather_clinical_documentation
+      - complete_authorization_form
+      - submit_request
+      - track_status
+      - appeal_if_denied
+    documentation:
+      - clinical_indication
+      - treatment_history
+      - supporting_evidence
+      - physician_statement
+
+  - name: claim_processing
+    description: "Process and submit insurance claims"
+    when: trigger == "claim_submission"
+    priority: "medium"
+    actions:
+      - validate_coding
+      - check_billing_rules
+      - submit_claim
+      - track_status
+      - post_payments
+      - manage_denials
+    validation:
+      - icd10_codes
+      - cpt_codes
+      - modifier_usage
+      - bundling_rules
+
+# =============================================================================
+# ACTION DEFINITIONS
+# =============================================================================
 
 actions:
+  # Patient Registration Actions
   verify_insurance:
     type: api_call
     endpoint: /api/insurance/verify
     method: POST
-    retry: 3
-  
+    timeout: 30s
+    retry:
+      max_attempts: 3
+      backoff: exponential
+    fallback: manual_verification
+    audit: true
+
   create_patient_record:
     type: database
     operation: insert
     table: patients
-  
+    validation:
+      - required_fields
+      - format_validation
+      - duplicate_check
+    audit: true
+
+  collect_demographics:
+    type: form
+    fields:
+      - name
+      - date_of_birth
+      - gender
+      - address
+      - phone
+      - email
+      - emergency_contact
+    validation:
+      - address_verification
+      - phone_validation
+      - email_validation
+
+  # Clinical Actions
   normalize_results:
     type: transformation
-    format: HL7 FHIR
-  
+    format: HL7_FHIR
+    mappings:
+      loinc_codes: standard
+      snomed_codes: standard
+      units: ucum
+
   flag_abnormal_values:
     type: rules_engine
     rules: abnormal_lab_flags
-  
+    reference_ranges:
+      glucose:
+        normal: [70, 100]
+        pre_diabetic: [100, 126]
+        diabetic: [126, 999]
+      potassium:
+        normal: [3.5, 5.0]
+        low: [0, 3.5]
+        high: [5.0, 999]
+
+  apply_clinical_rules:
+    type: rules_engine
+    rules: clinical_decision_support
+    rulesets:
+      - sepsis_screening
+      - fall_risk_assessment
+      - pressure_ulcer_prevention
+      - venous_thromboembolism_prophylaxis
+
   run_ai_assessment:
     type: ml_inference
     model: medical-imaging-v2
     confidence_threshold: 0.85
-  
+    fallback: manual_review
+    audit: true
+    logging:
+      - input_image
+      - prediction
+      - confidence
+      - timestamp
+
+  # Medication Actions
   check_drug_interactions:
     type: rules_engine
     rules: drug_interactions
+    database: drug_interactions_db
+    severity_levels:
+      critical: "immediate_action_required"
+      major: "physician_notification"
+      moderate: "pharmacist_review"
+      minor: "informational"
+
+  check_allergies:
+    type: database_lookup
+    table: patient_allergies
+    cross_reference: medication_orders
+    alert_on_match: true
+
+  check_dose_range:
+    type: rules_engine
+    rules: dose_range_check
+    factors:
+      - weight
+      - age
+      - renal_function
+      - hepatic_function
+
+  check_renal_adjustment:
+    type: calculation
+    formula: cockcroft_gault
+    adjust_dose: true
+    thresholds:
+      normal: "> 90"
+      mild_impairment: [60, 90]
+      moderate_impairment: [30, 60]
+      severe_impairment: "< 30"
+
+  # Care Coordination Actions
+  assess_discharge_readiness:
+    type: checklist
+    criteria:
+      - medical_stability
+      - functional_status
+      - home_environment
+      - support_system
+      - understanding_of_care
+
+  schedule_follow_appointments:
+    type: integration
+    system: scheduling_system
+    rules:
+      - specialty_matching
+      - timeframe_requirements
+      - location_preference
+
+  prepare_discharge_instructions:
+    type: template
+    template: discharge_instructions
+    sections:
+      - diagnosis
+      - medications
+      - activity_restrictions
+      - diet
+      - warning_signs
+      - follow_up
+
+  # Compliance Actions
+  document_incident:
+    type: form
+    fields:
+      - incident_type
+      - severity
+      - patient_involved
+      - description
+      - witnesses
+      - immediate_actions
+    routing:
+      critical: ["risk_management", "quality", "administration"]
+      serious: ["risk_management", "quality"]
+      minor: ["quality"]
+
+  monitor_infection_rates:
+    type: calculation
+    metrics:
+      - infection_rate
+      - standardized_infection_ratio
+      - device_utilization_ratio
+    thresholds:
+      alert: "above_benchmark"
+      critical: "outbreak_criteria"
+
+  # Financial Actions
+  validate_coding:
+    type: rules_engine
+    rules: coding_validation
+    checks:
+      - diagnosis_code_validity
+      - procedure_code_validity
+      - modifier_appropriateness
+      - bundling_compliance
+
+  submit_claim:
+    type: integration
+    system: clearinghouse
+    format: x12_837
+    validation:
+      - claim_completeness
+      - coding_accuracy
+      - billing_rules
+    tracking:
+      - submission_id
+      - status
+      - acknowledgment
+
+# =============================================================================
+# NOTIFICATION TEMPLATES
+# =============================================================================
+
+notifications:
+  critical_lab_alert:
+    channel: [pager, sms, email]
+    recipients: [ordering_physician, charge_nurse]
+    template: |
+      CRITICAL LAB VALUE ALERT
+      Patient: {{patient_name}} (MRN: {{mrn}})
+      Test: {{test_name}}
+      Value: {{value}} {{unit}}
+      Reference Range: {{reference_range}}
+      Time: {{timestamp}}
+      
+      Please contact laboratory immediately.
+
+  medication_interaction:
+    channel: [ehr_alert, pharmacy]
+    recipients: [ordering_physician, pharmacist]
+    template: |
+      DRUG INTERACTION ALERT
+      Patient: {{patient_name}}
+      Severity: {{severity}}
+      Drug 1: {{drug1}}
+      Drug 2: {{drug2}}
+      Effect: {{interaction_effect}}
+      Recommendation: {{recommendation}}
+
+  discharge_ready:
+    channel: [ehr, email]
+    recipients: [attending_physician, case_manager, social_worker]
+    template: |
+      DISCHARGE READINESS NOTIFICATION
+      Patient: {{patient_name}}
+      Discharge Date: {{target_date}}
+      Status: {{readiness_status}}
+      Pending Items: {{pending_items}}
+
+# =============================================================================
+# METRICS & KPIs
+# =============================================================================
 
 metrics:
-  patient_intake_time: "< 5 minutes"
-  lab_notification_latency: "< 30 seconds"
-  imaging_assessment_time: "< 2 minutes"
-  drug_check_latency: "< 1 second"
+  patient_flow:
+    - name: "door_to_doctor_time"
+      target: "< 30 minutes"
+      alert_threshold: "> 45 minutes"
+    - name: "length_of_stay"
+      target: "< 4.5 days"
+      benchmark: "national_average"
+    - name: "readmission_rate_30day"
+      target: "< 10%"
+      penalty_threshold: "> 15%"
+
+  clinical_quality:
+    - name: "lab_result_notification_time"
+      target: "< 30 seconds for critical"
+      alert_threshold: "> 60 seconds"
+    - name: "medication_error_rate"
+      target: "< 0.1%"
+      critical_threshold: "> 0.5%"
+    - name: "fall_rate"
+      target: "< 2 per 1000 patient days"
+      alert_threshold: "> 3 per 1000"
+
+  patient_satisfaction:
+    - name: "hcahps_overall_rating"
+      target: "> 90%"
+      benchmark: "national_75th_percentile"
+    - name: "discharge_satisfaction"
+      target: "> 85%"
+      improvement_goal: "increase_5%"
+
+  financial:
+    - name: "clean_claim_rate"
+      target: "> 95%"
+      alert_threshold: "< 90%"
+    - name: "days_in_accounts_receivable"
+      target: "< 40 days"
+      alert_threshold: "> 50 days"
+    - name: "denial_rate"
+      target: "< 5%"
+      critical_threshold: "> 10%"
+
+  compliance:
+    - name: "incident_report_completion_rate"
+      target: "100%"
+      alert_threshold: "< 95%"
+    - name: "infection_control_compliance"
+      target: "> 95%"
+      critical_threshold: "< 90%"
+    - name: "documentation_completion_rate"
+      target: "> 98%"
+      alert_threshold: "< 95%"
+
+# =============================================================================
+# COMPLIANCE RULES
+# =============================================================================
+
+compliance:
+  hipaa:
+    - patient_data_encryption: "AES-256"
+    - access_logging: "all_access_logged"
+    - minimum_necessary: "role_based_access"
+    - business_associate_agreements: "required"
+    - breach_notification: "within_60_days"
+
+  hitech:
+    - electronic_health_records: "meaningful_use"
+    - health_information_exchange: "hl7_fhir"
+    - patient_access: "portal_available"
+    - accounting_of_disclosures: "tracked"
+
+  cms:
+    - quality_reporting: "quarterly"
+    - readmission_reduction: "active_program"
+    - value_based_purchasing: "participating"
+    - icd10_coding: "required"
+
+# =============================================================================
+# INTEGRATION POINTS
+# =============================================================================
+
+integrations:
+  electronic_health_record:
+    system: "epic"
+    protocols: ["hl7_fhir", "hl7_v2"]
+    capabilities:
+      - patient_data
+      - orders
+      - results
+      - medications
+      - notes
+
+  laboratory_information_system:
+    system: "sunquest"
+    protocols: ["hl7_v2"]
+    capabilities:
+      - order_entry
+      - result_delivery
+      - specimen_tracking
+
+  radiology_information_system:
+    system: "pacs"
+    protocols: ["dicom", "hl7_fhir"]
+    capabilities:
+      - study_order
+      - image_delivery
+      - report_delivery
+
+  pharmacy_system:
+    system: "omnicell"
+    protocols: ["hl7_fhir"]
+    capabilities:
+      - medication_orders
+      - dispensing
+      - administration
+
+  billing_system:
+    system: "revcycle"
+    protocols: ["x12_837", "x12_835"]
+    capabilities:
+      - charge_capture
+      - claim_submission
+      - payment_posting
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+
+changelog:
+  - version: "2.0.0"
+    date: "2024-03-01"
+    changes:
+      - "Added comprehensive clinical workflows"
+      - "Enhanced medication safety checks"
+      - "Added quality measure tracking"
+      - "Improved compliance features"
+      - "Added financial workflows"
+
+  - version: "1.0.0"
+    date: "2024-01-01"
+    changes:
+      - "Initial release"
+      - "Basic patient intake"
+      - "Lab result processing"
+      - "Medication management"

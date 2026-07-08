@@ -1,35 +1,144 @@
 name: "Full-Stack Planner"
-version: "1.0.0"
-description: "End-to-end project architecture and planning agent"
+version: "2.0.0"
+description: "End-to-end project architecture and planning agent with comprehensive workflows"
 author: "Awesome Grok Skills"
 license: "MIT"
+metadata:
+  category: "architecture"
+  complexity: "advanced"
+  tags:
+    - "full-stack"
+    - "architecture"
+    - "planning"
+    - "devops"
+    - "agile"
 
-# Workflow steps
+# =============================================================================
+# WORKFLOW STEPS
+# =============================================================================
+
 steps:
+  # -------------------------------------------------------------------------
+  # Phase 1: Discovery & Requirements
+  # -------------------------------------------------------------------------
   - name: "requirements_analysis"
-    description: "Analyze project requirements and constraints"
+    description: "Analyze project requirements, constraints, and stakeholder needs"
+    phase: "discovery"
     inputs:
       - "requirements_document"
+      - "stakeholder_interviews"
       - "team_size"
       - "timeline"
       - "budget"
+      - "existing_systems"
     outputs:
       - "technical_requirements"
       - "architecture_needs"
+      - "constraint_analysis"
+      - "risk_assessment"
+    substeps:
+      - name: "gather_requirements"
+        description: "Collect and document all requirements"
+      - name: "analyze_constraints"
+        description: "Identify technical and business constraints"
+      - name: "assess_risks"
+        description: "Evaluate potential risks and mitigation strategies"
+      - name: "prioritize_features"
+        description: "Rank features by value and complexity"
+
+  - name: "stakeholder_alignment"
+    description: "Align stakeholder expectations and validate requirements"
+    phase: "discovery"
+    inputs:
+      - "technical_requirements"
+      - "stakeholder_interviews"
+    outputs:
+      - "aligned_requirements"
+      - "stakeholder_signoff"
+    substeps:
+      - name: "present_findings"
+        description: "Present analysis to stakeholders"
+      - name: "resolve_conflicts"
+        description: "Address conflicting requirements"
+      - name: "obtain_approval"
+        description: "Get formal approval to proceed"
+
+  # -------------------------------------------------------------------------
+  # Phase 2: Architecture Design
+  # -------------------------------------------------------------------------
+  - name: "architecture_design"
+    description: "Design system architecture and technology stack"
+    phase: "architecture"
+    inputs:
+      - "aligned_requirements"
+      - "constraint_analysis"
+    outputs:
+      - "system_architecture"
+      - "technology_stack"
+      - "integration_plan"
+    substeps:
+      - name: "design_high_level"
+        description: "Create high-level system design"
+      - name: "select_technologies"
+        description: "Choose appropriate technologies"
+      - name: "plan_integrations"
+        description: "Design system integrations"
+      - name: "define_interfaces"
+        description: "Specify API contracts and interfaces"
 
   - name: "technology_selection"
-    description: "Choose optimal tech stack"
+    description: "Choose optimal tech stack based on requirements"
+    phase: "architecture"
     inputs:
       - "technical_requirements"
       - "architecture_needs"
+      - "team_expertise"
+      - "budget_constraints"
     outputs:
       - "frontend_stack"
       - "backend_stack"
       - "database_choice"
+      - "infrastructure_choice"
       - "deployment_strategy"
+    decision_points:
+      - name: "frontend_framework"
+        options:
+          - "React"
+          - "Vue"
+          - "Angular"
+          - "Svelte"
+        criteria:
+          - "team_expertise"
+          - "ecosystem_maturity"
+          - "performance_requirements"
+      - name: "backend_framework"
+        options:
+          - "Node.js/Express"
+          - "Python/Django"
+          - "Go/Gin"
+          - "Java/Spring"
+        criteria:
+          - "performance_requirements"
+          - "team_expertise"
+          - "ecosystem_needs"
+      - name: "database"
+        options:
+          - "PostgreSQL"
+          - "MySQL"
+          - "MongoDB"
+          - "Redis"
+          - "Elasticsearch"
+        criteria:
+          - "data_structure"
+          - "scalability_needs"
+          - "query_patterns"
 
+  # -------------------------------------------------------------------------
+  # Phase 3: Project Structure
+  # -------------------------------------------------------------------------
   - name: "project_structure"
-    description: "Create project architecture"
+    description: "Create project architecture and directory structure"
+    phase: "planning"
     inputs:
       - "frontend_stack"
       - "backend_stack"
@@ -38,49 +147,670 @@ steps:
       - "directory_structure"
       - "component_architecture"
       - "api_design"
+      - "data_models"
+    substeps:
+      - name: "design_directory"
+        description: "Create directory structure"
+      - name: "design_components"
+        description: "Design component architecture"
+      - name: "design_api"
+        description: "Design API endpoints"
+      - name: "design_data_models"
+        description: "Create data models"
 
+  - name: "api_design"
+    description: "Design RESTful/GraphQL API architecture"
+    phase: "planning"
+    inputs:
+      - "technical_requirements"
+      - "data_models"
+    outputs:
+      - "api_specification"
+      - "endpoint_documentation"
+      - "authentication_design"
+      - "error_handling_strategy"
+    substeps:
+      - name: "define_endpoints"
+        description: "Define all API endpoints"
+      - name: "design_schemas"
+        description: "Create request/response schemas"
+      - name: "plan_versioning"
+        description: "Design API versioning strategy"
+      - name: "document_errors"
+        description: "Define error responses"
+
+  # -------------------------------------------------------------------------
+  # Phase 4: Implementation Planning
+  # -------------------------------------------------------------------------
   - name: "implementation_plan"
     description: "Create detailed implementation roadmap"
+    phase: "planning"
     inputs:
       - "project_structure"
       - "timeline"
       - "team_size"
+      - "budget"
     outputs:
       - "development_phases"
       - "milestones"
       - "resource_allocation"
+      - "risk_mitigation_plan"
+    substeps:
+      - name: "define_phases"
+        description: "Break project into phases"
+      - name: "set_milestones"
+        description: "Define key milestones"
+      - name: "allocate_resources"
+        description: "Assign team members to tasks"
+      - name: "plan_iterations"
+        description: "Create sprint/iteration plan"
 
-# Decision trees
+  - name: "sprint_planning"
+    description: "Plan development sprints and iterations"
+    phase: "planning"
+    inputs:
+      - "development_phases"
+      - "team_capacity"
+    outputs:
+      - "sprint_backlog"
+      - "sprint_goals"
+      - "velocity_projection"
+    substeps:
+      - name: "estimate_effort"
+        description: "Estimate story points for features"
+      - name: "prioritize_backlog"
+        description: "Prioritize sprint backlog"
+      - name: "set_sprint_goals"
+        description: "Define sprint objectives"
+
+  # -------------------------------------------------------------------------
+  # Phase 5: Development Setup
+  # -------------------------------------------------------------------------
+  - name: "development_environment"
+    description: "Set up development environment and tooling"
+    phase: "development"
+    inputs:
+      - "technology_stack"
+      - "project_structure"
+    outputs:
+      - "development_setup"
+      - "tooling_configuration"
+      - "coding_standards"
+    substeps:
+      - name: "setup_repositories"
+        description: "Create and configure repositories"
+      - name: "configure_tooling"
+        description: "Set up linters, formatters, editors"
+      - name: "create_templates"
+        description: "Generate project templates"
+      - name: "document_setup"
+        description: "Create setup documentation"
+
+  - name: "ci_cd_pipeline"
+    description: "Design and implement CI/CD pipeline"
+    phase: "development"
+    inputs:
+      - "technology_stack"
+      - "deployment_strategy"
+    outputs:
+      - "pipeline_configuration"
+      - "build_scripts"
+      - "deployment_scripts"
+      - "monitoring_setup"
+    substeps:
+      - name: "design_pipeline"
+        description: "Design CI/CD workflow"
+      - name: "configure_builds"
+        description: "Set up build processes"
+      - name: "setup_testing"
+        description: "Configure automated testing"
+      - name: "configure_deployment"
+        description: "Set up deployment automation"
+
+  # -------------------------------------------------------------------------
+  # Phase 6: Implementation
+  # -------------------------------------------------------------------------
+  - name: "frontend_implementation"
+    description: "Implement frontend components and pages"
+    phase: "implementation"
+    inputs:
+      - "frontend_stack"
+      - "component_architecture"
+      - "api_specification"
+    outputs:
+      - "frontend_code"
+      - "component_library"
+      - "frontend_tests"
+    parallel_with: "backend_implementation"
+
+  - name: "backend_implementation"
+    description: "Implement backend services and APIs"
+    phase: "implementation"
+    inputs:
+      - "backend_stack"
+      - "api_specification"
+      - "data_models"
+    outputs:
+      - "backend_code"
+      - "api_endpoints"
+      - "backend_tests"
+    parallel_with: "frontend_implementation"
+
+  - name: "database_implementation"
+    description: "Implement database schema and migrations"
+    phase: "implementation"
+    inputs:
+      - "database_choice"
+      - "data_models"
+    outputs:
+      - "database_schema"
+      - "migrations"
+      - "seed_data"
+
+  # -------------------------------------------------------------------------
+  # Phase 7: Testing
+  # -------------------------------------------------------------------------
+  - name: "testing_strategy"
+    description: "Implement comprehensive testing strategy"
+    phase: "testing"
+    inputs:
+      - "frontend_code"
+      - "backend_code"
+      - "api_specification"
+    outputs:
+      - "unit_tests"
+      - "integration_tests"
+      - "e2e_tests"
+      - "performance_tests"
+    substeps:
+      - name: "write_unit_tests"
+        description: "Create unit test suites"
+      - name: "write_integration_tests"
+        description: "Create integration tests"
+      - name: "write_e2e_tests"
+        description: "Create end-to-end tests"
+      - name: "performance_testing"
+        description: "Conduct performance testing"
+
+  # -------------------------------------------------------------------------
+  # Phase 8: Deployment
+  # -------------------------------------------------------------------------
+  - name: "deployment_preparation"
+    description: "Prepare for production deployment"
+    phase: "deployment"
+    inputs:
+      - "pipeline_configuration"
+      - "monitoring_setup"
+    outputs:
+      - "deployment_checklist"
+      - "rollback_plan"
+      - "monitoring_dashboard"
+    substeps:
+      - name: "security_audit"
+        description: "Conduct security review"
+      - name: "performance_audit"
+        description: "Verify performance targets"
+      - name: "prepare_rollback"
+        description: "Create rollback procedures"
+      - name: "setup_monitoring"
+        description: "Configure production monitoring"
+
+  - name: "production_deployment"
+    description: "Deploy to production environment"
+    phase: "deployment"
+    inputs:
+      - "deployment_checklist"
+      - "rollback_plan"
+    outputs:
+      - "production_environment"
+      - "deployment_verification"
+    substeps:
+      - name: "execute_deployment"
+        description: "Run deployment process"
+      - name: "verify_deployment"
+        description: "Validate production deployment"
+      - name: "enable_monitoring"
+        description: "Activate production monitoring"
+
+  # -------------------------------------------------------------------------
+  # Phase 9: Post-Launch
+  # -------------------------------------------------------------------------
+  - name: "post_launch_support"
+    description: "Provide post-launch support and monitoring"
+    phase: "post_launch"
+    inputs:
+      - "production_environment"
+      - "monitoring_dashboard"
+    outputs:
+      - "support_plan"
+      - "incident_response_plan"
+      - "performance_baselines"
+    substeps:
+      - name: "monitor_health"
+        description: "Monitor application health"
+      - name: "address_issues"
+        description: "Resolve post-launch issues"
+      - name: "optimize_performance"
+        description: "Optimize based on real usage"
+
+# =============================================================================
+# DECISION TREES
+# =============================================================================
+
 decision_trees:
   frontend:
-    mobile_first: 
-      condition: "target_mobile === true"
-      recommendation: "React Native or Flutter"
-    web_app:
-      condition: "target_mobile === false"
-      recommendation: "Next.js or React"
-    
+    mobile_first:
+      condition: "target_mobile === true AND offline_support === true"
+      recommendation: "React Native with offline-first architecture"
+      alternatives:
+        - "Flutter"
+        - "Ionic"
+    web_application:
+      condition: "target_mobile === false AND seo_required === true"
+      recommendation: "Next.js with SSR/SSG"
+      alternatives:
+        - "Nuxt.js"
+        - "SvelteKit"
+    spa:
+      condition: "target_mobile === false AND seo_required === false"
+      recommendation: "React with React Router"
+      alternatives:
+        - "Vue with Vue Router"
+        - "Angular"
+    progressive_web:
+      condition: "target_mobile === true AND offline_support === false"
+      recommendation: "React PWA"
+      alternatives:
+        - "Vue PWA"
+        - "Angular PWA"
+
+  backend:
+    api_type:
+      rest:
+        condition: "graphql_required === false"
+        recommendation: "Express.js/Fastify with REST"
+      graphql:
+        condition: "graphql_required === true"
+        recommendation: "Apollo Server with GraphQL"
+      both:
+        condition: "api_flexibility_required === true"
+        recommendation: "Express + Apollo Server"
+    runtime:
+      high_performance:
+        condition: "performance_critical === true"
+        recommendation: "Go/Gin or Rust/Actix"
+      rapid_development:
+        condition: "time_to_market === 'critical'"
+        recommendation: "Node.js/Express or Python/Django"
+      enterprise:
+        condition: "enterprise_features === true"
+        recommendation: "Java/Spring Boot"
+
   database:
     relational:
-      condition: "structured_data === true AND scale < 'large'"
+      condition: "structured_data === true AND acid_required === true"
       recommendation: "PostgreSQL"
-    nosql:
-      condition: "structured_data === false OR scale === 'large'"
+      alternatives:
+        - "MySQL"
+        - "MariaDB"
+    document:
+      condition: "flexible_schema === true"
       recommendation: "MongoDB"
+      alternatives:
+        - "DynamoDB"
+        - "CouchDB"
+    cache:
+      condition: "caching_required === true"
+      recommendation: "Redis"
+      use_cases:
+        - "Session storage"
+        - "Rate limiting"
+        - "Real-time features"
+    search:
+      condition: "full_text_search === true"
+      recommendation: "Elasticsearch"
+      alternatives:
+        - "Meilisearch"
+        - "Typesense"
+    time_series:
+      condition: "time_series_data === true"
+      recommendation: "InfluxDB or TimescaleDB"
 
-# Templates and patterns
+  deployment:
+    containerization:
+      condition: "microservices === true"
+      recommendation: "Docker + Kubernetes"
+    serverless:
+      condition: "variable_traffic === true AND stateless === true"
+      recommendation: "AWS Lambda or Vercel"
+    traditional:
+      condition: "legacy_compatibility === true"
+      recommendation: "VM-based deployment with Ansible"
+    platform:
+      condition: "team_size < 5"
+      recommendation: "Heroku or Railway"
+
+# =============================================================================
+# TEMPLATES
+# =============================================================================
+
 templates:
-  project_structure: |
-    /src
-    /components
-    /pages
-    /api
-    /utils
-    /styles
-    /tests
+  project_structure:
+    frontend_react: |
+      /frontend
+        /src
+          /components
+            /common
+            /features
+            /layout
+          /pages
+          /hooks
+          /context
+          /services
+          /utils
+          /styles
+          /assets
+        /public
+        /tests
+          /unit
+          /integration
+          /e2e
+        package.json
+        tsconfig.json
+        .env
+    
+    backend_node: |
+      /backend
+        /src
+          /controllers
+          /services
+          /repositories
+          /models
+          /middleware
+          /routes
+          /utils
+          /config
+        /tests
+          /unit
+          /integration
+        /migrations
+        /seeds
+        package.json
+        tsconfig.json
+    
+    backend_python: |
+      /backend
+        /app
+          /api
+            /v1
+          /core
+          /models
+          /services
+          /repositories
+          /schemas
+          /utils
+        /tests
+          /unit
+          /integration
+        /migrations
+        requirements.txt
+        pyproject.toml
+
+  api_endpoints:
+    crud: |
+      GET    /api/v1/{resource}          # List all
+      GET    /api/v1/{resource}/:id      # Get one
+      POST   /api/v1/{resource}          # Create
+      PUT    /api/v1/{resource}/:id      # Update
+      DELETE /api/v1/{resource}/:id      # Delete
+    
+    nested: |
+      GET    /api/v1/{parent}/:id/{child}           # List children
+      POST   /api/v1/{parent}/:id/{child}           # Create child
+      GET    /api/v1/{parent}/:id/{child}/:childId   # Get child
+    
+    auth: |
+      POST   /api/v1/auth/register
+      POST   /api/v1/auth/login
+      POST   /api/v1/auth/logout
+      POST   /api/v1/auth/refresh
+      POST   /api/v1/auth/forgot-password
+      POST   /api/v1/auth/reset-password
+
+  database_schemas:
+    user: |
+      users
+        id: UUID (PK)
+        email: VARCHAR(255) UNIQUE
+        password_hash: VARCHAR(255)
+        name: VARCHAR(255)
+        role: ENUM('user', 'admin')
+        created_at: TIMESTAMP
+        updated_at: TIMESTAMP
+    
+    audit_log: |
+      audit_logs
+        id: UUID (PK)
+        user_id: UUID (FK)
+        action: VARCHAR(50)
+        entity_type: VARCHAR(50)
+        entity_id: UUID
+        old_value: JSONB
+        new_value: JSONB
+        ip_address: INET
+        created_at: TIMESTAMP
+
+  docker:
+    dockerfile: |
+      # Build stage
+      FROM node:18-alpine AS builder
+      WORKDIR /app
+      COPY package*.json ./
+      RUN npm ci
+      COPY . .
+      RUN npm run build
+      
+      # Production stage
+      FROM node:18-alpine AS production
+      WORKDIR /app
+      COPY --from=builder /app/dist ./dist
+      COPY --from=builder /app/node_modules ./node_modules
+      EXPOSE 3000
+      CMD ["node", "dist/main.js"]
+    
+    docker_compose: |
+      version: '3.8'
+      services:
+        app:
+          build: .
+          ports:
+            - "3000:3000"
+          environment:
+            - NODE_ENV=production
+            - DATABASE_URL=postgresql://postgres:password@db:5432/myapp
+          depends_on:
+            - db
+            - redis
+        
+        db:
+          image: postgres:15-alpine
+          environment:
+            - POSTGRES_DB=myapp
+            - POSTGRES_PASSWORD=password
+          volumes:
+            - postgres_data:/var/lib/postgresql/data
+        
+        redis:
+          image: redis:7-alpine
+        
+      volumes:
+        postgres_data:
+
+  ci_cd:
+    github_actions: |
+      name: CI/CD Pipeline
+      on:
+        push:
+          branches: [main, develop]
+        pull_request:
+          branches: [main]
+      
+      jobs:
+        test:
+          runs-on: ubuntu-latest
+          steps:
+            - uses: actions/checkout@v3
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                node-version: '18'
+            - run: npm ci
+            - run: npm run lint
+            - run: npm run typecheck
+            - run: npm run test:coverage
+            - run: npm run security-audit
+        
+        deploy:
+          needs: test
+          if: github.ref == 'refs/heads/main'
+          runs-on: ubuntu-latest
+          steps:
+            - uses: actions/checkout@v3
+            - name: Deploy to production
+              run: ./scripts/deploy.sh
+
+  monitoring:
+    health_check: |
+      GET /health
+      Response: { "status": "healthy", "version": "1.0.0", "uptime": 12345 }
+    
+    metrics: |
+      - request_duration_seconds (histogram)
+      - request_total (counter)
+      - error_total (counter)
+      - database_connections (gauge)
+      - cache_hit_ratio (gauge)
+
+# =============================================================================
+# CHECKLISTS
+# =============================================================================
+
+checklists:
+  pre_development:
+    - "Requirements documented and approved"
+    - "Architecture design reviewed"
+    - "Technology stack selected"
+    - "Development environment set up"
+    - "Coding standards defined"
+    - "Git workflow established"
+    - "CI/CD pipeline configured"
+
+  pre_deployment:
+    - "All tests passing"
+    - "Code review completed"
+    - "Security audit passed"
+    - "Performance benchmarks met"
+    - "Documentation updated"
+    - "Rollback plan prepared"
+    - "Monitoring configured"
+    - "Stakeholders notified"
+
+  post_deployment:
+    - "Health checks passing"
+    - "Metrics baseline established"
+    - "Error rates acceptable"
+    - "Performance within targets"
+    - "User feedback collected"
+    - "Incident response ready"
+
+# =============================================================================
+# METRICS & GOALS
+# =============================================================================
+
+metrics:
+  code_quality:
+    - "test_coverage >= 80%"
+    - "lint_errors = 0"
+    - "type_errors = 0"
+    - "security_vulnerabilities = 0"
   
-  api_endpoints: |
-    GET /api/resource
-    POST /api/resource
-    PUT /api/resource/:id
-    DELETE /api/resource/:id
+  performance:
+    - "api_response_time < 200ms"
+    - "page_load_time < 3s"
+    - "lighthouse_score >= 90"
+    - "uptime >= 99.9%"
+  
+  process:
+    - "cycle_time < 5 days"
+    - "pr_review_time < 24 hours"
+    - "deployment_frequency >= weekly"
+    - "lead_time < 2 weeks"
+
+# =============================================================================
+# TEAM ROLES
+# =============================================================================
+
+roles:
+  architect:
+    responsibilities:
+      - "System design"
+      - "Technology selection"
+      - "Code review"
+      - "Technical mentorship"
+    skills:
+      - "Architecture patterns"
+      - "System design"
+      - "Multiple programming languages"
+  
+  frontend_developer:
+    responsibilities:
+      - "UI implementation"
+      - "Component development"
+      - "State management"
+      - "Performance optimization"
+    skills:
+      - "HTML/CSS/JavaScript"
+      - "React/Vue/Angular"
+      - "Testing frameworks"
+  
+  backend_developer:
+    responsibilities:
+      - "API development"
+      - "Business logic"
+      - "Database design"
+      - "Security implementation"
+    skills:
+      - "Node.js/Python/Go"
+      - "Database management"
+      - "API design"
+  
+  devops_engineer:
+    responsibilities:
+      - "CI/CD pipeline"
+      - "Infrastructure management"
+      - "Monitoring setup"
+      - "Security hardening"
+    skills:
+      - "Docker/Kubernetes"
+      - "Cloud platforms"
+      - "Infrastructure as Code"
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+
+changelog:
+  - version: "2.0.0"
+    date: "2024-03-01"
+    changes:
+      - "Added comprehensive decision trees"
+      - "Expanded templates library"
+      - "Added team roles"
+      - "Added metrics and goals"
+  
+  - version: "1.0.0"
+    date: "2024-01-01"
+    changes:
+      - "Initial release"
+      - "Basic workflow steps"
+      - "Simple templates"

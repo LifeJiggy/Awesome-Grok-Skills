@@ -82,8 +82,8 @@ git clone <repository-url>
 cd Awesome-Grok-Skills
 pip install pyyaml
 
-# Verify
-python -c "from agents.ci_cd_pipeline.agent import CICDPipelineAgent; print('OK')"
+# Verify the installation
+python -c "from agents.ci_cd_pipeline.agent import CICDPipelineAgent; print('CI/CD Pipeline Agent loaded')"
 ```
 
 ## Features
@@ -96,7 +96,7 @@ python -c "from agents.ci_cd_pipeline.agent import CICDPipelineAgent; print('OK'
 | Test Orchestration | Manage test execution, coverage, parallel runs, and quality gates |
 | Security Scanning | Integrated SAST, SCA, secret scanning, container scanning |
 | Deployment | Blue-green, canary, rolling, recreate, feature flag strategies |
-| Rollback | Automatic and manual rollback with strategy selection |
+| Rollback | Automatic and manual rollback with strategy selection and audit trail |
 | Notifications | Multi-channel notifications (Slack, email, Teams, webhook) |
 | Artifact Management | Versioned artifacts with registry push and retention policies |
 | Quality Gates | Configurable thresholds for coverage, vulnerabilities, and build time |
@@ -881,4 +881,18 @@ A: Create separate pipelines per service or package, and use path-based triggers
 
 - `agent.py` — Main implementation (~900 lines)
 - `ARCHITECTURE.md` — System architecture with diagrams
-- `GROK.md` —
+- `GROK.md` — Agent instructions and identity
+- `README.md` — This file
+- `tests/` — Unit and integration tests
+
+## Contributing
+
+1. Follow the existing code style with type hints and dataclasses
+2. Add provider-specific config generators for new CI/CD platforms
+3. Include tests for new deployment strategies
+4. Update documentation for API changes
+5. Ensure all existing tests pass before submitting
+
+## License
+
+Part of the Awesome Grok Skills collection. See project root for license details.

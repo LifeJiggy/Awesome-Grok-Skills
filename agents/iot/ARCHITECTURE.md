@@ -86,6 +86,15 @@ The IoT Agent is a comprehensive Internet of Things management platform covering
 │  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘                     │  │
 │  └────────────────────────────────────────────────────────────────────────────┘  │
 │                                                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────┐  │
+│  │                     Security Layer                                          │  │
+│  │                                                                            │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐                     │  │
+│  │  │Device    │ │Firmware  │ │Audit     │ │Encryption│                     │  │
+│  │  │Auth      │ │Signing   │ │Logging   │ │& TLS     │                     │  │
+│  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘                     │  │
+│  └────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                   │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -129,6 +138,19 @@ Handles the complete device lifecycle from registration through decommissioning.
 - `battery_level`: Battery percentage (0-100)
 - `signal_strength`: RSSI in dBm
 
+**Device Types:**
+
+| Type | Description | Typical Protocols |
+|------|-------------|-------------------|
+| SENSOR | Environmental readings (temp, humidity, pressure) | MQTT, CoAP, LoRa |
+| ACTUATOR | Controls physical systems (valves, motors, relays) | MQTT, HTTP |
+| GATEWAY | Aggregates and routes device traffic | HTTP, WebSocket, AMQP |
+| CAMERA | Video and image capture | HTTP, RTSP, WebSocket |
+| WEARABLE | Body-worn sensors (fitness, medical) | BLE, MQTT |
+| EDGE_NODE | Compute node for edge processing | HTTP, WebSocket |
+| CONTROLLER | PLC and industrial controller | MQTT, AMQP |
+| BEACON | Proximity and location beacons | BLE, LoRa |
+
 **Bulk Operations:**
 ```python
 results = device_manager.bulk_operations(
@@ -138,6 +160,17 @@ results = device_manager.bulk_operations(
 )
 # Returns per-device success/failure status
 ```
+
+**Bulk Operation Types:**
+
+| Operation | Description | Risk Level |
+|-----------|-------------|------------|
+| update_firmware | OTA firmware update | HIGH |
+| restart | Remote restart | MEDIUM |
+| update_config | Configuration change | LOW |
+| calibrate | Sensor calibration | MEDIUM |
+| decommission | Remove from fleet | HIGH |
+| migrate | Move to new platform | HIGH |
 
 ### Telemetry Manager
 
@@ -172,6 +205,16 @@ Thresholds:
   z_score > 5.0  → CRITICAL alert
 ```
 
+**Anomaly Detection Methods:**
+
+| Method | Description | Best For |
+|--------|-------------|----------|
+| Z-Score | Statistical deviation from mean | Normal distributions |
+| IQR | Interquartile range | Skewed distributions |
+| Moving Average | Deviation from rolling average | Trending data |
+| Exponential Smoothing | Weighted recent values | Seasonal patterns |
+| Isolation Forest | ML-based outlier detection | Complex patterns |
+
 **Aggregation Window Types:**
 | Window | Duration | Use Case |
 |--------|----------|----------|
@@ -179,8 +222,26 @@ Thresholds:
 | Short-term | 5 minutes | Operational dashboards |
 | Hourly | 60 minutes | Trend analysis |
 | Daily | 24 hours | Reporting and archival |
+| Weekly | 7 days | Capacity planning |
+| Monthly | 30 days | Long-term analysis |
 
 **Supported Aggregations:** min, max, avg, sum, count, std_deviation
+
+**Telemetry Data Schema:**
+```json
+{
+  "device_id": "DEV-ABC123",
+  "metric_name": "temperature",
+  "value": 22.5,
+  "unit": "C",
+  "timestamp": "2026-01-15T10:30:00Z",
+  "quality": 0.95,
+  "metadata": {
+    "location": "Building A, Floor 1",
+    "sensor_model": "TC-100"
+  }
+}
+```
 
 ### Edge Computing Manager
 
@@ -228,6 +289,17 @@ Create Workload → Select Target Nodes → Resource Check
                         └───────────┘      │
 ```
 
+**Edge Node States:**
+| State | Description | Actions |
+|-------|-------------|---------|
+| ONLINE | Connected and ready | Deploy, monitor |
+| OFFLINE | Not connected | Wake, troubleshoot |
+| DEPLOYING | Workload being deployed | Monitor progress |
+| UPDATING | Software update in progress | Status check |
+| WARNING | Resource constraints | Scale, migrate |
+| ERROR | Failed state | Reset, debug |
+| MAINTENANCE | Scheduled maintenance | Status check |
+
 ### Digital Twin Manager
 
 Creates and maintains virtual representations of physical devices for simulation and prediction.
@@ -252,11 +324,41 @@ For each sensor metric:
 Overall health = 1 - avg(all_failure_probabilities)
 ```
 
+**Prediction Confidence Levels:**
+
+| Confidence | Range | Action |
+|------------|-------|--------|
+| HIGH | > 80% | Schedule maintenance |
+| MEDIUM | 50-80% | Monitor closely |
+| LOW | < 50% | Continue monitoring |
+
 **Simulation Capabilities:**
 - Load increase/decrease scenarios
 - Environmental condition changes
 - Component failure injection
 - Capacity planning projections
+- What-if analysis for configuration changes
+
+**Digital Twin Schema:**
+```json
+{
+  "twin_id": "TWIN-XYZ789",
+  "device_id": "DEV-ABC123",
+  "model_type": "industrial_pump",
+  "state": "SYNCHRONIZED",
+  "properties": {
+    "temperature": 25.0,
+    "vibration": 2.3,
+    "pressure": 45.2,
+    "rpm": 1450
+  },
+  "metadata": {
+    "created_at": "2026-01-15T10:30:00Z",
+    "last_sync": "2026-01-15T10:30:45Z",
+    "sync_interval_seconds": 30
+  }
+}
+```
 
 ### Fleet Manager
 
@@ -276,6 +378,31 @@ Create Group → Add Devices → Schedule Maintenance
                               Execute Checklist
                                     │
                               Report Results
+```
+
+**Fleet Group Types:**
+
+| Group Type | Description | Example |
+|------------|-------------|---------|
+| LOCATION | Devices in same physical location | "Building A Sensors" |
+| FUNCTION | Devices serving same purpose | "HVAC Controllers" |
+| CUSTOM | User-defined grouping | "Q1 Deployment" |
+| DYNAMIC | Rule-based grouping | "Low Battery Devices" |
+
+**Maintenance Checklist Template:**
+```json
+{
+  "checklist_id": "CHK-001",
+  "name": "Firmware Update",
+  "items": [
+    {"item": "Backup current config", "status": "pending"},
+    {"item": "Download firmware package", "status": "pending"},
+    {"item": "Verify checksum", "status": "pending"},
+    {"item": "Update firmware", "status": "pending"},
+    {"item": "Verify operation", "status": "pending"},
+    {"item": "Update documentation", "status": "pending"}
+  ]
+}
 ```
 
 ## Data Flow
@@ -307,6 +434,25 @@ Create Group → Add Devices → Schedule Maintenance
 8. Rollback triggered if failure rate exceeds threshold
 ```
 
+**Firmware Update States:**
+```
+PENDING → DOWNLOADING → VERIFYING → FLASHING → RESTARTING → COMPLETE
+                              ↘ FAILED ↗          ↘ FAILED ↗
+```
+
+### Edge-to-Cloud Sync
+
+```
+Edge Node → Local Processing → Batched Upload → Cloud Ingestion → Long-term Storage
+    │                            │
+    │                      ┌─────▼─────┐
+    │                      │ Edge      │
+    │                      │ Analytics │
+    │                      └───────────┘
+    │
+    └──→ Local Alerting (immediate)
+```
+
 ## Security
 
 - X.509 certificate-based device authentication
@@ -316,6 +462,17 @@ Create Group → Add Devices → Schedule Maintenance
 - Encrypted telemetry storage
 - Secure boot chain validation on supported devices
 - Audit logging for all administrative actions
+
+**Security Controls:**
+
+| Control | Description | Implementation |
+|---------|-------------|----------------|
+| Device Authentication | X.509 certificates | Per-device cert provisioning |
+| Transport Security | TLS 1.3 | All communications encrypted |
+| Firmware Integrity | Signature verification | SHA-256 + RSA signatures |
+| Access Control | RBAC | Role-based permissions |
+| Data Encryption | AES-256 | At-rest encryption |
+| Audit Logging | Immutable logs | All operations logged |
 
 ## Scalability
 
@@ -337,3 +494,53 @@ Create Group → Add Devices → Schedule Maintenance
 | Digital twin sync | < 1s end-to-end |
 | OTA update (1K devices) | < 30 minutes |
 | Fleet health check | < 5s for 10K devices |
+
+## Design Patterns
+
+### Publish-Subscribe
+Devices publish telemetry to topics; consumers subscribe to topics of interest. Decouples producers from consumers.
+
+### Gateway Pattern
+Protocol translation happens at the gateway layer, allowing devices to use any supported protocol while the cloud uses a unified internal format.
+
+### Digital Twin
+Virtual representation of physical devices enables simulation, prediction, and what-if analysis without affecting real devices.
+
+### Edge-First
+Processing happens where data is generated, reducing latency and bandwidth costs. Only summaries and anomalies are sent to the cloud.
+
+## Configuration Reference
+
+```yaml
+device_management:
+  max_devices: 1000000
+  default_protocol: mqtt
+  heartbeat_interval_seconds: 60
+  offline_threshold_seconds: 180
+  auto_decommission_days: 365
+
+telemetry:
+  ingestion_buffer_size: 100000
+  retention_days: 90
+  aggregation_windows: [1m, 5m, 1h, 24h]
+  anomaly_threshold_sigma: 3.0
+  alert_cooldown_minutes: 15
+
+edge_computing:
+  max_nodes: 10000
+  health_check_interval_seconds: 30
+  workload_timeout_seconds: 3600
+  resource_alert_threshold: 80
+
+digital_twins:
+  sync_interval_seconds: 30
+  stale_threshold_seconds: 300
+  prediction_confidence_threshold: 0.5
+  max_simultaneous_simulations: 100
+
+fleet_operations:
+  max_group_size: 10000
+  maintenance_checklist_max_items: 50
+  bulk_operation_timeout_seconds: 3600
+  rollback_failure_threshold: 0.1
+```
