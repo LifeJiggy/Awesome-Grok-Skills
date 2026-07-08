@@ -27,7 +27,7 @@ The API Management Agent provides end-to-end API lifecycle management including 
 ### What It Does
 
 - **API Design**: Create APIs with OpenAPI 3.0 specification generation
-- **Version Management**: Lifecycle from draft to retirement with deprecation timelines
+- **Version Management**: Full lifecycle from draft to retirement with deprecation timelines
 - **Developer Portal**: Register developers, generate API keys, track usage
 - **Gateway Configuration**: Routing, rate limiting, circuit breaking, load balancing
 - **Security Assessment**: Vulnerability scanning, auth configuration, compliance checks
@@ -49,6 +49,7 @@ The API Management Agent provides end-to-end API lifecycle management including 
 | Monitoring | Metrics, alerts, health checks |
 | Monetization | Tiers (Free → Enterprise), pricing plans |
 | Multi-Protocol | REST, GraphQL, gRPC, WebSocket |
+| Compliance | Security scoring, vulnerability tracking, audit logging |
 
 ---
 
@@ -114,6 +115,7 @@ api = agent.design_api("Payment API", description="Payment processing API")
 # 2. Add endpoints
 agent.add_endpoint(api.api_id, "/payments", "POST", "Create payment", auth_type="jwt")
 agent.add_endpoint(api.api_id, "/payments/{id}", "GET", "Get payment", auth_type="jwt")
+agent.add_endpoint(api.api_id, "/payments/{id}/refund", "POST", "Refund payment", auth_type="jwt")
 
 # 3. Create version
 agent.create_version(api.api_id, "v1")
@@ -133,6 +135,7 @@ print(f"Score: {assessment.security_score}/100")
 # 7. Set up monitoring
 agent.set_up_monitoring(api.api_id, [
     {"name": "High Errors", "condition": "error_rate > 5%", "severity": "critical"},
+    {"name": "Slow Responses", "condition": "p99_latency > 500ms", "severity": "warning"},
 ])
 
 # 8. Export spec
@@ -142,19 +145,24 @@ agent.export_openapi(api.api_id, "./docs/openapi.json")
 ### Developer Portal Management
 
 ```python
-# Register multiple developers
-for name, email, tier in [
+# Register multiple developers with different tiers
+developers = [
     ("Startup Inc", "dev@startup.io", "basic"),
     ("Enterprise Corp", "api@enterprise.com", "enterprise"),
-]:
+    ("Consultant", "freelancer@dev.io", "professional"),
+]
+
+for name, email, tier in developers:
     dev = agent.register_developer(name, email, tier=tier)
     key, raw = agent.generate_api_key(dev.developer_id, "default", expires_days=365)
     print(f"{name}: {raw[:20]}...")
 
-# Check usage
+# Check usage for all developers
 for dev in agent.list_developers():
     usage = agent.get_developer_usage(dev.developer_id)
-    print(f"{dev.name}: {usage['total_requests']}/{usage['monthly_limit']}")
+    print(f"{dev.name}: {usage['total_requests']}/{usage['monthly_limit']} requests")
+    if usage['total_requests'] / usage['monthly_limit'] > 0.8:
+        print(f"  WARNING: {dev.name} approaching monthly limit")
 ```
 
 ### Version Deprecation Workflow
@@ -163,11 +171,11 @@ for dev in agent.list_developers():
 # Create v2 with breaking changes
 v2 = agent.create_version(
     api.api_id, "v2",
-    changelog=["Added batch operations", "Improved error messages"],
-    breaking_changes=["Response envelope changed", "Auth header required"]
+    changelog=["Added batch operations", "Improved error messages", "New pagination model"],
+    breaking_changes=["Response envelope changed", "Auth header required", "Pagination required"]
 )
 
-# Deprecate v1 (90-day notice)
+# Deprecate v1 (90-day notice by default)
 agent.deprecate_version(api.api_id, "v1")
 
 # Get deprecation plan
@@ -179,7 +187,49 @@ print(f"Affected endpoints: {plan['affected_endpoints']}")
 # Monitor remaining v1 traffic
 status = agent.get_version_status(api.api_id)
 for v in status["versions"]:
-    print(f"{v['version']}: {v['status']} ({v['usage_percent']}% traffic)")
+    print(f"{v['version']}: {v['status']} ({v['usage_percent']:.1f}% traffic)")
+```
+
+### Security Assessment
+
+```python
+assessment = agent.assess_security(api.api_id)
+print(f"Security Score: {assessment.security_score}/100")
+
+# Categorize vulnerabilities
+for vuln in assessment.vulnerabilities:
+    severity = vuln['severity']
+    if severity == 'critical':
+        print(f"CRITICAL: {vuln['type']} — {vuln['recommendation']}")
+    elif severity == 'high':
+        print(f"HIGH: {vuln['type']} — {vuln['recommendation']}")
+
+# Apply recommendations
+for rec in assessment.recommendations:
+    print(f"TODO: {rec}")
+```
+
+### Monitoring & Alerts
+
+```python
+# Set up comprehensive monitoring
+alerts = agent.set_up_monitoring(api.api_id, [
+    {"name": "High Error Rate", "condition": "error_rate > 5%", "severity": "critical"},
+    {"name": "Slow Responses", "condition": "p99_latency > 500ms", "severity": "warning"},
+    {"name": "Rate Limit Saturation", "condition": "rate_limit_usage > 90%", "severity": "warning"},
+    {"name": "Auth Failures Spike", "condition": "auth_failure_rate > 10%", "severity": "critical"},
+])
+
+# Check health
+health = agent.get_health_status(api.api_id)
+print(f"Status: {health['status']}")
+print(f"Uptime: {health['uptime_percent']}%")
+
+# Get metrics
+metrics = agent.get_api_metrics(api.api_id)
+print(f"Requests: {metrics.total_requests}")
+print(f"Error Rate: {metrics.error_rate}%")
+print(f"p99 Latency: {metrics.latency_p99}ms")
 ```
 
 ---
@@ -242,11 +292,14 @@ agent = APIManagementAgent()
 api = agent.design_api("Catalog API", base_path="/api/v1")
 agent.add_endpoint(api.api_id, "/products", "GET", "List products")
 agent.add_endpoint(api.api_id, "/products/{id}", "GET", "Get product")
+agent.add_endpoint(api.api_id, "/products/{id}/reviews", "GET", "Get reviews")
 agent.create_version(api.api_id, "v1")
 
 # Design v2 with breaking changes
 v2 = agent.create_version(api.api_id, "v2", breaking_changes=["Pagination required"])
 agent.add_endpoint(api.api_id, "/products", "GET", "List products (paginated)")
+agent.add_endpoint(api.api_id, "/products/{id}", "GET", "Get product (enhanced)")
+agent.add_endpoint(api.api_id, "/products/search", "GET", "Search products")
 
 # Deprecate v1
 agent.deprecate_version(api.api_id, "v1")
@@ -255,14 +308,70 @@ agent.deprecate_version(api.api_id, "v1")
 status = agent.get_version_status(api.api_id)
 print(f"Current: {status['current_version']}")
 for v in status["versions"]:
-    print(f"  {v['version']}: {v['status']}")
+    print(f"  {v['version']}: {v['status']} ({v['endpoints_count']} endpoints)")
 ```
 
 ### GraphQL API
 
 ```python
 api = agent.design_api("GraphQL API", protocol="graphql", base_path="/graphql")
-agent.add_endpoint(api.api_id, "/graphql", "POST", "GraphQL endpoint")
+agent.add_endpoint(api.api_id, "/graphql", "POST", "GraphQL endpoint", auth_type="jwt")
+agent.add_endpoint(api.api_id, "/graphql", "GET", "GraphQL playground (dev only)")
+
+# Generate spec
+spec = agent.generate_openapi_spec(api.api_id)
+```
+
+### Enterprise Developer Portal
+
+```python
+# Register enterprise customer
+enterprise_dev = agent.register_developer(
+    name="MegaCorp Inc",
+    email="api@megacorp.com",
+    company="MegaCorp",
+    tier="enterprise"
+)
+
+# Generate production key with high limits
+prod_key, raw = agent.generate_api_key(
+    enterprise_dev.developer_id,
+    name="Production API Key",
+    scopes=["read", "write", "admin"],
+    rate_limit=50000,
+    expires_days=365
+)
+
+# Generate sandbox key
+sandbox_key, raw_sandbox = agent.generate_api_key(
+    enterprise_dev.developer_id,
+    name="Sandbox Key",
+    scopes=["read"],
+    rate_limit=1000,
+    expires_days=90
+)
+
+# Track usage
+usage = agent.get_developer_usage(enterprise_dev.developer_id)
+print(f"Production: {usage['total_requests']}/{usage['monthly_limit']}")
+```
+
+### Gateway with Multiple Routes
+
+```python
+gw = agent.configure_gateway("Production Gateway", auth_type="jwt", rate_limit=50000)
+
+# Versioned API routes
+agent.add_route(gw.gateway_id, "/api/v1", "http://api-v1.internal:8080")
+agent.add_route(gw.gateway_id, "/api/v2", "http://api-v2.internal:8080")
+
+# Internal service routes
+agent.add_route(gw.gateway_id, "/internal/metrics", "http://prometheus:9090", strip_prefix=True)
+agent.add_route(gw.gateway_id, "/internal/logs", "http://elasticsearch:9200", strip_prefix=True)
+
+# Health check
+status = agent.get_gateway_status(gw.gateway_id)
+print(f"Routes: {status['routes']}, Health: {status['health']}")
 ```
 
 ---
@@ -270,7 +379,7 @@ agent.add_endpoint(api.api_id, "/graphql", "POST", "GraphQL endpoint")
 ## Configuration
 
 ```python
-from agent import Config
+from agents.api_management.agent import Config
 
 config = Config(
     default_rate_limit=1000,
@@ -281,11 +390,15 @@ config = Config(
     sunset_notice_days=180,
     alert_on_error_rate=5.0,
     alert_on_latency_ms=500.0,
+    alert_on_rate_limit_usage=90.0,
     ssl_enabled=True,
     waf_enabled=True,
     cors_origins=["https://app.example.com"],
     caching_enabled=True,
     cache_ttl_seconds=300,
+    email_smtp_host="smtp.example.com",
+    email_smtp_port=587,
+    email_from="api-platform@example.com",
 )
 
 agent = APIManagementAgent(config=config)
@@ -303,6 +416,10 @@ agent = APIManagementAgent(config=config)
 6. **Monitor Continuously**: Set up alerts for error rates and latency
 7. **Rotate API Keys**: Encourage developers to rotate keys every 90 days
 8. **Export Specs**: Keep OpenAPI specs in version control
+9. **Use Tags**: Group endpoints by tags for organized documentation
+10. **Define Schemas**: Always define request/response schemas for validation
+11. **Idempotency Keys**: Require idempotency keys for write operations
+12. **Pagination**: Use cursor-based pagination for large datasets
 
 ---
 
@@ -317,6 +434,163 @@ agent = APIManagementAgent(config=config)
 | Version deprecation fails | Version not active | Only active versions can be deprecated |
 | Security score low | Missing auth on endpoints | Add auth to unprotected endpoints |
 | Rate limit errors | Limits too restrictive | Adjust `RateLimitConfig` values |
+| Monitoring alerts not firing | Condition syntax wrong | Verify condition format |
+| Developer over limit | Monthly cap reached | Upgrade tier or increase limit |
+| CORS errors | Origin not in allowlist | Add origin to CORS configuration |
+
+---
+
+## Advanced Usage
+
+### Bulk API Import from OpenAPI Spec
+
+```python
+import yaml
+
+with open("microservices-openapi.yaml") as f:
+    spec = yaml.safe_load(f)
+
+api = agent.design_api(spec["info"]["title"], description=spec["info"]["description"])
+
+for path, methods in spec["paths"].items():
+    for method, details in methods.items():
+        if method in ["get", "post", "put", "patch", "delete"]:
+            agent.add_endpoint(
+                api.api_id,
+                path,
+                method.upper(),
+                details.get("summary", ""),
+                tags=details.get("tags", []),
+            )
+
+agent.create_version(api.api_id, "v1")
+agent.export_openapi(api.api_id, "./imported-api.json")
+```
+
+### Multi-Version Traffic Shifting
+
+```python
+# Gradually shift traffic from v1 to v2
+status = agent.get_version_status(api.api_id)
+for v in status["versions"]:
+    if v['version'] == 'v1' and v.get('usage_percent', 0) > 10:
+        print(f"v1 still at {v['usage_percent']:.0f}% — continue migration")
+    elif v['version'] == 'v2' and v.get('usage_percent', 0) < 90:
+        print(f"v2 at {v['usage_percent']:.0f}% — monitor stability")
+```
+
+### Developer Onboarding Automation
+
+```python
+# Automated onboarding for new partners
+partners = [
+    {"name": "Partner A", "email": "api@partnerA.com", "tier": "professional"},
+    {"name": "Partner B", "email": "dev@partnerB.com", "tier": "enterprise"},
+]
+
+for partner in partners:
+    dev = agent.register_developer(partner["name"], partner["email"], tier=partner["tier"])
+    key, raw = agent.generate_api_key(
+        dev.developer_id,
+        name="Production Key",
+        scopes=["read", "write"],
+        expires_days=365,
+    )
+
+    # Send onboarding email
+    agent.send_notification(
+        "email",
+        partner["email"],
+        f"Welcome to {api.name}",
+        f"Your API key: {raw}\nDocumentation: https://docs.example.com",
+    )
+```
+
+### Compliance Reporting
+
+```python
+# Generate compliance report
+assessment = agent.assess_security(api.api_id)
+
+report = {
+    "api_name": api.name,
+    "security_score": assessment.security_score,
+    "vulnerabilities": len(assessment.vulnerabilities),
+    "critical_findings": len([v for v in assessment.vulnerabilities if v['severity'] == 'critical']),
+    "authenticated_endpoints": sum(1 for e in api.endpoints if e.auth_type != 'NONE'),
+    "total_endpoints": len(api.endpoints),
+    "rate_limited_endpoints": sum(1 for e in api.endpoints if e.rate_limit),
+}
+print(json.dumps(report, indent=2))
+```
+
+### Gateway Failover Configuration
+
+```python
+# Configure failover routes
+gw = agent.configure_gateway("Failover Gateway", auth_type="jwt", rate_limit=10000)
+
+# Primary route
+agent.add_route(gw.gateway_id, "/api/v1", "http://primary-api:8080")
+
+# Backup route (if primary fails)
+agent.add_route(gw.gateway_id, "/api/v1", "http://backup-api:8080")
+```
+
+### Rate Limit Dashboard
+
+```python
+# Monitor rate limit usage across developers
+for dev in agent.list_developers():
+    usage = agent.get_developer_usage(dev.developer_id)
+    if usage['total_requests'] / usage['monthly_limit'] > 0.8:
+        print(f"ALERT: {dev.name} at {usage['total_requests']}/{usage['monthly_limit']}")
+```
+
+### API Version Sunset Automation
+
+```python
+# Automated sunset process
+status = agent.get_version_status(api.api_id)
+for v in status["versions"]:
+    if v['status'] == 'DEPRECATED':
+        plan = agent.plan_deprecation(api.api_id, v['version'])
+        from datetime import datetime
+        sunset = datetime.fromisoformat(plan['sunset_date'])
+        if sunset < datetime.now():
+            agent.retire_version(api.api_id, v['version'])
+            print(f"Retired {v['version']} (past sunset date)")
+```
+
+---
+
+## Error Codes
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| `API_NOT_FOUND` | 404 | API does not exist |
+| `VERSION_NOT_FOUND` | 404 | Version does not exist |
+| `ENDPOINT_NOT_FOUND` | 404 | Endpoint does not exist |
+| `DEVELOPER_NOT_FOUND` | 404 | Developer does not exist |
+| `KEY_REVOKED` | 401 | API key has been revoked |
+| `KEY_EXPIRED` | 401 | API key has expired |
+| `RATE_LIMITED` | 429 | Developer exceeded rate limit |
+| `MONTHLY_LIMIT` | 429 | Developer exceeded monthly limit |
+| `INVALID_SPEC` | 400 | OpenAPI spec validation failed |
+| `VERSION_CONFLICT` | 409 | Version already exists |
+
+---
+
+## Performance Reference
+
+| Operation | Complexity | Notes |
+|-----------|------------|-------|
+| API lookup | O(1) | Dict lookup by api_id |
+| Endpoint lookup | O(n) | Linear scan of endpoints |
+| OpenAPI spec generation | O(e) | e = number of endpoints |
+| Security assessment | O(e) | Checks each endpoint |
+| Developer lookup | O(1) | Dict lookup by developer_id |
+| API key validation | O(1) | Dict lookup by key hash |
 
 ---
 

@@ -4,35 +4,41 @@
 
 The Gaming Agent is a comprehensive game development toolkit providing combat simulation, economy management, progression systems, loot/gacha mechanics, player engagement analytics, QA testing, and difficulty scaling. It is designed as a modular, pluggable system suitable for game designers, developers, and live-ops teams.
 
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                            GAMING AGENT                                      │
+│                                                                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐      │
+│  │   Combat     │  │   Economy    │  │  Progression │  │    Loot    │      │
+│  │   Engine     │  │   Manager    │  │   System     │  │   System   │      │
+│  │              │  │              │  │              │  │            │      │
+│  │ • Damage calc│  │ • Currency   │  │ • Exp curves │  │ • Drop rate│      │
+│  │ • Turn-based │  │ • Faucets    │  │ • Leveling   │  │ • Pity     │      │
+│  │ • Balance    │  │ • Sinks      │  │ • Unlocks    │  │ • Rarity   │      │
+│  │ • Simulate   │  │ • Inflation  │  │ • Rewards    │  │ • Expected │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘      │
+│                                                                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐      │
+│  │  Engagement  │  │     QA       │  │  Difficulty  │  │   Event    │      │
+│  │  Analyzer    │  │   Manager    │  │   Scaler     │  │  Config    │      │
+│  │              │  │              │  │              │  │            │      │
+│  │ • Segment    │  │ • Bugs       │  │ • Adaptive   │  │ • Seasonal │      │
+│  │ • Churn      │  │ • Severity   │  │ • Scaling    │  │ • Limited  │      │
+│  │ • Score      │  │ • Release    │  │ • Balance    │  │ • Rewards  │      │
+│  │ • Retention  │  │ • Test cases │  │ • Recommend  │  │ • Schedule │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘      │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │         Data Models (Player, Item, Quest, Bug, Level, Event)        │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
 ---
 
-## 2. High-Level Architecture
+## 2. Component Deep Dives
 
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                           GAMING AGENT                                    │
-│                                                                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
-│  │   Combat     │  │   Economy    │  │  Progression │  │    Loot    │  │
-│  │   Engine     │  │   Manager    │  │   System     │  │   System   │  │
-│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘  │
-│                                                                          │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
-│  │  Engagement  │  │     QA       │  │  Difficulty  │  │   Event    │  │
-│  │  Analyzer    │  │   Manager    │  │   Scaler     │  │  Config    │  │
-│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘  │
-│                                                                          │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │         Data Models (Player, Item, Quest, Bug, Level, Event)     │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-└──────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 3. Component Deep Dives
-
-### 3.1 Combat Engine
+### 2.1 Combat Engine
 
 Turn-based combat simulation with formula-driven damage calculation.
 
@@ -69,7 +75,13 @@ final_damage = max(1, after_defense × block_modifier)
        └───────────────┘
 ```
 
-### 3.2 Economy Manager
+**Balance Simulation:**
+- Runs N battles between two character builds (default: 1000)
+- Measures win rates, average turns, damage distribution
+- Balance score: 1.0 = perfectly balanced, 0.0 = one-sided
+- Statistical significance check with configurable confidence
+
+### 2.2 Economy Manager
 
 In-game currency and pricing system with inflation tracking.
 
@@ -86,7 +98,12 @@ In-game currency and pricing system with inflation tracking.
 | Supply ratio | < 2x | 2-3x | > 3x |
 | Sink/Faucet | 0.8-1.2 | 0.5-1.5 | < 0.5 or > 1.5 |
 
-### 3.3 Progression System
+**Currency Types:**
+- SOFT: Earned through gameplay (gold, coins)
+- PREMIUM: Purchased with real money (gems, crystals)
+- EVENT: Time-limited seasonal currencies
+
+### 2.3 Progression System
 
 Level curves, experience tables, and feature unlock gates.
 
@@ -110,7 +127,12 @@ Level 40:  Legendary Quests
 Level 50:  Endgame Dungeons
 ```
 
-### 3.4 Loot System
+**Time-to-Max Estimation:**
+- Calculates total experience from level 1 to max
+- Estimates based on average earn rate per hour
+- Accounts for diminishing returns at higher levels
+
+### 2.4 Loot System
 
 Gacha/loot box mechanics with pity timers and probability management.
 
@@ -118,6 +140,7 @@ Gacha/loot box mechanics with pity timers and probability management.
 - Counter increments each roll
 - At threshold (default 50), guarantees legendary drop
 - Counter resets after pity trigger
+- Separate pity counters per rarity tier
 
 **Drop Rate Formula:**
 ```
@@ -129,7 +152,16 @@ for entry in sorted_by_rarity:
         return entry
 ```
 
-### 3.5 Engagement Analyzer
+**Rarity Tiers:**
+| Rarity | Base Rate | Color |
+|--------|-----------|-------|
+| Common | 50% | Gray |
+| Uncommon | 30% | Green |
+| Rare | 15% | Blue |
+| Epic | 4% | Purple |
+| Legendary | 1% | Gold |
+
+### 2.5 Engagement Analyzer
 
 Player segmentation and churn prediction.
 
@@ -150,7 +182,14 @@ Player segmentation and churn prediction.
 - Non-paying engaged (+0.1)
 - Stalled progression (+0.1)
 
-### 3.6 QA Manager
+**Engagement Score Formula:**
+```
+score = (playtime_factor × 0.3) + (session_factor × 0.2) +
+        (spending_factor × 0.2) + (social_factor × 0.15) +
+        (progression_factor × 0.15)
+```
+
+### 2.6 QA Manager
 
 Bug tracking with severity classification and release readiness.
 
@@ -165,8 +204,10 @@ Bug tracking with severity classification and release readiness.
 - Zero CRITICAL open bugs
 - Zero HIGH open bugs
 - All test cases passed
+- Performance benchmarks met
+- Security audit passed
 
-### 3.7 Difficulty Scaler
+### 2.7 Difficulty Scaler
 
 Adaptive difficulty based on player performance.
 
@@ -177,9 +218,15 @@ hp_mult = 1 + hp_scale × level_diff (capped at max_multiplier)
 dmg_mult = 1 + damage_scale × level_diff (capped at max_multiplier)
 ```
 
+**Adaptive Logic:**
+- If win_rate > 80%: increase difficulty
+- If win_rate < 40%: decrease difficulty
+- Adjustments are gradual (±10% per session)
+- Minimum difficulty floor to prevent trivial content
+
 ---
 
-## 4. Data Flow
+## 3. Data Flow
 
 ```
   ┌──────────────────────────────────────────────────────┐
@@ -208,23 +255,26 @@ dmg_mult = 1 + damage_scale × level_diff (capped at max_multiplier)
 
 ---
 
-## 5. Design Patterns
+## 4. Design Patterns
 
 ### Strategy Pattern
-Different combat formulas, difficulty algorithms, and loot mechanics are swappable via configuration.
+Different combat formulas, difficulty algorithms, and loot mechanics are swappable via configuration. Each system implements a common interface, allowing runtime method selection.
 
 ### Pity Timer Pattern
-Guaranteed outcomes after N attempts — prevents extreme bad luck.
+Guaranteed outcomes after N attempts — prevents extreme bad luck. Separate counters per rarity tier ensure fair distribution across all drop categories.
 
 ### Observer Pattern (Economy)
-Economy state changes trigger health checks and alerts.
+Economy state changes trigger health checks and alerts. When inflation crosses thresholds, recommendations are generated automatically.
 
 ### State Machine (Player)
-Player status transitions: NEW → CASUAL → REGULAR → DEDICATED / CHURNED.
+Player status transitions: NEW → CASUAL → REGULAR → DEDICATED / CHURNED. Each transition triggers appropriate engagement strategies.
+
+### Template Method (Quests)
+Quest generation follows a common template with type-specific variations. The base flow (objective → requirements → rewards) is fixed; quest types override specific steps.
 
 ---
 
-## 6. Technology Stack
+## 5. Technology Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -234,10 +284,12 @@ Player status transitions: NEW → CASUAL → REGULAR → DEDICATED / CHURNED.
 | Collections | defaultdict, list |
 | Logging | Python logging |
 | Dependencies | Zero (stdlib only) |
+| Serialization | JSON-compatible dicts |
+| Testing | pytest (optional) |
 
 ---
 
-## 7. Balance Tuning Framework
+## 6. Balance Tuning Framework
 
 ### Simulation Approach
 1. Define two character builds with stats
@@ -252,9 +304,17 @@ Player status transitions: NEW → CASUAL → REGULAR → DEDICATED / CHURNED.
 - Skill multipliers
 - Element modifiers
 
+### Balance Score Interpretation
+| Score | Interpretation | Action |
+|-------|---------------|--------|
+| 0.9-1.0 | Excellent | Ship as-is |
+| 0.7-0.9 | Good | Minor tuning |
+| 0.5-0.7 | Needs work | Significant adjustments |
+| 0.0-0.5 | Broken | Major rebalance needed |
+
 ---
 
-## 8. Monetization Models
+## 7. Monetization Models
 
 | Model | Description | Key Metrics |
 |-------|-------------|-------------|
@@ -265,42 +325,77 @@ Player status transitions: NEW → CASUAL → REGULAR → DEDICATED / CHURNED.
 | Battle Pass | Seasonal content pass | Pass purchase rate, completion |
 | Hybrid | Multiple models | Blended revenue |
 
+### Monetization Ethics
+- No pay-to-win mechanics
+- Clear odds for loot boxes
+- Spending caps or pity systems
+- Free players can access all content
+- No dark patterns or manipulation
+
 ---
 
-## 9. Extension Points
+## 8. Extension Points
 
 ### Custom Combat Formula
-Override damage calculation by subclassing or providing a custom function.
+Override damage calculation by subclassing or providing a custom function. Implement the CombatFormula interface for full control.
 
 ### Custom Loot Table
-Define new rarity tiers, drop rates, and pity mechanics.
+Define new rarity tiers, drop rates, and pity mechanics. Loot tables are JSON-configurable for easy iteration.
 
 ### Custom Difficulty Curve
-Provide scaling functions for HP, damage, and enemy behavior.
+Provide scaling functions for HP, damage, and enemy behavior. Support adaptive and static difficulty modes.
 
 ### Analytics Hooks
-Subscribe to events: battle_complete, item_acquired, level_up, purchase, session_start/end.
+Subscribe to events: battle_complete, item_acquired, level_up, purchase, session_start/end. Events are emitted for real-time pipeline integration.
+
+### Custom Player Segments
+Define new segmentation rules beyond the built-in set. Custom segments can trigger personalized engagement strategies.
 
 ---
 
-## 10. Testing Strategy
+## 9. Testing Strategy
 
 ### Balance Testing
 - Simulate 10K+ battles per matchup
 - Verify win rates within 45-55% for balanced characters
-- Check TTK (time-to-kill) within acceptable range
+- Check TTK (time-to-kill) within acceptable range (3-8 turns)
+- Verify no dominant strategy exists
 
 ### Economy Testing
 - Simulate 30 days of earn/spend
 - Verify inflation stays within ±5%
 - Check sink/faucet ratio near 1.0
+- Test for currency exploits
 
 ### Loot Testing
 - Simulate 100K drops
-- Verify rates match configured probabilities
+- Verify rates match configured probabilities (within 2% tolerance)
 - Confirm pity timer triggers correctly
+- Test edge cases (first roll, after pity trigger)
 
 ### Progression Testing
 - Verify exp curves produce reasonable time-to-max
 - Check unlock gates are reachable
 - Validate level-up rewards scale appropriately
+- Test catch-up mechanics
+
+### QA Testing
+- Verify bug severity classification accuracy
+- Test release readiness criteria enforcement
+- Validate test case generation coverage
+- Check audit trail completeness
+
+---
+
+## 10. Performance Targets
+
+| Metric | Target | Notes |
+|--------|--------|-------|
+| Combat simulation (1 battle) | < 5ms | Single battle |
+| Balance simulation (1000 battles) | < 500ms | Statistical significance |
+| Economy health check | < 10ms | All currencies |
+| Loot roll | < 1ms | Single roll |
+| Player segmentation | < 50ms | 10K players |
+| Engagement score | < 5ms | Single player |
+| Difficulty scaling | < 2ms | Single encounter |
+| QA release check | < 20ms | All criteria |

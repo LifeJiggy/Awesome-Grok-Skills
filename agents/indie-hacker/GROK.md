@@ -4,10 +4,32 @@ version: "2.0.0"
 description: "Comprehensive AI-powered platform for solo entrepreneurs to build, launch, grow, and monetize software products with advanced business tools and automation"
 author: "Awesome Grok Skills"
 license: "MIT"
-tags: ["indie-hacker", "startup", "solo-entrepreneur", "saas", "mvp", "growth", "marketing", "analytics", "revenue", "customer-acquisition"]
+tags:
+  - indie-hacker
+  - startup
+  - solo-entrepreneur
+  - saas
+  - mvp
+  - growth
+  - marketing
+  - analytics
+  - revenue
+  - customer-acquisition
+  - retention
+  - pricing
 category: "indie-hacker"
 personality: "indie-entrepreneur"
-use_cases: ["saas-development", "marketing-automation", "growth-hacking", "revenue-optimization", "customer-retention", "project-management"]
+use_cases:
+  - "saas-development"
+  - "marketing-automation"
+  - "growth-hacking"
+  - "revenue-optimization"
+  - "customer-retention"
+  - "project-management"
+  - "content-strategy"
+  - "pricing-optimization"
+  - "funnel-analysis"
+  - "a-b-testing"
 complexity: "advanced"
 dependencies: ["python>=3.8"]
 ---
@@ -18,11 +40,19 @@ dependencies: ["python>=3.8"]
 
 ## Core Principles
 
-1. **Ship Fast, Iterate Faster** — Done is better than perfect. Get to market quickly.
-2. **Data Over Intuition** — Every decision backed by metrics, not gut feelings.
-3. **Customer-Centric** — Build what customers need, not what you think they need.
-4. **Sustainable Growth** — Profitable growth beats vanity metrics every time.
-5. **Focus is Power** — Say no to everything except your core value proposition.
+1. **Ship Fast, Iterate Faster** — Done is better than perfect. Get to market quickly, then improve based on real feedback.
+
+2. **Data Over Intuition** — Every decision backed by metrics, not gut feelings. If you can't measure it, it doesn't matter.
+
+3. **Customer-Centric** — Build what customers need, not what you think they need. Talk to users daily.
+
+4. **Sustainable Growth** — Profitable growth beats vanity metrics every time. Focus on revenue, not pageviews.
+
+5. **Focus is Power** — Say no to everything except your core value proposition. Distraction kills startups.
+
+6. **Retention > Acquisition** — Reducing churn is 5x cheaper than acquiring new customers. Fix retention first.
+
+7. **Ship Weekly** — Small, frequent releases beat big quarterly launches. Stay in front of users.
 
 ## Capabilities
 
@@ -92,6 +122,11 @@ automation = agent.marketing_engine.create_automation(
     trigger="user_signup",
     actions=["send_welcome", "wait_2_days", "send_features", "wait_7_days", "send_check_in"],
 )
+
+# Track performance
+stats = agent.marketing_engine.get_campaign_stats("Welcome Series")
+print(f"Open rate: {stats['open_rate']:.1%}")
+print(f"Click rate: {stats['click_rate']:.1%}")
 ```
 
 ### Customer Intelligence
@@ -111,6 +146,7 @@ risk = agent.churn_predictor.predict_churn_risk(
 
 # Analyze churn reasons
 analysis = agent.churn_predictor.analyze_churn_reasons(churned_customers)
+# → {"top_reasons": ["price", "missing_feature", "support"], ...}
 ```
 
 ### Pricing Optimization
@@ -172,6 +208,9 @@ funnel = agent.funnel.create_funnel("Signup Flow", [
 # Analyze
 analysis = agent.funnel.analyze_funnel("Signup Flow")
 # → {"overall_conversion_rate": 12.0, "biggest_dropoff": {"stage": "Sign Up Form", "rate": 70.0}}
+
+# Get recommendations
+recs = agent.funnel.get_recommendations("Signup Flow")
 ```
 
 ### Content Strategy
@@ -216,6 +255,8 @@ agent.project_manager.log_time(task.id, "Implemented OAuth flow", hours=6.5)
 
 # Get report
 report = agent.project_manager.get_project_report("My SaaS")
+print(f"Velocity: {report['velocity']} tasks/week")
+print(f"Hours logged: {report['total_hours']}")
 ```
 
 ### MVP Templates
@@ -230,6 +271,8 @@ mvp = agent.mvp_engine.generate_saas_template(
 # → {"timeline_weeks": 8, "tech_stack": {...}, "launch_checklist": [...]}
 ```
 
+---
+
 ## Data Models
 
 ### Customer
@@ -241,6 +284,8 @@ mvp = agent.mvp_engine.generate_saas_template(
 | ltv | float | Lifetime value |
 | health_score | int | Health score (0-100) |
 | engagement_score | int | Engagement score (0-100) |
+| created_at | str | Signup date |
+| last_active | str | Last activity date |
 
 ### Task
 | Field | Type | Description |
@@ -248,18 +293,20 @@ mvp = agent.mvp_engine.generate_saas_template(
 | id | str | Unique identifier |
 | title | str | Task title |
 | priority | TaskPriority | CRITICAL, HIGH, MEDIUM, LOW |
-| status | TaskStatus | BACKLOG → DONE |
+| status | TaskStatus | BACKLOG → IN_PROGRESS → REVIEW → DONE |
 | estimated_hours | float | Time estimate |
 | actual_hours | float | Time spent |
+| tags | List[str] | Category tags |
 
 ### EmailCampaign
 | Field | Type | Description |
 |-------|------|-------------|
 | name | str | Campaign name |
-| subject | str | Email subject |
+| subject | str | Email subject line |
 | segment | str | Target segment |
 | open_rate | float | Open rate (0-1) |
 | click_rate | float | Click rate (0-1) |
+| status | str | draft → scheduled → sent → completed |
 
 ### GrowthExperiment
 | Field | Type | Description |
@@ -269,64 +316,92 @@ mvp = agent.mvp_engine.generate_saas_template(
 | metric | str | Primary metric |
 | control_conversion | float | Control group rate |
 | variant_conversion | float | Variant group rate |
+| significant | bool | Statistical significance |
+| winner | str | control or variant |
+
+---
 
 ## Checklists
 
 ### MVP Launch
 - [ ] Domain configured and SSL installed
-- [ ] User authentication working
+- [ ] User authentication working (email + password minimum)
 - [ ] Core feature implemented and tested
-- [ ] Payment integration live
-- [ ] Error monitoring active (Sentry)
-- [ ] Analytics configured
+- [ ] Payment integration live (Stripe recommended)
+- [ ] Error monitoring active (Sentry or equivalent)
+- [ ] Analytics configured (Mixpanel, Amplitude, or GA4)
 - [ ] Terms of service ready
-- [ ] Privacy policy ready
-- [ ] Support process defined
-- [ ] Landing page converted
+- [ ] Privacy policy ready (GDPR compliant)
+- [ ] Support process defined (email minimum)
+- [ ] Landing page converted (> 2% signup rate)
+- [ ] Onboarding flow complete (time to first value < 5 min)
+- [ ] Mobile responsive (test on 3+ devices)
 
 ### Growth Experiment
-- [ ] Clear hypothesis defined
-- [ ] Primary metric identified
-- [ ] Sample size calculated
-- [ ] Control and variant designed
-- [ ] Tracking implemented
-- [ ] Experiment started
-- [ ] Results recorded
-- [ ] Statistical significance checked
-- [ ] Winner implemented
-- [ ] Learnings documented
+- [ ] Clear hypothesis defined (testable statement)
+- [ ] Primary metric identified (one metric that matters)
+- [ ] Sample size calculated (statistical power > 80%)
+- [ ] Control and variant designed (only one variable changed)
+- [ ] Tracking implemented (verified with test data)
+- [ ] Experiment started (minimum 7 days or 1000 users)
+- [ ] Results recorded (no peeking at significance)
+- [ ] Statistical significance checked (p < 0.05)
+- [ ] Winner implemented (full rollout)
+- [ ] Learnings documented (what worked, what didn't)
 
 ### Customer Retention
-- [ ] Health scores configured
-- [ ] Churn prediction active
-- [ ] At-risk customers identified
-- [ ] Outreach templates ready
-- [ ] Win-back campaigns defined
-- [ ] NPS survey configured
-- [ ] Feedback loop established
-- [ ] Success metrics tracked
+- [ ] Health scores configured (usage, support, payment signals)
+- [ ] Churn prediction active (daily risk scoring)
+- [ ] At-risk customers identified (score < 40)
+- [ ] Outreach templates ready (personalized per risk reason)
+- [ ] Win-back campaigns defined (email sequences)
+- [ ] NPS survey configured (quarterly minimum)
+- [ ] Feedback loop established (feature requests tracked)
+- [ ] Success metrics tracked (retention rate, NRR)
+
+---
 
 ## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| MRR seems wrong | Check tier prices and customer counts match |
-| LTV is infinite | Churn rate is 0 — set a minimum churn assumption |
-| Experiment not significant | Increase sample size or extend duration |
-| Funnel shows 0% conversion | Check visitor counts at each stage |
-| Churn risk always low | Adjust thresholds and factor weights |
-| Runway shows infinity | Revenue exceeds burn — set realistic revenue estimate |
+| MRR seems wrong | Check tier prices and customer counts match; verify no double-counting |
+| LTV is infinite | Churn rate is 0 — set a minimum churn assumption (0.5% minimum) |
+| Experiment not significant | Increase sample size or extend duration; check for external factors |
+| Funnel shows 0% conversion | Check visitor counts at each stage; verify tracking is working |
+| Churn risk always low | Adjust thresholds and factor weights; add more behavioral signals |
+| Runway shows infinity | Revenue exceeds burn — set realistic revenue estimate with growth rate |
+| Quick ratio < 1 | You're losing more customers than gaining — focus on retention before acquisition |
+| Payback > 12 months | Reduce CAC or increase ARPU; consider higher-tier pricing |
+
+---
 
 ## Integration Points
 
 The agent integrates with:
-- **Stripe** — Payment and subscription data
-- **SendGrid / Mailchimp** — Email campaign delivery
-- **Google Analytics** — Traffic and conversion data
-- **Mixpanel / Amplitude** — Product analytics
-- **Slack** — Team notifications
-- **GitHub** — Development tracking
-- **Intercom / Crisp** — Customer support data
+- **Stripe** — Payment and subscription data (MRR, churn, refunds)
+- **SendGrid / Mailchimp** — Email campaign delivery and analytics
+- **Google Analytics** — Traffic, conversion, and attribution data
+- **Mixpanel / Amplitude** — Product analytics and user behavior
+- **Slack** — Team notifications and alerts
+- **GitHub** — Development tracking and release management
+- **Intercom / Crisp** — Customer support data and satisfaction scores
+- **Hotjar / FullStory** — User session recordings and heatmaps
+
+---
+
+## Best Practices
+
+1. **Start with metrics** — Set up MRR tracking before anything else; you can't improve what you don't measure
+2. **Automate early** — Use marketing automation from day one; manual follow-up doesn't scale
+3. **Track everything** — Log time, track experiments, measure everything; data is your competitive advantage
+4. **Focus on retention** — Reducing churn is 5x cheaper than acquiring new customers
+5. **Ship weekly** — Small, frequent releases beat big quarterly launches; stay in front of users
+6. **Listen to customers** — Health scores and churn predictions guide outreach; talk to users weekly
+7. **Price for value** — Don't compete on price; compete on value; raise prices annually
+8. **Build in public** — Share your journey; transparency builds trust and attracts early adopters
+9. **Automate support** — FAQ, chatbots, and knowledge base reduce support burden by 60%
+10. **Say no** — Feature requests will overwhelm you; focus on core value proposition
 
 ---
 
