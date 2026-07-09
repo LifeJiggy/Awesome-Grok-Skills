@@ -281,4 +281,137 @@ function checkMarketAlerts(marketData) {
 
 ---
 
+## Appendix: API Authentication Reference
+
+### OAuth 2.0 Setup for Twitter
+
+```python
+import tweepy
+
+def setup_twitter_api():
+    auth = tweepy.OAuthHandler(
+        consumer_key=os.getenv('TWITTER_CONSUMER_KEY'),
+        consumer_secret=os.getenv('TWITTER_CONSUMER_SECRET')
+    )
+    auth.set_access_token(
+        os.getenv('TWITTER_ACCESS_TOKEN'),
+        os.getenv('TWITTER_ACCESS_SECRET')
+    )
+    return tweepy.API(auth, wait_on_rate_limit=True)
+```
+
+### GitHub Personal Access Token
+
+```bash
+# Create token with 'repo' and 'read:org' scopes
+export GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxx"
+
+# Verify authentication
+curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user
+```
+
+### Reddit Script App Credentials
+
+```python
+import praw
+
+reddit = praw.Reddit(
+    client_id=os.getenv('REDDIT_CLIENT_ID'),
+    client_secret=os.getenv('REDDIT_CLIENT_SECRET'),
+    user_agent='market-research-oracle/1.0'
+)
+```
+
+## Competitive Intelligence Data
+
+### Patent Database Queries
+
+```python
+def search_patents(keywords, assignee=None, date_range=None):
+    """Search USPTO for patent filings."""
+    query = " OR ".join(keywords)
+    if assignee:
+        query += f' AND AN/"{assignee}"'
+    if date_range:
+        query += f' AND APD:[{date_range[0]} TO {date_range[1]}]'
+
+    results = uspto_search(query)
+    return {
+        'total': len(results),
+        'recent': [r for r in results if r.filing_date > datetime.now() - timedelta(days=365)],
+        'technology_clusters': cluster_patents(results)
+    }
+```
+
+### Job Posting Analysis
+
+```python
+def analyze_job_postings(company, platform='linkedin'):
+    """Analyze job postings for technology signals."""
+    postings = scrape_job_postings(company, platform)
+
+    tech_signals = {
+        'technologies': extract_technologies(postings),
+        'team_growth': len(postings),
+        'new_initiatives': identify_new_initiatives(postings),
+        'salary_ranges': extract_salary_data(postings)
+    }
+
+    return tech_signals
+```
+
+### Funding Round Tracking
+
+```python
+def track_funding_rounds(industry, min_amount=1000000):
+    """Track recent funding rounds in an industry."""
+    rounds = crunchbase_search(industry, min_amount=min_amount)
+
+    return {
+        'total_raised': sum(r.amount for r in rounds),
+        'avg_round_size': np.mean([r.amount for r in rounds]),
+        'top_deals': sorted(rounds, key=lambda x: x.amount, reverse=True)[:10],
+        'investor_activity': aggregate_investors(rounds)
+    }
+```
+
+## Data Quality Validation
+
+### Source Reliability Scoring
+
+| Source | Reliability | Update Frequency | Cost |
+|--------|------------|-----------------|------|
+| Twitter API | High | Real-time | Free tier available |
+| Reddit API | High | Near real-time | Free |
+| GitHub API | High | Real-time | Free |
+| Google Trends | Medium | Daily | Free |
+| Crunchbase | High | Weekly | Paid |
+| Product Hunt | Medium | Daily | Free |
+| Stack Overflow | High | Annual survey | Free |
+| NPM Registry | High | Real-time | Free |
+
+### Data Freshness Requirements
+
+```yaml
+freshness_requirements:
+  social_media: "last 24 hours"
+  github_activity: "last 7 days"
+  npm_downloads: "last 30 days"
+  market_trends: "last 90 days"
+  funding_data: "last 30 days"
+  job_postings: "last 14 days"
+```
+
+### Anomaly Detection Rules
+
+```python
+def detect_anomalies(data_series, threshold=2.0):
+    mean = np.mean(data_series)
+    std = np.std(data_series)
+    anomalies = [x for x in data_series if abs(x - mean) > threshold * std]
+    return anomalies
+```
+
+---
+
 *Remember: The best market research combines real-time data with historical context. Always validate across multiple sources before making strategic decisions.*

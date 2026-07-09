@@ -315,4 +315,106 @@ dashboard = agent.get_dashboard()
 
 ---
 
+## Method Signatures Reference
+
+### LeadScorer
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `score_lead(lead)` | `Lead` | `int` | Calculate lead score 0-100 |
+| `qualify_lead(lead)` | `Lead` | `Dict` | BANT qualification result |
+| `update_score(lead_id, factor, value)` | `str, str, float` | `None` | Adjust score by factor |
+| `get_score_breakdown(lead_id)` | `str` | `Dict` | Detailed score components |
+
+### PipelineManager
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `create_deal(lead_id, value, expected_close, products)` | `str, float, datetime, List[str]` | `Deal` | Create new deal |
+| `move_deal_stage(deal_id, stage)` | `str, DealStage` | `Deal` | Advance deal stage |
+| `get_pipeline_value()` | `None` | `float` | Weighted pipeline total |
+| `get_deals_by_stage()` | `None` | `Dict[DealStage, List[Deal]]` | Group deals by stage |
+| `forecast_revenue(periods)` | `int` | `List[Dict]` | Revenue forecast |
+
+### OutreachManager
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `add_template(name, subject, body, trigger)` | `str, str, str, str` | `None` | Create template |
+| `personalize_template(template_name, lead)` | `str, Lead` | `Dict` | Personalize for lead |
+| `schedule_outreach(lead_id, template_name, time)` | `str, str, datetime` | `None` | Schedule send |
+| `track_interaction(lead_id, type, details)` | `str, str, Dict` | `None` | Log interaction |
+
+### SalesAnalytics
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `calculate_metrics()` | `None` | `SalesMetrics` | Full metrics snapshot |
+| `analyze_conversion_rates()` | `None` | `Dict` | Stage-by-stage conversion |
+| `identify_top_performers()` | `None` | `List[Dict]` | Top deals and leads |
+| `generate_report()` | `None` | `Dict` | Comprehensive report |
+
+## Advanced Patterns
+
+### Deal Scoring
+
+```python
+def calculate_deal_score(deal, lead_score):
+    """Weighted deal score combining lead quality and deal metrics."""
+    weights = {
+        'lead_score': 0.3,
+        'deal_value': 0.25,
+        'timeline_urgency': 0.2,
+        'engagement_level': 0.15,
+        'champion_strength': 0.1
+    }
+
+    scores = {
+        'lead_score': lead_score / 100,
+        'deal_value': min(deal.value / 100000, 1.0),
+        'timeline_urgency': _urgency_score(deal.expected_close),
+        'engagement_level': _engagement_score(deal.lead_id),
+        'champion_strength': _champion_score(deal)
+    }
+
+    return sum(scores[k] * weights[k] for k in weights) * 100
+```
+
+### Pipeline Velocity
+
+```python
+def calculate_pipeline_velocity(pipeline_manager, period_days=30):
+    """Calculate pipeline velocity = (# deals * avg deal size * win rate) / sales cycle length."""
+    metrics = pipeline_manager.get_pipeline_value()
+    deals = pipeline_manager.get_all_deals()
+
+    avg_deal_size = sum(d.value for d in deals) / len(deals) if deals else 0
+    win_rate = len([d for d in deals if d.stage == DealStage.CLOSED_WON]) / len(deals) if deals else 0
+    avg_cycle = _calculate_avg_cycle(deals)
+
+    velocity = (len(deals) * avg_deal_size * win_rate) / avg_cycle if avg_cycle > 0 else 0
+    return velocity
+```
+
+### Revenue Forecasting
+
+```python
+def forecast_quarterly_revenue(pipeline, historical_data):
+    """Forecast using weighted pipeline + historical trends."""
+    weighted = pipeline.get_pipeline_value()
+    historical_growth = _calculate_growth_trend(historical_data)
+    seasonal_factor = _get_seasonal_factor(datetime.now().month)
+
+    forecast = weighted * (1 + historical_growth) * seasonal_factor
+
+    return {
+        'conservative': forecast * 0.7,
+        'optimistic': forecast * 1.3,
+        'expected': forecast,
+        'confidence': _calculate_confidence(historical_data)
+    }
+```
+
+---
+
 *Drive revenue with data, focus on quality, close with confidence.*

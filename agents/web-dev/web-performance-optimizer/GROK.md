@@ -365,4 +365,90 @@ class ImageOptimizer:
 
 ---
 
+## Method Signatures Reference
+
+### WebPerformanceAnalyzer
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `analyze_performance(url_or_build, analysis_type)` | `str, str` | `Dict` | Full performance audit |
+| `measure_core_web_vitals(url)` | `str` | `Dict` | LCP, FID, CLS metrics |
+| `compare_baselines(current, baseline)` | `Dict, Dict` | `Dict` | Regression detection |
+
+### PerformanceOptimizer
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `optimize_application(project_path, config)` | `str, Dict` | `Dict` | Multi-layer optimization |
+| `optimize_frontend(project_path, config)` | `str, Dict` | `List` | Frontend-specific |
+| `optimize_backend(project_path, config)` | `str, Dict` | `List` | Backend-specific |
+
+### RealTimePerformanceMonitor
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `monitor_application(config)` | `Dict` | `None` | Start monitoring |
+| `get_current_metrics()` | `None` | `Dict` | Live metrics snapshot |
+| `trigger_alert(metric, threshold)` | `str, float` | `Dict` | Manual alert |
+
+### BundleAnalyzer
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `analyze_bundle(build_path)` | `str` | `Dict` | Bundle composition |
+| `find_duplicates(chunks)` | `List` | `List` | Duplicate modules |
+| `suggest_code_splitting(chunks)` | `List` | `List` | Splitting points |
+
+### ImageOptimizer
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `optimize_images(paths, config)` | `List[str], Dict` | `List` | Optimize all images |
+| `convert_format(path, format)` | `str, str` | `str` | Single format conversion |
+| `generate_responsive(path, breakpoints)` | `str, List[int]` | `Dict` | Responsive variants |
+
+## Performance Budgets
+
+```yaml
+performance_budgets:
+  javascript:
+    total: "100KB compressed"
+    initial: "50KB compressed"
+    per_chunk: "30KB compressed"
+
+  css:
+    total: "50KB compressed"
+    critical: "10KB inlined"
+
+  images:
+    per_image: "200KB max"
+    total_page: "1MB max"
+    format: "webp or avif preferred"
+
+  fonts:
+    total: "100KB"
+    formats: "woff2 preferred"
+    loading: "font-display: swap"
+
+  network:
+    ttfb: "200ms max"
+    fcp: "1.8s max"
+    lcp: "2.5s max"
+    cls: "0.1 max"
+    fid: "100ms max"
+```
+
+## Physics-Based Optimization Rules
+
+| Principle | Application | Metric Impact |
+|-----------|-------------|---------------|
+| Minimize Mass | Reduce bundle size | Lower LCP |
+| Reduce Friction | Minimize render-blocking resources | Lower FCP |
+| Store Energy | Implement aggressive caching | Lower TTFB on repeat |
+| Parallel Forces | Use HTTP/2 multiplexing | Lower TTI |
+| Inertia Control | Lazy load non-critical resources | Lower CLS |
+| Thermal Management | Optimize image compression | Lower bandwidth |
+
+---
+
 *Optimize with physics principles: minimize energy (resources) for maximum velocity (user experience).*
