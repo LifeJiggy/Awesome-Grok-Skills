@@ -19,9 +19,14 @@ Strategic planning, competitive intelligence, OKR management, risk assessment, s
   - [Business Model Canvas](#business-model-canvas)
   - [Dashboard](#dashboard)
 - [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Configuration](#configuration)
 - [Examples](#examples)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [Files](#files)
 - [Contributing](#contributing)
@@ -30,6 +35,21 @@ Strategic planning, competitive intelligence, OKR management, risk assessment, s
 ## Overview
 
 The Strategy Agent provides a comprehensive strategic planning and business intelligence platform. It manages the full strategy lifecycle from market analysis and competitive intelligence through OKR tracking, risk management, and scenario planning.
+
+```
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│                         StrategyAgent (Facade)                                    │
+├──────────────┬──────────────┬──────────────┬──────────────┬───────────────────────┤
+│  Strategic   │    SWOT      │ Competitive  │    Risk      │    Scenario           │
+│  Planner     │   Analyzer   │  Analyzer    │   Manager    │    Planner            │
+├──────────────┼──────────────┼──────────────┼──────────────┼───────────────────────┤
+│ Objectives   │ TOWS Matrix  │ Battle Cards │ Risk Matrix  │ Best/Base/Worst Case  │
+│ Key Results  │ Scores       │ Market Share │ Mitigations  │ Weighted Impact       │
+│ Initiatives  │ Strategies   │ Talk Tracks  │ Risk Scores  │ Recommendations       │
+├──────────────┴──────────────┴──────────────┴──────────────┴───────────────────────┤
+│                          Market Analyzer | Business Model Canvas                  │
+└───────────────────────────────────────────────────────────────────────────────────┘
+```
 
 **Key Benefits:**
 - Unified strategic planning across multiple domains
@@ -53,7 +73,7 @@ The Strategy Agent provides a comprehensive strategic planning and business inte
 | **OKR Management** | Objectives with key results, progress tracking, timeline analysis | Stable |
 | **SWOT Analysis** | TOWS matrix strategy generation, comparative analysis | Stable |
 | **Competitive Intelligence** | Battle cards, market share tracking, talk tracks | Stable |
-| **Risk Management** | Probability × impact scoring, mitigation tracking, risk register | Stable |
+| **Risk Management** | Probability x impact scoring, mitigation tracking, risk register | Stable |
 | **Scenario Planning** | Best/base/worst case evaluation, weighted impact analysis | Stable |
 | **Market Analysis** | Segment sizing, opportunity scoring, phase analysis | Stable |
 | **Business Model Canvas** | 9-block BMC, value scoring, model comparison | Stable |
@@ -61,19 +81,29 @@ The Strategy Agent provides a comprehensive strategic planning and business inte
 
 ## Architecture
 
+### Component Interaction
+
 ```
-┌───────────────────────────────────────────────────────────────────────────────────┐
-│                         StrategyAgent (Facade)                                    │
-├──────────────┬──────────────┬──────────────┬──────────────┬───────────────────────┤
-│  Strategic   │    SWOT      │ Competitive  │    Risk      │    Scenario           │
-│  Planner     │   Analyzer   │  Analyzer    │   Manager    │    Planner            │
-├──────────────┼──────────────┼──────────────┼──────────────┼───────────────────────┤
-│ Objectives   │ TOWS Matrix  │ Battle Cards │ Risk Matrix  │ Best/Base/Worst Case  │
-│ Key Results  │ Scores       │ Market Share │ Mitigations  │ Weighted Impact       │
-│ Initiatives  │ Strategies   │ Talk Tracks  │ Risk Scores  │ Recommendations       │
-├──────────────┴──────────────┴──────────────┴──────────────┴───────────────────────┤
-│                          Market Analyzer │ Business Model Canvas                  │
-└───────────────────────────────────────────────────────────────────────────────────┘
+                    ┌─────────────────┐
+                    │  StrategyAgent  │
+                    │    (Facade)     │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │  Strategic   │ │    SWOT     │ │ Competitive  │
+    │  Planner     │ │  Analyzer   │ │  Analyzer    │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │    Risk      │ │  Scenario   │ │   Market     │
+    │   Manager    │ │   Planner   │ │  Analyzer    │
+    └──────────────┘ └─────────────┘ └──────────────┘
 ```
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for full technical details including data flow diagrams, design patterns, and scalability considerations.
@@ -373,6 +403,55 @@ dashboard = agent.get_strategy_dashboard()
 | `create_model(name, blocks)` | BusinessModel | Create BMC |
 | `compare_models(id1, id2)` | Dict | Compare models |
 
+## Data Models
+
+### StrategicObjective
+OKR with title, key results, progress, owner, and timeline.
+
+### SWOTAnalysis
+Strengths, weaknesses, opportunities, threats with TOWS strategies.
+
+### Competitor
+Competitor record with market share, strengths, weaknesses, and moves.
+
+### StrategicRisk
+Risk with probability, impact, mitigations, and level classification.
+
+### Scenario
+Scenario with assumptions, impacts, probability, and weighted evaluation.
+
+### MarketSegment
+Market segment with size, growth rate, phase, and trends.
+
+### BusinessModel
+BMC with 9 blocks and calculated value score.
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Facade** | Unified strategy interface | StrategyAgent |
+| **Strategy** | Multiple OKR scoring methods | StrategicPlanner |
+| **Observer** | Risk threshold alerts | RiskManager |
+| **Builder** | Construct BMC models | BusinessModelCanvas |
+| **Template Method** | SWOT analysis flow | SWOTAnalyzer |
+
+## Security
+
+- Strategic data access controls
+- Audit trail for all strategic decisions
+- Sensitive competitive intel protection
+- Role-based access for different operations
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Objectives | Indexed by priority + status | Fast filtered queries |
+| Risks | Indexed by level + category | Efficient triage |
+| Competitors | Indexed by market share | Landscape view |
+| Scenarios | Cached evaluation | Recompute on change |
+
 ## Configuration
 
 ```python
@@ -453,6 +532,28 @@ for objection, response in card['objection_handling'].items():
 9. **Document assumptions** - Especially for scenarios
 10. **Review and adjust quarterly** - Strategy is iterative
 
+## Checklists
+
+### OKR Setting
+- [ ] Objectives aligned with strategy
+- [ ] Key results measurable (numbers)
+- [ ] Owners assigned
+- [ ] Timeline realistic
+- [ ] Budget allocated (if needed)
+
+### SWOT Analysis
+- [ ] 3+ items per dimension
+- [ ] TOWS strategies generated
+- [ ] Action items created
+- [ ] Review schedule set
+
+### Risk Assessment
+- [ ] All categories covered
+- [ ] Probabilities realistic
+- [ ] Impacts quantified
+- [ ] Mitigations assigned
+- [ ] Review cadence established
+
 ## Troubleshooting
 
 | Problem | Solution |
@@ -499,4 +600,4 @@ MIT License - See [LICENSE](../../LICENSE) for details.
 
 ---
 
-*Strategy Agent v2.0 — Part of the Awesome Grok Skills collection.*
+*Strategy Agent v2.0 -- Part of the Awesome Grok Skills collection.*

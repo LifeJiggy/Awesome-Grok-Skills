@@ -1,6 +1,6 @@
 # Crisis Management Agent
 
-> Comprehensive crisis response — planning, communication, stakeholder management, recovery, and post-mortem.
+> Comprehensive crisis response -- planning, communication, stakeholder management, recovery, and post-mortem.
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -12,6 +12,7 @@
 
 - [Overview](#overview)
 - [Features](#features)
+- [Architecture](#architecture)
 - [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -25,9 +26,14 @@
   - [Plan Testing](#plan-testing)
   - [Dashboard](#dashboard)
 - [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Examples](#examples)
 - [Configuration](#configuration)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 - [License](#license)
@@ -37,6 +43,36 @@
 ## Overview
 
 The Crisis Management Agent is a comprehensive system for managing the full crisis lifecycle. It handles crisis response planning, communication strategy development, stakeholder management, recovery protocol design, and post-crisis analysis.
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    CRISIS MANAGEMENT AGENT                               │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
+│  │   Crisis     │  │ Communication│  │  Stakeholder │  │  Recovery  │  │
+│  │   Planner    │  │   Manager    │  │   Manager    │  │  Planner   │  │
+│  │              │  │              │  │              │  │            │  │
+│  │ • Plans      │  │ • 18 channels│  │ • Priority   │  │ • Milestones│ │
+│  │ • Scenarios  │  │ • Templates  │  │ • Notify     │  │ • RTO/RPO  │  │
+│  │ • Steps      │  │ • Approval   │  │ • Comms      │  │ • Phases   │  │
+│  │ • Contacts   │  │ • Tracking   │  │ • History    │  │ • Progress │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────────┐   │
+│  │  Post-Mortem │  │  Escalation  │  │       Dashboard              │   │
+│  │   Analyzer   │  │   Manager    │  │       Generator              │   │
+│  │              │  │              │  │                              │   │
+│  │ • Lessons    │  │ • L1-L4      │  │ • Active crises              │   │
+│  │ • Actions    │  │ • Auto-escal │  │ • By severity                │   │
+│  │ • Timeline   │  │ • Thresholds │  │ • Timeline                   │   │
+│  └──────────────┘  └──────────────┘  └──────────────────────────────┘   │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    Audit Trail (Immutable)                        │   │
+│  │  All operations logged with timestamps for compliance/forensics   │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 Built for communications teams, risk managers, executives, and incident response teams who need a structured, auditable approach to crisis management.
 
@@ -68,6 +104,45 @@ Built for communications teams, risk managers, executives, and incident response
 | Plan Testing | Gap analysis and recommendations |
 | Export | JSON, CSV, Markdown, PDF formats |
 | Audit Trail | Immutable operation logging |
+
+---
+
+## Architecture
+
+### Component Interaction
+
+```
+                    ┌─────────────────┐
+                    │   CrisisMgmt    │
+                    │     Agent       │
+                    │    (Facade)     │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │   Crisis     │ │Communication│ │  Stakeholder │
+    │   Planner    │ │   Manager   │ │   Manager    │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │  Recovery    │ │ Post-Mortem │ │  Escalation  │
+    │  Planner     │ │  Analyzer   │ │   Manager    │
+    └──────────────┘ └─────────────┘ └──────────────┘
+```
+
+### Crisis Lifecycle
+
+```
+Plan Creation ──▶ Crisis Detection ──▶ Activation ──▶ Response
+       │                                              │
+       ▼                                              ▼
+Plan Testing ◀──── Post-Mortem ◀──── Recovery ◀── Containment
+```
 
 ---
 
@@ -128,7 +203,10 @@ cd Awesome-Grok-Skills
 ### Crisis Plan Creation
 
 ```python
-from agents.crisis_management.agent import CrisisManagementAgent, CrisisType, CrisisSeverity, ComplianceRequirement
+from agents.crisis_management.agent import (
+    CrisisManagementAgent, CrisisType, CrisisSeverity,
+    ComplianceRequirement
+)
 
 agent = CrisisManagementAgent()
 
@@ -180,7 +258,9 @@ agent.update_crisis_status(crisis.crisis_id, IncidentStatus.CONTAINED)
 agent.update_crisis_status(crisis.crisis_id, IncidentStatus.RESOLVED)
 
 # Escalate if needed
-agent.escalate_crisis(crisis.crisis_id, EscalationLevel.L4_C_SUITE, "Critical breach")
+agent.escalate_crisis(
+    crisis.crisis_id, EscalationLevel.L4_C_SUITE, "Critical breach"
+)
 ```
 
 ### Communication Management
@@ -220,8 +300,14 @@ draft = agent.draft_communication(
 
 ```python
 # Add stakeholders
-agent.add_stakeholder(name="Jane Smith", role="CEO", priority=StakeholderPriority.P1_IMMEDIATE)
-agent.add_stakeholder(name="Legal Team", role="Legal", priority=StakeholderPriority.P2_URGENT)
+agent.add_stakeholder(
+    name="Jane Smith", role="CEO",
+    priority=StakeholderPriority.P1_IMMEDIATE
+)
+agent.add_stakeholder(
+    name="Legal Team", role="Legal",
+    priority=StakeholderPriority.P2_URGENT
+)
 
 # Get notification list
 notify_list = agent.get_notification_list(severity=CrisisSeverity.CRITICAL)
@@ -312,6 +398,60 @@ print(f"By severity: {dashboard['by_severity']}")
 
 ---
 
+## Data Models
+
+### CrisisEvent
+Core crisis record with status, severity, timeline, and associated plan.
+
+### CrisisPlan
+Scenario-based plan with steps, contacts, compliance requirements, and testing status.
+
+### CommunicationPlan
+Communication strategy with messages, channels, spokesperson, and approval workflow.
+
+### Stakeholder
+Contact with priority level, communication preferences, and notification rules.
+
+### RecoveryPlan
+Recovery milestones with RTO/RPO targets, phases, and progress tracking.
+
+### PostMortem
+Structured analysis with timeline, root cause, lessons learned, and action items.
+
+---
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **State Machine** | Crisis status lifecycle | CrisisEvent |
+| **Facade** | Unified crisis interface | CrisisManagementAgent |
+| **Observer** | Notify on status changes | EscalationManager |
+| **Template Method** | Communication templates | CommunicationManager |
+| **Chain of Responsibility** | Escalation rules | EscalationManager |
+| **Memento** | Immutable audit trail | AuditTrail |
+
+## Security
+
+- All operations logged with immutable audit trail
+- Stakeholder contact info access-controlled
+- Communication approval workflows for external messages
+- Crisis data encrypted at rest
+- Role-based access for different crisis operations
+- Backup and disaster recovery for crisis data
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Crisis Events | Indexed by status + severity | Fast filtered queries |
+| Communications | Partitioned by channel | Platform-specific handling |
+| Stakeholders | Indexed by priority | Quick notification lists |
+| Audit Trail | Append-only log | Immutable, chronological |
+| Plans | Versioned with snapshots | Rollback support |
+
+---
+
 ## Examples
 
 ### Example 1: Full Crisis Response
@@ -328,12 +468,19 @@ plan = agent.create_crisis_plan(
 )
 
 # Activate
-crisis = agent.activate_crisis(plan.plan_id, "S3 Bucket Breach", severity=CrisisSeverity.CRITICAL)
+crisis = agent.activate_crisis(
+    plan.plan_id, "S3 Bucket Breach",
+    severity=CrisisSeverity.CRITICAL
+)
 
 # Respond
 agent.update_crisis_status(crisis.crisis_id, IncidentStatus.ACKNOWLEDGED)
 agent.develop_communication_plan(crisis.crisis_id)
-agent.send_communication(crisis.crisis_id, MessageType.INITIAL_ALERT, CommunicationChannel.SLACK, AudienceType.INTERNAL_ALL_EMPLOYEES)
+agent.send_communication(
+    crisis.crisis_id, MessageType.INITIAL_ALERT,
+    CommunicationChannel.SLACK,
+    AudienceType.INTERNAL_ALL_EMPLOYEES
+)
 
 # Resolve
 agent.update_crisis_status(crisis.crisis_id, IncidentStatus.RESOLVED)
@@ -346,7 +493,9 @@ post_mortem = agent.generate_post_mortem(crisis.crisis_id)
 
 ```python
 # Notify by priority
-stakeholders = agent.get_notification_list(severity=CrisisSeverity.CRITICAL)
+stakeholders = agent.get_notification_list(
+    severity=CrisisSeverity.CRITICAL
+)
 for s in stakeholders:
     agent.send_communication(
         crisis_id=crisis.crisis_id,
@@ -369,7 +518,9 @@ for milestone in recovery.milestones:
 ## Configuration
 
 ```python
-from agents.crisis_management.agent import Config, CommunicationConfig, RecoveryConfig
+from agents.crisis_management.agent import (
+    Config, CommunicationConfig, RecoveryConfig
+)
 
 config = Config(
     agent_name="MyCrisisAgent",
@@ -394,35 +545,69 @@ agent = CrisisManagementAgent(config=config)
 
 ### Planning
 
-1. **Create plans for all scenario types** — don't wait for a crisis
-2. **Include compliance requirements** — GDPR, SOC2, HIPAA deadlines
-3. **Test plans regularly** — quarterly at minimum
-4. **Keep contacts updated** — people change roles
-5. **Document escalation paths** — who calls whom
+1. **Create plans for all scenario types** -- don't wait for a crisis
+2. **Include compliance requirements** -- GDPR, SOC2, HIPAA deadlines
+3. **Test plans regularly** -- quarterly at minimum
+4. **Keep contacts updated** -- people change roles
+5. **Document escalation paths** -- who calls whom
 
 ### Communication
 
-1. **Lead with empathy** — acknowledge impact first
-2. **No speculation** — only confirmed facts
-3. **Regular updates** — even without new information
-4. **Multi-channel** — appropriate channel for each audience
-5. **Approval for external** — legal/executive review required
+1. **Lead with empathy** -- acknowledge impact first
+2. **No speculation** -- only confirmed facts
+3. **Regular updates** -- even without new information
+4. **Multi-channel** -- appropriate channel for each audience
+5. **Approval for external** -- legal/executive review required
 
 ### Recovery
 
-1. **Set RTO/RPO targets** — know your recovery goals
-2. **Track milestones** — measure progress
-3. **Verify before declaring** — test all systems
-4. **Monitor post-recovery** — watch for recurrence
-5. **Communicate resolution** — notify all stakeholders
+1. **Set RTO/RPO targets** -- know your recovery goals
+2. **Track milestones** -- measure progress
+3. **Verify before declaring** -- test all systems
+4. **Monitor post-recovery** -- watch for recurrence
+5. **Communicate resolution** -- notify all stakeholders
 
 ### Post-Mortem
 
-1. **Schedule within 72 hours** — before memories fade
-2. **Blameless culture** — focus on systems, not people
-3. **Document lessons** — track to completion
-4. **Share widely** — organization-wide learning
-5. **Update plans** — incorporate findings
+1. **Schedule within 72 hours** -- before memories fade
+2. **Blameless culture** -- focus on systems, not people
+3. **Document lessons** -- track to completion
+4. **Share widely** -- organization-wide learning
+5. **Update plans** -- incorporate findings
+
+---
+
+## Checklists
+
+### Pre-Crisis
+
+- [ ] Crisis plans created for all scenarios
+- [ ] Contact lists current and verified
+- [ ] Communication templates approved
+- [ ] Escalation paths documented
+- [ ] Plan testing completed quarterly
+- [ ] Compliance requirements mapped
+- [ ] Recovery targets defined (RTO/RPO)
+
+### During Crisis
+
+- [ ] Crisis activated and status tracked
+- [ ] Incident commander assigned
+- [ ] Communication plan developed
+- [ ] Stakeholders notified by priority
+- [ ] Regular status updates sent
+- [ ] Compliance deadlines tracked
+- [ ] All actions logged in audit trail
+
+### Post-Crisis
+
+- [ ] All systems verified recovered
+- [ ] Stakeholders notified of resolution
+- [ ] Post-mortem scheduled within 72 hours
+- [ ] Lessons documented
+- [ ] Action items assigned with owners
+- [ ] Plans updated with findings
+- [ ] Audit trail exported and archived
 
 ---
 
@@ -453,6 +638,6 @@ MIT License - see [LICENSE](../../LICENSE).
 
 ---
 
-*Crisis Management Agent v3.0.0 — Part of the Awesome Grok Skills collection.*
+*Crisis Management Agent v3.0.0 -- Part of the Awesome Grok Skills collection.*
 
 *Last updated: 2026-07-06*

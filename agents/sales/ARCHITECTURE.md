@@ -1,4 +1,4 @@
-# Sales Agent — System Architecture
+# Sales Agent -- System Architecture
 
 ## 1. Executive Summary
 
@@ -63,7 +63,7 @@ Lead scoring and qualification using weighted criteria.
 
 **Scoring Formula:**
 ```
-Lead Score = Σ (criterion_score × weight)
+Lead Score = Sum(criterion_score x weight)
 
 Weights:
   company_size:  0.15
@@ -79,16 +79,16 @@ Total = 1.00
 
 **Qualification Matrix (BANT):**
 ```
-┌───────────┬──────────────────────────────────────────────┐
-│ Criterion │ Qualification Logic                          │
-├───────────┼──────────────────────────────────────────────┤
-│ Budget    │ Has budget indicator in contact info         │
-│ Authority │ Title is CTO, VP, Director, or CEO          │
-│ Need      │ Has notes or "need" tag                     │
-│ Timeline  │ Has timeline in contact info                │
-├───────────┼──────────────────────────────────────────────┤
-│ Qualified │ Score >= 60 AND >= 3 BANT criteria met      │
-└───────────┴──────────────────────────────────────────────┘
++-----------+----------------------------------------------+
+| Criterion | Qualification Logic                          |
++-----------+----------------------------------------------+
+| Budget    | Has budget indicator in contact info         |
+| Authority | Title is CTO, VP, Director, or CEO          |
+| Need      | Has notes or "need" tag                     |
+| Timeline  | Has timeline in contact info                |
++-----------+----------------------------------------------+
+| Qualified | Score >= 60 AND >= 3 BANT criteria met      |
++-----------+----------------------------------------------+
 ```
 
 **Key Methods:**
@@ -112,25 +112,25 @@ Sales pipeline and deal lifecycle management.
 
 **Deal Stage Probabilities:**
 ```
-┌────────────────────┬─────────────┬──────────────────────────────────┐
-│ Stage              │ Probability │ Description                      │
-├────────────────────┼─────────────┼──────────────────────────────────┤
-│ DISCOVERY          │ 10%         │ Initial contact, exploring needs │
-│ QUALIFICATION      │ 20%         │ BANT criteria being evaluated    │
-│ NEEDS_ANALYSIS     │ 30%         │ Deep dive into requirements      │
-│ PROPOSAL           │ 40%         │ Proposal sent to prospect        │
-│ DEMO               │ 50%         │ Product demonstration            │
-│ PRICING            │ 60%         │ Pricing discussion               │
-│ CONTRACT           │ 75%         │ Contract in negotiation          │
-│ CLOSING            │ 90%         │ Final closing steps              │
-└────────────────────┴─────────────┴──────────────────────────────────┘
++--------------------+-------------+----------------------------------+
+| Stage              | Probability | Description                      |
++--------------------+-------------+----------------------------------+
+| DISCOVERY          | 10%         | Initial contact, exploring needs |
+| QUALIFICATION      | 20%         | BANT criteria being evaluated    |
+| NEEDS_ANALYSIS     | 30%         | Deep dive into requirements      |
+| PROPOSAL           | 40%         | Proposal sent to prospect        |
+| DEMO               | 50%         | Product demonstration            |
+| PRICING            | 60%         | Pricing discussion               |
+| CONTRACT           | 75%         | Contract in negotiation          |
+| CLOSING            | 90%         | Final closing steps              |
++--------------------+-------------+----------------------------------+
 ```
 
 **Pipeline Value Calculation:**
 ```
-Pipeline Value = Σ (deal_value × probability)
-Committed Value = Σ (deal_value) where stage >= CONTRACT
-Weighted Forecast = Σ (deal_value × probability × recency_factor)
+Pipeline Value = Sum(deal_value x probability)
+Committed Value = Sum(deal_value) where stage >= CONTRACT
+Weighted Forecast = Sum(deal_value x probability x recency_factor)
 ```
 
 **Key Methods:**
@@ -158,9 +158,9 @@ Sales outreach and communication management.
 **Template Personalization:**
 ```
 Placeholders:
-  {{name}}     → Lead's name
-  {{company}}  → Lead's company
-  {{title}}    → Lead's job title
+  {{name}}     -> Lead's name
+  {{company}}  -> Lead's company
+  {{title}}    -> Lead's job title
 
 Template Example:
   Subject: "Hi {{name}}, improve {{company}}'s security"
@@ -190,17 +190,17 @@ Sales performance analysis and reporting.
 
 **Key Metrics:**
 ```
-┌──────────────────────┬─────────────────────────────────────────┐
-│ Metric               │ Calculation                             │
-├──────────────────────┼─────────────────────────────────────────┤
-│ Win Rate             │ closed_won / total_closed               │
-│ Avg Deal Size        │ sum(closed_won_values) / count(won)     │
-│ Pipeline Value       │ sum(deal_value × probability)           │
-│ Revenue Forecast     │ pipeline_value × win_rate_factor        │
-│ Conversion Rate      │ deals_in_stage / total_deals            │
-│ Sales Cycle Length    │ avg(close_date - created_date)          │
-│ Lead-to-Close Rate   │ closed_won / total_leads                │
-└──────────────────────┴─────────────────────────────────────────┘
++----------------------+-----------------------------------------+
+| Metric               | Calculation                             |
++----------------------+-----------------------------------------+
+| Win Rate             | closed_won / total_closed               |
+| Avg Deal Size        | sum(closed_won_values) / count(won)     |
+| Pipeline Value       | sum(deal_value x probability)           |
+| Revenue Forecast     | pipeline_value x win_rate_factor        |
+| Conversion Rate      | deals_in_stage / total_deals            |
+| Sales Cycle Length    | avg(close_date - created_date)          |
+| Lead-to-Close Rate   | closed_won / total_leads                |
++----------------------+-----------------------------------------+
 ```
 
 **Key Methods:**
@@ -218,81 +218,80 @@ Sales performance analysis and reporting.
 ### 5.1 Lead-to-Deal Pipeline
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    LEAD-TO-DEAL PIPELINE                                  │
-│                                                                          │
-│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐          │
-│  │  New     │    │  Score   │    │ Qualify  │    │  Convert │          │
-│  │  Lead    │───▶│  Lead    │───▶│  Lead    │───▶│  to Deal │          │
-│  │          │    │          │    │          │    │          │          │
-│  │ • Name   │    │ • BANT   │    │ • Score  │    │ • Value  │          │
-│  │ • Email  │    │ • Score  │    │ • > 60   │    │ • Close  │          │
-│  │ • Source │    │ • Weight │    │ • 3/4    │    │   date   │          │
-│  └──────────┘    └──────────┘    └──────────┘    └────┬─────┘          │
-│                                                        │                │
-│                                                        ▼                │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                     DEAL STAGES                                  │   │
-│  │                                                                   │   │
-│  │  Discovery ──▶ Qualification ──▶ Needs Analysis ──▶ Proposal    │   │
-│  │     10%            20%              30%              40%         │   │
-│  │                                                                   │   │
-│  │  Demo ──▶ Pricing ──▶ Contract ──▶ Closing                      │   │
-│  │   50%       60%         75%          90%                         │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-│                              │                                           │
-│                              ▼                                           │
-│                    ┌──────────────────┐                                  │
-│                    │   CLOSED WON     │                                  │
-│                    │                  │                                  │
-│                    │ Revenue recorded │                                  │
-│                    │ Win rate updated │                                  │
-│                    └──────────────────┘                                  │
-└─────────────────────────────────────────────────────────────────────────┘
++-------------------------------------------------------------------------+
+|                    LEAD-TO-DEAL PIPELINE                                  |
+|                                                                          |
+|  +----------+    +----------+    +----------+    +----------+          |
+|  |  New     |    |  Score   |    | Qualify  |    |  Convert |          |
+|  |  Lead    |--->|  Lead    |--->|  Lead    |--->|  to Deal |          |
+|  |          |    |          |    |          |    |          |          |
+|  | * Name   |    | * BANT   |    | * Score  |    | * Value  |          |
+|  | * Email  |    | * Score  |    | * > 60   |    | * Close  |          |
+|  | * Source |    | * Weight |    | * 3/4    |    |   date   |          |
+|  +----------+    +----------+    +----------+    +----+-----+          |
+|                                                        |                |
+|                                                        v                |
+|  +------------------------------------------------------------------+  |
+|  |                     DEAL STAGES                                  |  |
+|  |                                                                   |  |
+|  |  Discovery --> Qualification --> Needs Analysis --> Proposal     |  |
+|  |     10%            20%              30%              40%         |  |
+|  |                                                                   |  |
+|  |  Demo --> Pricing --> Contract --> Closing                       |  |
+|  |   50%       60%         75%          90%                         |  |
+|  +------------------------------------------------------------------+  |
+|                              |                                           |
+|                              v                                           |
+|                    +------------------+                                  |
+|                    |   CLOSED WON     |                                  |
+|                    |                  |                                  |
+|                    | Revenue recorded |                                  |
+|                    | Win rate updated |                                  |
+|                    +------------------+                                  |
++-------------------------------------------------------------------------+
 ```
 
 ### 5.2 Outreach Flow
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    OUTREACH FLOW                                 │
-│                                                                  │
-│  ┌──────────┐    ┌──────────┐    ┌──────────┐                  │
-│  │ Template │    │ Personalize│   │ Schedule │                  │
-│  │ Created  │───▶│ for Lead  │───▶│ Outreach │                  │
-│  └──────────┘    └──────────┘    └────┬─────┘                  │
-│                                       │                          │
-│                                       ▼                          │
-│                              ┌──────────────┐                   │
-│                              │  Send/Track  │                   │
-│                              │              │                   │
-│                              │ • Email sent │                   │
-│                              │ • Opened     │                   │
-│                              │ • Clicked    │                   │
-│                              │ • Replied    │                   │
-│                              └──────────────┘                   │
-└─────────────────────────────────────────────────────────────────┘
++-------------------------------------------------------------------------+
+|                    OUTREACH FLOW                                         |
+|                                                                          |
+|  +----------+    +----------+    +----------+                           |
+|  | Template |    | Personalize|   | Schedule |                           |
+|  | Created  |--->| for Lead  |--->| Outreach |                           |
+|  +----------+    +----------+    +----+-----+                           |
+|                                       |                                  |
+|                                       v                                  |
+|                              +--------------+                           |
+|                              |  Send/Track  |                           |
+|                              |              |                           |
+|                              | * Email sent |                           |
+|                              | * Opened     |                           |
+|                              | * Clicked    |                           |
+|                              | * Replied    |                           |
+|                              +--------------+                           |
++-------------------------------------------------------------------------+
 ```
 
 ### 5.3 Revenue Forecast Flow
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                  REVENUE FORECAST FLOW                           │
-│                                                                  │
-│  Current Deals ──→ Stage Weighting ──→ Period Assignment         │
-│       │                  │                    │                  │
-│       ▼                  ▼                    ▼                  │
-│  Deal Values      × Probability      = Weighted Revenue         │
-│  Close Dates         by Stage         per Period                 │
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  Period 1 (Month 1)  │ $50K committed + $30K weighted  │   │
-│  │  Period 2 (Month 2)  │ $20K committed + $45K weighted  │   │
-│  │  Period 3 (Month 3)  │ $10K committed + $60K weighted  │   │
-│  │  ...                                                        │   │
-│  └──────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
++-------------------------------------------------------------------------+
+|                  REVENUE FORECAST FLOW                                   |
+|                                                                          |
+|  Current Deals --> Stage Weighting --> Period Assignment                 |
+|       |                  |                    |                          |
+|       v                  v                    v                          |
+|  Deal Values      x Probability      = Weighted Revenue                 |
+|  Close Dates         by Stage         per Period                         |
+|                                                                          |
+|  +--------------------------------------------------------------+      |
+|  |  Period 1 (Month 1)  | $50K committed + $30K weighted       |      |
+|  |  Period 2 (Month 2)  | $20K committed + $45K weighted       |      |
+|  |  Period 3 (Month 3)  | $10K committed + $60K weighted       |      |
+|  +--------------------------------------------------------------+      |
++-------------------------------------------------------------------------+
 ```
 
 ---
@@ -358,30 +357,29 @@ Sales performance analysis and reporting.
 ## 10. Integration Points
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    INTEGRATION ARCHITECTURE                       │
-│                                                                  │
-│  ┌──────────────┐         ┌──────────────┐                      │
-│  │  CRM System  │ ◀─────▶ │  Sales       │                      │
-│  │  (Salesforce,│  sync   │  Agent       │                      │
-│  │   HubSpot)   │         │              │                      │
-│  └──────────────┘         └──────────────┘                      │
-│         │                       │                                │
-│         │                       │                                │
-│  ┌──────────────┐         ┌──────────────┐                      │
-│  │  Email       │ ◀─────▶ │  Outreach    │                      │
-│  │  Platform    │  send   │  Manager     │                      │
-│  │  (SendGrid)  │         │              │                      │
-│  └──────────────┘         └──────────────┘                      │
-│         │                       │                                │
-│         │                       │                                │
-│  ┌──────────────┐         ┌──────────────┐                      │
-│  │  Calendar    │ ◀─────▶ │  Scheduling  │                      │
-│  │  (Google,    │  events │              │                      │
-│  │   Outlook)   │         │              │                      │
-│  └──────────────┘         └──────────────┘                      │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
++-------------------------------------------------------------------------+
+|                    INTEGRATION ARCHITECTURE                              |
+|                                                                          |
+|  +--------------+         +--------------+                              |
+|  |  CRM System  | <---> |  Sales       |                              |
+|  |  (Salesforce,|  sync |  Agent       |                              |
+|  |   HubSpot)   |        |              |                              |
+|  +--------------+        +--------------+                              |
+|         |                       |                                        |
+|         |                       |                                        |
+|  +--------------+         +--------------+                              |
+|  |  Email       | <---> |  Outreach    |                              |
+|  |  Platform    |  send |  Manager     |                              |
+|  |  (SendGrid)  |        |              |                              |
+|  +--------------+        +--------------+                              |
+|         |                       |                                        |
+|         |                       |                                        |
+|  +--------------+         +--------------+                              |
+|  |  Calendar    | <---> |  Scheduling  |                              |
+|  |  (Google,    |  events|              |                              |
+|  |   Outlook)   |        |              |                              |
+|  +--------------+        +--------------+                              |
++-------------------------------------------------------------------------+
 ```
 
 ---
@@ -391,30 +389,30 @@ Sales performance analysis and reporting.
 ### Core Entities
 
 ```
-┌─────────────────┐     ┌─────────────────┐
-│      Lead       │     │      Deal       │
-│                 │     │                 │
-│ • id            │     │ • id            │
-│ • name          │     │ • lead_id       │
-│ • email         │     │ • stage         │
-│ • company       │     │ • value         │
-│ • title         │     │ • probability   │
-│ • status        │     │ • expected_close│
-│ • source        │     │ • products      │
-│ • score         │     │ • requirements  │
-│ • tags          │     │ • competitors   │
-│ • notes         │     └─────────────────┘
-│ • contact_info  │
-└─────────────────┘     ┌─────────────────┐
-                        │  SalesMetrics   │
-┌─────────────────┐     │                 │
-│ OutreachTemplate│     │ • total_leads   │
-│                 │     │ • qualified     │
-│ • name          │     │ • pipeline_val  │
-│ • subject       │     │ • win_rate      │
-│ • body          │     │ • avg_deal_size │
-│ • trigger       │     │ • forecast      │
-└─────────────────┘     └─────────────────┘
++-----------------+     +-----------------+
+|      Lead       |     |      Deal       |
+|                 |     |                 |
+| * id            |     | * id            |
+| * name          |     | * lead_id       |
+| * email         |     | * stage         |
+| * company       |     | * value         |
+| * title         |     | * probability   |
+| * status        |     | * expected_close|
+| * source        |     | * products      |
+| * score         |     | * requirements  |
+| * tags          |     | * competitors   |
+| * notes         |     +-----------------+
+| * contact_info  |
++-----------------+     +-----------------+
+                        |  SalesMetrics   |
++-----------------+     |                 |
+| OutreachTemplate|     | * total_leads   |
+|                 |     | * qualified     |
+| * name          |     | * pipeline_val  |
+| * subject       |     | * win_rate      |
+| * body          |     | * avg_deal_size |
+| * trigger       |     | * forecast      |
++-----------------+     +-----------------+
 ```
 
 ---
@@ -436,7 +434,7 @@ Sales performance analysis and reporting.
 
 | Term | Definition |
 |------|-----------|
-| BANT | Budget, Authority, Need, Timeline — lead qualification framework |
+| BANT | Budget, Authority, Need, Timeline -- lead qualification framework |
 | Pipeline | Active deals in various stages of the sales process |
 | Win Rate | Percentage of deals that close successfully |
 | Deal Velocity | Speed at which deals move through the pipeline |

@@ -8,12 +8,26 @@
 
 - [Overview](#overview)
 - [Features](#features)
+- [Architecture](#architecture)
 - [Quick Start](#quick-start)
 - [Usage](#usage)
+  - [Carbon Tracking](#carbon-tracking)
+  - [Goal Management](#goal-management)
+  - [Initiative Management](#initiative-management)
+  - [Supply Chain](#supply-chain)
+  - [Circular Economy](#circular-economy)
+  - [Resource Tracking](#resource-tracking)
+  - [Compliance](#compliance)
+  - [Dashboard](#dashboard)
 - [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Examples](#examples)
 - [Configuration](#configuration)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
@@ -31,6 +45,30 @@ The Sustainability Agent provides a complete toolkit for organizational sustaina
 - **Circular Economy**: Product lifecycle and recyclability tracking
 - **Resource Usage**: Water, waste, and energy monitoring
 - **Compliance**: Regulatory framework tracking (GRI, SASB, CDP, TCFD, EU CSRD)
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                     SUSTAINABILITY AGENT                              │
+│                                                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────┐  │
+│  │   Carbon     │  │   Goal       │  │  Initiative  │  │ Supply │  │
+│  │  Calculator  │  │   Tracker    │  │   Manager    │  │ Chain  │  │
+│  │              │  │              │  │              │  │Manager │  │
+│  │ * Scope 1/2/3│  │ * Targets    │  │ * ROI calc   │  │*Tiers  │  │
+│  │ * Regional   │  │ * Progress   │  │ * Portfolio  │  │*Scores │  │
+│  │ * Activity   │  │ * Status     │  │ * Carbon     │  │*Audit  │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────┘  │
+│                                                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────┐  │
+│  │  Circular    │  │  Resource    │  │  Compliance  │  │  ESG   │  │
+│  │  Economy     │  │   Usage     │  │   Manager    │  │Reporter│  │
+│  │              │  │              │  │              │  │        │  │
+│  │ * Product    │  │ * Water      │  │ * GRI/SASB   │  │*Score  │  │
+│  │ * Recyclable │  │ * Waste      │  │ * CDP/TCFD   │  │*Rating │  │
+│  │ * Circularity│  │ * Energy     │  │ * EU CSRD    │  │*Report │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -72,6 +110,38 @@ The Sustainability Agent provides a complete toolkit for organizational sustaina
 - Recycled content tracking
 - Circularity scoring
 - End-of-life option tracking
+
+---
+
+## Architecture
+
+### Component Interaction
+
+```
+                    ┌─────────────────┐
+                    │ Sustainability  │
+                    │     Agent       │
+                    │    (Facade)     │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │   Carbon     │ │    Goal     │ │  Initiative  │
+    │  Calculator  │ │   Tracker   │ │   Manager    │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │   Supply     │ │  Circular   │ │  Resource    │
+    │   Chain      │ │   Economy   │ │   Usage      │
+    └──────────────┘ └─────────────┘ └──────────────┘
+```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for full details.
 
 ---
 
@@ -208,6 +278,20 @@ summary = agent.supply_chain.get_supply_chain_summary()
 print(f"Average score: {summary['average_sustainability_score']}")
 ```
 
+### Circular Economy
+
+```python
+product = agent.circular_economy.add_product(
+    "EcoWidget", "Electronics",
+    {"aluminum": 40, "plastic": 30, "glass": 30},
+    recyclable_pct=85, recycled_content_pct=25,
+    carbon_footprint=12.5
+)
+
+circularity = agent.circular_economy.calculate_circularity_score(product.product_id)
+print(f"Circularity: {circularity['circularity_score']}")
+```
+
 ### Dashboard
 
 ```python
@@ -261,6 +345,36 @@ print(f"Rating: {dashboard['esg_score']['rating']}")
 
 ---
 
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Facade** | Unified sustainability interface | SustainabilityAgent |
+| **Strategy** | Multiple emission calculation methods | CarbonCalculator |
+| **Observer** | Goal threshold alerts | GoalTracker |
+| **Builder** | Construct complex reports | ESGReporter |
+| **Template Method** | Compliance framework flows | ComplianceManager |
+
+## Security
+
+- Sensitive environmental data encrypted
+- Access controls on data modification
+- Audit trail for all sustainability operations
+- Role-based access for different operations
+- Third-party verification support
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Emissions | Time-series storage | Efficient trend analysis |
+| Goals | Indexed by status + priority | Fast filtered queries |
+| Suppliers | Indexed by tier + score | Portfolio view |
+| Resources | Partitioned by type | Water, waste, energy |
+| Compliance | Indexed by framework | Deadline tracking |
+
+---
+
 ## Examples
 
 ### Complete Workflow
@@ -277,7 +391,7 @@ agent = SustainabilityAgent()
 
 # 1. Track emissions
 agent.track_emission(SustainabilityCategory.ENERGY, CarbonScope.SCOPE_1,
-                     "Natural Gas", 3000, "m³", location="Factory")
+                     "Natural Gas", 3000, "m3", location="Factory")
 agent.track_emission(SustainabilityCategory.ENERGY, CarbonScope.SCOPE_2,
                      "Electricity", 50000, "kWh", location="Office")
 
@@ -360,7 +474,7 @@ agent.goals.create_goal(
 4. **Documentation**: Document data sources and methodologies
 
 ### Goal Setting
-1. **Science-Based**: Align with climate science (1.5°C pathway)
+1. **Science-Based**: Align with climate science (1.5C pathway)
 2. **Measurable**: Define clear, quantifiable targets
 3. **Time-Bound**: Set realistic but ambitious timelines
 4. **Accountable**: Assign ownership and responsibility
@@ -373,9 +487,32 @@ agent.goals.create_goal(
 
 ---
 
-## Troubleshooting
+## Checklists
 
-### Common Issues
+### Carbon Tracking
+- [ ] All emission sources identified
+- [ ] Emission factors validated
+- [ ] Scope boundaries defined
+- [ ] Data quality verified
+- [ ] Third-party verification completed
+
+### Goal Setting
+- [ ] Baseline established
+- [ ] Target science-based
+- [ ] Timeline realistic
+- [ ] Owner assigned
+- [ ] Milestones defined
+
+### Compliance
+- [ ] Frameworks identified
+- [ ] Requirements documented
+- [ ] Evidence collected
+- [ ] Deadlines tracked
+- [ ] Follow-up assigned
+
+---
+
+## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|

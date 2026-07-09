@@ -1,6 +1,6 @@
 # Data Sources for Market Research
 
-## 🌐 Real-Time Data Sources
+## Real-Time Data Sources
 
 ### X/Twitter API
 - **Endpoint**: `https://api.twitter.com/2/tweets/search/recent`
@@ -22,7 +22,7 @@
 - **Metrics**: Stars, forks, issues, commits, contributors
 - **Use Cases**: Technology adoption trends, project health assessment
 
-## 📊 Market Intelligence Platforms
+## Market Intelligence Platforms
 
 ### Google Trends
 - **Endpoint**: `https://trends.google.com/trends/api/`
@@ -39,7 +39,7 @@
 - **Indicators**: Funding rounds, company growth, market size
 - **Use Cases**: Market size estimation, competitive landscape
 
-## 🔍 Technical Trend Detection
+## Technical Trend Detection
 
 ### Stack Overflow Developer Survey
 - **Frequency**: Annual
@@ -56,9 +56,10 @@
 - **Indicators**: Language usage trends, project distribution
 - **Use Cases**: Technology trend forecasting
 
-## 🤖 AI-Powered Analysis Tools
+## AI-Powered Analysis Tools
 
 ### Sentiment Analysis
+
 ```javascript
 const sentimentProviders = {
   twitter: 'natural-language-understanding',
@@ -68,6 +69,7 @@ const sentimentProviders = {
 ```
 
 ### Topic Modeling
+
 ```python
 # Using GPT-based topic extraction
 def extract_topics(text_corpus):
@@ -77,14 +79,14 @@ def extract_topics(text_corpus):
             "role": "system",
             "content": "Extract key technology topics from this text corpus"
         }, {
-            "role": "user", 
+            "role": "user",
             "content": text_corpus
         }]
     )
     return topics.choices[0].message.content
 ```
 
-## 📈 Validation Metrics
+## Validation Metrics
 
 ### Market Demand Indicators
 - **Search Volume**: Google Trends, Keyword Planner
@@ -99,23 +101,28 @@ def extract_topics(text_corpus):
 - **Community Health**: Issue resolution time, contributor activity
 - **Documentation**: README completeness, API docs quality
 
-## 🛠️ Data Collection Scripts
+## Data Collection Scripts
 
 ### Twitter Trend Collector
+
 ```javascript
 async function collectTweets(query, maxResults = 100) {
-  const response = await fetch(`https://api.twitter.com/2/tweets/search/recent?query=${encodeURIComponent(query)}&max_results=${maxResults}`, {
-    headers: {
-      'Authorization': `Bearer ${process.env.TWITTER_BEARER_TOKEN}`
+  const response = await fetch(
+    `https://api.twitter.com/2/tweets/search/recent?query=${encodeURIComponent(query)}&max_results=${maxResults}`,
+    {
+      headers: {
+        'Authorization': `Bearer ${process.env.TWITTER_BEARER_TOKEN}`
+      }
     }
-  });
-  
+  );
+
   const data = await response.json();
   return analyzeSentiment(data.data);
 }
 ```
 
 ### Reddit Sentiment Monitor
+
 ```python
 import praw
 
@@ -125,39 +132,44 @@ def monitor_reddit_sentiment(subreddits, keywords, timeframe='week'):
         client_secret=os.getenv('REDDIT_CLIENT_SECRET'),
         user_agent='market-research-oracle'
     )
-    
+
     sentiment_data = {}
-    
+
     for subreddit in subreddits:
         for submission in reddit.subreddit(subreddit).top(time_filter=timeframe):
             if any(keyword in submission.title.lower() for keyword in keywords):
-                sentiment = analyze_sentiment(submission.title + " " + submission.selftext)
+                sentiment = analyze_sentiment(
+                    submission.title + " " + submission.selftext
+                )
                 sentiment_data[submission.id] = {
                     'title': submission.title,
                     'sentiment': sentiment,
                     'upvotes': submission.score,
                     'comments': submission.num_comments
                 }
-    
+
     return sentiment_data
 ```
 
 ### GitHub Growth Tracker
+
 ```javascript
 async function trackRepositoryGrowth(repoNames, period = '30d') {
   const growthData = {};
-  
+
   for (const repo of repoNames) {
     const [owner, name] = repo.split('/');
-    
+
     // Get current stats
-    const currentStats = await fetch(`https://api.github.com/repos/${owner}/${name}`)
-      .then(res => res.json());
-    
-    // Get historical data (requires GitHub API with token)
-    const history = await fetch(`https://api.github.com/repos/${owner}/${name}/stats/commit_activity`)
-      .then(res => res.json());
-    
+    const currentStats = await fetch(
+      `https://api.github.com/repos/${owner}/${name}`
+    ).then(res => res.json());
+
+    // Get historical data
+    const history = await fetch(
+      `https://api.github.com/repos/${owner}/${name}/stats/commit_activity`
+    ).then(res => res.json());
+
     growthData[repo] = {
       stars: currentStats.stargazers_count,
       forks: currentStats.forks_count,
@@ -165,14 +177,15 @@ async function trackRepositoryGrowth(repoNames, period = '30d') {
       health_score: calculateHealthScore(currentStats, history)
     };
   }
-  
+
   return growthData;
 }
 ```
 
-## 📊 Reporting Framework
+## Reporting Framework
 
 ### Market Validation Score
+
 ```javascript
 function calculateValidationScore(metrics) {
   const weights = {
@@ -183,7 +196,7 @@ function calculateValidationScore(metrics) {
     developer_interest: 0.1,
     market_size: 0.1
   };
-  
+
   return Object.entries(weights).reduce((score, [metric, weight]) => {
     return score + (metrics[metric] * weight);
   }, 0);
@@ -191,6 +204,7 @@ function calculateValidationScore(metrics) {
 ```
 
 ### Trend Prediction Model
+
 ```python
 def predict_trend_direction(historical_data, confidence_threshold=0.7):
     # Analyze multiple indicators
@@ -199,11 +213,11 @@ def predict_trend_direction(historical_data, confidence_threshold=0.7):
         'volatility': calculate_volatility(historical_data),
         'correlation': calculate_correlation_with_similar_tech(historical_data)
     }
-    
+
     # Machine learning model for prediction
     prediction = ml_model.predict(indicators)
     confidence = ml_model.predict_proba(indicators).max()
-    
+
     if confidence >= confidence_threshold:
         return {
             'direction': prediction,
@@ -218,35 +232,38 @@ def predict_trend_direction(historical_data, confidence_threshold=0.7):
         }
 ```
 
-## 🔄 Data Pipeline Architecture
+## Data Pipeline Architecture
 
 ### Real-time Processing
+
 ```
-Data Sources → Kafka → Spark Processing → ML Models → Dashboard
-     ↓             ↓           ↓            ↓           ↓
+Data Sources -> Kafka -> Spark Processing -> ML Models -> Dashboard
+     |             |           |            |           |
    Twitter    Reddit    GitHub     Sentiment   Metrics API
-    API         API        API      Analysis      
+    API         API        API      Analysis
 ```
 
 ### Batch Processing (Daily)
+
 ```
-Historical Data → Data Lake → Analytics → Reports → Stakeholders
+Historical Data -> Data Lake -> Analytics -> Reports -> Stakeholders
 ```
 
-## 🚨 Alert System
+## Alert System
 
 ### Market Opportunity Alerts
+
 ```javascript
 const alertConditions = {
   viral_trend: (data) => data.mentions_24h > data.average_mentions * 3,
-  technology_shift: (data) => data.technology_growth > 50, // 50% growth
+  technology_shift: (data) => data.technology_growth > 50,
   community_spike: (data) => data.new_contributors > 10,
-  funding_activity: (data) => data.recent_funding > 1000000 // $1M+
+  funding_activity: (data) => data.recent_funding > 1000000
 };
 
 function checkMarketAlerts(marketData) {
   const alerts = [];
-  
+
   for (const [condition, check] of Object.entries(alertConditions)) {
     if (check(marketData)) {
       alerts.push({
@@ -257,11 +274,11 @@ function checkMarketAlerts(marketData) {
       });
     }
   }
-  
+
   return alerts;
 }
 ```
 
 ---
 
-*Remember: The best market research combines real-time data with historical context. Always validate across multiple sources before making strategic decisions.* 📊
+*Remember: The best market research combines real-time data with historical context. Always validate across multiple sources before making strategic decisions.*

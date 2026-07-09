@@ -18,15 +18,44 @@ Comprehensive social media management platform with content scheduling, engageme
   - [Campaign Management](#campaign-management)
   - [Dashboard](#dashboard)
 - [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Configuration](#configuration)
 - [Examples](#examples)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
 ## Overview
 
 The Social Agent provides end-to-end social media management across multiple platforms. It handles content lifecycle from creation through scheduling and publishing, tracks engagement with sentiment analysis, analyzes audience demographics, manages influencer collaborations, and monitors brand reputation with crisis detection.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                       SOCIAL MEDIA AGENT                              │
+│                                                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────┐  │
+│  │   Content    │  │  Engagement  │  │   Audience   │  │ Social │  │
+│  │   Manager    │  │   Manager    │  │   Analyzer   │  │Analytics│ │
+│  │              │  │              │  │              │  │        │  │
+│  │ * Posts      │  │ * Tracking   │  │ * Demographics│ │ * KPIs │  │
+│  │ * Templates  │  │ * Sentiment  │  │ * Best times │  │*Reports│  │
+│  │ * Calendar   │  │ * Automations│  │ * Growth     │  │*Trends │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────┘  │
+│                                                                      │
+│  ┌──────────────┐  ┌──────────────┐                                  │
+│  │  Influencer  │  │ Reputation   │                                  │
+│  │   Manager    │  │   Monitor    │                                  │
+│  │              │  │              │                                  │
+│  │ * Discovery  │  │ * Keywords   │                                  │
+│  │ * Tiers      │  │ * Alerts     │                                  │
+│  │ * ROI        │  │ * Crisis     │                                  │
+│  └──────────────┘  └──────────────┘                                  │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 ## Features
 
@@ -44,14 +73,29 @@ The Social Agent provides end-to-end social media management across multiple pla
 
 ## Architecture
 
+### Component Interaction
+
 ```
-SocialAgent (Facade)
-├── ContentManager (Posts, Templates, Calendar, Platform Rules)
-├── EngagementManager (Tracking, Sentiment, Automations)
-├── AudienceAnalyzer (Demographics, Best Times, Growth)
-├── SocialAnalytics (KPIs, Reports, Top Posts)
-├── InfluencerManager (Discovery, Tiers, ROI)
-└── ReputationMonitor (Keywords, Alerts, Crisis Detection)
+                    ┌─────────────────┐
+                    │   SocialAgent   │
+                    │    (Facade)     │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │  Content     │ │ Engagement  │ │  Audience    │
+    │  Manager     │ │  Manager    │ │  Analyzer    │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │  Influencer  │ │ Reputation  │ │   Social     │
+    │  Manager     │ │  Monitor    │ │  Analytics   │
+    └──────────────┘ └─────────────┘ └──────────────┘
 ```
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for full details.
@@ -328,6 +372,50 @@ dashboard = agent.get_social_dashboard()
 | `get_reputation_score()` | Dict |
 | `get_recent_events(days?)` | List[ReputationEvent] |
 
+## Data Models
+
+### SocialPost
+Post record with platform, content, hashtags, and scheduling data.
+
+### Engagement
+Interaction record with type, user, sentiment, and timestamp.
+
+### AudienceInsight
+Platform audience data with demographics, growth, and activity patterns.
+
+### InfluencerProfile
+Influencer record with followers, engagement rate, niche, and collaboration history.
+
+### ReputationEvent
+Brand mention with sentiment, platform, and alert level.
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Facade** | Unified social interface | SocialAgent |
+| **Strategy** | Platform-specific formatting | ContentManager |
+| **Observer** | Engagement tracking | EngagementManager |
+| **Template Method** | Post creation per platform | ContentManager |
+| **State Machine** | Campaign lifecycle | CampaignManager |
+
+## Security
+
+- Social account credentials encrypted
+- Access controls on content modification
+- Audit trail for all posts and campaigns
+- Rate limiting on platform APIs
+- Content moderation before publishing
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Posts | Indexed by platform + date | Fast calendar queries |
+| Engagement | Time-series storage | Efficient trend analysis |
+| Audiences | Partitioned by platform | Platform-specific analytics |
+| Campaigns | Indexed by status | Active vs archived |
+
 ## Configuration
 
 ```python
@@ -362,6 +450,20 @@ See `main()` in `agent.py` for a complete working example demonstrating:
 5. **Schedule during peak hours** - Use audience analytics
 6. **Respond to negative sentiment quickly** - Prevent escalation
 7. **Review sentiment trends weekly** - Spot patterns early
+
+## Checklists
+
+### Content Creation
+- [ ] Platform-specific formatting applied
+- [ ] Hashtags relevant and within limits
+- [ ] Scheduled at optimal time
+- [ ] Brand voice consistent
+
+### Campaign Management
+- [ ] Multi-platform strategy defined
+- [ ] Budget allocated per platform
+- [ ] KPIs established
+- [ ] Content calendar populated
 
 ## Troubleshooting
 

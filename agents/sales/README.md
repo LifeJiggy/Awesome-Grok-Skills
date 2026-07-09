@@ -8,13 +8,22 @@
 
 - [Overview](#overview)
 - [Features](#features)
-- [Quick Start](#quick-start)
 - [Architecture](#architecture)
+- [Quick Start](#quick-start)
 - [Usage](#usage)
+  - [Lead Scoring](#lead-scoring)
+  - [Pipeline Management](#pipeline-management)
+  - [Outreach](#outreach)
+  - [Analytics](#analytics)
 - [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Examples](#examples)
 - [Configuration](#configuration)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
@@ -23,6 +32,27 @@
 ## Overview
 
 The Sales Agent is a comprehensive sales automation platform that provides lead scoring and qualification using the BANT framework, sales pipeline management with deal stage tracking, revenue forecasting by period, outreach template creation and personalization, sales performance analytics, conversion rate analysis, and comprehensive reporting. It is designed for sales teams, business development representatives, and revenue operations.
+
+```
++-------------------------------------------------------------------------+
+|                       SalesAgent (Orchestrator)                           |
++-------------------------------------------------------------------------+
+|                                                                          |
+|  +------------------+  +------------------+  +-------------------+      |
+|  |  LeadScorer       |  |  PipelineManager  |  | OutreachManager   |      |
+|  |                   |  |                  |  |                   |      |
+|  | * Score leads     |  | * Deal CRUD      |  | * Templates       |      |
+|  | * BANT qualify    |  | * Stage mgmt     |  | * Personalize     |      |
+|  | * Prioritize      |  | * Forecast       |  | * Schedule        |      |
+|  +------------------+  +------------------+  +-------------------+      |
+|                                                                          |
+|  +---------------------------------------------------------------+     |
+|  |                      SalesAnalytics                             |     |
+|  |                                                                |     |
+|  | * Metrics | * Conversion | * Reports | * Forecast              |     |
+|  +---------------------------------------------------------------+     |
++-------------------------------------------------------------------------+
+```
 
 ### Design Principles
 
@@ -45,6 +75,12 @@ The Sales Agent is a comprehensive sales automation platform that provides lead 
 | **Sales Analytics** | Win rate, avg deal size, conversion rates, pipeline metrics |
 | **Interaction Tracking** | Log emails, calls, meetings with leads |
 | **Sales Reporting** | Comprehensive dashboard and reports |
+
+---
+
+## Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system architecture including component deep dives, data flow diagrams, design patterns, and scalability considerations.
 
 ---
 
@@ -98,27 +134,6 @@ deal = agent.convert_to_deal(
 
 ---
 
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                       SalesAgent (Orchestrator)                   │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────┐  │
-│  │  LeadScorer       │  │  PipelineManager  │  │OutreachManager│  │
-│  └──────────────────┘  └──────────────────┘  └───────────────┘  │
-│                                                                   │
-│  ┌───────────────────────────────────────────────────────────┐   │
-│  │                   SalesAnalytics                           │   │
-│  └───────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system architecture.
-
----
-
 ## Usage
 
 ### Lead Scoring
@@ -137,7 +152,10 @@ qualification = scorer.qualify_lead(lead)
 from agents.sales.agent import PipelineManager, DealStage
 
 pipeline = PipelineManager()
-deal = pipeline.create_deal(lead_id="L001", value=50000, expected_close=datetime(2024, 6, 30))
+deal = pipeline.create_deal(
+    lead_id="L001", value=50000,
+    expected_close=datetime(2024, 6, 30)
+)
 pipeline.move_deal_stage(deal.id, DealStage.PROPOSAL)
 pipeline_value = pipeline.get_pipeline_value()
 forecast = pipeline.forecast_revenue(periods=6)
@@ -151,7 +169,10 @@ from agents.sales.agent import OutreachManager
 outreach = OutreachManager()
 outreach.add_template("intro", "Hi {{name}}", "Let's discuss {{company}}'s needs...")
 personalized = outreach.personalize_template("intro", lead)
-outreach.schedule_outreach("L001", "intro", datetime.now() + timedelta(hours=1))
+outreach.schedule_outreach(
+    "L001", "intro",
+    datetime.now() + timedelta(hours=1)
+)
 ```
 
 ### Analytics
@@ -183,6 +204,52 @@ report = analytics.generate_report()
 | `LeadStatus` | NEW, CONTACTED, QUALIFIED, PROPOSAL, NEGOTIATION, CLOSED_WON, CLOSED_LOST |
 | `LeadSource` | WEBSITE, REFERRAL, COLD_OUTREACH, SOCIAL_MEDIA, EVENT, PAID_ADS, ORGANIC |
 | `DealStage` | DISCOVERY, QUALIFICATION, NEEDS_ANALYSIS, PROPOSAL, DEMO, PRICING, CONTRACT, CLOSING |
+
+---
+
+## Data Models
+
+### Lead
+Contact record with scoring, qualification status, and interaction history.
+
+### Deal
+Opportunity with stage, value, probability, and forecast data.
+
+### SalesMetrics
+Aggregated sales performance metrics including win rate and pipeline value.
+
+### OutreachTemplate
+Reusable email template with personalization placeholders.
+
+---
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Strategy** | Multiple scoring algorithms | LeadScorer |
+| **State Machine** | Deal stage lifecycle | PipelineManager |
+| **Template Method** | Email personalization | OutreachManager |
+| **Facade** | Unified sales interface | SalesAgent |
+| **Observer** | Interaction tracking | OutreachManager |
+
+## Security
+
+- Lead PII handled with care
+- Access controls on deal modifications
+- Audit trail for all sales operations
+- Template sanitization before personalization
+- Role-based access for different sales operations
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Leads | Indexed by status + score | Fast filtered queries |
+| Deals | Indexed by stage + value | Pipeline view |
+| Templates | Cached by trigger | Fast lookup |
+| Analytics | Pre-aggregated | Dashboard speed |
+| Forecasts | Cached with invalidation | Recompute on change |
 
 ---
 
@@ -262,28 +329,44 @@ The agent uses sensible defaults. Key configurable parameters:
 ## Best Practices
 
 ### Lead Management
-1. Score every lead on entry — never skip qualification
+1. Score every lead on entry -- never skip qualification
 2. Focus on leads with score >= 60 and 3+ BANT criteria
 3. Follow up within 24 hours of qualification
 4. Enrich contact info to improve scoring accuracy
 
 ### Pipeline Management
-1. Update deal stages weekly — stale deals kill forecasts
+1. Update deal stages weekly -- stale deals kill forecasts
 2. Use probability overrides for high-confidence deals
 3. Review pipeline coverage (3x target) monthly
 4. Document competitor presence for win/loss analysis
 
 ### Outreach
-1. Personalize every email — never send generic blasts
+1. Personalize every email -- never send generic blasts
 2. A/B test subject lines and body content
 3. Track all interactions for context
 4. Follow up consistently but not excessively
 
 ### Analytics
-1. Review win rate monthly — declining rates signal issues
+1. Review win rate monthly -- declining rates signal issues
 2. Analyze conversion rates by stage to find bottlenecks
 3. Track average deal size trends
 4. Compare forecast vs. actual to improve accuracy
+
+---
+
+## Checklists
+
+### Lead Qualification
+- [ ] Score >= 60
+- [ ] 3+ BANT criteria met
+- [ ] Contact info complete
+- [ ] Follow-up scheduled
+
+### Pipeline Management
+- [ ] Deal stages updated weekly
+- [ ] Pipeline coverage >= 3x
+- [ ] Competitor info documented
+- [ ] Forecast reviewed monthly
 
 ---
 
@@ -306,13 +389,13 @@ The agent uses sensible defaults. Key configurable parameters:
 | `agent.py` | Full implementation (all classes and logic) |
 | `GROK.md` | Agent identity, capabilities, and code examples |
 | `ARCHITECTURE.md` | System architecture with diagrams |
-| `README.md` | This file — overview and quick start |
+| `README.md` | This file -- overview and quick start |
 
 ---
 
 ## License
 
-MIT License — see [LICENSE](../../LICENSE) for details.
+MIT License -- see [LICENSE](../../LICENSE) for details.
 
 ---
 

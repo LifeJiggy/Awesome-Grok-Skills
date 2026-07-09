@@ -18,15 +18,44 @@ Customer support operations platform with ticket management, knowledge bases, SL
   - [Analytics and Reporting](#analytics-and-reporting)
   - [Dashboard](#dashboard)
 - [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Configuration](#configuration)
 - [Examples](#examples)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
 ## Overview
 
 The Support Agent provides end-to-end customer support operations. It manages tickets from intake through resolution, maintains a searchable knowledge base, generates automated and templated responses, enforces SLA policies, handles multi-level escalation, and produces comprehensive analytics.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                       SUPPORT AGENT                                   │
+│                                                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────┐  │
+│  │   Ticket     │  │  Knowledge   │  │  Response    │  │  SLA   │  │
+│  │   Manager    │  │    Base      │  │   Engine     │  │ Tracker│  │
+│  │              │  │              │  │              │  │        │  │
+│  │ * CRUD       │  │ * Articles   │  │ * Auto       │  │ *Per-pr│  │
+│  │ * Status     │  │ * Search     │  │ * Template   │  │ *Per-tier│
+│  │ * History    │  │ * Voting     │  │ * KB match   │  │ *Alerts│  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────┘  │
+│                                                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
+│  │  Escalation  │  │  Customer    │  │   Support    │              │
+│  │   Manager    │  │   Manager    │  │  Analytics   │              │
+│  │              │  │              │  │              │              │
+│  │ * L1-L4      │  │ * Profiles   │  │ * Metrics    │              │
+│  │ * Rules      │  │ * Tiers      │  │ * Reports    │              │
+│  │ * Ack        │  │ * CSAT/NPS   │  │ * FCR rate   │              │
+│  └──────────────┘  └──────────────┘  └──────────────┘              │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 ## Features
 
@@ -43,14 +72,29 @@ The Support Agent provides end-to-end customer support operations. It manages ti
 
 ## Architecture
 
+### Component Interaction
+
 ```
-SupportAgent (Facade)
-├── TicketManager (CRUD, SLA, Status Flow, History)
-├── KnowledgeBase (Articles, Search Index, Voting)
-├── ResponseEngine (Auto, Template, KB Match, Escalation)
-├── EscalationManager (Rules, Levels, Acknowledgment)
-├── CustomerManager (Profiles, Tiers, Satisfaction)
-└── SupportAnalytics (Metrics, Reports, Recommendations)
+                    ┌─────────────────┐
+                    │  SupportAgent   │
+                    │    (Facade)     │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │   Ticket     │ │ Knowledge   │ │  Response    │
+    │   Manager    │ │    Base     │ │   Engine     │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │  Escalation  │ │  Customer   │ │   Support    │
+    │   Manager    │ │   Manager   │ │  Analytics   │
+    └──────────────┘ └─────────────┘ └──────────────┘
 ```
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for full details.
@@ -210,7 +254,7 @@ rule = em.check_escalation_rules(ticket)
 
 **Escalation levels:**
 ```
-L1 (Tier 1) → L2 (Tier 2) → L3 (Engineering) → Management
+L1 (Tier 1) -> L2 (Tier 2) -> L3 (Engineering) -> Management
 ```
 
 ### Customer Management
@@ -330,6 +374,51 @@ dashboard = agent.get_support_dashboard()
 | `calculate_metrics()` | SupportMetrics |
 | `generate_report(start_date?, end_date?)` | Dict |
 
+## Data Models
+
+### Ticket
+Support ticket with subject, description, category, priority, status, and message history.
+
+### KnowledgeArticle
+Searchable article with title, content, tags, helpfulness score, and view count.
+
+### Customer
+Customer profile with name, email, company, tier, and satisfaction history.
+
+### Escalation
+Escalation record with levels, reason, acknowledgment, and resolution status.
+
+### SupportMetrics
+Aggregated support metrics including response times, CSAT, and FCR rate.
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Facade** | Unified support interface | SupportAgent |
+| **State Machine** | Ticket status lifecycle | TicketManager |
+| **Strategy** | Multiple response types | ResponseEngine |
+| **Observer** | SLA threshold alerts | TicketManager |
+| **Chain of Responsibility** | Escalation rules | EscalationManager |
+
+## Security
+
+- Customer PII encrypted at rest
+- Access controls on ticket modifications
+- Audit trail for all support operations
+- Role-based access for different support tiers
+- Sensitive ticket data protection
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Tickets | Indexed by status + priority | Fast triage |
+| Knowledge Base | Full-text indexed | Efficient search |
+| Customers | Indexed by email + tier | Fast lookup |
+| Escalations | Indexed by status | Active vs resolved |
+| Analytics | Pre-aggregated | Dashboard speed |
+
 ## Configuration
 
 ```python
@@ -373,6 +462,27 @@ See `main()` in `agent.py` for a complete working example demonstrating:
 5. **Review escalations** - Recurring escalations indicate training gaps
 6. **Update KB regularly** - Outdated articles erode trust
 7. **Close resolved tickets** - Open-but-resolved skews metrics
+
+## Checklists
+
+### Ticket Handling
+- [ ] Category correctly assigned
+- [ ] Priority set appropriately
+- [ ] SLA tracking active
+- [ ] Response within SLA window
+- [ ] Resolution documented
+
+### Knowledge Base
+- [ ] Article has clear title
+- [ ] Steps are actionable
+- [ ] Tags are relevant
+- [ ] Reviewed by team lead
+
+### Escalation
+- [ ] Reason documented
+- [ ] Correct level selected
+- [ ] Acknowledged by recipient
+- [ ] Resolution tracked
 
 ## Troubleshooting
 

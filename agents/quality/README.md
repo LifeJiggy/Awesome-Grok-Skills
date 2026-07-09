@@ -8,13 +8,26 @@
 
 - [Overview](#overview)
 - [Features](#features)
-- [Quick Start](#quick-start)
 - [Architecture](#architecture)
+- [Quick Start](#quick-start)
 - [Usage](#usage)
+  - [Test Planning](#test-planning)
+  - [Test Case Design](#test-case-design)
+  - [Test Execution](#test-execution)
+  - [Defect Management](#defect-management)
+  - [SPC Analysis](#spc-analysis)
+  - [Six Sigma DMAIC](#six-sigma-dmaic)
+  - [Root Cause Analysis](#root-cause-analysis)
+  - [Quality Gates](#quality-gates)
 - [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Examples](#examples)
 - [Configuration](#configuration)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
@@ -23,6 +36,41 @@
 ## Overview
 
 The Quality Assurance Agent is a comprehensive QA platform that provides test planning, test case design, test execution, defect tracking, Statistical Process Control (SPC), Six Sigma DMAIC methodology, root cause analysis, quality gates, and risk management. It is designed for QA teams, development organizations, and anyone focused on software quality improvement.
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    QUALITY ASSURANCE AGENT                               │
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────┐  │
+│  │  TestPlanManager  │  │ TestCaseManager  │  │     TestRunner        │  │
+│  │                   │  │                  │  │                       │  │
+│  │ • Create/Activate │  │ • Design cases   │  │ • Execute tests       │  │
+│  │ • Entry/Exit      │  │ • Boundary anal  │  │ • Record results      │  │
+│  │ • Scope tracking  │  │ • Partitioning   │  │ • Retry mechanisms    │  │
+│  └──────────────────┘  └──────────────────┘  └───────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────┐  │
+│  │  DefectManager    │  │    SPCEngine     │  │   SixSigmaManager     │  │
+│  │                   │  │                  │  │                       │  │
+│  │ • Report defects  │  │ • Control limits │  │ • DMAIC projects      │  │
+│  │ • Lifecycle FSM   │  │ • W.E. rules     │  │ • Sigma calculation   │  │
+│  │ • Severity/Pri    │  │ • Capability     │  │ • Phase checklists    │  │
+│  └──────────────────┘  └──────────────────┘  └───────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────┐  │
+│  │RootCauseAnalyzer │  │ QualityGates     │  │    RiskManager        │  │
+│  │                   │  │                  │  │                       │  │
+│  │ • 5 Whys          │  │ • Gate criteria  │  │ • Risk assessment     │  │
+│  │ • Fishbone        │  │ • Pass/Fail      │  │ • P x I scoring       │  │
+│  │ • Pareto          │  │ • Tracking       │  │ • Mitigation          │  │
+│  └──────────────────┘  └──────────────────┘  └───────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │              QualityMetricsEngine                                  │   │
+│  │  Track, aggregate, and scorecard quality metrics                  │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 ### Design Principles
 
@@ -46,8 +94,39 @@ The Quality Assurance Agent is a comprehensive QA platform that provides test pl
 | **Six Sigma DMAIC** | Project management with phase checklists and sigma level calculation |
 | **Root Cause Analysis** | 5 Whys, Fishbone, Pareto analysis methods |
 | **Quality Gates** | Gate evaluation with pass/fail criteria tracking |
-| **Risk Management** | Risk assessment with probability × impact scoring |
+| **Risk Management** | Risk assessment with probability x impact scoring |
 | **Quality Metrics** | Track, aggregate, and scorecard quality metrics with threshold alerting |
+
+---
+
+## Architecture
+
+### Component Interaction
+
+```
+                    ┌─────────────────┐
+                    │   QualityAgent  │
+                    │  (Orchestrator) │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │ TestPlan     │ │ TestCase    │ │  TestRunner  │
+    │ Manager      │ │ Manager     │ │              │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │  Defect      │ │  SPC        │ │ SixSigma     │
+    │  Manager     │ │  Engine     │ │ Manager      │
+    └──────────────┘ └─────────────┘ └──────────────┘
+```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system architecture.
 
 ---
 
@@ -89,35 +168,6 @@ plan = mgr.create_plan(
 )
 mgr.activate_plan(plan.plan_id)
 ```
-
----
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Quality Agent (Orchestrator)                   │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────┐  │
-│  │ TestPlanManager   │  │ TestCaseManager   │  │  TestRunner   │  │
-│  └──────────────────┘  └──────────────────┘  └───────────────┘  │
-│                                                                   │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────┐  │
-│  │  DefectManager    │  │    SPCEngine      │  │  SixSigma     │  │
-│  └──────────────────┘  └──────────────────┘  └───────────────┘  │
-│                                                                   │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────┐  │
-│  │ RootCauseAnalyzer │  │QualityGates      │  │ RiskManager   │  │
-│  └──────────────────┘  └──────────────────┘  └───────────────┘  │
-│                                                                   │
-│  ┌───────────────────────────────────────────────────────────┐   │
-│  │              QualityMetricsEngine                          │   │
-│  └───────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system architecture.
 
 ---
 
@@ -190,7 +240,9 @@ spc = SPCEngine()
 for value in [10.2, 10.5, 10.1, 10.3, 15.2, 10.4]:
     spc.add_data_point("response_time", value)
 
-limits = spc.calculate_control_limits("response_time", SPCCalculationType.I_MR)
+limits = spc.calculate_control_limits(
+    "response_time", SPCCalculationType.I_MR
+)
 violations = spc.detect_out_of_control("response_time")
 capability = spc.capability_analysis("response_time", usl=12.0, lsl=8.0)
 ```
@@ -214,6 +266,44 @@ project = ss.create_project(
     target_sigma=4.5
 )
 sigma = ss.sigma_level(defects=100, opportunities=10000)
+```
+
+### Root Cause Analysis
+
+```python
+from agents.quality.agent import RootCauseAnalyzer, RootCauseMethod
+
+rca = RootCauseAnalyzer()
+
+# 5 Whys
+analysis = rca.five_whys(
+    problem="Login fails intermittently",
+    causes=[
+        "Session store timeout",
+        "Redis connection pool exhausted",
+        "High memory usage on Redis server",
+        "Memory leak in application",
+        "Unclosed database connections"
+    ]
+)
+
+# Pareto
+pareto = rca.pareto_analysis({
+    "UI bugs": 45,
+    "API errors": 30,
+    "Performance": 15,
+    "Security": 10,
+})
+```
+
+### Quality Gates
+
+```python
+from agents.quality.agent import QualityGatesManager, QualityGate
+
+qm = QualityGatesManager()
+result = qm.evaluate_gate(QualityGate.CODE_COVERAGE, 85.0)
+print(f"Status: {result.status.value}")
 ```
 
 ---
@@ -251,12 +341,65 @@ sigma = ss.sigma_level(defects=100, opportunities=10000)
 
 ---
 
+## Data Models
+
+### TestCase
+Test case definition with steps, expected results, and metadata.
+
+### TestPlan
+Test plan with scope, objectives, entry/exit criteria, and linked test cases.
+
+### Defect
+Defect record with severity, priority, status, steps to reproduce, and history.
+
+### SPCLimits
+Control chart limits (UCL, CL, LCL) with calculation metadata.
+
+### SixSigmaProject
+DMAIC project with phases, milestones, and sigma level tracking.
+
+---
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **State Machine** | Defect lifecycle transitions | DefectManager |
+| **Strategy** | Multiple SPC calculation methods | SPCEngine |
+| **Template Method** | DMAIC phase checklists | SixSigmaManager |
+| **Observer** | Quality metric threshold alerts | QualityMetricsEngine |
+| **Facade** | Unified QA interface | QualityAgent |
+| **Builder** | Construct complex test plans | TestPlanManager |
+
+## Security
+
+- Test data isolation between projects
+- Access controls on defect modifications
+- Audit trail for all quality operations
+- Sensitive test data encryption
+- Role-based access for different QA operations
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Test Cases | Indexed by type + priority | Fast filtered queries |
+| Defects | Indexed by severity + status | Efficient triage |
+| SPC Data | Time-series storage | Efficient trend analysis |
+| Metrics | Pre-aggregated on write | Dashboard speed |
+| DMAIC | Project-scoped isolation | Parallel projects |
+
+---
+
 ## Examples
 
 ### Complete QA Workflow
 
 ```python
-from agents.quality.agent import QualityAgent, TestType, TestPriority, DefectSeverity, DefectPriority
+from agents.quality.agent import (
+    QualityAgent, TestType, TestPriority,
+    DefectSeverity, DefectPriority
+)
 
 # Initialize
 agent = QualityAgent()
@@ -321,7 +464,9 @@ for i in range(50):
     spc.add_data_point("api_response_time", value)
 
 # Calculate limits
-limits = spc.calculate_control_limits("api_response_time", SPCCalculationType.I_MR)
+limits = spc.calculate_control_limits(
+    "api_response_time", SPCCalculationType.I_MR
+)
 print(f"Center Line: {limits.center_line}")
 print(f"UCL: {limits.upper_control_limit}")
 print(f"LCL: {limits.lower_control_limit}")
@@ -397,6 +542,38 @@ config = QualityConfig(
 
 ---
 
+## Checklists
+
+### Test Planning
+- [ ] Test objectives defined
+- [ ] Test scope agreed
+- [ ] Test environments identified
+- [ ] Test data requirements specified
+- [ ] Entry/exit criteria defined
+
+### Test Execution
+- [ ] Test environment ready
+- [ ] Test data loaded
+- [ ] Tests executed in order
+- [ ] Results recorded accurately
+- [ ] Failures investigated
+
+### Defect Management
+- [ ] Defects properly categorized
+- [ ] Steps to reproduce clear
+- [ ] Assignee designated
+- [ ] Priority/severity set
+- [ ] Linked to test cases
+
+### Quality Gates
+- [ ] All critical tests passing
+- [ ] Code coverage meets threshold
+- [ ] No critical security vulnerabilities
+- [ ] Performance benchmarks met
+- [ ] Quality gates passed
+
+---
+
 ## Troubleshooting
 
 | Issue | Solution |
@@ -404,7 +581,7 @@ config = QualityConfig(
 | Test execution fails with import error | Ensure `agents/quality/` is in your Python path |
 | SPC shows no violations | Verify control limits are calculated before detection |
 | Defect transition fails | Check the valid transition table for the current state |
-| Quality gate always passes | Review criteria — ensure they test real conditions |
+| Quality gate always passes | Review criteria -- ensure they test real conditions |
 | Sigma level returns 0 | Check that defects and opportunities are > 0 |
 | Test suite blocked | Verify all entry criteria are met |
 | Metrics show stale data | Ensure metrics are being tracked regularly |
@@ -418,13 +595,13 @@ config = QualityConfig(
 | `agent.py` | Full implementation (all classes and logic) |
 | `GROK.md` | Agent identity, capabilities, and code examples |
 | `ARCHITECTURE.md` | System architecture with diagrams |
-| `README.md` | This file — overview and quick start |
+| `README.md` | This file -- overview and quick start |
 
 ---
 
 ## License
 
-MIT License — see [LICENSE](../../LICENSE) for details.
+MIT License -- see [LICENSE](../../LICENSE) for details.
 
 ---
 

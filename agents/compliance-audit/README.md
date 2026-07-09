@@ -25,9 +25,13 @@ Comprehensive regulatory compliance assessment, audit management, policy enforce
   - [PolicyManager](#policymanager)
 - [Data Models](#data-models)
 - [Supported Frameworks](#supported-frameworks)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Configuration](#configuration)
 - [Examples](#examples)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 - [License](#license)
@@ -36,11 +40,42 @@ Comprehensive regulatory compliance assessment, audit management, policy enforce
 
 The Compliance Audit Agent is a Python-based system for managing the full compliance lifecycle from framework selection through assessment, audit execution, risk management, evidence collection, and remediation tracking. It supports multiple regulatory frameworks with built-in control libraries.
 
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    COMPLIANCE AUDIT AGENT                                │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
+│  │  Framework   │  │    Risk      │  │ Remediation  │  │  Evidence  │  │
+│  │   Manager    │  │  Assessment  │  │   Tracker    │  │  Manager   │  │
+│  │              │  │    Engine    │  │              │  │            │  │
+│  │ • SOC2       │  │ • Threat     │  │ • Findings   │  │ • Collect  │  │
+│  │ • GDPR       │  │ • Vuln       │  │ • Owners     │  │ • Verify   │  │
+│  │ • HIPAA      │  │ • Impact     │  │ • Deadlines  │  │ • Audit    │  │
+│  │ • PCI DSS    │  │ • Mitigation │  │ • Status     │  │ • Hash     │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────────┐   │
+│  │    Audit     │  │   Policy     │  │       Dashboard              │   │
+│  │   Manager    │  │   Manager    │  │       Generator              │   │
+│  │              │  │              │  │                              │   │
+│  │ • Scope      │  │ • Create     │  │ • Framework coverage         │   │
+│  │ • Team       │  │ • Approve    │  │ • Risk heatmap               │   │
+│  │ • Timeline   │  │ • Review     │  │ • Remediation status         │   │
+│  │ • Findings   │  │ • Enforce    │  │ • Evidence completeness      │   │
+│  └──────────────┘  └──────────────┘  └──────────────────────────────┘   │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    Data Layer                                     │   │
+│  │  Controls │ Frameworks │ Findings │ Evidence │ Policies │ Audits  │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
 **Key Capabilities:**
 - Multi-framework compliance assessment (SOC 2, GDPR, HIPAA, PCI DSS, ISO 27001)
 - Policy lifecycle management with review scheduling
 - Audit preparation and execution support
-- Risk assessment with likelihood × impact scoring
+- Risk assessment with likelihood x impact scoring
 - Evidence collection with integrity verification
 - Finding lifecycle tracking with remediation management
 - Unified compliance dashboard
@@ -62,23 +97,55 @@ The Compliance Audit Agent is a Python-based system for managing the full compli
 | Evidence Management | Collect, verify, and track audit evidence |
 | Remediation Tracking | Finding lifecycle with deadline management |
 | Dashboard | Unified compliance status across all dimensions |
+| Cross-Framework Mapping | Map controls between different frameworks |
+| Compliance Scoring | Weighted scoring with configurable thresholds |
+| Escalation Rules | Automatic escalation for overdue items |
 
 ## Architecture
 
+### Component Interaction
+
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                 Compliance Audit Agent                      │
-├─────────────────────────────────────────────────────────────┤
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐     │
-│  │Framework │ │   Risk   │ │Remediation│ │ Evidence │     │
-│  │ Manager  │ │Assessment│ │ Tracker   │ │ Manager  │     │
-│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘     │
-│       │            │            │            │             │
-│  ┌────┴─────┐ ┌────┴─────┐ ┌────┴─────┐ ┌────┴─────┐     │
-│  │  Audit   │ │ Policy   │ │ Finding  │ │Dashboard │     │
-│  │ Manager  │ │ Manager  │ │ Manager  │ │Generator │     │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘     │
-└─────────────────────────────────────────────────────────────┘
+                    ┌─────────────────┐
+                    │ ComplianceAudit │
+                    │     Agent       │
+                    │   (Facade)      │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │  Framework   │ │    Risk     │ │  Evidence    │
+    │   Manager    │ │  Assessment │ │   Manager    │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │ Control      │ │ Risk        │ │ Evidence     │
+    │ Library      │ │ Register    │ │ Store        │
+    └──────────────┘ └─────────────┘ └──────────────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │   Audit      │ │   Policy    │ │ Remediation  │
+    │   Manager    │ │   Manager   │ │   Tracker    │
+    └──────────────┘ └─────────────┘ └──────────────┘
+```
+
+### Data Flow
+
+```
+Framework Selection ──▶ Control Mapping ──▶ Assessment ──▶ Gap Analysis
+                                                          │
+Evidence Collection ◀─────────────────────────────────────┘
+       │
+       ▼
+Verification ──▶ Finding Creation ──▶ Remediation Plan ──▶ Tracking
+       │
+       ▼
+Dashboard Update ──▶ Reporting ──▶ Executive Summary
 ```
 
 ## Quick Start
@@ -177,7 +244,7 @@ risk = agent.record_risk(
     owner="Security Team",
 )
 
-# Risk score: 0.4 × 0.9 = 0.36 → MEDIUM
+# Risk score: 0.4 x 0.9 = 0.36 -> MEDIUM
 print(f"Risk level: {risk['risk_level']}")
 print(f"Risk score: {risk['risk_score']}")
 
@@ -261,59 +328,139 @@ print(f"Policies: {dashboard['policies']['total']}")
 | `record_risk()` | asset, threat, vulnerability, likelihood, impact, mitigation, owner | Risk dict |
 | `collect_evidence()` | name, evidence_type, description, control_ids, finding_ids, collected_by | Evidence dict |
 | `plan_remediation()` | finding_id, owner, deadline_days, plan | Finding dict |
-| `get_compliance_dashboard()` | — | Dashboard dict |
-| `list_frameworks()` | — | Frameworks dict |
-| `list_audits()` | — | List of audit dicts |
-| `get_status()` | — | Agent status dict |
+| `get_compliance_dashboard()` | -- | Dashboard dict |
+| `list_frameworks()` | -- | Frameworks dict |
+| `list_audits()` | -- | List of audit dicts |
+| `get_status()` | -- | Agent status dict |
 
 ### ComplianceFrameworkManager
 
-| Method | Parameters | Returns |
-|--------|-----------|---------|
-| `get_controls()` | framework | List of control dicts |
-| `get_control()` | framework, control_id | Control dict |
-| `map_controls()` | source_framework, target_framework | Mapping dict |
+```python
+class ComplianceFrameworkManager:
+    def get_controls(self, framework: str) -> List[Dict]:
+        """Get all controls for a framework."""
+
+    def get_control(self, framework: str, control_id: str) -> Dict:
+        """Get a specific control."""
+
+    def map_controls(self, source: str, target: str) -> Dict:
+        """Map controls between frameworks."""
+
+    def get_framework_summary(self, framework: str) -> Dict:
+        """Get framework summary with control counts."""
+```
 
 ### RiskAssessmentEngine
 
-| Method | Parameters | Returns |
-|--------|-----------|---------|
-| `assess_risk()` | asset, threat, vulnerability, likelihood, impact, existing_controls, mitigation_plan | Risk assessment |
-| `update_residual_risk()` | risk_id, new_residual, mitigation_notes | Updated risk |
-| `get_risk_register()` | level_filter | List of risks |
-| `risk_summary()` | — | Summary dict |
+```python
+class RiskAssessmentEngine:
+    def assess_risk(self, asset: str, threat: str, vulnerability: str,
+                    likelihood: float, impact: float,
+                    existing_controls: List[str] = None,
+                    mitigation_plan: str = "") -> Dict:
+        """Full risk assessment with scoring."""
+
+    def update_residual_risk(self, risk_id: str, new_residual: float,
+                            mitigation_notes: str = "") -> Dict:
+        """Update residual risk after controls."""
+
+    def get_risk_register(self, level_filter: str = None) -> List[Dict]:
+        """Get risk register, optionally filtered by level."""
+
+    def risk_summary(self) -> Dict:
+        """Summary of all risks by level."""
+
+    def get_top_risks(self, limit: int = 10) -> List[Dict]:
+        """Get highest-rated risks."""
+```
 
 ### RemediationTracker
 
-| Method | Parameters | Returns |
-|--------|-----------|---------|
-| `add_finding()` | finding | Finding ID |
-| `update_status()` | finding_id, new_status, notes, updated_by | Finding dict |
-| `assign_remediation()` | finding_id, owner, deadline_days, plan | Finding dict |
-| `get_overdue()` | — | List of overdue findings |
-| `get_progress_report()` | — | Progress dict |
+```python
+class RemediationTracker:
+    def add_finding(self, finding: Finding) -> str:
+        """Add a finding, return finding_id."""
+
+    def update_status(self, finding_id: str, new_status: FindingStatus,
+                     notes: str = "", updated_by: str = "") -> Dict:
+        """Update finding status."""
+
+    def assign_remediation(self, finding_id: str, owner: str,
+                          deadline_days: int, plan: str = "") -> Dict:
+        """Assign remediation with deadline."""
+
+    def get_overdue(self) -> List[Dict]:
+        """Get all overdue findings."""
+
+    def get_progress_report(self) -> Dict:
+        """Completion rate, overdue count, by severity."""
+```
 
 ### EvidenceManager
 
-| Method | Parameters | Returns |
-|--------|-----------|---------|
-| `collect()` | name, evidence_type, description, control_ids, finding_ids, collected_by | Evidence |
-| `verify()` | evidence_id, verified_by | Evidence dict |
-| `get_for_control()` | control_id | List of evidence |
-| `get_for_finding()` | finding_id | List of evidence |
+```python
+class EvidenceManager:
+    def collect(self, name: str, evidence_type: str, description: str,
+               control_ids: List[str] = None, finding_ids: List[str] = None,
+               collected_by: str = "") -> Dict:
+        """Collect evidence with integrity hash."""
+
+    def verify(self, evidence_id: str, verified_by: str) -> Dict:
+        """Verify evidence integrity."""
+
+    def get_for_control(self, control_id: str) -> List[Dict]:
+        """Get all evidence for a control."""
+
+    def get_for_finding(self, finding_id: str) -> List[Dict]:
+        """Get all evidence for a finding."""
+
+    def get_stats(self) -> Dict:
+        """Verification rates, by type, total count."""
+```
 
 ### PolicyManager
 
-| Method | Parameters | Returns |
-|--------|-----------|---------|
-| `create_policy()` | title, description, category, content, owner, frameworks | Policy |
-| `approve_policy()` | policy_id, approved_by | Policy dict |
-| `get_policies_due_for_review()` | — | List of policies |
+```python
+class PolicyManager:
+    def create_policy(self, title: str, description: str, category: str,
+                     content: str = "", owner: str = "",
+                     frameworks: List[str] = None) -> Dict:
+        """Create a new policy."""
+
+    def approve_policy(self, policy_id: str, approved_by: str) -> Dict:
+        """Approve a policy."""
+
+    def get_policies_due_for_review(self) -> List[Dict]:
+        """Get policies needing review."""
+
+    def archive_policy(self, policy_id: str) -> Dict:
+        """Archive an obsolete policy."""
+
+    def get_policy_status(self, policy_id: str) -> Dict:
+        """Get policy lifecycle status."""
+```
 
 ## Data Models
 
 ### Finding
 Audit finding with severity, remediation status, owner, and deadline.
+
+```python
+@dataclass
+class Finding:
+    finding_id: str
+    title: str
+    description: str
+    severity: Severity  # CRITICAL, HIGH, MEDIUM, LOW, INFO
+    framework: ComplianceFramework
+    control_ids: List[str]
+    status: FindingStatus = FindingStatus.OPEN
+    owner: str = ""
+    deadline: Optional[datetime] = None
+    remediation_plan: str = ""
+    created_at: datetime = field(default_factory=datetime.now)
+    updated_at: datetime = field(default_factory=datetime.now)
+```
 
 ### RiskAssessment
 Risk entry with threat, vulnerability, likelihood, impact, and mitigation plan.
@@ -329,13 +476,81 @@ Audit record with scope, team, findings, and compliance rate.
 
 ## Supported Frameworks
 
-| Framework | Controls | Focus |
+| Framework | Controls | Focus | Key Areas |
+|-----------|----------|-------|-----------|
+| SOC 2 | 16 | Trust Service Criteria | Security, Availability, Processing Integrity, Confidentiality, Privacy |
+| GDPR | 12 | Data Protection | Consent, Data Subject Rights, Breach Notification, DPO |
+| HIPAA | 11 | ePHI Safeguards | Administrative, Physical, Technical |
+| PCI DSS | 12 | Cardholder Data | Network Security, Access Control, Monitoring, Testing |
+| ISO 27001 | 14 domains | ISMS | Risk Management, Controls, Continual Improvement |
+| CCPA | 10 | Consumer Privacy | Right to Know, Delete, Opt-Out, Non-Discrimination |
+
+### Framework Mapping
+
+```
+SOC 2 CC6.1 ◀──▶ ISO 27001 A.9.1 ◀──▶ HIPAA §164.312(a)
+SOC 2 CC7.1 ◀──▶ ISO 27001 A.12.4 ◀──▶ PCI DSS 10.1
+SOC 2 CC3.1 ◀──▶ ISO 27001 A.8.2  ◀──▶ GDPR Art. 32
+```
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Facade** | Unified compliance interface | ComplianceAuditAgent |
+| **Strategy** | Different scoring algorithms per framework | ComplianceFrameworkManager |
+| **Observer** | Notify on status changes | RemediationTracker |
+| **Builder** | Construct complex audit objects | Audit Preparation |
+| **Chain of Responsibility** | Escalation rules processing | Escalation Engine |
+| **Decorator** | Add verification hashing to evidence | EvidenceManager |
+| **State Machine** | Finding lifecycle transitions | RemediationTracker |
+| **Template Method** | Framework-specific assessment flows | Assessment Engine |
+
+## Security
+
+- All evidence files hashed with SHA-256 for integrity verification
+- Access controls on policy approval workflows
+- Audit trail for all compliance actions
+- Sensitive data encryption at rest
+- Role-based access for different compliance operations
+- Regular access reviews and privilege audits
+- Evidence chain of custody tracking
+- Tamper-evident logging for all assessments
+
+```
+┌──────────────────────────────────────────────────┐
+│              Security Controls                    │
+├──────────────────────────────────────────────────┤
+│ Authentication ──▶ Authorization ──▶ Audit Log   │
+│       │                  │                │       │
+│  MFA Support      Role-Based        Immutable    │
+│  SSO Integration  Permission Set    Tamper-proof │
+│  API Keys         Resource Scope    Retention    │
+└──────────────────────────────────────────────────┘
+```
+
+## Scalability
+
+| Dimension | Strategy | Notes |
 |-----------|----------|-------|
-| SOC 2 | 16 | Trust Service Criteria |
-| GDPR | 12 | Data Protection |
-| HIPAA | 11 | ePHI Safeguards |
-| PCI DSS | 12 | Cardholder Data |
-| ISO 27001 | 14 domains | ISMS |
+| Control Library | Lazy loading by framework | Load only active frameworks |
+| Evidence Storage | File system with metadata DB | Hash-based deduplication |
+| Risk Register | Indexed by severity and owner | Fast filtered queries |
+| Audit History | Partitioned by year | Archive old audits |
+| Concurrent Assessments | Async processing | Multiple framework assessments |
+| Dashboard | Cached aggregation | Refresh on write |
+| Policy Versioning | Append-only history | Full audit trail |
+
+### Performance Targets
+
+| Operation | Target | Notes |
+|-----------|--------|-------|
+| Control lookup | < 1ms | Indexed by framework + ID |
+| Assessment scoring | < 50ms | Per-framework calculation |
+| Evidence verification | < 100ms | SHA-256 hash comparison |
+| Risk register query | < 20ms | Indexed filtering |
+| Dashboard generation | < 200ms | Cached aggregation |
+| Policy search | < 10ms | Full-text indexed |
 
 ## Configuration
 
@@ -425,38 +640,100 @@ dashboard = agent.get_compliance_dashboard()
 print(f"Compliance Status: {dashboard['overall_status']}")
 ```
 
+### Cross-Framework Mapping
+
+```python
+# Map SOC2 controls to ISO 27001
+mapping = agent._framework_manager.map_controls("SOC2", "ISO27001")
+
+for soc2_control, iso_control in mapping.items():
+    print(f"{soc2_control} -> {iso_control}")
+
+# Use mapping to avoid duplicate evidence
+evidence = agent.collect_evidence(
+    name="Access Control Evidence",
+    evidence_type="technical",
+    control_ids=["CC6.1", "A.9.1.1"],  # Both frameworks
+)
+```
+
 ## Best Practices
 
-1. **Assess Regularly** — Don't wait for audit season to check compliance
-2. **Risk-Based Prioritization** — Focus on critical and high risks first
-3. **Evidence in Advance** — Collect evidence continuously, not during audit crunch
-4. **Accountable Remediation** — Every finding needs an owner and a deadline
-5. **Policy Lifecycle** — Review and update policies on schedule
-6. **Continuous Monitoring** — Compliance is a process, not a point-in-time event
-7. **Cross-Framework Mapping** — Leverage control mappings to reduce duplication
-8. **Automation First** — Automate evidence collection and verification where possible
-9. **Regular Training** — Ensure all stakeholders understand compliance requirements
-10. **Document Everything** — Maintain comprehensive audit trails
+1. **Assess Regularly** -- Don't wait for audit season to check compliance
+2. **Risk-Based Prioritization** -- Focus on critical and high risks first
+3. **Evidence in Advance** -- Collect evidence continuously, not during audit crunch
+4. **Accountable Remediation** -- Every finding needs an owner and a deadline
+5. **Policy Lifecycle** -- Review and update policies on schedule
+6. **Continuous Monitoring** -- Compliance is a process, not a point-in-time event
+7. **Cross-Framework Mapping** -- Leverage control mappings to reduce duplication
+8. **Automation First** -- Automate evidence collection and verification where possible
+9. **Regular Training** -- Ensure all stakeholders understand compliance requirements
+10. **Document Everything** -- Maintain comprehensive audit trails
+
+## Checklists
+
+### Pre-Audit Readiness
+
+- [ ] All framework controls mapped and scored
+- [ ] Evidence collected for every in-scope control
+- [ ] Evidence integrity verified (SHA-256 hashes)
+- [ ] All high/critical findings remediated or have approved plans
+- [ ] Policies reviewed and approved within last 12 months
+- [ ] Risk register updated within last 90 days
+- [ ] Audit team assigned and briefed on scope
+- [ ] Systems inventory current and accurate
+- [ ] Previous audit findings closed
+- [ ] Stakeholder communication plan ready
+
+### Risk Assessment Checklist
+
+- [ ] All assets inventoried and classified
+- [ ] Threat landscape reviewed for each asset
+- [ ] Vulnerabilities identified through scanning/assessment
+- [ ] Likelihood scores assigned with justification
+- [ ] Impact scores assigned with business context
+- [ ] Existing controls documented
+- [ ] Residual risk calculated after controls
+- [ ] Mitigation plans created for high/critical risks
+- [ ] Risk owners assigned
+- [ ] Review schedule established
+
+### Evidence Collection Checklist
+
+- [ ] Evidence type classified (document, technical, interview)
+- [ ] Evidence linked to specific controls
+- [ ] Collection date and collector documented
+- [ ] Integrity hash generated (SHA-256)
+- [ ] Chain of custody maintained
+- [ ] Storage location secure and accessible
+- [ ] Retention period defined
+- [ ] Verification status recorded
+- [ ] Backup copies stored separately
+- [ ] Access permissions restricted
 
 ## Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
-| Low compliance score | Prioritize critical/high severity gaps |
-| Evidence not verifiable | Collect additional evidence, verify chain of custody |
-| Remediation overdue | Escalate to management, reassign resources |
-| Finding keeps reopening | Address root cause, not just symptoms |
-| Framework mismatch | Use cross-framework mapping |
-| Audit timeline slipping | Narrow scope, increase resources |
-| Risk assessments outdated | Schedule quarterly risk assessments |
-| Policy not enforced | Implement mandatory compliance training |
+| Problem | Diagnosis | Solution |
+|---------|-----------|----------|
+| Low compliance score | Missing controls or weak implementations | Prioritize critical/high severity gaps first |
+| Evidence not verifiable | Hash mismatch or corrupt file | Collect fresh evidence, verify chain of custody |
+| Remediation overdue | Resource constraints or unclear ownership | Escalate to management, reassign resources |
+| Finding keeps reopening | Root cause not addressed | Address root cause, not just symptoms |
+| Framework mismatch | Controls don't align between frameworks | Use cross-framework mapping to find equivalents |
+| Audit timeline slipping | Scope too broad or resources insufficient | Narrow scope, increase resources, negotiate timeline |
+| Risk assessments outdated | No scheduled review process | Schedule quarterly risk assessments with reminders |
+| Policy not enforced | No training or monitoring | Implement mandatory compliance training program |
+| Dashboard shows stale data | Cache not refreshed | Clear cache, verify data pipeline |
+| Control library incomplete | Framework update not applied | Update control library to latest version |
+| Escalation not firing | Threshold not configured | Review escalation rules and thresholds |
+| Finding severity incorrect | Misclassification | Reassess using CVSS or custom severity matrix |
 
 ## Files
 
-- `agent.py` — Main implementation (~900 lines)
-- `ARCHITECTURE.md` — System architecture with diagrams
-- `GROK.md` — Agent instructions and identity
-- `README.md` — This file
+- `agent.py` -- Main implementation (~900 lines)
+- `ARCHITECTURE.md` -- System architecture with diagrams
+- `GROK.md` -- Agent instructions and identity
+- `README.md` -- This file
 
 ## Contributing
 
@@ -464,7 +741,8 @@ print(f"Compliance Status: {dashboard['overall_status']}")
 2. Enhance risk scoring algorithms
 3. Add integration with GRC platforms
 4. Improve evidence management workflows
-5. Update documentation for API changes
+5. Add automated control testing capabilities
+6. Update documentation for API changes
 
 ## License
 

@@ -6,29 +6,31 @@ time_estimate: "4-6 hours"
 dependencies: ["web-performance", "caching", "optimization", "monitoring"]
 tags: ["performance", "optimization", "web-dev", "frontend", "backend"]
 grok_personality: "speed-optimizer"
-description: "Comprehensive web performance optimization agent that analyzes and improves website speed using Grok's efficiency-first approach"
+description: "Comprehensive web performance optimization agent that analyzes and improves website speed using efficiency-first approach"
 ---
 
 # Web Performance Optimization Agent
 
 ## Overview
-Grok, you'll optimize web application performance using physics-inspired principles of efficiency and resource optimization. This agent combines frontend and backend optimization techniques to achieve maximum speed with minimal resource usage.
+
+This agent optimizes web application performance using physics-inspired principles of efficiency and resource optimization. It combines frontend and backend optimization techniques to achieve maximum speed with minimal resource usage.
 
 ## Performance Analysis Framework
 
 ### 1. Performance Metrics
+
 ```yaml
 key_metrics:
   core_web_vitals:
     - lcp: "Largest Contentful Paint < 2.5s"
     - fid: "First Input Delay < 100ms"
     - cls: "Cumulative Layout Shift < 0.1"
-  
+
   network_performance:
     - ttfb: "Time to First Byte < 200ms"
     - fcp: "First Contentful Paint < 1.8s"
     - tti: "Time to Interactive < 3.8s"
-  
+
   resource_optimization:
     - bundle_size: "JavaScript < 100KB compressed"
     - image_optimization: "WebP/AVIF format, lazy loading"
@@ -36,6 +38,7 @@ key_metrics:
 ```
 
 ### 2. Analysis Engine
+
 ```python
 # performance_analyzer.py
 class WebPerformanceAnalyzer:
@@ -46,9 +49,9 @@ class WebPerformanceAnalyzer:
             'bundle_analyzer': BundleAnalyzer(),
             'network_profiler': NetworkProfiler()
         }
-    
+
     def analyze_performance(self, url_or_build, analysis_type='comprehensive'):
-        """Grok's comprehensive performance analysis"""
+        """Comprehensive performance analysis"""
         results = {
             'overall_score': 0,
             'metrics': {},
@@ -56,27 +59,27 @@ class WebPerformanceAnalyzer:
             'recommendations': [],
             'optimization_potential': {}
         }
-        
+
         # Run parallel performance audits
         audit_results = self._run_parallel_audits(url_or_build)
-        
+
         # Analyze different performance aspects
         results['metrics'] = self._extract_metrics(audit_results)
         results['issues'] = self._identify_issues(audit_results)
         results['optimization_potential'] = self._calculate_optimization_potential(audit_results)
-        
-        # Generate Grok's physics-based recommendations
+
+        # Generate efficiency-focused recommendations
         results['recommendations'] = self._generate_recommendations(results)
-        
+
         # Calculate overall score
         results['overall_score'] = self._calculate_performance_score(results)
-        
+
         return results
-    
+
     def _generate_recommendations(self, analysis_results):
-        """Generate Grok's efficiency-focused recommendations"""
+        """Generate efficiency-focused recommendations"""
         recommendations = []
-        
+
         # Frontend optimizations
         if analysis_results['metrics']['bundle_size'] > 100000:  # 100KB
             recommendations.append({
@@ -87,7 +90,7 @@ class WebPerformanceAnalyzer:
                 'estimated_impact': '30-50% bundle reduction',
                 'physics_analogy': 'Reduce inertial mass - less energy to accelerate'
             })
-        
+
         # Image optimizations
         if analysis_results['metrics']['unoptimized_images'] > 0:
             recommendations.append({
@@ -98,7 +101,7 @@ class WebPerformanceAnalyzer:
                 'estimated_impact': '50-80% bandwidth reduction',
                 'physics_analogy': 'Compress data - reduce entropy in visual information'
             })
-        
+
         # Caching strategies
         if analysis_results['metrics']['cache_hit_rate'] < 0.95:
             recommendations.append({
@@ -109,11 +112,12 @@ class WebPerformanceAnalyzer:
                 'estimated_impact': '10x faster repeat loads',
                 'physics_analogy': 'Store potential energy - reuse for faster access'
             })
-        
+
         return recommendations
 ```
 
 ### 3. Optimization Strategies
+
 ```python
 # optimizer.py
 class PerformanceOptimizer:
@@ -124,32 +128,32 @@ class PerformanceOptimizer:
             'network': NetworkOptimizer(),
             'database': DatabaseOptimizer()
         }
-    
+
     def optimize_application(self, project_path, optimization_config):
-        """Apply Grok's multi-layer optimization"""
+        """Apply multi-layer optimization"""
         optimizations_applied = []
-        
+
         # Frontend optimization
         frontend_results = self.optimization_strategies['frontend'].optimize(
             project_path, optimization_config.get('frontend', {})
         )
         optimizations_applied.extend(frontend_results)
-        
+
         # Backend optimization
         backend_results = self.optimization_strategies['backend'].optimize(
             project_path, optimization_config.get('backend', {})
         )
         optimizations_applied.extend(backend_results)
-        
+
         # Network optimization
         network_results = self.optimization_strategies['network'].optimize(
             project_path, optimization_config.get('network', {})
         )
         optimizations_applied.extend(network_results)
-        
+
         # Generate performance report
         performance_report = self._generate_optimization_report(optimizations_applied)
-        
+
         return {
             'optimizations': optimizations_applied,
             'report': performance_report,
@@ -160,6 +164,7 @@ class PerformanceOptimizer:
 ## Usage Examples
 
 ### 1. Performance Audit
+
 ```bash
 # Audit live website
 grok --agent web-performance-optimizer \
@@ -175,6 +180,7 @@ grok --agent web-performance-optimizer \
 ```
 
 ### 2. Automatic Optimization
+
 ```python
 # Example: Optimize React application
 optimization_config = {
@@ -206,39 +212,97 @@ results = await performance_optimizer.optimize_application(
 ## Advanced Features
 
 ### 1. Real-Time Monitoring
+
 ```python
 # performance_monitor.py
 class RealTimePerformanceMonitor:
     def __init__(self):
         self.metrics_collector = MetricsCollector()
         self.alert_system = AlertSystem()
-    
+
     def monitor_application(self, monitoring_config):
-        """Real-time performance monitoring with Grok's efficiency"""
+        """Real-time performance monitoring"""
         # Set up performance observers
         observers = self._setup_observers(monitoring_config)
-        
+
         # Collect real-time metrics
         def metrics_callback(metrics):
             # Analyze performance in real-time
             analysis = self._analyze_real_time_metrics(metrics)
-            
+
             # Trigger alerts for performance degradation
             if analysis['performance_degradation']:
                 self.alert_system.trigger_alert(
                     'performance_degradation',
                     analysis
                 )
-            
+
             # Suggest optimizations
             if analysis['optimization_opportunity']:
                 self._suggest_optimization(analysis)
-        
+
         # Start monitoring
         self.metrics_collector.start_monitoring(
-            observers, 
+            observers,
             callback=metrics_callback
         )
+```
+
+### 2. Bundle Analysis
+
+```python
+class BundleAnalyzer:
+    def analyze_bundle(self, build_path):
+        """Analyze JavaScript bundle for optimization opportunities"""
+        analysis = {
+            'total_size': 0,
+            'chunks': [],
+            'duplicate_modules': [],
+            'tree_shaking_candidates': [],
+            'code_splitting_opportunities': []
+        }
+
+        # Analyze each chunk
+        for chunk in self._get_chunks(build_path):
+            chunk_analysis = self._analyze_chunk(chunk)
+            analysis['chunks'].append(chunk_analysis)
+            analysis['total_size'] += chunk_analysis['size']
+
+        # Find duplicates across chunks
+        analysis['duplicate_modules'] = self._find_duplicates(analysis['chunks'])
+
+        # Identify tree shaking candidates
+        analysis['tree_shaking_candidates'] = self._find_unused_exports(analysis['chunks'])
+
+        return analysis
+```
+
+### 3. Image Optimization
+
+```python
+class ImageOptimizer:
+    def optimize_images(self, image_paths, config):
+        """Optimize images for web delivery"""
+        optimized = []
+
+        for path in image_paths:
+            # Analyze image
+            original = self._analyze_image(path)
+
+            # Generate optimized variants
+            variants = {
+                'webp': self._convert_to_webp(path, quality=config.get('webp_quality', 80)),
+                'avif': self._convert_to_avif(path, quality=config.get('avif_quality', 75)),
+                'responsive': self._generate_responsive_variants(path, config.get('breakpoints', [320, 640, 768, 1024, 1280]))
+            }
+
+            optimized.append({
+                'original': original,
+                'variants': variants,
+                'savings': self._calculate_savings(original, variants)
+            })
+
+        return optimized
 ```
 
 ## Best Practices
@@ -249,4 +313,56 @@ class RealTimePerformanceMonitor:
 4. **Continuous Monitoring**: Track performance over time
 5. **Physics-Based Optimization**: Apply efficiency principles from physics
 
-Remember: Web performance optimization follows the same principles as physics - minimize energy (resources) needed to achieve maximum velocity (user experience).
+## Optimization Checklist
+
+### Frontend
+
+- [ ] Bundle size under 100KB compressed
+- [ ] Tree shaking enabled
+- [ ] Code splitting implemented
+- [ ] Lazy loading for non-critical resources
+- [ ] Images in modern formats (WebP/AVIF)
+- [ ] Responsive images with srcset
+- [ ] Critical CSS inlined
+- [ ] Font loading optimized (font-display: swap)
+
+### Backend
+
+- [ ] Gzip/Brotli compression enabled
+- [ ] HTTP/2 or HTTP/3 enabled
+- [ ] CDN configured for static assets
+- [ ] Database queries optimized
+- [ ] Response caching configured
+- [ ] Connection pooling enabled
+- [ ] Keep-alive connections
+
+### Network
+
+- [ ] DNS prefetch configured
+- [ ] Preconnect to critical origins
+- [ ] HTTP/2 server push for critical resources
+- [ ] Service worker for offline support
+- [ ] Resource hints (preload, prefetch)
+
+### Monitoring
+
+- [ ] Core Web Vitals tracked
+- [ ] Real User Monitoring (RUM) enabled
+- [ ] Synthetic monitoring configured
+- [ ] Alert thresholds set
+- [ ] Performance regression detection
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| High LCP | Optimize largest element, preload critical resources |
+| High CLS | Set explicit dimensions, avoid dynamic content insertion |
+| High FID | Break up long tasks, use web workers |
+| Large bundle | Enable tree shaking, code splitting, dynamic imports |
+| Slow TTFB | Optimize server response, enable caching |
+| Low cache hit rate | Review cache headers, implement service worker |
+
+---
+
+*Optimize with physics principles: minimize energy (resources) for maximum velocity (user experience).*

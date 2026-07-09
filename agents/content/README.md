@@ -18,9 +18,13 @@ Content management, creation workflows, editorial processes, publishing pipeline
 - [API Reference](#api-reference)
 - [Content Types](#content-types)
 - [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Configuration](#configuration)
 - [Examples](#examples)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [Files](#files)
 - [Contributing](#contributing)
@@ -29,6 +33,36 @@ Content management, creation workflows, editorial processes, publishing pipeline
 ## Overview
 
 The Content Agent is a Python-based system for managing the full content lifecycle from ideation through publishing and performance tracking. It combines content generation, SEO optimization, calendar management, social media publishing, moderation, and analytics into a single, cohesive platform.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                       CONTENT AGENT                                  │
+│                                                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────┐  │
+│  │   Content    │  │     SEO      │  │  Calendar    │  │ Social │  │
+│  │  Generator   │  │  Optimizer   │  │   Manager    │  │Manager │  │
+│  │              │  │              │  │              │  │        │  │
+│  │ • Titles     │  │ • Keywords   │  │ • Schedule   │  │ •Posts │  │
+│  │ • Bodies     │  │ • Readability│  │ • Topics     │  │•Thread │  │
+│  │ • Meta Desc  │  │ • Structure  │  │ • Conflicts  │  │ •Tags  │  │
+│  │ • CTAs       │  │ • Score      │  │ • Recurring  │  │        │  │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  └───┬────┘  │
+│         │                 │                  │              │        │
+│  ┌──────▼───────┐  ┌──────▼───────┐  ┌──────▼───────┐  ┌───▼────┐  │
+│  │  Content     │  │ Performance  │  │    Topic     │  │Report  │  │
+│  │  Moderator   │  │   Tracker    │  │  Suggester   │  │Generator│ │
+│  │              │  │              │  │              │  │        │  │
+│  │ • Quality    │  │ • Views      │  │ • Ideas      │  │•Summary│  │
+│  │ • Flags      │  │ • Clicks     │  │ • Keywords   │  │•Trends │  │
+│  │ • Brand      │  │ • CTR        │  │ • Niche      │  │•Top 10 │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────┘  │
+│                                                                      │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │                     Data Layer                                │   │
+│  │  ContentStore │ CalendarStore │ SocialStore │ MetricsStore    │   │
+│  └──────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 **Key Capabilities:**
 - Multi-format content generation (blog, article, social, email, landing page, etc.)
@@ -59,34 +93,43 @@ The Content Agent is a Python-based system for managing the full content lifecyc
 
 ## Architecture
 
+### Component Interaction
+
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Content Agent                             │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │ Content  │  │   SEO    │  │Calendar  │  │ Social   │   │
-│  │Generator │  │Optimizer │  │ Manager  │  │ Manager  │   │
-│  │          │  │          │  │          │  │          │   │
-│  │• Titles  │  │• Keywords│  │• Schedule│  │• Posts   │   │
-│  │• Bodies  │  │• Readab. │  │• Topics  │  │• Threads │   │
-│  │• Meta    │  │• Struct. │  │• Status  │  │• Tags    │   │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │
-│       │             │             │             │           │
-│  ┌────┴─────┐  ┌────┴─────┐  ┌────┴─────┐  ┌────┴─────┐   │
-│  │Content   │  │Perform-  │  │ Topic    │  │ Report   │   │
-│  │Moderator │  │ance Track│  │ Suggest  │  │Generator │   │
-│  │          │  │          │  │ Engine   │  │          │   │
-│  │• Quality │  │• Views   │  │• Ideas   │  │• Summary │   │
-│  │• Flags   │  │• Clicks  │  │• Keywords│  │• Trends  │   │
-│  │• Brand   │  │• CTR     │  │• Niche   │  │• Top 10  │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │                   Data Layer                         │   │
-│  │  ContentStore │ CalendarStore │ SocialStore │ Metrics│   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+                    ┌─────────────────┐
+                    │  ContentAgent   │
+                    │    (Facade)     │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │   Content    │ │     SEO     │ │   Calendar   │
+    │  Generator   │ │  Optimizer  │ │   Manager    │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │   Social     │ │  Content    │ │ Performance  │
+    │   Manager    │ │  Moderator  │ │   Tracker    │
+    └──────────────┘ └─────────────┘ └──────────────┘
+```
+
+### Data Flow
+
+```
+Topic Input ──▶ Content Generation ──▶ SEO Analysis ──▶ Moderation
+                                                      │
+Content Calendar ◀───────────────────────────────────┘
+       │
+       ▼
+Publishing ──▶ Social Distribution ──▶ Performance Tracking
+                                            │
+                                            ▼
+                                    Analytics & Reports
 ```
 
 ## Quick Start
@@ -200,7 +243,7 @@ agent.add_calendar_entry(
 # Suggest topics
 topics = agent.suggest_topics("AI Marketing", 10)
 for topic in topics:
-    print(f"  {topic['title']} — {topic['difficulty']}")
+    print(f"  {topic['title']} -- {topic['difficulty']}")
 
 # Get calendar
 calendar = agent.get_calendar(start_date="2024-01-01", end_date="2024-03-31")
@@ -267,9 +310,9 @@ for item in top:
 | `get_content_performance()` | content_id | Performance summary dict |
 | `get_top_performing()` | limit | List of top performers |
 | `get_calendar()` | start_date, end_date | List of calendar entries |
-| `get_calendar_summary()` | — | Calendar summary dict |
-| `list_content()` | — | List of content pieces |
-| `get_status()` | — | Agent status dict |
+| `get_calendar_summary()` | -- | Calendar summary dict |
+| `list_content()` | -- | List of content pieces |
+| `get_status()` | -- | Agent status dict |
 
 ## Content Types
 
@@ -291,6 +334,27 @@ for item in top:
 ### ContentPiece
 Complete content with title, body, SEO metadata, status, and performance tracking fields.
 
+```python
+@dataclass
+class ContentPiece:
+    content_id: str
+    title: str
+    body: str
+    content_type: ContentType
+    status: ContentStatus  # DRAFT, REVIEW, APPROVED, PUBLISHED, ARCHIVED
+    tone: str
+    target_audience: str
+    keywords: List[str]
+    meta_description: str = ""
+    cta: str = ""
+    word_count: int = 0
+    reading_time_minutes: int = 0
+    created_at: datetime = field(default_factory=datetime.now)
+    published_at: Optional[datetime] = None
+    platform: str = "website"
+    author: str = ""
+```
+
 ### SEOMetrics
 SEO analysis with keyword density breakdown, readability score, structure analysis, and prioritized recommendations.
 
@@ -302,6 +366,64 @@ Scheduled content with platform, author, keywords, and status tracking.
 
 ### SocialPost
 Platform-optimized social media content with character count, hashtags, and thread support.
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Facade** | Unified content interface | ContentAgent |
+| **Strategy** | Different generation strategies per content type | ContentGenerator |
+| **Template Method** | Platform-specific social post formatting | SocialManager |
+| **Observer** | Notify on content status changes | ContentModerator |
+| **Builder** | Construct complex content objects | ContentGenerator |
+| **Decorator** | Add SEO analysis to content | SEOOptimizer |
+| **Chain of Responsibility** | Content moderation pipeline | ContentModerator |
+| **State Machine** | Content lifecycle transitions | ContentStore |
+
+## Security
+
+- Content sanitization before publishing (XSS prevention)
+- Input validation on all user-provided content
+- Rate limiting on content generation endpoints
+- Access controls on content modification
+- Audit trail for all content changes
+- Safe handling of user-generated content in moderation
+- API key protection for external platform integrations
+
+```
+┌──────────────────────────────────────────────────┐
+│              Security Controls                    │
+├──────────────────────────────────────────────────┤
+│ Input Sanitization ──▶ Access Control ──▶ Audit  │
+│       │                     │               │    │
+│  XSS Prevention       Role-Based       Change   │
+│  Profanity Filter     Content Owner    Logging  │
+│  Brand Compliance     Publish Rights   Version  │
+└──────────────────────────────────────────────────┘
+```
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Content Store | Indexed by type, status, date | Fast filtered queries |
+| Calendar | Time-bucketed storage | Efficient date range queries |
+| Performance | Append-only with aggregation | Historical trend analysis |
+| Social Posts | Per-platform partitioning | Platform-specific rules |
+| Moderation | Async processing queue | Non-blocking content checks |
+| SEO Analysis | Cached results | Re-analyze on content change |
+
+### Performance Targets
+
+| Operation | Target | Notes |
+|-----------|--------|-------|
+| Content generation | < 2s | Template-based |
+| SEO analysis | < 500ms | Per-content |
+| Moderation check | < 200ms | Rule-based scanning |
+| Calendar query | < 50ms | Indexed by date |
+| Social post creation | < 100ms | Platform formatting |
+| Performance metrics | < 100ms | Aggregated |
+| Topic suggestions | < 1s | Keyword-based |
 
 ## Configuration
 
@@ -398,36 +520,79 @@ print(f"Instagram: {instagram['text'][:100]}...")
 
 ## Best Practices
 
-1. **Know Your Audience** — Research and understand your target audience deeply before writing
-2. **Provide Value** — Every piece of content should offer genuine, actionable value
-3. **Optimize for SEO** — Balance SEO keywords with natural, engaging writing
-4. **Be Authentic** — Maintain a consistent, authentic brand voice across all content
-5. **Test and Iterate** — Continuously refine based on performance data
-6. **Plan Ahead** — Use the calendar to maintain consistent publishing cadence
-7. **Repurpose Content** — Adapt high-performing content for multiple platforms
-8. **Monitor Performance** — Track metrics weekly and adjust strategy monthly
-9. **Quality Check** — Always run moderation before publishing
-10. **Document Style** — Create and maintain a brand style guide
+1. **Know Your Audience** -- Research and understand your target audience deeply before writing
+2. **Provide Value** -- Every piece of content should offer genuine, actionable value
+3. **Optimize for SEO** -- Balance SEO keywords with natural, engaging writing
+4. **Be Authentic** -- Maintain a consistent, authentic brand voice across all content
+5. **Test and Iterate** -- Continuously refine based on performance data
+6. **Plan Ahead** -- Use the calendar to maintain consistent publishing cadence
+7. **Repurpose Content** -- Adapt high-performing content for multiple platforms
+8. **Monitor Performance** -- Track metrics weekly and adjust strategy monthly
+9. **Quality Check** -- Always run moderation before publishing
+10. **Document Style** -- Create and maintain a brand style guide
+
+## Checklists
+
+### Content Creation
+
+- [ ] Topic researched and validated
+- [ ] Target audience defined
+- [ ] Keywords identified and mapped
+- [ ] Content type selected
+- [ ] Tone and style consistent with brand
+- [ ] Title optimized for SEO
+- [ ] Meta description written (150-160 chars)
+- [ ] CTA included and relevant
+- [ ] Content proofread
+- [ ] Images/media assets ready
+
+### SEO Optimization
+
+- [ ] Primary keyword in title
+- [ ] Primary keyword in first paragraph
+- [ ] Keyword density 1-2%
+- [ ] H1-H6 hierarchy correct
+- [ ] Internal links added
+- [ ] External links to authoritative sources
+- [ ] Image alt text descriptive
+- [ ] Meta description includes keyword
+- [ ] URL slug is clean and descriptive
+- [ ] Readability score above 60
+
+### Publishing
+
+- [ ] Content approved through moderation
+- [ ] Scheduled at optimal time
+- [ ] Platform-specific formatting applied
+- [ ] Social media posts created
+- [ ] Email distribution scheduled
+- [ ] Analytics tracking enabled
+- [ ] UTM parameters added
+- [ ] Content calendar updated
+- [ ] Team notified of publication
+- [ ] Performance baseline recorded
 
 ## Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
-| Content too generic | Add specific audience pain points, examples, and data |
-| SEO score low | Follow SEO recommendations, add keywords naturally in headings and body |
-| Content flagged | Review flagged terms and remove or replace with alternatives |
-| Low engagement | Adjust tone for platform, add stronger CTAs, test different headlines |
-| Calendar gaps | Use topic suggestion engine, batch-create content monthly |
-| Social post too long | Trim to platform limits or split into thread format |
-| Reading time wrong | Verify word count calculation, check for special characters |
-| Hashtag count off | Limit to 2-3 for Twitter, 5-10 for Instagram, 3-5 for LinkedIn |
+| Problem | Diagnosis | Solution |
+|---------|-----------|----------|
+| Content too generic | Insufficient audience research | Add specific pain points, examples, and data |
+| SEO score low | Poor keyword placement or density | Follow recommendations, add keywords in headings |
+| Content flagged | Triggered moderation rules | Review flagged terms, replace with alternatives |
+| Low engagement | Wrong tone or weak CTA | Adjust tone for platform, add stronger CTAs |
+| Calendar gaps | No content planning | Use topic suggestion engine, batch-create monthly |
+| Social post too long | Platform character limits | Trim or split into thread format |
+| Reading time wrong | Word count miscalculation | Verify word count, check special characters |
+| Hashtag count off | Platform limits exceeded | 2-3 for Twitter, 5-10 for Instagram, 3-5 LinkedIn |
+| Performance data stale | No tracking setup | Ensure analytics tracking enabled at publish |
+| Moderate always fails | Threshold too high | Lower moderation_threshold or improve content |
 
 ## Files
 
-- `agent.py` — Main implementation (~900 lines)
-- `ARCHITECTURE.md` — System architecture with diagrams and component details
-- `GROK.md` — Agent instructions, identity, and API reference
-- `README.md` — This file
+- `agent.py` -- Main implementation (~900 lines)
+- `ARCHITECTURE.md` -- System architecture with diagrams and component details
+- `GROK.md` -- Agent instructions, identity, and API reference
+- `README.md` -- This file
 
 ## Contributing
 

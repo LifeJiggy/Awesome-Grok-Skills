@@ -10,20 +10,20 @@ personality: "binary-analyst"
 use_cases: ["binary-analysis", "malware-analysis", "vulnerability-research"]
 ---
 
-# Reverse Engineering Agent 🔬
+# Reverse Engineering Agent
 
-> Reverse engineer with Grok's physics-based precision and systematic deconstruction
+> Reverse engineer with precision and systematic deconstruction
 
-## 🎯 Why This Matters for Grok
+## Why This Matters
 
-Grok's analytical mind approaches reverse engineering like analyzing a complex physical system:
+Analytical approach to reverse engineering like analyzing a complex physical system:
 
-- **Systematic Deconstruction** ⚛️: Breaking down binaries systematically
-- **Pattern Recognition** 🧩: Identifying structural patterns
-- **Energy Flow Analysis** ⚡: Understanding data and control flow
-- **Component Analysis** 🔍: Detailed examination of each element
+- **Systematic Deconstruction**: Breaking down binaries systematically
+- **Pattern Recognition**: Identifying structural patterns
+- **Energy Flow Analysis**: Understanding data and control flow
+- **Component Analysis**: Detailed examination of each element
 
-## 🛠️ Core Capabilities
+## Core Capabilities
 
 ### 1. Binary Analysis
 ```yaml
@@ -72,7 +72,7 @@ malware:
     - sandbox_execution
 ```
 
-## 🧠 Advanced Reverse Engineering Framework
+## Advanced Reverse Engineering Framework
 
 ### Binary Analyzer
 ```python
@@ -81,7 +81,7 @@ class BinaryAnalyzer:
         self.loaded_binaries = {}
         self.functions = {}
         self.strings = []
-    
+
     def analyze_file(self, file_path: str) -> BinaryInfo:
         """Analyze binary file"""
         return BinaryInfo(
@@ -105,7 +105,7 @@ class BinaryAnalyzer:
                 {'name': 'helper', 'address': 0x401200}
             ]
         )
-    
+
     def extract_strings(self, file_path: str, min_length: int = 4) -> List[Dict]:
         """Extract strings from binary"""
         return [
@@ -113,7 +113,7 @@ class BinaryAnalyzer:
             {'string': 'Password: ', 'address': 0x402010, 'type': 'ascii'},
             {'string': 'http://evil.com', 'address': 0x402040, 'type': 'url'}
         ]
-    
+
     def identify_protections(self, binary_path: str) -> Dict:
         """Identify binary protections"""
         return {
@@ -133,7 +133,7 @@ class DisassemblerEngine:
         self.instructions = []
         self.basic_blocks = []
         self.functions = {}
-    
+
     def disassemble(self, code_bytes: bytes, start_address: int) -> List[Instruction]:
         """Disassemble code bytes"""
         return [
@@ -159,7 +159,7 @@ class DisassemblerEngine:
                 category='control_flow'
             )
         ]
-    
+
     def identify_functions(self, instructions: List[Instruction]) -> List[FunctionInfo]:
         """Identify functions from instructions"""
         return [
@@ -180,7 +180,7 @@ class DisassemblerEngine:
                 arguments=1
             )
         ]
-    
+
     def build_control_flow_graph(self, start_address: int) -> Dict:
         """Build control flow graph"""
         return {
@@ -195,21 +195,21 @@ class DisassemblerEngine:
                 {'from': 1, 'to': 2, 'type': 'unconditional'}
             ]
         }
-    
+
     def decompile_function(self, address: int) -> str:
         """Generate pseudo-code decompilation"""
         return f"""
 int sub_{address:x}(int arg1, int arg2) {{
     int var1;
     int var2;
-    
+
     var1 = arg1;
     var2 = arg2;
-    
+
     if (arg1 > 0) {{
         var2 = var1 * arg2;
     }}
-    
+
     return var2;
 }}
 """
@@ -222,7 +222,7 @@ class MalwareAnalysisEngine:
         self.samples = {}
         self.behaviors = {}
         self.iocs = {}
-    
+
     def analyze_sample(self, sample_path: str, sample_data: bytes) -> Dict:
         """Analyze malware sample"""
         return {
@@ -245,7 +245,7 @@ class MalwareAnalysisEngine:
                 {'protocol': 'HTTP', 'host': 'evil.com', 'path': '/upload'}
             ]
         }
-    
+
     def extract_yara_rules(self, analysis: Dict) -> str:
         """Generate YARA rules from analysis"""
         return f"""
@@ -254,18 +254,18 @@ rule malware_sample
     meta:
         description = "Detected malware sample"
         hash = "{analysis['iocs'][0]['value']}"
-    
+
     strings:
         $s1 = "evil.com" ascii
         $s2 = "C2 Server" ascii
-    
+
     condition:
         2 of them
 }}
 """
 ```
 
-## 📊 Reverse Engineering Dashboard
+## Reverse Engineering Dashboard
 
 ### Analysis Metrics
 ```javascript
@@ -276,7 +276,7 @@ const ReverseEngineeringDashboard = {
     vulnerabilitiesFound: 28,
     malwareSamples: 15
   },
-  
+
   currentBinary: {
     file: '/path/to/binary',
     type: 'ELF 64-bit',
@@ -288,18 +288,18 @@ const ReverseEngineeringDashboard = {
       pie: true
     }
   },
-  
+
   functions: [
     { name: 'main', address: 0x401000, size: 256 },
     { name: 'decrypt_payload', address: 0x401100, size: 128 },
     { name: 'connect_c2', address: 0x401200, size: 96 }
   ],
-  
+
   strings: [
     { value: 'evil.com', address: 0x402000, type: 'url' },
     { value: 'Password: ', address: 0x402010, type: 'credentials' }
   ],
-  
+
   cfg: {
     nodes: 15,
     edges: 22,
@@ -309,7 +309,7 @@ const ReverseEngineeringDashboard = {
 };
 ```
 
-## 🎯 Reverse Engineering Workflow
+## Reverse Engineering Workflow
 
 ### Phase 1: Initial Analysis
 - [ ] Identify file format and architecture
@@ -335,7 +335,7 @@ const ReverseEngineeringDashboard = {
 - [ ] Extract IOCs
 - [ ] Share findings
 
-## 📊 Success Metrics
+## Success Metrics
 
 ### Reverse Engineering Excellence
 ```yaml
@@ -344,13 +344,13 @@ analysis_quality:
   accurate_decompilation: "> 80%"
   protection_detection: "> 99%"
   string_extraction: "> 90%"
-  
+
 malware_analysis:
   detection_rate: "> 90%"
   ioc_extraction: "> 50/sample"
   yara_rule_accuracy: "> 85%"
   behavioral_coverage: "> 80%"
-  
+
 vulnerability_research:
   exploit_development: "> 50 exploits"
   poc_success_rate: "> 75%"
@@ -359,4 +359,4 @@ vulnerability_research:
 
 ---
 
-*Deconstruct with precision, understand completely.* 🔬✨
+*Deconstruct with precision, understand completely.*

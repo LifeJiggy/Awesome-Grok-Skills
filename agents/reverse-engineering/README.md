@@ -8,13 +8,23 @@
 
 - [Overview](#overview)
 - [Features](#features)
-- [Quick Start](#quick-start)
 - [Architecture](#architecture)
+- [Quick Start](#quick-start)
 - [Usage](#usage)
+  - [Binary Analysis](#binary-analysis)
+  - [Disassembly](#disassembly)
+  - [Malware Analysis](#malware-analysis)
+  - [Encryption Analysis](#encryption-analysis)
+  - [Full Dashboard](#full-dashboard-analysis)
 - [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Examples](#examples)
 - [Configuration](#configuration)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
@@ -24,9 +34,32 @@
 
 The Reverse Engineering Agent is a comprehensive binary analysis platform that provides binary file analysis (parsing, section layout, imports/exports, strings, protections), disassembly with function identification and control flow graph construction, pseudo-code decompilation, malware analysis with IOC extraction and YARA rule generation, encryption and encoding detection, and binary comparison. It is designed for security researchers, malware analysts, and reverse engineers.
 
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                 REVERSE ENGINEERING DASHBOARD                            │
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────┐  │
+│  │  BinaryAnalyzer  │  │DisassemblerEngine│  │  MalwareAnalysisEngine│  │
+│  │                  │  │                  │  │                       │  │
+│  │ • File format    │  │ • Instructions   │  │ • Sample analysis     │  │
+│  │ • Sections       │  │ • Functions      │  │ • IOC extraction      │  │
+│  │ • Imports/Export │  │ • CFG            │  │ • YARA generation     │  │
+│  │ • Strings        │  │ • Decompilation  │  │ • Network signatures  │  │
+│  └──────────────────┘  └──────────────────┘  └───────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────┐                                                    │
+│  │EncryptionAnalyzer│                                                    │
+│  │                  │                                                    │
+│  │ • Entropy        │                                                    │
+│  │ • Algorithm ID   │                                                    │
+│  │ • Base64 decode  │                                                    │
+│  └──────────────────┘                                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
 ### Design Principles
 
-- **Static-Only Analysis**: No live execution — safe for malware analysis
+- **Static-Only Analysis**: No live execution -- safe for malware analysis
 - **Comprehensive Reporting**: Full analysis results in a single view
 - **Extensible Architecture**: Plugin points for new file formats and architectures
 - **Signature Generation**: Auto-generate YARA and Snort rules from analysis
@@ -51,6 +84,34 @@ The Reverse Engineering Agent is a comprehensive binary analysis platform that p
 | **Encryption Detection** | Identify encryption algorithms and entropy |
 | **Base64 Decoding** | Decode and validate Base64 encoded strings |
 | **Binary Comparison** | Compare two binaries for similarities and differences |
+
+---
+
+## Architecture
+
+### Component Interaction
+
+```
+                    ┌─────────────────┐
+                    │   RE Dashboard  │
+                    │   (Orchestrator)│
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │ BinaryAnalyzer│ │Disassembler │ │  Malware     │
+    │               │ │   Engine    │ │  Analysis    │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │EncryptionAnalyzer│
+                    └─────────────────┘
+```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system architecture.
 
 ---
 
@@ -96,27 +157,6 @@ for s in strings:
 protections = analyzer.identify_protections("/path/to/binary")
 print(f"Protections: {protections}")
 ```
-
----
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                  ReverseEngineeringDashboard                     │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────┐  │
-│  │  BinaryAnalyzer   │  │DisassemblerEngine│  │MalwareEngine  │  │
-│  └──────────────────┘  └──────────────────┘  └───────────────┘  │
-│                                                                   │
-│  ┌──────────────────┐                                            │
-│  │EncryptionAnalyzer│                                            │
-│  └──────────────────┘                                            │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system architecture.
 
 ---
 
@@ -273,6 +313,36 @@ print(f"Similarity: {comparison['similarity_score']:.0%}")
 
 ---
 
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Strategy** | Multiple analysis approaches | BinaryAnalyzer |
+| **Facade** | Unified RE interface | ReverseEngineeringDashboard |
+| **Builder** | Construct complex analyses | DisassemblerEngine |
+| **Decorator** | Add encryption detection | EncryptionAnalyzer |
+| **Observer** | Notify on findings | MalwareAnalysisEngine |
+
+## Security
+
+- Static-only analysis -- no live execution
+- Sandboxed analysis environment recommended
+- IOCs handled with care (no auto-blocking)
+- YARA rules validated before deployment
+- Sensitive sample data encrypted at rest
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Binaries | Indexed by hash | Deduplication |
+| Functions | Indexed by address | Fast lookup |
+| Strings | Full-text indexed | Efficient search |
+| IOCs | Indexed by type | Fast correlation |
+| YARA Rules | Compiled for speed | Efficient scanning |
+
+---
+
 ## Examples
 
 ### Complete Malware Analysis Workflow
@@ -287,7 +357,7 @@ results = dashboard.analyze_binary("/path/to/suspicious.exe")
 
 # 2. Check protections
 if not results['protections'].get('aslr'):
-    print("WARNING: No ASLR — easier to exploit")
+    print("WARNING: No ASLR -- easier to exploit")
 
 # 3. Check for suspicious imports
 suspicious = results['imports']['suspicious_imports']
@@ -319,7 +389,7 @@ dashboard = ReverseEngineeringDashboard()
 comparison = dashboard.compare_binaries("v1.0.exe", "v2.0.exe")
 
 if comparison['same_architecture']:
-    print("Same architecture — direct comparison valid")
+    print("Same architecture -- direct comparison valid")
 
 print(f"Similarity: {comparison['similarity_score']:.0%}")
 print(f"Common functions: {comparison['common_functions']}")
@@ -347,11 +417,11 @@ The agent uses default configuration suitable for most use cases. Key configurab
 ### Binary Analysis
 1. Always check protections before exploitation testing
 2. Review import categories for risk assessment
-3. Extract strings early — they often reveal functionality
+3. Extract strings early -- they often reveal functionality
 4. Compare binaries to detect changes between versions
 
 ### Malware Analysis
-1. **Never execute** malware samples — static analysis only
+1. **Never execute** malware samples -- static analysis only
 2. Generate YARA rules for future detection
 3. Extract all IOCs for threat intelligence
 4. Review behavioral analysis for kill chain mapping
@@ -364,14 +434,35 @@ The agent uses default configuration suitable for most use cases. Key configurab
 
 ---
 
+## Checklists
+
+### Binary Analysis
+- [ ] File format identified
+- [ ] Architecture confirmed
+- [ ] Protections documented
+- [ ] Strings extracted and classified
+- [ ] Imports categorized
+- [ ] Exports listed
+
+### Malware Analysis
+- [ ] Sample hashed (MD5, SHA1, SHA256)
+- [ ] File type confirmed
+- [ ] Strings extracted
+- [ ] Behaviors documented
+- [ ] IOCs extracted
+- [ ] YARA rules generated
+- [ ] Network signatures created
+
+---
+
 ## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| Binary parse fails | Check file format — may not be supported |
+| Binary parse fails | Check file format -- may not be supported |
 | No strings found | Lower min_length parameter |
 | Disassembly looks wrong | Verify architecture and endianness |
-| High entropy on all data | Binary may be packed — check for packing indicators |
+| High entropy on all data | Binary may be packed -- check for packing indicators |
 | YARA rules too broad | Add more specific string patterns |
 
 ---
@@ -382,13 +473,13 @@ The agent uses default configuration suitable for most use cases. Key configurab
 |------|-------------|
 | `agent.py` | Full implementation (all classes and logic) |
 | `ARCHITECTURE.md` | System architecture with diagrams |
-| `README.md` | This file — overview and quick start |
+| `README.md` | This file -- overview and quick start |
 
 ---
 
 ## License
 
-MIT License — see [LICENSE](../../LICENSE) for details.
+MIT License -- see [LICENSE](../../LICENSE) for details.
 
 ---
 

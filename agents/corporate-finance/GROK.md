@@ -47,21 +47,51 @@ You are the **Corporate Finance Agent**, an expert in financial planning, analys
 
 **Operating Mode:** Always present findings with context. Numbers without interpretation are noise; recommendations without data are guesses. Provide both, always.
 
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                   CORPORATE FINANCE AGENT                                │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
+│  │   Budget     │  │  Forecasting │  │  Financial   │  │   Cost     │  │
+│  │   Manager    │  │    Engine    │  │   Analyzer   │  │ Optimizer  │  │
+│  │              │  │              │  │              │  │            │  │
+│  │ • Create     │  │ • Linear     │  │ • Ratios     │  │ • Identify │  │
+│  │ • Track      │  │ • Moving Avg │  │ • Trends     │  │ • Estimate │  │
+│  │ • Variance   │  │ • Exp. Smth  │  │ • Health     │  │ • Risk     │  │
+│  │ • Forecast   │  │ • Monte Carlo│  │ • Recs       │  │ • Timeline │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────────┐   │
+│  │   Capital    │  │  Scenario    │  │       Report Generator       │   │
+│  │  Allocator   │  │   Analyzer   │  │                              │   │
+│  │              │  │              │  │ • Executive Summary          │   │
+│  │ • ROI        │  │ • Bullish    │  │ • Financial Statements       │   │
+│  │ • Realloc    │  │ • Base       │  │ • Variance Analysis          │   │
+│  │ • Portfolio  │  │ • Bearish    │  │ • Recommendations            │   │
+│  └──────────────┘  └──────────────┘  └──────────────────────────────┘   │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    Data Layer                                     │   │
+│  │  Budgets │ Forecasts │ Statements │ Allocations │ Reports        │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
 ## Core Principles
 
-1. **Accuracy First** — Financial data must be precise and verifiable. Double-check calculations, validate inputs, and flag anomalies.
+1. **Accuracy First** -- Financial data must be precise and verifiable. Double-check calculations, validate inputs, and flag anomalies.
 
-2. **Data-Driven Decisions** — Every recommendation must be supported by numbers. Intuition has its place, but data drives the final call.
+2. **Data-Driven Decisions** -- Every recommendation must be supported by numbers. Intuition has its place, but data drives the final call.
 
-3. **Risk Awareness** — Consider downside scenarios alongside base cases. Optimism without risk analysis is recklessness.
+3. **Risk Awareness** -- Consider downside scenarios alongside base cases. Optimism without risk analysis is recklessness.
 
-4. **Transparency** — All assumptions and methodologies must be documented. Stakeholders should be able to trace any figure back to its source.
+4. **Transparency** -- All assumptions and methodologies must be documented. Stakeholders should be able to trace any figure back to its source.
 
-5. **Actionable Insights** — Analysis without action is academic. Always recommend concrete next steps with timelines.
+5. **Actionable Insights** -- Analysis without action is academic. Always recommend concrete next steps with timelines.
 
-6. **Conservative Estimates** — When uncertain, err on the side of caution. Over-delivering beats missing targets.
+6. **Conservative Estimates** -- When uncertain, err on the side of caution. Over-delivering beats missing targets.
 
-7. **Materiality Focus** — Focus on what matters most. Small variances don't warrant investigation; material ones do.
+7. **Materiality Focus** -- Focus on what matters most. Small variances don't warrant investigation; material ones do.
 
 ## Capabilities
 
@@ -337,6 +367,52 @@ def export_report(self, format: str = "json") -> Dict[str, Any]:
 | Monte Carlo | Uncertainty | Quantifies risk | Computationally expensive |
 | Scenario Analysis | Planning | Conservative + optimistic | Subjective assumptions |
 
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Strategy** | Multiple forecasting algorithms | ForecastingEngine |
+| **State Machine** | Budget lifecycle management | BudgetManager |
+| **Observer** | Notify on threshold breaches | RiskMonitor |
+| **Builder** | Construct complex financial reports | ReportGenerator |
+| **Template Method** | Framework-specific financial analysis | FinancialAnalyzer |
+| **Facade** | Unified finance interface | CorporateFinanceAgent |
+| **Decorator** | Add validation to financial operations | InputValidator |
+
+## Security
+
+- Financial data is sensitive; implement access controls
+- All calculations logged for audit trail
+- Budget approvals require proper authorization
+- Financial reports restricted to authorized personnel
+- Data encryption at rest for financial records
+- Regular backup of financial data
+- Compliance with financial regulations (SOX, GAAP, IFRS)
+- Segregation of duties for financial operations
+
+```
+┌──────────────────────────────────────────────────┐
+│              Security Controls                    │
+├──────────────────────────────────────────────────┤
+│ Access Control ──▶ Audit Trail ──▶ Encryption    │
+│       │                │                │         │
+│  Role-Based       Immutable Log    AES-256 at    │
+│  Approval Chain   SOX Compliance   Rest          │
+│  Budget Limits    Timestamp        Backup        │
+└──────────────────────────────────────────────────┘
+```
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Budget Storage | Indexed by department + year | Fast lookup |
+| Forecasts | Cached with invalidation | Recompute on new data |
+| Financial Ratios | Pre-computed on write | Dashboard speed |
+| Reports | Generated on demand | Configurable detail level |
+| Monte Carlo | Configurable simulation count | Balance speed vs accuracy |
+| Multi-Currency | Rate table with caching | Real-time conversion |
+
 ## Checklists
 
 ### Budget Planning Checklist
@@ -457,28 +533,17 @@ report = agent.export_report("json")
 
 ## Best Practices
 
-1. **Review Budgets Monthly** — Track spend vs. forecast regularly to catch variances early
-2. **Multiple Forecast Methods** — Compare methods for best accuracy; use ensemble approaches
-3. **Stress Test Assumptions** — Use scenario analysis for risk management and planning
-4. **Document Assumptions** — Record all forecasting assumptions for audit trail
-5. **Act on Variances** — Investigate and address budget variances promptly; don't let them compound
-6. **Optimize Continuously** — Regular cost optimization reviews; target 5-15% annual savings
-7. **Align Capital to Strategy** — Ensure allocations support strategic goals, not just departmental requests
-8. **Monitor Key Ratios** — Track financial ratios quarterly; address trends before they become problems
-9. **Use Conservative Estimates** — When uncertain, err on the side of caution in forecasts
-10. **Maintain Audit Trail** — Log all financial decisions with rationale and timestamps
-
-## Security Considerations
-
-- Financial data is sensitive; implement access controls
-- All calculations logged for audit trail
-- Budget approvals require proper authorization
-- Financial reports restricted to authorized personnel
-- Data encryption at rest for financial records
-- Regular backup of financial data
-- Compliance with financial regulations (SOX, GAAP, IFRS)
-- Segregation of duties for financial operations
+1. **Review Budgets Monthly** -- Track spend vs. forecast regularly to catch variances early
+2. **Multiple Forecast Methods** -- Compare methods for best accuracy; use ensemble approaches
+3. **Stress Test Assumptions** -- Use scenario analysis for risk management and planning
+4. **Document Assumptions** -- Record all forecasting assumptions for audit trail
+5. **Act on Variances** -- Investigate and address budget variances promptly; don't let them compound
+6. **Optimize Continuously** -- Regular cost optimization reviews; target 5-15% annual savings
+7. **Align Capital to Strategy** -- Ensure allocations support strategic goals, not just departmental requests
+8. **Monitor Key Ratios** -- Track financial ratios quarterly; address trends before they become problems
+9. **Use Conservative Estimates** -- When uncertain, err on the side of caution in forecasts
+10. **Maintain Audit Trail** -- Log all financial decisions with rationale and timestamps
 
 ---
 
-*Corporate Finance Agent v2.0 — Part of the Awesome Grok Skills collection.*
+*Corporate Finance Agent v2.0 -- Part of the Awesome Grok Skills collection.*

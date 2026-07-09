@@ -8,12 +8,25 @@
 
 - [Overview](#overview)
 - [Features](#features)
+- [Architecture](#architecture)
 - [Quick Start](#quick-start)
 - [Usage](#usage)
+  - [Test Generation](#test-generation)
+  - [Test Execution](#test-execution)
+  - [Coverage Analysis](#coverage-analysis)
+  - [Performance Testing](#performance-testing)
+  - [Security Testing](#security-testing)
+  - [Quality Gates](#quality-gates)
+  - [Defect Tracking](#defect-tracking)
 - [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Examples](#examples)
 - [Configuration](#configuration)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
@@ -31,6 +44,30 @@ The Testing Agent provides a complete software testing toolkit covering:
 - **Quality Gates**: Automated pass/fail criteria enforcement
 - **Defect Tracking**: Bug lifecycle management
 - **Test Reporting**: Comprehensive test execution reports
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        TESTING AGENT                                  │
+│                                                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────┐  │
+│  │    Test      │  │    Test      │  │  Coverage    │  │Quality │  │
+│  │  Generator   │  │   Runner     │  │  Analyzer    │  │  Gates │  │
+│  │              │  │              │  │              │  │        │  │
+│  │ * From reqs  │  │ * Execute    │  │ * Line cov   │  │*Pass/  │  │
+│  │ * From code  │  │ * Parallel   │  │ * Branch cov │  │ Fail   │  │
+│  │ * API tests  │  │ * Retry      │  │ * Gaps       │  │*Thresh │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────┘  │
+│                                                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────┐  │
+│  │ Performance  │  │  Security    │  │   Defect     │  │ Test   │  │
+│  │   Tester     │  │   Tester     │  │   Tracker    │  │Report  │  │
+│  │              │  │              │  │              │  │Generator│ │
+│  │ * Load test  │  │ * SAST       │  │ * Lifecycle  │  │*Report │  │
+│  │ * Stress     │  │ * DAST       │  │ * Severity   │  │*Trends │  │
+│  │ * Benchmark  │  │ * SCA        │  │ * Priority   │  │*Summary│  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -65,6 +102,37 @@ The Testing Agent provides a complete software testing toolkit covering:
 - Multi-gate evaluation
 - Historical trend tracking
 - CI/CD pipeline blocking
+
+---
+
+## Architecture
+
+### Component Interaction
+
+```
+                    ┌─────────────────┐
+                    │  TestingAgent   │
+                    │  (Orchestrator) │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │    Test      │ │    Test     │ │  Coverage    │
+    │  Generator   │ │   Runner    │ │  Analyzer    │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │ Performance  │ │  Security   │ │  Quality     │
+    │   Tester     │ │   Tester    │ │   Gates      │
+    └──────────────┘ └─────────────┘ └──────────────┘
+```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for full details.
 
 ---
 
@@ -320,6 +388,36 @@ print(f"Overall: {status.value}")
 
 ---
 
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Strategy** | Multiple test generation methods | TestGenerator |
+| **Facade** | Unified testing interface | TestingAgent |
+| **Template Method** | Test execution flow | TestRunner |
+| **Observer** | Quality gate alerts | QualityGateManager |
+| **Builder** | Construct complex test suites | TestGenerator |
+
+## Security
+
+- Test data isolated between environments
+- Security scan results access-controlled
+- Vulnerability data encrypted at rest
+- Audit trail for all test operations
+- Role-based access for different test operations
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Test Cases | Indexed by type + priority | Fast filtered queries |
+| Executions | Time-series storage | Efficient trend analysis |
+| Coverage | Indexed by file | File-level tracking |
+| Defects | Indexed by severity + status | Efficient triage |
+| Reports | Generated on demand | Configurable detail |
+
+---
+
 ## Examples
 
 ### Complete Testing Workflow
@@ -351,12 +449,17 @@ for t in tests:
     agent.test_cases[t.test_id] = t
 
 # 2. Create and run suite
-suite = agent.create_test_suite("Auth Tests", "Authentication test suite", [t.test_id for t in tests])
+suite = agent.create_test_suite(
+    "Auth Tests", "Authentication test suite",
+    [t.test_id for t in tests]
+)
 results = agent.execute_test_suite(suite.suite_id)
 
 # 3. Check coverage
 coverage = agent.coverage.calculate_coverage(
-    ["src/auth.py"], {"src/auth.py": set(range(50))}, {"src/auth.py": 100}
+    ["src/auth.py"],
+    {"src/auth.py": set(range(50))},
+    {"src/auth.py": 100}
 )
 
 # 4. Run security scan
@@ -469,9 +572,32 @@ qm.configure_gate(QualityGate.SECURITY_SCAN, threshold=0)
 
 ---
 
-## Troubleshooting
+## Checklists
 
-### Common Issues
+### Test Planning
+- [ ] Test objectives defined
+- [ ] Test scope agreed
+- [ ] Test environments identified
+- [ ] Test data requirements specified
+- [ ] Entry/exit criteria defined
+
+### Test Execution
+- [ ] Test environment ready
+- [ ] Test data loaded
+- [ ] Tests executed in order
+- [ ] Results recorded accurately
+- [ ] Failures investigated
+
+### Release Readiness
+- [ ] All critical tests passing
+- [ ] Code coverage meets threshold
+- [ ] No critical security vulnerabilities
+- [ ] Performance benchmarks met
+- [ ] Quality gates passed
+
+---
+
+## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|

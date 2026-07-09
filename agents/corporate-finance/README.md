@@ -19,9 +19,13 @@ Financial modeling, valuation, budgeting, forecasting, M&A analysis, capital str
 - [Financial Ratios](#financial-ratios)
 - [Forecasting Methods](#forecasting-methods)
 - [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Configuration](#configuration)
 - [Examples](#examples)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [Files](#files)
 - [Contributing](#contributing)
@@ -30,6 +34,35 @@ Financial modeling, valuation, budgeting, forecasting, M&A analysis, capital str
 ## Overview
 
 The Corporate Finance Agent is a Python-based system for managing corporate finance functions including budgeting, forecasting, financial analysis, cost optimization, and capital allocation. It provides audit-ready reporting, scenario analysis, Monte Carlo simulation, and executive-level dashboards.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                 CORPORATE FINANCE AGENT                              │
+│                                                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────┐  │
+│  │    Budget    │  │  Forecasting │  │  Financial   │  │  Cost  │  │
+│  │   Manager    │  │    Engine    │  │   Analyzer   │  │Optimizer│ │
+│  │              │  │              │  │              │  │        │  │
+│  │ • Create     │  │ • Linear     │  │ • Ratios     │  │•Identif│  │
+│  │ • Track      │  │ • Moving Avg │  │ • Trends     │  │•Estimte│  │
+│  │ • Variance   │  │ • Exp. Smth  │  │ • Health     │  │•Risk   │  │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  └───┬────┘  │
+│         │                 │                  │              │        │
+│  ┌──────▼───────┐  ┌──────▼───────┐  ┌──────▼───────┐  ┌───▼────┐  │
+│  │   Capital    │  │  Financial   │  │   Report     │  │Scenario│  │
+│  │  Allocator   │  │   Storage    │  │  Generator   │  │Analyzer│  │
+│  │              │  │              │  │              │  │        │  │
+│  │ • ROI        │  │ • JSON       │  │ • Executive   │  │•Bull   │  │
+│  │ • Realloc    │  │ • Audit      │  │ • Summary    │  │•Base   │  │
+│  │ • Portfolio  │  │ • Export     │  │ • Detail     │  │•Bear   │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────┘  │
+│                                                                      │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │                     Data Layer                                │   │
+│  │  Budgets │ Forecasts │ Statements │ Allocations │ Reports    │   │
+│  └──────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 **Key Capabilities:**
 - Departmental budget creation and tracking with variance analysis
@@ -61,35 +94,45 @@ The Corporate Finance Agent is a Python-based system for managing corporate fina
 
 ## Architecture
 
+### Component Interaction
+
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                Corporate Finance Agent                       │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │ Budget   │  │Forecasting│  │Financial │  │  Cost    │   │
-│  │ Manager  │  │  Engine   │  │ Analyzer │  │Optimizer │   │
-│  │          │  │           │  │          │  │          │   │
-│  │• Create  │  │• Linear   │  │• Ratios  │  │• Identify│   │
-│  │• Track   │  │• Moving   │  │• Trends  │  │• Estimate│   │
-│  │• Variance│  │• Exp.     │  │• Health  │  │• Risk    │   │
-│  │          │  │• Monte    │  │• Recs    │  │          │   │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │
-│       │             │             │             │           │
-│  ┌────┴─────┐  ┌────┴─────┐  ┌────┴─────┐  ┌────┴─────┐   │
-│  │ Capital  │  │Financial │  │ Report   │  │ Scenario │   │
-│  │Allocator │  │ Storage  │  │Generator │  │ Analyzer │   │
-│  │          │  │          │  │          │  │          │   │
-│  │• ROI     │  │• JSON    │  │• Exec    │  │• Bull    │   │
-│  │• Realloc │  │• Audit   │  │• Summary │  │• Base    │   │
-│  │• Portfolio│ │• Export  │  │• Detail  │  │• Bear    │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │                   Data Layer                         │   │
-│  │  Budgets │ Forecasts │ Statements │ Allocations      │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+                    ┌─────────────────┐
+                    │ CorporateFinance│
+                    │     Agent       │
+                    │    (Facade)     │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │    Budget    │ │ Forecasting │ │  Financial   │
+    │   Manager    │ │   Engine    │ │   Analyzer   │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │    Cost      │ │   Capital   │ │   Scenario   │
+    │  Optimizer   │ │  Allocator  │ │   Analyzer   │
+    └──────────────┘ └─────────────┘ └──────────────┘
+```
+
+### Data Flow
+
+```
+Financial Data ──▶ Budget Creation ──▶ Spend Tracking ──▶ Variance Analysis
+                                  │
+                                  ▼
+Forecasting ◀────────────────────┘──▶ Financial Ratios ──▶ Health Score
+     │                                                  │
+     ▼                                                  ▼
+Scenario Analysis ◀──────────────────────────── Cost Optimization
+     │                                                  │
+     ▼                                                  ▼
+Capital Allocation ◀───────────────────── Executive Report
 ```
 
 ## Quick Start
@@ -285,7 +328,7 @@ print(f"Bearish (-20%): {scenarios['scenarios']['bearish']}")
 | `run_scenario_analysis()` | base_values, periods | Scenario dict |
 | `allocate_capital()` | department, total_budget, initiatives | CapitalAllocation object |
 | `reallocate_capital()` | allocation_id, new_department, amount | Reallocation dict |
-| `get_status()` | — | Agent status dict |
+| `get_status()` | -- | Agent status dict |
 | `export_report()` | format | Financial report dict |
 
 ## Financial Ratios
@@ -323,6 +366,40 @@ Cost reduction analysis with savings estimates, timeline, risk level, and implem
 
 ### CapitalAllocation
 Capital distribution across departments and initiatives with ROI tracking and reallocation support.
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Strategy** | Multiple forecasting algorithms | ForecastingEngine |
+| **State Machine** | Budget lifecycle management | BudgetManager |
+| **Observer** | Notify on threshold breaches | RiskMonitor |
+| **Builder** | Construct complex financial reports | ReportGenerator |
+| **Template Method** | Framework-specific financial analysis | FinancialAnalyzer |
+| **Facade** | Unified finance interface | CorporateFinanceAgent |
+| **Decorator** | Add validation to financial operations | InputValidator |
+
+## Security
+
+- Financial data is sensitive; implement access controls
+- All calculations logged for audit trail
+- Budget approvals require proper authorization
+- Financial reports restricted to authorized personnel
+- Data encryption at rest for financial records
+- Regular backup of financial data
+- Compliance with financial regulations (SOX, GAAP, IFRS)
+- Segregation of duties for financial operations
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Budget Storage | Indexed by department + year | Fast lookup |
+| Forecasts | Cached with invalidation | Recompute on new data |
+| Financial Ratios | Pre-computed on write | Dashboard speed |
+| Reports | Generated on demand | Configurable detail level |
+| Monte Carlo | Configurable simulation count | Balance speed vs accuracy |
+| Multi-Currency | Rate table with caching | Real-time conversion |
 
 ## Configuration
 
@@ -396,16 +473,44 @@ report = agent.export_report("json")
 
 ## Best Practices
 
-1. **Review Budgets Monthly** — Track spend vs. forecast regularly to catch variances early
-2. **Multiple Forecast Methods** — Compare methods for best accuracy; use ensemble approaches
-3. **Stress Test Assumptions** — Use scenario analysis for risk management and planning
-4. **Document Assumptions** — Record all forecasting assumptions for audit trail
-5. **Act on Variances** — Investigate and address budget variances promptly; don't let them compound
-6. **Optimize Continuously** — Regular cost optimization reviews; target 5-15% annual savings
-7. **Align Capital to Strategy** — Ensure allocations support strategic goals, not just departmental requests
-8. **Monitor Key Ratios** — Track financial ratios quarterly; address trends before they become problems
-9. **Use Conservative Estimates** — When uncertain, err on the side of caution in forecasts
-10. **Maintain Audit Trail** — Log all financial decisions with rationale and timestamps
+1. **Review Budgets Monthly** -- Track spend vs. forecast regularly to catch variances early
+2. **Multiple Forecast Methods** -- Compare methods for best accuracy; use ensemble approaches
+3. **Stress Test Assumptions** -- Use scenario analysis for risk management and planning
+4. **Document Assumptions** -- Record all forecasting assumptions for audit trail
+5. **Act on Variances** -- Investigate and address budget variances promptly; don't let them compound
+6. **Optimize Continuously** -- Regular cost optimization reviews; target 5-15% annual savings
+7. **Align Capital to Strategy** -- Ensure allocations support strategic goals, not just departmental requests
+8. **Monitor Key Ratios** -- Track financial ratios quarterly; address trends before they become problems
+9. **Use Conservative Estimates** -- When uncertain, err on the side of caution in forecasts
+10. **Maintain Audit Trail** -- Log all financial decisions with rationale and timestamps
+
+## Checklists
+
+### Budget Planning
+
+- [ ] Historical spend data reviewed (12+ months)
+- [ ] Variances from prior year explained
+- [ ] Contingency reserves allocated (5-10%)
+- [ ] Approval workflow defined
+- [ ] Monitoring cadence established (monthly)
+- [ ] KPIs and thresholds documented
+
+### Financial Analysis
+
+- [ ] Income statement reviewed
+- [ ] Balance sheet analyzed
+- [ ] Cash flow statement examined
+- [ ] Key ratios calculated and benchmarked
+- [ ] Trends identified (3+ periods)
+- [ ] Recommendations documented with priority
+
+### Cost Optimization
+
+- [ ] Cost categories defined (fixed vs variable)
+- [ ] Current benchmarks established
+- [ ] Quick wins identified (low effort, high impact)
+- [ ] Savings estimates validated
+- [ ] Implementation timeline defined
 
 ## Troubleshooting
 
@@ -422,10 +527,10 @@ report = agent.export_report("json")
 
 ## Files
 
-- `agent.py` — Main implementation (~900 lines)
-- `ARCHITECTURE.md` — System architecture with diagrams and component details
-- `GROK.md` — Agent instructions, identity, and API reference
-- `README.md` — This file
+- `agent.py` -- Main implementation (~900 lines)
+- `ARCHITECTURE.md` -- System architecture with diagrams and component details
+- `GROK.md` -- Agent instructions, identity, and API reference
+- `README.md` -- This file
 
 ## Contributing
 

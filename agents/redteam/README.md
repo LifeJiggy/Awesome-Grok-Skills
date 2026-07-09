@@ -9,16 +9,57 @@ A comprehensive offensive security operations framework for authorized penetrati
 - [Architecture](#architecture)
 - [Quick Start](#quick-start)
 - [Usage](#usage)
+  - [Reconnaissance](#reconnaissance)
+  - [Exploitation](#exploitation)
+  - [Post-Exploitation](#post-exploitation)
+  - [Adversary Emulation](#adversary-emulation)
+  - [C2 Framework](#c2-framework)
 - [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Examples](#examples)
 - [Configuration](#configuration)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
 ## Overview
 
 The Red Team Agent provides a complete offensive security operations framework that simulates real-world threat actors. It covers the entire attack lifecycle from reconnaissance through reporting, with built-in MITRE ATT&CK mapping and adversary emulation capabilities.
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    RED TEAM OPERATION MANAGER                            │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────────┐  │
+│  │Reconnaissance│  │   Exploit    │  │      Post-Exploitation       │  │
+│  │   Engine     │  │  Development │  │          Engine              │  │
+│  │              │  │    Engine     │  │                              │  │
+│  │ • Passive    │  │ • RCE        │  │ • Credential harvest         │  │
+│  │ • Active     │  │ • LPE        │  │ • Persistence (12+ methods)  │  │
+│  │ • Web        │  │ • SQLi/XSS   │  │ • Lateral movement (13)      │  │
+│  │ • OSINT      │  │ • Payloads   │  │ • Data exfiltration          │  │
+│  └──────────────┘  └──────────────┘  └──────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────────┐  │
+│  │  Adversary   │  │     C2       │  │         Reporting            │  │
+│  │  Emulation   │  │  Framework   │  │         Engine               │  │
+│  │              │  │              │  │                              │  │
+│  │ • APT29/41   │  │ • Listeners  │  │ • Executive summary          │  │
+│  │ • Lazarus    │  │ • Beacons    │  │ • MITRE ATT&CK mapping      │  │
+│  │ • Custom     │  │ • Tasking    │  │ • Evidence & recommendations │  │
+│  │ • MITRE Map  │  │ • Infra      │  │ • Remediation guidance       │  │
+│  └──────────────┘  └──────────────┘  └──────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                 Operation Audit Trail                              │   │
+│  │  All actions logged with timestamps for reporting                  │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 ### Key Capabilities
 
@@ -79,20 +120,38 @@ The Red Team Agent provides a complete offensive security operations framework t
 
 ## Architecture
 
+### Component Interaction
+
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                  Red Team Operation Manager                     │
-├─────────────────────────────────────────────────────────────────┤
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
-│  │Reconnaissance│  │   Exploit    │  │   Post-Exploitation  │  │
-│  │   Engine     │  │  Development │  │       Engine         │  │
-│  └──────────────┘  │   Engine     │  └──────────────────────┘  │
-│                     └──────────────┘                            │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
-│  │  Adversary   │  │     C2       │  │     Reporting        │  │
-│  │  Emulation   │  │  Framework   │  │     Engine           │  │
-│  └──────────────┘  └──────────────┘  └──────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
+                    ┌─────────────────┐
+                    │  RedTeamOp      │
+                    │  Manager        │
+                    │  (Facade)       │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │Reconnaissance│ │   Exploit   │ │Post-Exploit  │
+    │   Engine     │ │  Development│ │   Engine     │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │  Adversary   │ │     C2      │ │  Reporting   │
+    │  Emulation   │ │  Framework  │ │   Engine     │
+    └──────────────┘ └─────────────┘ └──────────────┘
+```
+
+### Attack Lifecycle Flow
+
+```
+Reconnaissance ──▶ Weaponization ──▶ Delivery ──▶ Exploitation
+                                                      │
+Reporting ◀──── Cleanup ◀──── Post-Exploit ◀──── Installation
 ```
 
 For detailed architecture documentation, see [ARCHITECTURE.md](ARCHITECTURE.md).
@@ -301,6 +360,51 @@ status = c2.get_beacon_status(beacon_id)
 | `exfiltrate_data()` | session_id, files, method, destination? | Dict | Exfiltrate data |
 | `cleanup_persistence()` | session_id | List[str] | Clean persistence |
 
+## Data Models
+
+### Operation
+Core operation record with targets, objectives, status, and timeline.
+
+### Finding
+Security finding with severity, evidence, MITRE ATT&CK mapping, and remediation.
+
+### Session
+Active session with target, type, access level, and persistence status.
+
+### Credential
+Harvested credential with username, source, type, and hash.
+
+### EmulationPlan
+Adversary emulation plan with tactics, techniques, and sequencing.
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Strategy** | Multiple recon methods | ReconnaissanceEngine |
+| **State Machine** | Operation lifecycle | RedTeamOperationManager |
+| **Facade** | Unified red team interface | RedTeamOperationManager |
+| **Observer** | Notify on findings | ReportingEngine |
+| **Builder** | Construct complex exploits | ExploitDevelopmentEngine |
+
+## Security
+
+- All operations require explicit authorization
+- Scope restrictions enforced on all actions
+- Audit trail for every operation action
+- Credential handling follows best practices
+- Cleanup verification before operation close
+- Data handling compliance with engagement rules
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Operations | Indexed by status + date | Fast filtered queries |
+| Findings | Indexed by severity + MITRE | Efficient triage |
+| Sessions | Partitioned by operation | Isolation |
+| Reports | Generated on demand | Configurable detail |
+
 ## Examples
 
 ### Full Penetration Test
@@ -358,7 +462,9 @@ for technique, findings in report.mitre_mapping.items():
 ### Custom Adversary Profile
 
 ```python
-from agents.redteam.agent import AdversaryEmulationEngine, TacticID, TechniqueID
+from agents.redteam.agent import (
+    AdversaryEmulationEngine, TacticID, TechniqueID
+)
 
 emulation = AdversaryEmulationEngine()
 
@@ -419,27 +525,27 @@ c2:
 
 ### Before the Operation
 
-1. **Define Clear Scope** - Explicitly list all targets and boundaries
-2. **Get Written Authorization** - Ensure RoE is signed
-3. **Prepare Infrastructure** - Set up C2 and exfiltration channels
-4. **Establish Communication** - Set up out-of-band comms
-5. **Test Your Tools** - Verify all exploits and payloads work
+1. **Define Clear Scope** -- Explicitly list all targets and boundaries
+2. **Get Written Authorization** -- Ensure RoE is signed
+3. **Prepare Infrastructure** -- Set up C2 and exfiltration channels
+4. **Establish Communication** -- Set up out-of-band comms
+5. **Test Your Tools** -- Verify all exploits and payloads work
 
 ### During the Operation
 
-1. **Document Everything** - Log every action and finding
-2. **Maintain OPSEC** - Use proper tradecraft
-3. **Stay in Scope** - Never test outside authorized boundaries
-4. **Monitor for Detection** - Watch for blue team activity
-5. **Adapt Your Approach** - Change TTPs if detected
+1. **Document Everything** -- Log every action and finding
+2. **Maintain OPSEC** -- Use proper tradecraft
+3. **Stay in Scope** -- Never test outside authorized boundaries
+4. **Monitor for Detection** -- Watch for blue team activity
+5. **Adapt Your Approach** -- Change TTPs if detected
 
 ### After the Operation
 
-1. **Clean Up** - Remove all persistence and artifacts
-2. **Verify Cleanup** - Double-check nothing was left behind
-3. **Write the Report** - Include all findings with evidence
-4. **Brief Stakeholders** - Present findings to leadership
-5. **Track Remediation** - Follow up on fix implementation
+1. **Clean Up** -- Remove all persistence and artifacts
+2. **Verify Cleanup** -- Double-check nothing was left behind
+3. **Write the Report** -- Include all findings with evidence
+4. **Brief Stakeholders** -- Present findings to leadership
+5. **Track Remediation** -- Follow up on fix implementation
 
 ### Reporting Guidelines
 
@@ -450,6 +556,36 @@ c2:
 - Map findings to MITRE ATT&CK
 - Include evidence (screenshots, logs, payloads)
 - Suggest remediation timelines
+
+## Checklists
+
+### Pre-Engagement
+
+- [ ] Rules of Engagement (RoE) signed
+- [ ] Scope explicitly defined
+- [ ] Emergency contacts established
+- [ ] Infrastructure tested
+- [ ] Communication channels set up
+- [ ] Legal review completed
+- [ ] Insurance verified
+
+### During Engagement
+
+- [ ] Every action logged with timestamp
+- [ ] Findings documented immediately
+- [ ] Scope respected at all times
+- [ ] OPSEC maintained
+- [ ] Regular status updates to stakeholders
+- [ ] Evidence properly handled
+
+### Post-Engagement
+
+- [ ] All persistence removed
+- [ ] All credentials rotated
+- [ ] Cleanup verified independently
+- [ ] Report delivered on time
+- [ ] Remediation tracking initiated
+- [ ] Lessons learned documented
 
 ## Troubleshooting
 

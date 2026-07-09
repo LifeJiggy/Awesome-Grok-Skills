@@ -22,9 +22,13 @@ Creative strategy, brand campaigns, design direction, team leadership, client re
 - [Asset Types](#asset-types)
 - [Design System Components](#design-system-components)
 - [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Configuration](#configuration)
 - [Examples](#examples)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [Files](#files)
 - [Contributing](#contributing)
@@ -33,6 +37,37 @@ Creative strategy, brand campaigns, design direction, team leadership, client re
 ## Overview
 
 The Creative Director Agent is a Python-based system for managing end-to-end creative operations. It creates brand identities, designs visual assets, builds design systems, develops creative strategies, optimizes content, reviews creative work, estimates timelines, and manages campaigns from draft to launch.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                   CREATIVE DIRECTOR AGENT                            │
+│                                                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────┐  │
+│  │    Brand     │  │   Visual     │  │   Design     │  │Creative│  │
+│  │  Identity    │  │   Asset      │  │   System     │  │Strategy│  │
+│  │  Designer    │  │  Designer    │  │   Builder    │  │Advisor │  │
+│  │              │  │              │  │              │  │        │  │
+│  │ • Palette    │  │ • Multi-fmt  │  │ • Components │  │•Positn │  │
+│  │ • Typography │  │ • Specs      │  │ • Tokens     │  │•Message│  │
+│  │ • Logo       │  │ • Mockups    │  │ • Guidelines │  │•Ideas  │  │
+│  │ • Voice      │  │ • Accessible │  │ • Versioning │  │•Metrics│  │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  └───┬────┘  │
+│         │                 │                  │              │        │
+│  ┌──────▼───────┐  ┌──────▼───────┐  ┌──────▼───────┐  ┌───▼────┐  │
+│  │  Content     │  │  Creative    │  │    Time      │  │ Design │  │
+│  │  Optimizer   │  │  Reviewer    │  │  Estimator   │  │ Asset  │  │
+│  │              │  │              │  │              │  │Storage │  │
+│  │ • Score      │  │ • 5 areas    │  │ • Hours      │  │•JSON   │  │
+│  │ • A/B tests  │  │ • Weights    │  │ • Cost       │  │•Version│  │
+│  │ • Alt text   │  │ • Verdict    │  │ • Team       │  │•Export │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────┘  │
+│                                                                      │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │                     Data Layer                                │   │
+│  │  Brand Identities │ Design Systems │ Campaigns │ Assets      │   │
+│  └──────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 **Key Capabilities:**
 - Brand identity creation with deterministic palette generation (same input = same output)
@@ -65,35 +100,42 @@ The Creative Director Agent is a Python-based system for managing end-to-end cre
 
 ## Architecture
 
+### Component Interaction
+
 ```
-┌─────────────────────────────────────────────────────────────┐
-│              Creative Director Agent                         │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │  Brand   │  │ Visual   │  │ Design   │  │Creative  │   │
-│  │Identity  │  │ Asset    │  │ System   │  │Strategy  │   │
-│  │Designer  │  │Designer  │  │ Builder  │  │Advisor   │   │
-│  │          │  │          │  │          │  │          │   │
-│  │• Palette │  │• Multi   │  │• Comps   │  │• Position│   │
-│  │• Type    │  │• Specs   │  │• Tokens  │  │• Message │   │
-│  │• Logo    │  │• Mockups │  │• Rules   │  │• Ideas   │   │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │
-│       │             │             │             │           │
-│  ┌────┴─────┐  ┌────┴─────┐  ┌────┴─────┐  ┌────┴─────┐   │
-│  │ Content  │  │Creative  │  │  Time    │  │  Design  │   │
-│  │Optimizer │  │Reviewer  │  │Estimator │  │  Asset   │   │
-│  │          │  │          │  │          │  │ Storage  │   │
-│  │• Score   │  │• 5 areas │  │• Hours   │  │• JSON    │   │
-│  │• A/B     │  │• Weights │  │• Cost    │  │• Version │   │
-│  │• Alt     │  │• Verdict │  │• Team    │  │• Export  │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │                   Data Layer                         │   │
-│  │  Brand Identities │ Design Systems │ Campaigns       │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+                    ┌─────────────────┐
+                    │ CreativeDirector│
+                    │     Agent       │
+                    │    (Facade)     │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │    Brand     │ │   Visual    │ │   Design     │
+    │  Identity    │ │   Asset     │ │   System     │
+    │  Designer    │ │  Designer   │ │   Builder    │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │  Creative    │ │  Content    │ │   Campaign   │
+    │  Reviewer    │ │  Optimizer  │ │   Manager    │
+    └──────────────┘ └─────────────┘ └──────────────┘
+```
+
+### Data Flow
+
+```
+Brand Brief ──▶ Identity Creation ──▶ Design System ──▶ Asset Creation
+                                                          │
+Strategy ◀────────────────────────────────────────────────┘
+       │
+       ▼
+Creative Review ──▶ Revision ──▶ Campaign Launch ──▶ Performance
 ```
 
 ## Quick Start
@@ -303,7 +345,7 @@ for component, hours in estimate["breakdown"].items():
 | `estimate_project()` | components, complexity | Estimate dict |
 | `create_campaign()` | name, objective, target_audience, channels, budget, duration_weeks | Campaign object |
 | `launch_campaign()` | campaign_id | Launch dict |
-| `get_status()` | — | Agent status dict |
+| `get_status()` | -- | Agent status dict |
 | `export_system()` | system_id, format | Export dict |
 
 ## Brand Tones
@@ -354,10 +396,40 @@ Complete brand system with deterministic 5-color palette, 3 typography families,
 Component library with design tokens (spacing, colors, typography), usage guidelines, version management, and multi-format export.
 
 ### Campaign
-Creative campaign with objective, audience, channels, budget, duration, and status tracking (draft → active → completed → archived).
+Creative campaign with objective, audience, channels, budget, duration, and status tracking (draft -> active -> completed -> archived).
 
 ### Asset
 Visual asset with format specs, design principles applied, accessibility notes, and version tracking.
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Strategy** | Multiple brand tone generators | BrandIdentityDesigner |
+| **Template Method** | Asset creation per format | VisualAssetDesigner |
+| **Builder** | Construct design systems | DesignSystemBuilder |
+| **Decorator** | Add accessibility checks | CreativeReviewer |
+| **State Machine** | Campaign lifecycle | CampaignManager |
+| **Facade** | Unified creative interface | CreativeDirectorAgent |
+
+## Security
+
+- Brand assets stored with access controls
+- Campaign budgets require approval workflows
+- Design system versions tracked for audit
+- Client data isolation between brands
+- Content moderation before publication
+- Version control prevents unauthorized changes
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Brand Storage | Indexed by brand name | Fast lookup |
+| Design Systems | Versioned with snapshots | Rollback support |
+| Asset Library | Indexed by type and tags | Efficient search |
+| Campaigns | Partitioned by status | Active vs archived |
+| Reviews | Cached scoring | Re-review on change |
 
 ## Configuration
 
@@ -433,36 +505,68 @@ agent.launch_campaign(campaign.campaign_id)
 
 ## Best Practices
 
-1. **Start with Strategy** — Define positioning and messaging before designing any assets
-2. **Maintain Consistency** — Use the design system for all touchpoints; never go rogue
-3. **Design for Accessibility** — WCAG 2.1 AA compliance minimum; AAA when possible
-4. **Document Everything** — Brand guidelines prevent drift; version control prevents chaos
-5. **Iterate Based on Data** — Use performance metrics to refine creative; gut feel isn't enough
-6. **Collaborate Early** — Involve stakeholders in brand development; buy-in prevents rework
-7. **Version Control** — Track design system versions; know what's deployed where
-8. **Budget for Review** — Creative review takes time; don't skip it under deadline pressure
-9. **Test Across Platforms** — What looks great on desktop may fail on mobile
-10. **Build Reusable Components** — One well-designed button template beats 50 one-off buttons
+1. **Start with Strategy** -- Define positioning and messaging before designing any assets
+2. **Maintain Consistency** -- Use the design system for all touchpoints; never go rogue
+3. **Design for Accessibility** -- WCAG 2.1 AA compliance minimum; AAA when possible
+4. **Document Everything** -- Brand guidelines prevent drift; version control prevents chaos
+5. **Iterate Based on Data** -- Use performance metrics to refine creative; gut feel isn't enough
+6. **Collaborate Early** -- Involve stakeholders in brand development; buy-in prevents rework
+7. **Version Control** -- Track design system versions; know what's deployed where
+8. **Budget for Review** -- Creative review takes time; don't skip it under deadline pressure
+9. **Test Across Platforms** -- What looks great on desktop may fail on mobile
+10. **Build Reusable Components** -- One well-designed button template beats 50 one-off buttons
+
+## Checklists
+
+### Brand Identity
+
+- [ ] Brand name validated (domain, social handles available)
+- [ ] Industry and audience defined
+- [ ] Tone and voice guidelines documented
+- [ ] 5-color palette with accessibility contrast ratios
+- [ ] 3 typography families (heading, body, mono)
+- [ ] Logo concept with specifications
+- [ ] Imagery style guide
+- [ ] Brand guidelines document
+
+### Asset Creation
+
+- [ ] Brief reviewed and approved
+- [ ] Design system tokens applied
+- [ ] Accessibility requirements met (contrast, alt text)
+- [ ] Multiple export formats generated
+- [ ] Brand guidelines compliance verified
+- [ ] Version tracked and documented
+
+### Campaign Launch
+
+- [ ] Strategy and messaging approved
+- [ ] All assets reviewed and approved
+- [ ] Platform-specific adaptations complete
+- [ ] Budget allocated and tracked
+- [ ] Timeline confirmed with stakeholders
+- [ ] Analytics tracking configured
+- [ ] Launch checklist completed
 
 ## Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
-| Colors inconsistent | Verify deterministic palette generation; same brand name = same colors |
-| Components not rendering | Check token names match CSS custom property definitions exactly |
-| Campaign launch fails | Verify campaign_id exists and current status allows the transition |
-| Review score low | Address weakest criteria first; focus on quick wins before deep fixes |
-| Timeline aggressive | Increase complexity estimate; add 20% buffer for revisions |
-| Brand identity generic | Add industry-specific elements; research competitor visual language |
-| Accessibility fails | Adjust palette for WCAG AA contrast ratios (4.5:1 text, 3:1 large text) |
-| Export fails | Verify design system has data for requested format; check version |
+| Problem | Diagnosis | Solution |
+|---------|-----------|----------|
+| Colors inconsistent | Seed not deterministic | Verify palette generation uses same brand name |
+| Components not rendering | Token name mismatch | Check token names match CSS custom property definitions |
+| Campaign launch fails | Status transition invalid | Verify campaign_id exists and current status allows transition |
+| Review score low | Weakest criteria dragging down | Address weakest criteria first; focus on quick wins |
+| Timeline aggressive | Underestimated complexity | Increase complexity estimate; add 20% buffer for revisions |
+| Brand identity generic | Missing industry context | Add industry-specific elements; research competitor visual language |
+| Accessibility fails | Insufficient contrast | Adjust palette for WCAG AA contrast ratios (4.5:1 text, 3:1 large text) |
+| Export fails | Format not supported | Verify design system has data for requested format; check version |
 
 ## Files
 
-- `agent.py` — Main implementation (~900 lines)
-- `ARCHITECTURE.md` — System architecture with diagrams and component details
-- `GROK.md` — Agent instructions, identity, and API reference
-- `README.md` — This file
+- `agent.py` -- Main implementation (~900 lines)
+- `ARCHITECTURE.md` -- System architecture with diagrams and component details
+- `GROK.md` -- Agent instructions, identity, and API reference
+- `README.md` -- This file
 
 ## Contributing
 

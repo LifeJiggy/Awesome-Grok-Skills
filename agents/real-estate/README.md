@@ -8,13 +8,25 @@
 
 - [Overview](#overview)
 - [Features](#features)
-- [Quick Start](#quick-start)
 - [Architecture](#architecture)
+- [Quick Start](#quick-start)
 - [Usage](#usage)
+  - [Property Valuation](#property-valuation)
+  - [Market Analysis](#market-analysis)
+  - [Investment Analysis](#investment-analysis)
+  - [Mortgage Calculator](#mortgage-calculator)
+  - [Rental Analysis](#rental-analysis)
+  - [Portfolio Management](#portfolio-management)
+  - [Due Diligence](#due-diligence)
 - [API Reference](#api-reference)
+- [Data Models](#data-models)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Examples](#examples)
 - [Configuration](#configuration)
 - [Best Practices](#best-practices)
+- [Checklists](#checklists)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
@@ -23,6 +35,41 @@
 ## Overview
 
 The Real Estate Agent is a comprehensive real estate analysis platform that provides property valuation using multiple methods (comparable sales, income approach, cost approach), market analysis and trend forecasting, investment ROI and cash flow analysis, mortgage calculation with amortization schedules, rental income optimization, portfolio management and rebalancing, due diligence checklist automation, tax impact analysis, property risk assessment, and multi-property comparison.
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     REAL ESTATE AGENT                                     │
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────┐  │
+│  │PropertyValuation  │  │  MarketAnalyzer  │  │  InvestmentAnalyzer   │  │
+│  │    Engine         │  │                  │  │                       │  │
+│  │ • Comparable      │  │ • Health score   │  │ • Buy & hold          │  │
+│  │ • Income approach │  │ • Trends         │  │ • Flip analysis       │  │
+│  │ • Cost approach   │  │ • Comparison     │  │ • Cash flow           │  │
+│  └──────────────────┘  └──────────────────┘  └───────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────┐  │
+│  │MortgageCalculator │  │  RentalAnalyzer  │  │   PortfolioManager    │  │
+│  │                   │  │                  │  │                       │  │
+│  │ • Payments        │  │ • Yield calc     │  │ • Property tracking   │  │
+│  │ • Amortization    │  │ • Optimization   │  │ • Allocation          │  │
+│  │ • Rate compare    │  │ • Expense mgmt   │  │ • Rebalancing         │  │
+│  └──────────────────┘  └──────────────────┘  └───────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────┐  │
+│  │DueDiligence      │  │   TaxAnalyzer    │  │   RiskAssessor        │  │
+│  │    Manager       │  │                  │  │                       │  │
+│  │ • Checklists     │  │ • Property tax   │  │ • Multi-category      │  │
+│  │ • Phases         │  │ • Depreciation   │  │ • Scoring             │  │
+│  │ • Progress       │  │ • Strategies     │  │ • Mitigation          │  │
+│  └──────────────────┘  └──────────────────┘  └───────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │            PropertyComparisonEngine                                │   │
+│  │  Side-by-side comparison with weighted scoring                    │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 ### Design Principles
 
@@ -47,6 +94,38 @@ The Real Estate Agent is a comprehensive real estate analysis platform that prov
 | **Tax Analysis** | Property tax, depreciation, tax strategies |
 | **Risk Assessment** | Multi-category risk scoring and mitigation |
 | **Property Comparison** | Side-by-side comparison with weighted scoring |
+
+---
+
+## Architecture
+
+### Component Interaction
+
+```
+                    ┌─────────────────┐
+                    │ RealEstateAgent │
+                    │  (Orchestrator) │
+                    └────────┬────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │  Property    │ │   Market    │ │ Investment   │
+    │  Valuation   │ │  Analyzer   │ │  Analyzer    │
+    │  Engine      │ │             │ │              │
+    └───────┬──────┘ └──────┬──────┘ └───────┬──────┘
+            │                │                │
+            └────────────────┼────────────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼──────┐ ┌──────▼──────┐ ┌───────▼──────┐
+    │  Mortgage    │ │   Rental    │ │  Portfolio   │
+    │  Calculator  │ │  Analyzer   │ │  Manager     │
+    └──────────────┘ └─────────────┘ └──────────────┘
+```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system architecture.
 
 ---
 
@@ -75,7 +154,10 @@ print(result)
 ### First Property Valuation
 
 ```python
-from agents.real_estate.agent import PropertyValuationEngine, Property, PropertyType, ListingStatus, PropertyCondition
+from agents.real_estate.agent import (
+    PropertyValuationEngine, Property, PropertyType,
+    ListingStatus, PropertyCondition
+)
 
 engine = PropertyValuationEngine()
 
@@ -106,38 +188,6 @@ engine.register_property(prop)
 
 ---
 
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                  Real Estate Agent (Orchestrator)                 │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────┐  │
-│  │ PropertyValuation │  │  MarketAnalyzer   │  │Investment     │  │
-│  │    Engine         │  │                   │  │Analyzer       │  │
-│  └──────────────────┘  └──────────────────┘  └───────────────┘  │
-│                                                                   │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────┐  │
-│  │MortgageCalculator │  │  RentalAnalyzer   │  │Portfolio      │  │
-│  │                   │  │                   │  │Manager        │  │
-│  └──────────────────┘  └──────────────────┘  └───────────────┘  │
-│                                                                   │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────┐  │
-│  │DueDiligence       │  │   TaxAnalyzer     │  │RiskAssessor   │  │
-│  │    Manager        │  │                   │  │               │  │
-│  └──────────────────┘  └──────────────────┘  └───────────────┘  │
-│                                                                   │
-│  ┌───────────────────────────────────────────────────────────┐   │
-│  │            PropertyComparisonEngine                        │   │
-│  └───────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system architecture.
-
----
-
 ## Usage
 
 ### Property Valuation
@@ -153,10 +203,15 @@ engine.add_comparable("P001", comp)
 val = engine.comparable_sales_valuation("P001")
 
 # Income approach
-val = engine.income_approach_valuation("P001", annual_rental_income=33600, cap_rate=0.055)
+val = engine.income_approach_valuation(
+    "P001", annual_rental_income=33600, cap_rate=0.055
+)
 
 # Cost approach
-val = engine.cost_approach_valuation("P001", land_value=150000, replacement_cost_per_sqft=200, depreciation_pct=0.15)
+val = engine.cost_approach_valuation(
+    "P001", land_value=150000,
+    replacement_cost_per_sqft=200, depreciation_pct=0.15
+)
 
 # Auto valuation
 val = engine.auto_valuation("P001")
@@ -165,7 +220,7 @@ val = engine.auto_valuation("P001")
 ### Market Analysis
 
 ```python
-from agents.real_estate.agent import MarketAnalyzer, MarketData, MarketCycle
+from agents.real_estate.agent import MarketAnalyzer
 
 analyzer = MarketAnalyzer()
 analyzer.register_market(market_data)
@@ -266,6 +321,54 @@ comparison = mortgage.compare_rates(
 
 ---
 
+## Data Models
+
+### Property
+Complete property record with physical attributes, listing status, and financial data.
+
+### MarketData
+Market health indicators including price trends, inventory, days on market, and vacancy rates.
+
+### InvestmentAnalysis
+ROI, cash flow projections, and strategy-specific analysis results.
+
+### AmortizationSchedule
+Monthly payment breakdown with principal, interest, and balance tracking.
+
+### PortfolioAllocation
+Property distribution with diversification metrics and rebalancing recommendations.
+
+---
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Strategy** | Multiple valuation methods | PropertyValuationEngine |
+| **Template Method** | Investment strategy analysis | InvestmentAnalyzer |
+| **Facade** | Unified real estate interface | RealEstateAgent |
+| **Builder** | Construct complex analyses | AnalysisBuilder |
+| **Observer** | Portfolio threshold alerts | PortfolioManager |
+
+## Security
+
+- Financial data encrypted at rest
+- Property data access controls
+- Audit trail for all valuations
+- Sensitive financial info protection
+- Role-based access for different operations
+
+## Scalability
+
+| Dimension | Strategy | Notes |
+|-----------|----------|-------|
+| Properties | Indexed by location + type | Fast geographic queries |
+| Valuations | Cached with invalidation | Recompute on data change |
+| Market Data | Time-series storage | Efficient trend analysis |
+| Portfolio | Partitioned by owner | Multi-user support |
+
+---
+
 ## Examples
 
 ### Complete Investment Analysis
@@ -281,8 +384,13 @@ agent.valuation.add_comparable("P001", comp)
 
 # Multi-method valuation
 comp_val = agent.valuation.comparable_sales_valuation("P001")
-income_val = agent.valuation.income_approach_valuation("P001", annual_rental_income=33600, cap_rate=0.055)
-cost_val = agent.valuation.cost_approach_valuation("P001", land_value=150000, replacement_cost_per_sqft=200, depreciation_pct=0.15)
+income_val = agent.valuation.income_approach_valuation(
+    "P001", annual_rental_income=33600, cap_rate=0.055
+)
+cost_val = agent.valuation.cost_approach_valuation(
+    "P001", land_value=150000,
+    replacement_cost_per_sqft=200, depreciation_pct=0.15
+)
 
 # Investment analysis
 analysis = agent.investment.analyze_property(
@@ -296,7 +404,9 @@ analysis = agent.investment.analyze_property(
 )
 
 # Risk assessment
-risks = agent.risks.assess_property_risks("P001", PropertyType.SINGLE_FAMILY, 2005)
+risks = agent.risks.assess_property_risks(
+    "P001", PropertyType.SINGLE_FAMILY, 2005
+)
 
 # Tax analysis
 tax = agent.tax.analyze_tax_impact("P001", 450000, 33600, 12000)
@@ -364,10 +474,39 @@ config = RealEstateConfig(
 4. Monitor population and employment growth trends
 
 ### Due Diligence
-1. Never skip inspections — they save money long-term
+1. Never skip inspections -- they save money long-term
 2. Complete all items before removing contingencies
 3. Document everything for legal protection
 4. Use the checklist to ensure nothing is missed
+
+---
+
+## Checklists
+
+### Property Evaluation
+- [ ] Location analyzed (schools, crime, amenities)
+- [ ] Comparable sales reviewed (3+ within 1 mile)
+- [ ] Physical inspection completed
+- [ ] Market conditions assessed
+- [ ] Rental demand verified
+- [ ] Cash flow modeled with conservative assumptions
+
+### Due Diligence
+- [ ] Title search completed
+- [ ] Property survey reviewed
+- [ ] Inspection reports reviewed
+- [ ] Environmental assessment (if applicable)
+- [ ] Zoning verification
+- [ ] HOA documents reviewed
+- [ ] Insurance quotes obtained
+
+### Investment Decision
+- [ ] Multiple valuation methods cross-checked
+- [ ] Cash flow positive at current rates
+- [ ] Emergency fund for vacancies/maintenance
+- [ ] Exit strategy defined
+- [ ] Tax implications analyzed
+- [ ] Risk assessment completed
 
 ---
 
@@ -390,13 +529,13 @@ config = RealEstateConfig(
 | `agent.py` | Full implementation (all classes and logic) |
 | `GROK.md` | Agent identity, capabilities, and code examples |
 | `ARCHITECTURE.md` | System architecture with diagrams |
-| `README.md` | This file — overview and quick start |
+| `README.md` | This file -- overview and quick start |
 
 ---
 
 ## License
 
-MIT License — see [LICENSE](../../LICENSE) for details.
+MIT License -- see [LICENSE](../../LICENSE) for details.
 
 ---
 
