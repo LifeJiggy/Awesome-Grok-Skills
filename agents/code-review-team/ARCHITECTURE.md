@@ -407,4 +407,477 @@ if gate.result.value == "fail":
 
 ---
 
+## Code Examples
+
+### Linting Python Code
+
+```python
+from agent import LinterIntegrator
+
+linter = LinterIntegrator()
+
+code = '''
+import os
+import sys
+from os import *
+
+def process(data):
+    print("processing")
+    result = eval(data)
+    return result
+'''
+
+issues = linter.lint(code, "app.py", "python")
+for issue in issues:
+    print(f"[{issue.severity.value}] {issue.rule_id}: {issue.message}")
+    print(f"  Line {issue.line_number}: {issue.code_snippet}")
+    print(f"  Fix: {issue.suggestion}")
+```
+
+### Scanning JavaScript Code
+
+```python
+code = '''
+const password = "admin123";
+const query = "SELECT * FROM users WHERE id=" + userId;
+document.innerHTML = userInput;
+eval(userCode);
+'''
+
+findings = scanner.scan(code, "app.js")
+for f in findings:
+    print(f"[{f.severity.value}] {f.vulnerability_type.value}")
+    print(f"  CWE: {f.cwe_id}")
+    print(f"  Fix: {f.recommendation}")
+```
+
+### Analyzing Complex Code
+
+```python
+code = '''
+def complex_logic(data):
+    if data:
+        for item in data:
+            if item.active:
+                if item.type == "a":
+                    for sub in item.children:
+                        if sub.valid:
+                            process(sub)
+                        else:
+                            skip(sub)
+                elif item.type == "b":
+                    handle_b(item)
+                else:
+                    handle_other(item)
+            else:
+                log_inactive(item)
+    return result
+'''
+
+metrics, issues = analyzer.analyze(code, "logic.py")
+print(f"Cyclomatic: {metrics.cyclomatic_complexity}")  # 10
+print(f"Cognitive: {metrics.cognitive_complexity}")    # 15
+print(f"Max Nesting: {metrics.max_nesting_depth}")    # 5
+```
+
+---
+
+## Configuration Examples
+
+### Strict Configuration (Enterprise)
+
+```python
+config = Config(
+    review_config=ReviewConfig(
+        max_line_length=100,
+        max_function_length=30,
+        max_file_length=300,
+        max_complexity=5,
+        max_nesting_depth=3,
+        require_docstrings=True,
+        require_type_hints=True,
+        security_scanning=True,
+        excluded_files=["*.test.*", "migrations/*"],
+    ),
+    min_score=85.0,
+    fail_on_critical=True,
+    fail_on_error=True,  # Strict: fail on errors too
+    report_formats=["markdown", "json"],
+)
+```
+
+### Relaxed Configuration (Legacy Code)
+
+```python
+config = Config(
+    review_config=ReviewConfig(
+        max_line_length=150,
+        max_function_length=100,
+        max_file_length=1000,
+        max_complexity=20,
+        max_nesting_depth=6,
+        require_docstrings=False,
+        require_type_hints=False,
+        security_scanning=True,
+        excluded_files=["*.test.*", "migrations/*", "legacy/*"],
+    ),
+    min_score=50.0,
+    fail_on_critical=True,
+    fail_on_error=False,
+    report_formats=["text"],
+)
+```
+
+---
+
+## Integration Examples
+
+### GitHub Actions Integration
+
+```yaml
+# .github/workflows/code-review.yml
+name: Code Review
+
+on: [pull_request]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Code Review
+        run: |
+          python agents/code-review-team/agent.py \
+            --changed-files "${{ steps.changed.outputs.files }}" \
+            --language python \
+            --output review.json
+      - name: Check Quality Gate
+        run: |
+          python -c "
+          import json
+          with open('review.json') as f:
+              data = json.load(f)
+          if data['gate'] == 'FAIL':
+              exit(1)
+          "
+```
+
+### Pre-commit Hook
+
+```bash
+#!/bin/bash
+# .git/hooks/pre-commit
+
+CHANGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$')
+
+if [ -z "$CHANGED_FILES" ]; then
+    exit 0
+fi
+
+python agents/code-review-team/agent.py \
+    --files $CHANGED_FILES \
+    --language python \
+    --output review.json
+
+GATE=$(python -c "import json; print(json.load(open('review.json'))['gate'])")
+
+if [ "$GATE" = "FAIL" ]; then
+    echo "❌ Code review failed. Fix issues before committing."
+    exit 1
+fi
+
+echo "✅ Code review passed."
+```
+
+### Slack Notification Integration
+
+```python
+import json
+import requests
+
+def notify_slack(review_result, webhook_url):
+    if review_result.gate == "FAIL":
+        color = "danger"
+        emoji = "❌"
+    else:
+        color = "good"
+        emoji = "✅"
+
+    payload = {
+        "attachments": [{
+            "color": color,
+            "title": f"{emoji} Code Review: {review_result.file_path}",
+            "fields": [
+                {"title": "Score", "value": f"{review_result.score}/100", "short": True},
+                {"title": "Issues", "value": str(len(review_result.issues)), "short": True},
+                {"title": "Gate", "value": review_result.gate, "short": True},
+            ],
+            "footer": "Code Review Team Agent",
+        }]
+    }
+    requests.post(webhook_url, json=payload)
+```
+
+---
+
+## Testing Strategy Examples
+
+### Unit Test for Linter
+
+```python
+def test_lint_detects_print():
+    linter = LinterIntegrator()
+    code = 'print("hello")'
+    issues = linter.lint(code, "test.py", "python")
+    assert len(issues) == 1
+    assert issues[0].rule_id == "W1001"
+    assert issues[0].severity == Severity.WARNING
+```
+
+### Unit Test for Security Scanner
+
+```python
+def test_scan_detects_sql_injection():
+    scanner = SecurityScanner()
+    code = 'query = f"SELECT * FROM users WHERE id = {user_id}"'
+    findings = scanner.scan(code, "test.py")
+    assert len(findings) == 1
+    assert findings[0].vulnerability_type == VulnerabilityType.SQL_INJECTION
+    assert findings[0].cwe_id == "CWE-89"
+```
+
+### Unit Test for Quality Gate
+
+```python
+def test_quality_gate_passes():
+    gate = QualityGate()
+    results = [
+        ReviewResult(score=85, issues=[], complexity=ComplexityMetrics(...)),
+    ]
+    gate_result = gate.check(results)
+    assert gate_result == GateResult.PASS
+
+def test_quality_gate_fails_on_critical():
+    gate = QualityGate()
+    results = [
+        ReviewResult(score=90, issues=[
+            CodeIssue(severity=Severity.CRITICAL, ...)
+        ], complexity=ComplexityMetrics(...)),
+    ]
+    gate_result = gate.check(results)
+    assert gate_result == GateResult.FAIL
+```
+
+---
+
+## Configuration Examples
+
+### Python Project Configuration
+
+```python
+python_config = Config(
+    review_config=ReviewConfig(
+        max_line_length=88,           # Black formatter default
+        max_function_length=50,
+        max_file_length=500,
+        max_complexity=10,
+        max_cognitive_complexity=15,
+        max_nesting_depth=4,
+        max_parameters=5,
+        require_docstrings=True,
+        require_type_hints=True,
+        security_scanning=True,
+        excluded_files=[
+            "*.test.*",
+            "test_*",
+            "conftest.py",
+            "migrations/*",
+            "__pycache__/*",
+            "venv/*",
+            ".venv/*",
+        ],
+    ),
+    min_score=75.0,
+    fail_on_critical=True,
+    fail_on_error=False,
+)
+```
+
+### JavaScript/TypeScript Configuration
+
+```python
+js_config = Config(
+    review_config=ReviewConfig(
+        max_line_length=100,
+        max_function_length=40,
+        max_file_length=400,
+        max_complexity=8,
+        max_nesting_depth=3,
+        require_docstrings=False,  # JSDoc optional
+        require_type_hints=False,
+        security_scanning=True,
+        excluded_files=[
+            "node_modules/*",
+            "dist/*",
+            "build/*",
+            "*.min.js",
+            "*.test.js",
+            "*.spec.js",
+        ],
+    ),
+    min_score=70.0,
+    fail_on_critical=True,
+    fail_on_error=False,
+)
+```
+
+---
+
+## Severity Levels Guide
+
+### CRITICAL
+
+Security vulnerabilities that allow immediate exploitation:
+- SQL Injection
+- Command Injection
+- Hardcoded secrets/credentials
+- Remote Code Execution
+
+**Action**: Must fix before merge. Block deployment.
+
+### ERROR
+
+Serious issues affecting reliability or security:
+- XSS vulnerabilities
+- Path traversal
+- Insecure deserialization
+- Missing authentication
+
+**Action**: Should fix before merge. Flag in PR review.
+
+### WARNING
+
+Code quality issues that may cause bugs:
+- Bare except clauses
+- Mutable default arguments
+- Console.log in production
+- var usage in JavaScript
+
+**Action**: Fix when possible. Track in tech debt.
+
+### INFO
+
+Style and convention violations:
+- TODO comments
+- Missing type hints
+- Long lines
+- Magic numbers
+
+**Action**: Fix in follow-up. Don't block merge.
+
+### HINT
+
+Suggestions for improvement:
+- Alternative approaches
+- Performance optimizations
+- Readability improvements
+
+**Action**: Consider during refactoring.
+
+---
+
+## Quality Score Calculation
+
+```python
+def calculate_score(issues, complexity_metrics):
+    """Calculate quality score (0-100)."""
+    score = 100.0
+
+    # Deductions by severity
+    deductions = {
+        Severity.CRITICAL: 25,
+        Severity.ERROR: 10,
+        Severity.WARNING: 3,
+        Severity.INFO: 1,
+        Severity.HINT: 0,
+    }
+
+    for issue in issues:
+        score -= deductions.get(issue.severity, 0)
+
+    # Complexity penalties
+    if complexity_metrics.cyclomatic_complexity > 20:
+        score -= 10
+    elif complexity_metrics.cyclomatic_complexity > 10:
+        score -= 5
+
+    if complexity_metrics.max_nesting_depth > 8:
+        score -= 10
+    elif complexity_metrics.max_nesting_depth > 4:
+        score -= 5
+
+    return max(0.0, min(100.0, score))
+```
+
+---
+
+## Report Format Examples
+
+### Markdown Report
+
+```markdown
+# Code Review Report
+
+**File**: app.py
+**Language**: Python
+**Score**: 85/100
+**Gate**: PASS
+
+## Summary
+- Critical: 0
+- Error: 0
+- Warning: 3
+- Info: 5
+
+## Issues
+
+### [WARNING] W1001: print() usage
+- **Line**: 15
+- **Code**: `print("debug info")`
+- **Fix**: Use logging module instead
+
+### [INFO] I1001: TODO comment
+- **Line**: 23
+- **Code**: `# TODO: optimize this`
+- **Fix**: Resolve before merge
+```
+
+### JSON Report
+
+```json
+{
+  "file_path": "app.py",
+  "language": "python",
+  "score": 85.0,
+  "gate": "PASS",
+  "issues": [
+    {
+      "rule_id": "W1001",
+      "severity": "WARNING",
+      "line_number": 15,
+      "message": "print() usage",
+      "suggestion": "Use logging module"
+    }
+  ],
+  "complexity": {
+    "cyclomatic": 8,
+    "cognitive": 12,
+    "loc": 150,
+    "max_function_length": 45
+  }
+}
+```
+
+---
+
 *Code Review Team Agent Architecture v2.0 — Part of the Awesome Grok Skills collection.*

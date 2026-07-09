@@ -386,6 +386,23 @@ for p in result['comparison']:
 | `cash_on_cash_return` | float | Cash-on-cash return (%) |
 | `break_even_years` | float | Years to break even |
 
+### Method Signatures
+
+```python
+class PropertyValuationEngine:
+    def register_property(self, prop: Property) -> Property
+    def add_comparable(self, property_id: str, comp: ComparableSale) -> None
+    def comparable_sales_valuation(self, property_id: str) -> Valuation
+    def income_approach_valuation(self, property_id: str, annual_rental_income: float, cap_rate: float) -> Valuation
+    def cost_approach_valuation(self, property_id: str, land_value: float, replacement_cost_per_sqft: float, depreciation_pct: float) -> Valuation
+    def auto_valuation(self, property_id: str) -> Valuation
+
+class InvestmentAnalyzer:
+    def analyze_property(self, property_id: str, purchase_price: float, down_payment_pct: float, interest_rate: float, loan_term_years: int, monthly_rental_income: float, monthly_expenses: float, strategy: InvestmentStrategy) -> InvestmentAnalysis
+    def flip_analysis(self, purchase_price: float, renovation_cost: float, holding_months: int, after_repair_value: float) -> Dict
+    def cash_flow_projection(self, monthly_rental: float, monthly_expenses: float, mortgage_payment: float, years: int) -> List[Dict]
+```
+
 ---
 
 ## Checklists
@@ -432,6 +449,35 @@ for p in result['comparison']:
 | High risk score | Multiple risk factors | Address highest-impact risks first |
 | Portfolio imbalance | Over-allocation to one strategy | Follow rebalance suggestions |
 | Low health score | Poor market indicators | Consider different markets |
+| Mortgage calc wrong | Check interest rate format | Use decimal (0.065 not 6.5) for some methods |
+
+---
+
+## Best Practices
+
+### Valuation
+1. Always use multiple valuation methods and cross-validate
+2. Select comparables within 1 mile and 6 months
+3. Adjust for size, condition, age, and location differences
+4. Document all assumptions and adjustments
+
+### Investment Analysis
+1. Include all expenses (tax, insurance, maintenance, management, vacancy)
+2. Stress-test with different rent growth and expense scenarios
+3. Consider both cash flow and appreciation in ROI calculations
+4. Account for closing costs in both purchase and sale
+
+### Market Analysis
+1. Track multiple indicators (price, rent, vacancy, DOM, inventory)
+2. Understand the current market cycle position
+3. Compare multiple markets before investing
+4. Monitor population and employment growth trends
+
+### Due Diligence
+1. Never skip inspections — they save money long-term
+2. Complete all items before removing contingencies
+3. Document everything for legal protection
+4. Use the checklist to ensure nothing is missed
 
 ---
 

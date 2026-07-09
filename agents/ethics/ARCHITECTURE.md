@@ -523,3 +523,295 @@ ethics_agent:
 | Integration tests | Full assessment | pytest + fixtures |
 | Property tests | Fairness axioms | hypothesis |
 | Regression tests | Known bias cases | pytest |
+
+### Unit Test Examples
+
+```python
+# Bias Detector Tests
+def test_bias_detection():
+    detector = BiasDetector()
+    predictions = [
+        ModelPrediction(1, 1, {"gender": "male"}),
+        ModelPrediction(0, 1, {"gender": "female"}),
+    ]
+    results = detector.analyze_predictions(predictions, ["gender"])
+    assert "gender" in results
+    assert results["gender"].bias_score > 0
+
+# Fairness Metrics Tests
+def test_demographic_parity():
+    fairness = FairnessMetrics()
+    predictions = [
+        ModelPrediction(1, 1, {"gender": "male"}),
+        ModelPrediction(1, 0, {"gender": "female"}),
+    ]
+    result = fairness.calculate_demographic_parity(predictions, "gender")
+    assert result.value >= 0
+    assert result.value <= 1
+
+# Compliance Tests
+def test_compliance_check():
+    manager = ComplianceFrameworkManager()
+    manager.add_framework(ComplianceFramework.EU_AI_ACT)
+    manager.add_requirement(ComplianceFramework.EU_AI_ACT, "Transparency", "Must be transparent")
+    result = manager.check_compliance(ComplianceFramework.EU_AI_ACT, {"Transparency": True})
+    assert result["compliant"]
+```
+
+### Statistical Test Examples
+
+```python
+def test_bias_statistical_significance():
+    """Test that bias detection uses proper statistical tests."""
+    detector = BiasDetector()
+    
+    # Create predictions with known bias
+    predictions = create_biased_predictions(bias_rate=0.2, n=1000)
+    results = detector.analyze_predictions(predictions, ["gender"])
+    
+    # Verify statistical significance
+    assert results["gender"].is_flagged
+    assert results["gender"].p_value < 0.05
+
+def test_fairness_metric_bounds():
+    """Test that fairness metrics are bounded [0, 1]."""
+    fairness = FairnessMetrics()
+    
+    for _ in range(100):
+        predictions = create_random_predictions(n=500)
+        dp = fairness.calculate_demographic_parity(predictions, "gender")
+        assert 0 <= dp.value <= 1
+```
+
+### Integration Test Examples
+
+```python
+def test_full_assessment():
+    agent = EthicsAgent()
+    
+    # Create predictions
+    predictions = [
+        ModelPrediction(1, 1, {"gender": "male", "race": "white"}),
+        ModelPrediction(0, 1, {"gender": "female", "race": "black"}),
+    ]
+    
+    # Run full assessment
+    report = agent.run_full_assessment(
+        model_id="test_model",
+        model_name="Test Model",
+        predictions=predictions,
+        protected_attributes=["gender", "race"],
+        compliance_frameworks=[ComplianceFramework.EU_AI_ACT],
+    )
+    
+    assert "bias_analysis" in report
+    assert "fairness_metrics" in report
+    assert "compliance" in report
+    assert "risk_assessment" in report
+```
+
+### Property Test Examples
+
+```python
+from hypothesis import given, strategies as st
+
+@given(st.lists(st.integers(0, 1), min_size=100))
+def test_demographic_parity_symmetry(labels):
+    """Demographic parity should be symmetric."""
+    fairness = FairnessMetrics()
+    predictions = create_predictions(labels)
+    dp = fairness.calculate_demographic_parity(predictions, "gender")
+    assert dp.value == fairness.calculate_demographic_parity(predictions, "gender")
+
+@given(st.floats(0.0, 1.0))
+def test_bias_score_bounds(bias_rate):
+    """Bias score should be bounded [0, 1]."""
+    detector = BiasDetector()
+    predictions = create_biased_predictions(bias_rate, n=1000)
+    results = detector.analyze_predictions(predictions, ["gender"])
+    assert 0 <= results["gender"].bias_score <= 1
+```
+
+---
+
+## Deployment Architecture
+
+### Single-Instance Deployment
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    APPLICATION SERVER                         │
+├─────────────────────────────────────────────────────────────┤
+│  ┌───────────────────────────────────────────────────────┐ │
+│  │                  EthicsAgent                           │ │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐    │ │
+│  │  │  Bias   │ │Fairness │ │Compliance│ │Trans-   │    │ │
+│  │  │Detector │ │ Metrics │ │ Manager │ │parency  │    │ │
+│  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘    │ │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐    │ │
+│  │  │Account- │ │  Audit  │ │  Risk   │ │Guide-   │    │ │
+│  │  │ability  │ │  Trail  │ │ Manager │ │lines    │    │ │
+│  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘    │ │
+│  └───────────────────────────────────────────────────────┘ │
+│                                                             │
+│  ┌───────────────────────────────────────────────────────┐ │
+│  │                  DATA LAYER                            │ │
+│  │  In-Memory │ Optional DB │ Audit Storage              │ │
+│  └───────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Integration with ML Pipeline
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ML PIPELINE INTEGRATION                    │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐  │
+│  │  Train  │ ─► │Validate │ ─► │  Ethics │ ─► │ Deploy  │  │
+│  │  Model  │    │ Model   │    │  Check  │    │ Model   │  │
+│  └─────────┘    └─────────┘    └─────────┘    └─────────┘  │
+│                       │               │                      │
+│                       │               ▼                      │
+│                       │         ┌─────────┐                 │
+│                       │         │  Block  │                 │
+│                       │         │ Deploy  │                 │
+│                       │         └─────────┘                 │
+│                       │                                      │
+│                       ▼                                      │
+│                 ┌─────────┐                                  │
+│                 │  Pass   │                                  │
+│                 └─────────┘                                  │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Security Architecture
+
+### Data Protection
+
+| Data Type | Protection | Storage |
+|-----------|------------|---------|
+| Predictions | Encrypted | Database |
+| Bias findings | Access-controlled | Audit trail |
+| Model cards | Version-controlled | Document store |
+| Audit logs | Immutable | Append-only log |
+| Incident reports | Access-controlled | Database |
+
+### Access Control
+
+| Role | Permissions |
+|------|-------------|
+| Data Scientist | Run bias analysis, view results |
+| Model Owner | Create model cards, assign accountability |
+| Ethics Committee | Approve documents, conduct audits |
+| Auditor | View audit trail, generate reports |
+| Admin | Full access |
+
+### Audit Trail Integrity
+
+- All entries are timestamped and immutable
+- Cryptographic hashing for tamper detection
+- Append-only storage
+- Regular integrity checks
+
+---
+
+## Monitoring and Observability
+
+### Key Metrics
+
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| Bias detection rate | Flagged attributes / total | > 20% |
+| Fairness compliance | Fair metrics / total | < 80% |
+| Compliance rate | Compliant requirements / total | < 90% |
+| Incident count | Open incidents | > 5 |
+| Audit completion | Completed / started | < 80% |
+| Risk score average | Mean risk score | > 35 |
+
+### Ethics Dashboard
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ETHICS DASHBOARD                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │ Bias        │  │ Fairness    │  │ Compliance  │         │
+│  │ Analyses    │  │ Metrics     │  │ Rate        │         │
+│  │    150      │  │   85%       │  │    92%      │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+│                                                               │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │ Incidents   │  │ High Risk   │  │ Audits      │         │
+│  │    3        │  │   Models    │  │  Completed  │         │
+│  │   Open      │  │     2       │  │    12       │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Data Retention Policy
+
+| Data Type | Retention | Archive After |
+|-----------|-----------|---------------|
+| Bias analyses | 5 years | 2 years |
+| Fairness metrics | 5 years | 2 years |
+| Compliance records | 7 years | 3 years |
+| Model cards | Indefinite | Never |
+| Audit logs | 7 years | 3 years |
+| Incident reports | 5 years | 2 years |
+
+---
+
+## Disaster Recovery
+
+### Backup Strategy
+
+| Data | Frequency | Method | Recovery Time |
+|------|-----------|--------|---------------|
+| Bias analyses | Daily | Full dump | < 1 hour |
+| Audit trail | Real-time | Replication | < 5 minutes |
+| Model cards | On change | Version control | < 15 minutes |
+| Compliance data | Daily | Encrypted backup | < 2 hours |
+
+### Recovery Procedures
+
+1. **Data corruption**: Restore from last backup
+2. **Service failure**: Restart and verify state
+3. **Audit trail breach**: Activate integrity verification
+4. **Full outage**: Deploy to backup region
+
+---
+
+## Regulatory Compliance
+
+### EU AI Act Requirements
+
+| Requirement | Status | Evidence |
+|-------------|--------|----------|
+| Risk classification | Supported | Model risk assessment |
+| Transparency | Supported | Model cards |
+| Human oversight | Supported | Accountability tracking |
+| Robustness | Supported | Bias detection |
+| Record keeping | Supported | Audit trail |
+
+### NIST AI RMF Functions
+
+| Function | Coverage |
+|----------|----------|
+| Govern | Accountability, policies |
+| Map | Risk assessment, impact analysis |
+| Measure | Bias detection, fairness metrics |
+| Manage | Incident response, mitigation |
+
+---
+
+**See Also**: [GROK.md](./GROK.md) for agent identity and capabilities,
+[README.md](./README.md) for quick start and API reference.

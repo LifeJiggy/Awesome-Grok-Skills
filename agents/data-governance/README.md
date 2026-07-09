@@ -12,6 +12,7 @@
 
 - [Overview](#overview)
 - [Features](#features)
+- [Architecture](#architecture)
 - [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -27,6 +28,9 @@
 - [API Reference](#api-reference)
 - [Examples](#examples)
 - [Configuration](#configuration)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
@@ -69,6 +73,40 @@ Built for data teams, compliance officers, data stewards, and data architects wh
 | Governance Scoring | Maturity scoring across 6 dimensions |
 | Export | JSON, CSV, Markdown, PDF formats |
 | Audit Trail | Immutable operation logging |
+
+---
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                     DataGovernanceAgent                                   │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Policy Mgr    │  │  Asset Mgr     │  │  Quality Engine            │  │
+│  │  ├ Create      │  │  ├ Register    │  │  ├ Profiling               │  │
+│  │  ├ Approve     │  │  ├ Search      │  │  ├ Rules (15+ types)       │  │
+│  │  ├ Enforce     │  │  ├ Update      │  │  ├ Scoring                 │  │
+│  │  └ Retire      │  │  └ Delete      │  │  └ Monitoring              │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Lineage       │  │  Metadata      │  │  Compliance                │  │
+│  │  ├ Track       │  │  ├ Catalog     │  │  ├ 18 frameworks           │  │
+│  │  ├ Upstream    │  │  ├ Glossary    │  │  ├ Assessment              │  │
+│  │  ├ Downstream  │  │  ├ Search      │  │  ├ Findings                │  │
+│  │  └ Impact      │  │  └ Tags        │  │  └ Remediation             │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Stewardship   │  │  Issues        │  │  Scoring                   │  │
+│  │  ├ Assign      │  │  ├ Create      │  │  ├ 6 dimensions            │  │
+│  │  ├ Track       │  │  ├ Track       │  │  ├ Maturity levels         │  │
+│  │  └ Metrics     │  │  ├ Resolve     │  │  └ Trend analysis          │  │
+│  │               │  │  └ Escalate    │  │                            │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -146,6 +184,18 @@ agent.approve_policy(policy.policy_id, "Data Governance Board")
 needs_review = agent.get_policies_needing_review()
 ```
 
+**Policy Types:**
+
+| Type | Description | Typical Rules |
+|------|-------------|---------------|
+| DATA_RETENTION | How long data is kept | Retention periods, deletion schedules |
+| ACCESS_CONTROL | Who can access data | Role-based, attribute-based |
+| DATA_CLASSIFICATION | How data is categorized | Sensitivity levels, labels |
+| DATA_QUALITY | Quality standards | Accuracy, completeness thresholds |
+| DATA_PRIVACY | Privacy requirements | PII handling, consent |
+| DATA_SECURITY | Security requirements | Encryption, masking |
+| DATA_LINEAGE | Lineage tracking | Source tracking, transformation |
+
 ### Asset Management
 
 ```python
@@ -166,6 +216,22 @@ results = agent.search_assets("customer")
 
 # Filter by domain
 customer_assets = agent.list_assets(domain=DataDomain.CUSTOMER)
+```
+
+**Asset Classification Levels:**
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                 Data Classification Matrix                     │
+├─────────────────┬──────────────────┬────────────────────────┤
+│  Level          │  Examples        │  Controls              │
+├─────────────────┼──────────────────┼────────────────────────┤
+│  PUBLIC         │  Marketing docs  │  None required         │
+│  INTERNAL       │  Internal wiki   │  Access logging        │
+│  CONFIDENTIAL   │  Customer data   │  Encryption + audit    │
+│  RESTRICTED     │  PII, PHI        │  Full controls + MFA   │
+│  TOP SECRET     │  Payment data    │  Maximum security      │
+└─────────────────┴──────────────────┴────────────────────────┘
 ```
 
 ### Quality Management
@@ -192,6 +258,21 @@ results = agent.run_quality_rules(asset.asset_id)
 summary = agent.get_quality_summary()
 ```
 
+**Quality Dimensions:**
+
+| Dimension | Description | Metrics |
+|-----------|-------------|---------|
+| COMPLETENESS | All required data present | Null %, missing % |
+| ACCURACY | Data matches real-world values | Error %, validation fail % |
+| CONSISTENCY | Data is uniform across systems | Conflict %, mismatch % |
+| TIMELINESS | Data is up-to-date | Age, freshness |
+| UNIQUENESS | No unwanted duplicates | Duplicate % |
+| VALIDITY | Data conforms to rules | Format, range violations |
+| INTEGRITY | Relationships are maintained | Orphan %, constraint violations |
+| CONFORMITY | Data follows standards | Standard compliance % |
+| PRESENTATION | Data is well-formatted | Formatting issues |
+| REASONABLENESS | Data is within expected bounds | Outlier % |
+
 ### Lineage Tracking
 
 ```python
@@ -211,6 +292,21 @@ print(f"Risk: {impact['risk_level']}")
 # Trace dependencies
 upstream = agent.trace_upstream("dim_customers")
 downstream = agent.trace_downstream("dim_customers")
+```
+
+**Lineage Graph:**
+
+```
+  raw_customers ──────► cleaned_customers ──────► dim_customers
+                           │                         │
+                           ▼                         ▼
+                      staging_orders            fact_sales
+                                                   │
+                                                   ▼
+                                              data_warehouse
+                                                   │
+                                                   ▼
+                                            BI_Reports
 ```
 
 ### Metadata Catalog
@@ -250,6 +346,19 @@ print(f"GDPR: {assessment.status.value} (score: {assessment.score:.2%})")
 summary = agent.get_compliance_summary()
 ```
 
+**Compliance Frameworks:**
+
+| Framework | Region | Focus |
+|-----------|--------|-------|
+| GDPR | EU | Data privacy, right to erasure |
+| SOC2 | Global | Security, availability, processing |
+| HIPAA | US | Healthcare data protection |
+| PCI-DSS | Global | Payment card data security |
+| CCPA | California | Consumer privacy |
+| ISO27001 | Global | Information security management |
+| FedRAMP | US Gov | Federal cloud security |
+| NIST CSF | US | Cybersecurity framework |
+
 ### Stewardship
 
 ```python
@@ -288,6 +397,16 @@ print(f"Overall Score: {score.overall_score:.2%}")
 print(f"Maturity: {score.maturity_level.value}")
 for dim, s in score.dimension_scores.items():
     print(f"  {dim}: {s:.2%}")
+```
+
+**Maturity Levels:**
+
+```
+Level 1: INITIAL      (0-20%)   Ad-hoc, reactive
+Level 2: DEVELOPING   (21-40%)  Some processes defined
+Level 3: DEFINED      (41-60%)  Standardized processes
+Level 4: MANAGED      (61-80%)  Measured and controlled
+Level 5: OPTIMIZING   (81-100%) Continuous improvement
 ```
 
 ---
@@ -425,6 +544,100 @@ agent = DataGovernanceAgent(config=config)
 
 ---
 
+## Design Patterns
+
+### Repository Pattern for Asset Storage
+
+```python
+class AssetRepository:
+    def __init__(self):
+        self._assets = {}
+    
+    def save(self, asset: DataAsset) -> None:
+        self._assets[asset.asset_id] = asset
+    
+    def find_by_id(self, asset_id: str) -> Optional[DataAsset]:
+        return self._assets.get(asset_id)
+    
+    def find_by_domain(self, domain: DataDomain) -> List[DataAsset]:
+        return [a for a in self._assets.values() if a.domain == domain]
+```
+
+### Observer Pattern for Quality Alerts
+
+```python
+class QualityObserver:
+    def on_quality_change(self, asset_id: str, old_score: float, new_score: float):
+        if new_score < 0.90:
+            self.alert_team(asset_id, new_score)
+```
+
+### Strategy Pattern for Compliance Assessment
+
+```python
+class ComplianceStrategy:
+    def assess(self, asset: DataAsset) -> ComplianceResult:
+        raise NotImplementedError
+
+class GDPRStrategy(ComplianceStrategy):
+    def assess(self, asset):
+        # GDPR-specific checks
+        pass
+
+class PCIStrategy(ComplianceStrategy):
+    def assess(self, asset):
+        # PCI-DSS-specific checks
+        pass
+```
+
+---
+
+## Security
+
+### Data Protection
+
+- Encrypt sensitive metadata at rest
+- Implement access controls for policy modifications
+- Audit all governance operations
+- Protect PII in quality profiling
+- Secure lineage data transmission
+
+### Access Control Matrix
+
+```
+┌─────────────────┬────────┬────────┬────────┬────────┐
+│  Role           │ Policy │ Asset  │ Quality│ Audit  │
+├─────────────────┼────────┼────────┼────────┼────────┤
+│  Viewer         │   ✓    │   ✓    │   ✓    │   ✗    │
+│  Steward        │   ✓    │   ✓    │   ✓    │   ✗    │
+│  Analyst        │   ✗    │   ✓    │   ✓    │   ✓    │
+│  Admin          │   ✓    │   ✓    │   ✓    │   ✓    │
+└─────────────────┴────────┴────────┴────────┴────────┘
+```
+
+---
+
+## Scalability
+
+### Performance Considerations
+
+| Operation | Small (1K assets) | Medium (100K) | Large (1M+) |
+|-----------|-------------------|---------------|-------------|
+| Quality profile | 100ms | 2s | 30s |
+| Impact analysis | 50ms | 500ms | 5s |
+| Compliance assess | 200ms | 3s | 45s |
+| Governance score | 10ms | 100ms | 1s |
+
+### Scaling Strategies
+
+- Use batch operations for large asset sets
+- Implement caching for frequently accessed metadata
+- Use incremental lineage updates
+- Parallelize quality rule execution
+- Archive historical assessments
+
+---
+
 ## Best Practices
 
 ### Policy Management
@@ -470,6 +683,8 @@ agent = DataGovernanceAgent(config=config)
 | Compliance non-compliant | Missing controls | Review findings, remediate |
 | No lineage | Not tracked | Track all transformations |
 | Missing metadata | Not cataloged | Add metadata entries |
+| Policy not enforced | Missing approval | Approve and activate policy |
+| High issue count | Systemic problems | Address root causes |
 
 ---
 

@@ -43,7 +43,7 @@ Whether you're localizing a mobile app for 20 markets, translating documentation
 
 ### Cultural Adaptation
 - Style guide management per language
-- Cultural rules and禁忌 tracking
+- Cultural rules tracking
 - Tone and formality control
 - Content adaptation recommendations
 - Brand voice enforcement
@@ -476,6 +476,361 @@ A: Use the leverage analysis to calculate cost savings from TM matches. Higher l
 
 **Q: What's the difference between translation and localization?**
 A: Translation is word-for-word conversion. Localization includes cultural adaptation, formatting, and context-appropriate modifications.
+
+---
+
+## Advanced Features
+
+### Translation Memory Maintenance
+
+```python
+# Run TM maintenance to optimize quality
+maintenance = agent.tm_engine.run_maintenance()
+
+print(f"TM Maintenance Report:")
+print(f"  Entries Reviewed: {maintenance['entries_reviewed']}")
+print(f"  Duplicates Removed: {maintenance['duplicates_removed']}")
+print(f"  Outdated Entries: {maintenance['outdated_entries']}")
+print(f"  Low Quality Entries: {maintenance['low_quality']}")
+print(f"  Consolidated Entries: {maintenance['consolidated']}")
+print(f"  Quality Score Before: {maintenance['quality_before']:.1f}%")
+print(f"  Quality Score After: {maintenance['quality_after']:.1f}%")
+```
+
+### Cost Savings Analysis
+
+```python
+# Calculate localization cost savings from TM
+savings = agent.calculate_cost_savings(
+    source_language="en",
+    target_languages=["es", "fr", "de", "ja"],
+    cost_per_word_new=0.15,
+    cost_per_word_fuzzy=0.05,
+    cost_per_word_exact=0.00,
+)
+
+print(f"Cost Savings Analysis:")
+for lang, data in savings.items():
+    print(f"\n  {lang}:")
+    print(f"    New Words: {data['new_words']:,} (${data['new_cost']:,.2f})")
+    print(f"    Fuzzy Matches: {data['fuzzy_words']:,} (${data['fuzzy_cost']:,.2f})")
+    print(f"    Exact Matches: {data['exact_words']:,} (${data['exact_cost']:,.2f})")
+    print(f"    Total Savings: ${data['total_savings']:,.2f}")
+    print(f"    Savings Percentage: {data['savings_percent']:.1f}%")
+```
+
+### Integration with CI/CD
+
+```python
+# Integrate with CI/CD pipeline
+agent.integrations.configure_cicd(
+    provider="github_actions",
+    repository="your-org/your-app",
+    trigger_on="pull_request",
+    checks=[
+        "missing_translations",
+        "placeholder_consistency",
+        "glossary_compliance",
+        "character_limit_check",
+    ],
+    fail_on="critical",
+)
+
+# Example GitHub Actions workflow
+workflow = """
+name: Localization QA
+on: [pull_request]
+jobs:
+  l10n-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Localization QA
+        uses: your-org/l10n-qa-action@v1
+        with:
+          source-lang: en
+          target-langs: es,fr,de,ja
+          fail-on: critical
+"""
+```
+
+---
+
+## Localization Best Practices by Language
+
+### Japanese (ja)
+
+```
+Honorifics: Use appropriate keigo levels
+  - です/ます form for B2C
+  - 丁寧語 for general business
+  - 尊敬語/謙譲語 for B2B enterprise
+
+Line breaks: Different rules than English
+  - Don't break mid-word
+  - Avoid breaking after particles (は, を, が)
+  - Allow breaking before particles
+
+Typography:
+  - Use half-width numbers in most contexts
+  - Use full-width punctuation (、。！？)
+  - Space between Japanese and Latin text recommended
+```
+
+### Arabic (ar)
+
+```
+RTL Layout:
+  - Mirror all directional icons
+  - Reverse navigation order
+  - Text alignment: right-aligned
+  - Numbers remain LTR within RTL text
+
+Pluralization: 6 forms (zero, one, two, few, many, other)
+  - Must handle all forms
+  - Test with 0, 1, 2, 3, 5, 100
+
+Cultural:
+  - Avoid pork/alcohol references
+  - Use appropriate date formats (Hijri option)
+  - Respect religious holidays
+```
+
+### German (de)
+
+```
+Compound Words: Can be very long
+  - Allow flexible line breaks
+  - Test with longest possible compounds
+  - Consider hyphenation rules
+
+Formality:
+  - Use "Sie" (formal) for B2B
+  - "Du" (informal) acceptable for B2C consumer apps
+  - Be consistent within a product
+
+Capitalization:
+  - All nouns are capitalized
+  - Job titles often capitalized
+  - "Internet" and "Email" often capitalized
+```
+
+---
+
+## Advanced Features
+
+### Translation Memory Maintenance
+
+```python
+# Run TM maintenance to optimize quality
+maintenance = agent.tm_engine.run_maintenance()
+
+print(f"TM Maintenance Report:")
+print(f"  Entries Reviewed: {maintenance['entries_reviewed']}")
+print(f"  Duplicates Removed: {maintenance['duplicates_removed']}")
+print(f"  Outdated Entries: {maintenance['outdated_entries']}")
+print(f"  Low Quality Entries: {maintenance['low_quality']}")
+print(f"  Consolidated Entries: {maintenance['consolidated']}")
+print(f"  Quality Score Before: {maintenance['quality_before']:.1f}%")
+print(f"  Quality Score After: {maintenance['quality_after']:.1f}%")
+```
+
+### Cost Savings Analysis
+
+```python
+# Calculate localization cost savings from TM
+savings = agent.calculate_cost_savings(
+    source_language="en",
+    target_languages=["es", "fr", "de", "ja"],
+    cost_per_word_new=0.15,
+    cost_per_word_fuzzy=0.05,
+    cost_per_word_exact=0.00,
+)
+
+print(f"Cost Savings Analysis:")
+for lang, data in savings.items():
+    print(f"\n  {lang}:")
+    print(f"    New Words: {data['new_words']:,} (${data['new_cost']:,.2f})")
+    print(f"    Fuzzy Matches: {data['fuzzy_words']:,} (${data['fuzzy_cost']:,.2f})")
+    print(f"    Exact Matches: {data['exact_words']:,} (${data['exact_cost']:,.2f})")
+    print(f"    Total Savings: ${data['total_savings']:,.2f}")
+    print(f"    Savings Percentage: {data['savings_percent']:.1f}%")
+```
+
+### Integration with CI/CD
+
+```python
+# Integrate with CI/CD pipeline
+agent.integrations.configure_cicd(
+    provider="github_actions",
+    repository="your-org/your-app",
+    trigger_on="pull_request",
+    checks=[
+        "missing_translations",
+        "placeholder_consistency",
+        "glossary_compliance",
+        "character_limit_check",
+    ],
+    fail_on="critical",
+)
+
+# Example GitHub Actions workflow
+workflow = """
+name: Localization QA
+on: [pull_request]
+jobs:
+  l10n-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Localization QA
+        uses: your-org/l10n-qa-action@v1
+        with:
+          source-lang: en
+          target-langs: es,fr,de,ja
+          fail-on: critical
+"""
+```
+
+---
+
+## Localization Best Practices by Language
+
+### Japanese (ja)
+
+```
+Honorifics: Use appropriate keigo levels
+  - です/ます form for B2C
+  - 丁寧語 for general business
+  - 尊敬語/謙譲語 for B2B enterprise
+
+Line breaks: Different rules than English
+  - Don't break mid-word
+  - Avoid breaking after particles (は, を, が)
+  - Allow breaking before particles
+
+Typography:
+  - Use half-width numbers in most contexts
+  - Use full-width punctuation (、。！？)
+  - Space between Japanese and Latin text recommended
+```
+
+### Arabic (ar)
+
+```
+RTL Layout:
+  - Mirror all directional icons
+  - Reverse navigation order
+  - Text alignment: right-aligned
+  - Numbers remain LTR within RTL text
+
+Pluralization: 6 forms (zero, one, two, few, many, other)
+  - Must handle all forms
+  - Test with 0, 1, 2, 3, 5, 100
+
+Cultural:
+  - Avoid pork/alcohol references
+  - Use appropriate date formats (Hijri option)
+  - Respect religious holidays
+```
+
+### German (de)
+
+```
+Compound Words: Can be very long
+  - Allow flexible line breaks
+  - Test with longest possible compounds
+  - Consider hyphenation rules
+
+Formality:
+  - Use "Sie" (formal) for B2B
+  - "Du" (informal) acceptable for B2C consumer apps
+  - Be consistent within a product
+
+Capitalization:
+  - All nouns are capitalized
+  - Job titles often capitalized
+  - "Internet" and "Email" often capitalized
+```
+
+---
+
+## Advanced Features
+
+### Translation Memory Maintenance
+
+```python
+# Run TM maintenance to optimize quality
+maintenance = agent.tm_engine.run_maintenance()
+
+print(f"TM Maintenance Report:")
+print(f"  Entries Reviewed: {maintenance['entries_reviewed']}")
+print(f"  Duplicates Removed: {maintenance['duplicates_removed']}")
+print(f"  Outdated Entries: {maintenance['outdated_entries']}")
+print(f"  Low Quality Entries: {maintenance['low_quality']}")
+print(f"  Consolidated Entries: {maintenance['consolidated']}")
+print(f"  Quality Score Before: {maintenance['quality_before']:.1f}%")
+print(f"  Quality Score After: {maintenance['quality_after']:.1f}%")
+```
+
+### Cost Savings Analysis
+
+```python
+# Calculate localization cost savings from TM
+savings = agent.calculate_cost_savings(
+    source_language="en",
+    target_languages=["es", "fr", "de", "ja"],
+    cost_per_word_new=0.15,
+    cost_per_word_fuzzy=0.05,
+    cost_per_word_exact=0.00,
+)
+
+print(f"Cost Savings Analysis:")
+for lang, data in savings.items():
+    print(f"\n  {lang}:")
+    print(f"    New Words: {data['new_words']:,} (${data['new_cost']:,.2f})")
+    print(f"    Fuzzy Matches: {data['fuzzy_words']:,} (${data['fuzzy_cost']:,.2f})")
+    print(f"    Exact Matches: {data['exact_words']:,} (${data['exact_cost']:,.2f})")
+    print(f"    Total Savings: ${data['total_savings']:,.2f}")
+    print(f"    Savings Percentage: {data['savings_percent']:.1f}%")
+```
+
+### Integration with CI/CD
+
+```python
+# Integrate with CI/CD pipeline
+agent.integrations.configure_cicd(
+    provider="github_actions",
+    repository="your-org/your-app",
+    trigger_on="pull_request",
+    checks=[
+        "missing_translations",
+        "placeholder_consistency",
+        "glossary_compliance",
+        "character_limit_check",
+    ],
+    fail_on="critical",
+)
+
+# Example GitHub Actions workflow
+workflow = """
+name: Localization QA
+on: [pull_request]
+jobs:
+  l10n-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Localization QA
+        uses: your-org/l10n-qa-action@v1
+        with:
+          source-lang: en
+          target-langs: es,fr,de,ja
+          fail-on: critical
+"""
+```
+
+---
 
 ## License
 

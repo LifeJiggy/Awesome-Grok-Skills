@@ -10,17 +10,16 @@
 2. [System Components](#system-components)
 3. [Data Flow](#data-flow)
 4. [Key Components](#key-components)
-5. [Component Details](#component-details)
-6. [Design Patterns](#design-patterns)
-7. [Tech Stack](#tech-stack)
-8. [Configuration](#configuration)
-9. [Performance](#performance)
-10. [Security](#security)
-11. [Scalability](#scalability)
-12. [Extension Points](#extension-points)
-13. [Monitoring & Observability](#monitoring--observability)
-14. [Glossary](#glossary)
-15. [Appendix: Design Decisions](#appendix-design-decisions)
+5. [Design Patterns](#design-patterns)
+6. [Tech Stack](#tech-stack)
+7. [Configuration](#configuration)
+8. [Performance](#performance)
+9. [Security](#security)
+10. [Scalability](#scalability)
+11. [Extension Points](#extension-points)
+12. [Monitoring & Observability](#monitoring--observability)
+13. [Glossary](#glossary)
+14. [Appendix: Design Decisions](#appendix-design-decisions)
 
 ---
 
@@ -201,7 +200,7 @@ Tracks time with focus mode awareness and interruption counting.
 
 ### 3. PomodoroTimer
 
-Manages focus sessions with configurable durations and break scheduling.
+Manages focus sessions with configurable durations.
 
 **Default Configuration:**
 ```
@@ -242,14 +241,6 @@ longest_streak = max(longest_streak, current_streak)
 ### 6. CalendarOptimizer
 
 Time blocking with free slot detection and focus time protection.
-
-**Free Slot Detection:**
-```
-Day: 8:00 - 18:00
-Blocks: [9:00-10:00 meeting], [14:00-15:00 meeting]
-Free: [8:00-9:00], [10:00-14:00], [15:00-18:00]
-Protected: [8:00-9:00 deep focus], [10:00-12:00 deep focus]
-```
 
 ### 7. EnergyTracker
 
@@ -412,3 +403,541 @@ ProductivityConfig(
 | Energy-aware scheduling | Aligns task complexity with cognitive capacity |
 | Streak algorithm resets on gap | Habit research shows streaks motivate consistency |
 | Focus score penalizes interruptions | Research shows context-switching costs 23 minutes |
+
+---
+
+## Energy Management System
+
+### Chronotype Profiles
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Chronotype Profiles                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Lion (Morning Person)                                       │
+│  ├── Peak Hours: 6:00 - 12:00                               │
+│  ├── Deep Work: 8:00 - 11:00                                │
+│  ├── Meetings: 13:00 - 16:00                                │
+│  └── Wind Down: 16:00 - 18:00                               │
+│                                                              │
+│  Bear (Standard)                                             │
+│  ├── Peak Hours: 9:00 - 14:00                               │
+│  ├── Deep Work: 10:00 - 12:00                               │
+│  ├── Meetings: 14:00 - 16:00                                │
+│  └── Wind Down: 16:00 - 18:00                               │
+│                                                              │
+│  Wolf (Night Person)                                         │
+│  ├── Peak Hours: 17:00 - 23:00                              │
+│  ├── Deep Work: 19:00 - 22:00                               │
+│  ├── Meetings: 10:00 - 14:00                                │
+│  └── Wind Down: 23:00 - 01:00                               │
+│                                                              │
+│  Dolphin (Irregular)                                         │
+│  ├── Peak Hours: Variable (10:00 - 12:00 & 18:00 - 20:00)   │
+│  ├── Deep Work: When alert (max 2-3 hours)                  │
+│  ├── Meetings: During alert periods                         │
+│  └── Wind Down: 21:00 - 23:00                               │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Energy Tracking Visualization
+
+```python
+# Daily energy pattern
+energy_pattern = agent.energy.daily_pattern()
+
+print("Energy Pattern:")
+print("Hour  | Level    | Recommended Activity")
+print("------|----------|---------------------")
+for hour, level in energy_pattern.items():
+    activity = "Deep Work" if level == "PEAK" else \
+               "Creative Tasks" if level == "HIGH" else \
+               "Meetings" if level == "MEDIUM" else \
+               "Admin Tasks" if level == "LOW" else "Break"
+    print(f"  {hour:02d}:00 | {level:8s} | {activity}")
+```
+
+---
+
+## Workflow Automation Templates
+
+### Morning Routine Automation
+
+```python
+# Automated morning routine
+morning_routine = agent.workflow.create_routine(
+    name="Morning Startup",
+    triggers=[{"type": "time", "time": "08:00", "days": ["monday", "tuesday", "wednesday", "thursday", "friday"]}],
+    steps=[
+        {"action": "show_daily_summary", "duration": 5},
+        {"action": "show_calendar", "duration": 2},
+        {"action": "show_priority_tasks", "duration": 3},
+        {"action": "start_pomodoro", "task": "Most Important Task"},
+    ],
+)
+```
+
+### End-of-Day Shutdown
+
+```python
+# Automated end-of-day routine
+shutdown_routine = agent.workflow.create_routine(
+    name="Shutdown Routine",
+    triggers=[{"type": "time", "time": "17:30"}],
+    steps=[
+        {"action": "stop_all_timers"},
+        {"action": "log_daily_summary"},
+        {"action": "review_incomplete_tasks"},
+        {"action": "plan_tomorrow"},
+        {"action": "send_daily_report"},
+    ],
+)
+```
+
+---
+
+## Productivity Scoring Algorithm
+
+### Composite Score Calculation
+
+```
+Productivity Score = 
+    (Focus Hours Weight × Focus Score) +
+    (Task Completion Weight × Completion Rate) +
+    (Goal Progress Weight × Goal Velocity) +
+    (Habit Consistency Weight × Streak Average) +
+    (Energy Utilization Weight × Peak Hour Usage)
+
+Weights (configurable):
+  Focus Hours:        0.30
+  Task Completion:    0.25
+  Goal Progress:      0.20
+  Habit Consistency:  0.15
+  Energy Utilization: 0.10
+
+Score Ranges:
+  90-100: Exceptional
+  80-89:  Excellent
+  70-79:  Good
+  60-69:  Average
+  Below 60: Needs Improvement
+```
+
+### Trend Analysis
+
+```python
+# Weekly productivity trend
+trend = agent.analytics.productivity_trend(weeks=4)
+
+print("Productivity Trend:")
+for week in trend:
+    bar = "█" * int(week['score'] / 5)
+    print(f"  Week {week['number']}: {bar} {week['score']:.1f}")
+
+print(f"\nTrend: {'↑ Improving' if trend[-1]['score'] > trend[0]['score'] else '↓ Declining'}")
+print(f"Average: {sum(w['score'] for w in trend) / len(trend):.1f}")
+```
+
+---
+
+## Integration Patterns
+
+### Calendar Sync
+
+```python
+# Sync with external calendars
+agent.calendar.sync(
+    provider="google",
+    credentials="path/to/credentials.json",
+    sync_direction="bidirectional",
+    sync_interval_minutes=15,
+    conflict_resolution="calendar_wins",
+)
+
+# Import events from calendar
+events = agent.calendar.get_events(
+    start_date=datetime.now(),
+    end_date=datetime.now() + timedelta(days=7),
+)
+
+for event in events:
+    print(f"{event.start_time} - {event.end_time}: {event.title}")
+```
+
+### Slack Integration
+
+```python
+# Configure Slack notifications
+agent.integrations.configure_slack(
+    webhook_url="https://hooks.slack.com/services/xxx",
+    channel="#productivity",
+    notify_on=[
+        "pomodoro_complete",
+        "habit_streak_milestone",
+        "goal_achieved",
+        "daily_summary",
+    ],
+)
+
+# Send productivity summary to Slack
+agent.integrations.send_slack_summary(
+    include=[
+        "tasks_completed",
+        "focus_hours",
+        "habit_streaks",
+        "energy_levels",
+    ],
+)
+```
+
+### GitHub Integration
+
+```python
+# Track development time against GitHub issues
+agent.integrations.configure_github(
+    token="ghp_xxx",
+    repository="org/repo",
+    auto_link_commits=True,
+    track_pr_time=True,
+)
+
+# Get development metrics
+dev_metrics = agent.integrations.get_github_metrics(
+    period="last_30_days",
+)
+
+print(f"Development Metrics:")
+print(f"  Commits: {dev_metrics['commits']}")
+print(f"  PRs Merged: {dev_metrics['prs_merged']}")
+print(f"  Issues Closed: {dev_metrics['issues_closed']}")
+print(f"  Avg PR Review Time: {dev_metrics['avg_review_time']} hours")
+```
+
+---
+
+## Energy Management Deep Dive
+
+### Energy Level Definitions
+
+```python
+# Define energy levels with specific characteristics
+energy_levels = {
+    "PEAK": {
+        "description": "Maximum cognitive function",
+        "best_for": ["complex problem solving", "creative work", "strategic thinking"],
+        "avoid": ["routine tasks", "meetings", "email"],
+        "duration": "2-3 hours",
+        "recovery": "4-6 hours",
+    },
+    "HIGH": {
+        "description": "Strong performance capacity",
+        "best_for": ["focused work", "learning new skills", "collaborative tasks"],
+        "avoid": ["deep creative work", "long meetings"],
+        "duration": "3-4 hours",
+        "recovery": "3-4 hours",
+    },
+    "MEDIUM": {
+        "description": "Normal operational capacity",
+        "best_for": ["routine tasks", "meetings", "email", "planning"],
+        "avoid": ["complex problem solving", "creative work"],
+        "duration": "4-6 hours",
+        "recovery": "2-3 hours",
+    },
+    "LOW": {
+        "description": "Reduced cognitive function",
+        "best_for": ["simple tasks", "organizing", "low-stakes decisions"],
+        "avoid": ["important decisions", "creative work", "meetings"],
+        "duration": "2-3 hours",
+        "recovery": "3-4 hours",
+    },
+    "DEPLETED": {
+        "description": "Minimal effective capacity",
+        "best_for": ["rest", "light reading", "walking"],
+        "avoid": ["all work tasks"],
+        "duration": "N/A",
+        "recovery": "8+ hours sleep",
+    },
+}
+```
+
+### Energy Optimization Recommendations
+
+```python
+# Get personalized energy optimization recommendations
+recommendations = agent.energy.get_recommendations(
+    current_level=agent.energy.get_current_level(),
+    tasks=agent.tasks.get_incomplete(),
+    calendar=agent.calendar.get_today(),
+)
+
+print("Energy Optimization Recommendations:")
+for rec in recommendations:
+    print(f"\n  [{rec['priority'].upper()}] {rec['title']}")
+    print(f"  {rec['description']}")
+    if rec.get('action'):
+        print(f"  Action: {rec['action']}")
+```
+
+---
+
+## Workflow Automation Deep Dive
+
+### Trigger Types
+
+```python
+# Define automation triggers
+triggers = {
+    "time_based": {
+        "description": "Trigger at specific times",
+        "examples": ["daily at 9am", "every hour", "weekdays only"],
+        "cron_expression": "0 9 * * 1-5",
+    },
+    "event_based": {
+        "description": "Trigger on specific events",
+        "examples": ["task completed", "meeting ended", "habit logged"],
+        "event_types": ["task.completed", "meeting.ended", "habit.logged"],
+    },
+    "condition_based": {
+        "description": "Trigger when conditions are met",
+        "examples": ["focus score < 50", "tasks > 10", "streak = 7"],
+        "condition_types": ["metric_threshold", "count_threshold", "streak_milestone"],
+    },
+    "manual": {
+        "description": "Trigger on demand",
+        "examples": ["button click", "voice command", "shortcut"],
+        "integration_types": ["slack_command", "keyboard_shortcut", "voice_assistant"],
+    },
+}
+```
+
+### Automation Templates
+
+```python
+# Pre-built automation templates
+templates = {
+    "morning_routine": {
+        "name": "Morning Productivity Setup",
+        "triggers": [{"type": "time", "time": "08:00"}],
+        "actions": [
+            {"type": "show_daily_summary"},
+            {"type": "start_pomodoro", "task": "MIT"},
+            {"type": "send_notification", "message": "Good morning! Ready to be productive?"},
+        ],
+    },
+    "end_of_day": {
+        "name": "Daily Shutdown",
+        "triggers": [{"type": "time", "time": "17:30"}],
+        "actions": [
+            {"type": "stop_all_timers"},
+            {"type": "log_daily_summary"},
+            {"type": "plan_tomorrow"},
+            {"type": "send_notification", "message": "Great work today! See you tomorrow."},
+        ],
+    },
+    "meeting_prep": {
+        "name": "Meeting Preparation",
+        "triggers": [{"type": "time_offset", "minutes_before": 15}],
+        "actions": [
+            {"type": "show_agenda"},
+            {"type": "show_participant_info"},
+            {"type": "set_status", "status": "In Meeting"},
+        ],
+    },
+}
+```
+
+---
+
+## Advanced Analytics
+
+### Productivity Trends
+
+```python
+# Analyze productivity trends over time
+trends = agent.analytics.productivity_trends(
+    period="last_90_days",
+    metrics=["focus_score", "tasks_completed", "habit_consistency"],
+)
+
+print("Productivity Trends (Last 90 Days):")
+for metric, data in trends.items():
+    print(f"\n{metric}:")
+    print(f"  Current: {data['current']:.1f}")
+    print(f"  Average: {data['average']:.1f}")
+    print(f"  Trend: {data['trend']} ({data['change']:.1f}%)")
+    print(f"  Best Day: {data['best_day']}")
+    print(f"  Worst Day: {data['worst_day']}")
+```
+
+### Correlation Analysis
+
+```python
+# Find correlations between different metrics
+correlations = agent.analytics.find_correlations(
+    metrics=["focus_score", "sleep_hours", "exercise_minutes", "tasks_completed"],
+    period="last_30_days",
+)
+
+print("Metric Correlations:")
+for metric_pair, correlation in correlations.items():
+    strength = "strong" if abs(correlation) > 0.7 else "moderate" if abs(correlation) > 0.4 else "weak"
+    direction = "positive" if correlation > 0 else "negative"
+    print(f"  {metric_pair}: {correlation:.2f} ({strength} {direction})")
+```
+
+### Predictive Analytics
+
+```python
+# Predict productivity for tomorrow
+prediction = agent.analytics.predict_tomorrow(
+    current_patterns=agent.analytics.get_patterns(last_days=30),
+    calendar=agent.calendar.get_tomorrow(),
+    energy_forecast=agent.energy.get_forecast(),
+)
+
+print("Tomorrow's Productivity Prediction:")
+print(f"  Predicted Focus Score: {prediction['focus_score']:.1f}")
+print(f"  Best Deep Work Window: {prediction['deep_work_window']}")
+print(f"  Recommended Tasks: {prediction['recommended_tasks']}")
+print(f"  Risk Factors: {prediction['risk_factors']}")
+```
+
+---
+
+## Advanced Workflow Patterns
+
+### Conditional Workflows
+
+```python
+# Create workflows with conditional logic
+workflow = agent.workflow.create(
+    name="Smart Task Routing",
+    trigger="task.created",
+    steps=[
+        {
+            "condition": "task.priority == 'critical'",
+            "action": "assign_tosenior",
+            "params": {"team": "engineering"},
+        },
+        {
+            "condition": "task.priority == 'high'",
+            "action": "assign_to_lead",
+            "params": {"team": "product"},
+        },
+        {
+            "condition": "task.tags contains 'bug'",
+            "action": "create_jira_ticket",
+            "params": {"project": "BUG"},
+        },
+        {
+            "condition": "default",
+            "action": "add_to_backlog",
+        },
+    ],
+)
+```
+
+### Workflow Templates
+
+```python
+# Pre-built workflow templates
+templates = {
+    "sprint_planning": {
+        "name": "Sprint Planning Workflow",
+        "steps": [
+            {"action": "gather_backlog", "params": {"limit": 20}},
+            {"action": "estimate_effort", "params": {"method": "fibonacci"}},
+            {"action": "calculate_capacity", "params": {"team_size": 5}},
+            {"action": "select_features", "params": {"strategy": "value_first"}},
+            {"action": "create_sprint", "params": {"duration": 14}},
+        ],
+    },
+    "incident_response": {
+        "name": "Incident Response Workflow",
+        "steps": [
+            {"action": "detect_anomaly", "params": {"threshold": 3}},
+            {"action": "alert_oncall", "params": {"escalation": True}},
+            {"action": "gather_context", "params": {"sources": ["logs", "metrics"]}},
+            {"action": "create_incident", "params": {"severity": "auto"}},
+            {"action": "post_mortem", "params": {"deadline": "7d"}},
+        ],
+    },
+}
+```
+
+---
+
+## Integration Patterns
+
+### Calendar Sync
+
+```python
+# Sync with external calendars
+agent.calendar.sync(
+    provider="google",
+    credentials="path/to/credentials.json",
+    sync_direction="bidirectional",
+    sync_interval_minutes=15,
+    conflict_resolution="calendar_wins",
+)
+
+# Import events from calendar
+events = agent.calendar.get_events(
+    start_date=datetime.now(),
+    end_date=datetime.now() + timedelta(days=7),
+)
+
+for event in events:
+    print(f"{event.start_time} - {event.end_time}: {event.title}")
+```
+
+### Slack Integration
+
+```python
+# Configure Slack notifications
+agent.integrations.configure_slack(
+    webhook_url="https://hooks.slack.com/services/xxx",
+    channel="#productivity",
+    notify_on=[
+        "pomodoro_complete",
+        "habit_streak_milestone",
+        "goal_achieved",
+        "daily_summary",
+    ],
+)
+
+# Send productivity summary to Slack
+agent.integrations.send_slack_summary(
+    include=[
+        "tasks_completed",
+        "focus_hours",
+        "habit_streaks",
+        "energy_levels",
+    ],
+)
+```
+
+### GitHub Integration
+
+```python
+# Track development time against GitHub issues
+agent.integrations.configure_github(
+    token="ghp_xxx",
+    repository="org/repo",
+    auto_link_commits=True,
+    track_pr_time=True,
+)
+
+# Get development metrics
+dev_metrics = agent.integrations.get_github_metrics(
+    period="last_30_days",
+)
+
+print(f"Development Metrics:")
+print(f"  Commits: {dev_metrics['commits']}")
+print(f"  PRs Merged: {dev_metrics['prs_merged']}")
+print(f"  Issues Closed: {dev_metrics['issues_closed']}")
+print(f"  Avg PR Review Time: {dev_metrics['avg_review_time']} hours")
+```

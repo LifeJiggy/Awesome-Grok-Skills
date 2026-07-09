@@ -29,9 +29,42 @@ You are a cryptocurrency mining operations expert with deep knowledge of mining 
 4. **Diversification**: Consider multiple coins and pools to reduce variance and maximize uptime
 5. **Energy Efficiency**: Optimize for performance-per-watt, not just raw hash rate
 
+## Architecture Overview
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                        CryptoMiningAgent                                  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌────────────────────────────────┐  │
+│  │  Pool Mgr    │  │  Hardware    │  │  Profitability Engine          │  │
+│  │  ├ Register  │  │  Monitor     │  │  ├ Multi-coin comparison       │  │
+│  │  ├ Connect   │  │  ├ Temp      │  │  ├ ROI / break-even           │  │
+│  │  ├ Switch    │  │  ├ HashRate  │  │  ├ Cash flow projection       │  │
+│  │  └ Health    │  │  ├ Fan       │  │  └ Difficulty analysis        │  │
+│  └──────────────┘  │  └ Alerts    │  └────────────────────────────────┘  │
+│                    └──────────────┘                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌────────────────────────────────┐  │
+│  │  Rig Mgr     │  │  Energy      │  │  Algorithm Selector           │  │
+│  │  ├ Register  │  │  Tracker     │  │  ├ HW compatibility           │  │
+│  │  ├ Lifecycle │  │  ├ KWh/cost  │  │  ├ Memory requirements        │  │
+│  │  ├ Fleet     │  │  ├ Carbon    │  │  ├ Power budgets              │  │
+│  │  └ Status    │  │  └ Optimize  │  │  └ Coin mapping               │  │
+│  └──────────────┘  └──────────────┘  └────────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐                                      │
+│  │  Economics   │  │  Optimizer   │                                      │
+│  │  ├ Revenue   │  │  ├ Fleet     │                                      │
+│  │  ├ Costs     │  │  ├ Power     │                                      │
+│  │  ├ ROI       │  │  └ Pool      │                                      │
+│  │  └ Risk      │  └             │                                      │
+│  └──────────────┘  └──────────────┘                                      │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
 ## Capabilities
 
 ### Mining Pool Management
+
 ```python
 # Register and manage mining pools
 agent.register_pool(
@@ -51,7 +84,18 @@ switch = agent.evaluate_pool_switch()
 # Returns: {"should_switch": True, "target_pool": "slushpool", ...}
 ```
 
+**Pool Reward Types:**
+
+| Type | Full Name | Variance | Fee | Best For |
+|------|-----------|----------|-----|----------|
+| PPS | Pay Per Share | Low | Higher | Conservative miners |
+| PPLNS | Pay Per Last N Shares | Medium | Lower | Consistent miners |
+| PROP | Proportional | High | Low | Variable hash rate |
+| SOLO | Solo mining | Very High | None | Large operations |
+| PPS+ | Pay Per Share Plus | Low | Higher | Full reward focus |
+
 ### Rig Registration and Control
+
 ```python
 # Register mining hardware
 agent.register_rig(
@@ -70,7 +114,26 @@ agent.stop_rig("asic_001")
 agent.restart_rig("asic_001")
 ```
 
+**Rig Lifecycle States:**
+
+```
+  ┌──────────┐     start      ┌──────────┐
+  │  IDLE    │ ──────────────►│  MINING  │
+  └──────────┘                └──────────┘
+       ▲  ▲                     │    │
+       │  │    stop             │    │  error
+       │  └─────────────────────┘    │
+       │                              ▼
+       │   restart              ┌──────────┐
+       └─────────────────────── │  ERROR   │
+                                └──────────┘
+       ┌──────────┐
+       │ OFFLINE  │◄── power loss / network
+       └──────────┘
+```
+
 ### Profitability Analysis
+
 ```python
 # Analyze single coin profitability
 result = agent.analyze_profitability(
@@ -89,7 +152,17 @@ comparison = agent.compare_profitability(
 # Returns ranked list by daily profit
 ```
 
+**Profitability Formula:**
+
+```
+Daily Revenue = (HashRate / NetworkDifficulty) × BlockReward × 86400
+Daily Cost    = (PowerConsumption_kWh × ElectricityCost) + (Revenue × PoolFee)
+Daily Profit  = Daily Revenue - Daily Cost
+Break-Even     = HardwareCost / MonthlyProfit (in months)
+```
+
 ### Hardware Monitoring
+
 ```python
 # Get temperature readings
 temps = agent.get_temperature_readings("asic_001")
@@ -100,7 +173,17 @@ health = agent.get_hardware_health_report()
 # Returns per-rig: status, hash_rate, temperature, shares, alerts
 ```
 
+**Temperature Thresholds:**
+
+| Component | Warning (°C) | Critical (°C) | Action |
+|-----------|-------------|---------------|--------|
+| GPU Core | 70 | 85 | Auto-throttle |
+| GPU VRM | 80 | 95 | Auto-shutdown |
+| ASIC Chip | 65 | 80 | Auto-throttle |
+| Ambient | 30 | 40 | Increase cooling |
+
 ### Energy Optimization
+
 ```python
 # Record energy consumption
 agent.record_energy_reading(
@@ -114,7 +197,19 @@ energy = agent.get_energy_report()
 # Returns: monthly_cost, daily_kwh, carbon_footprint, per-rig ratings
 ```
 
+**Energy Efficiency Ratings:**
+
+```
+Rating        J/GH (SHA-256)    Efficiency
+─────────────────────────────────────────
+Excellent     < 25              Top-tier ASICs
+Good          25-35             Modern ASICs
+Average       35-50             Older ASICs
+Poor          > 50              Inefficient hardware
+```
+
 ### Algorithm Selection
+
 ```python
 # Select best algorithm for hardware
 algo = agent.select_algorithm(
@@ -128,7 +223,23 @@ algo = agent.select_algorithm(
 algos = agent.get_compatible_algorithms(HardwareType.ASIC)
 ```
 
+**Algorithm-Hardware Compatibility Matrix:**
+
+```
+Algorithm     ASIC    GPU-NV   GPU-AMD   CPU    FPGA
+─────────────────────────────────────────────────────
+SHA-256       ✓       ✗        ✗         ✗      ✓
+Ethash        ✗       ✓        ✓         ✗      ✓
+Scrypt        ✓       ✗        ✗         ✗      ✓
+RandomX       ✗       ✗        ✗         ✓      ✗
+KawPow        ✗       ✓        ✓         ✗      ✓
+EquiHash      ✓       ✓        ✓         ✗      ✓
+CryptoNight   ✗       ✓        ✓         ✓      ✗
+Blake2S       ✓       ✗        ✗         ✗      ✓
+```
+
 ### Mining Economics
+
 ```python
 # Calculate ROI
 roi = agent.calculate_roi(total_revenue=15000, period_days=30)
@@ -151,19 +262,47 @@ cf = agent.get_cashflow_projection(
 ## Operational Guidelines
 
 ### Temperature Management
-- Warning threshold: 70-80°C (varies by hardware type)
-- Critical threshold: 85-95°C (auto-throttle engaged)
-- Always monitor both core and VRM temperatures
-- Adjust fan curves before reducing power limits
+
+```
+Temperature Control Flow:
+                                    
+  ┌─────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Monitor │───►│ Evaluate │───►│   Act    │───►│  Log     │
+  │ Sensors │    │ Thresholds│   │ Controls │    │  Result  │
+  └─────────┘    └──────────┘    └──────────┘    └──────────┘
+                      │                │
+                      ▼                ▼
+                 ┌─────────┐    ┌──────────┐
+                 │ < 70°C  │    │ > 70°C   │
+                 │ Normal  │    │ Increase │
+                 │         │    │ Fan Speed│
+                 └─────────┘    └──────────┘
+                                     │
+                                     ▼
+                                ┌──────────┐
+                                │ > 85°C   │
+                                │ Throttle │
+                                │ Power    │
+                                └──────────┘
+                                     │
+                                     ▼
+                                ┌──────────┐
+                                │ > 95°C   │
+                                │ Shutdown │
+                                │ Rig      │
+                                └──────────┘
+```
 
 ### Pool Selection Criteria
-1. Latency: < 100ms preferred, < 200ms acceptable
-2. Fee: < 2% for PPS pools, < 1% for PPLNS
-3. Uptime: > 99.5% historical availability
-4. Payout threshold: Align with your mining scale
-5. Geographic proximity: Closer servers = lower latency
+
+1. **Latency**: < 100ms preferred, < 200ms acceptable
+2. **Fee**: < 2% for PPS pools, < 1% for PPLNS
+3. **Uptime**: > 99.5% historical availability
+4. **Payout threshold**: Align with your mining scale
+5. **Geographic proximity**: Closer servers = lower latency
 
 ### Profitability Optimization
+
 1. Update coin prices frequently (every 5-15 minutes)
 2. Monitor network difficulty changes (daily)
 3. Factor in pool fees, not just gross revenue
@@ -171,6 +310,7 @@ cf = agent.get_cashflow_projection(
 5. Account for difficulty adjustment periods
 
 ### Energy Efficiency Best Practices
+
 1. Undervolt GPUs for better performance-per-watt
 2. Optimize power limits based on efficiency curves
 3. Use smart PDUs for remote power management
@@ -247,6 +387,7 @@ agent.get_full_report() -> Dict
 ## Data Models Reference
 
 ### Enums
+
 ```python
 AlgorithmType: SHA256, ETHASH, SCRYPT, RANDOMX, KAWPOW, EQUIHASH, ...
 HardwareType: ASIC, GPU_NVIDIA, GPU_AMD, CPU, FPGA
@@ -258,6 +399,7 @@ TemperatureUnit: CELSIUS, FAHRENHEIT, KELVIN
 ```
 
 ### Key Data Classes
+
 ```python
 @dataclass
 class ProfitabilityMetrics:
@@ -283,11 +425,30 @@ class RigHardware:
     hash_rate: float
     power_consumption: float
     unit_cost: float
+
+@dataclass
+class PoolConfig:
+    pool_name: str
+    coin: str
+    algorithm: AlgorithmType
+    endpoints: List[PoolEndpoint]
+    reward_type: RewardType
+    fee_percentage: float
+    is_default: bool
+
+@dataclass
+class EnergyReport:
+    total_monthly_cost: float
+    daily_kwh: float
+    carbon_footprint_kg_monthly: float
+    per_rig_ratings: Dict[str, float]
+    optimization_suggestions: List[str]
 ```
 
 ## Usage Patterns
 
 ### Full Mining Operation Setup
+
 ```python
 config = Config(
     electricity_cost_per_kwh=0.12,
@@ -320,6 +481,7 @@ switch = agent.evaluate_pool_switch()
 ```
 
 ### Continuous Monitoring Loop
+
 ```python
 import time
 
@@ -342,35 +504,139 @@ while True:
     time.sleep(60)
 ```
 
-## Checklists
+### Multi-Coin Comparison
 
-### Pre-Mining Setup Checklist
-- [ ] Hardware installed and connected to network
-- [ ] Power supply sized with 20% headroom
-- [ ] Cooling adequate for ambient temperature
-- [ ] Network connection stable (< 1ms to pool)
-- [ ] Pool account created with payout address
-- [ ] Worker names configured
-- [ ] Electricity cost per kWh confirmed
-- [ ] Temperature monitoring enabled
-- [ ] Alert notifications configured
+```python
+# Compare profitability across multiple coins
+comparison = agent.compare_profitability(
+    hash_rate=110.0,
+    power_consumption=3250,
+    coins=["bitcoin", "litecoin", "ravencoin", "ethereum_classic"]
+)
 
-### Daily Operations Checklist
-- [ ] Review fleet health report
-- [ ] Check for temperature anomalies
-- [ ] Verify share acceptance rate > 99%
-- [ ] Update coin prices for profitability calc
-- [ ] Review energy consumption vs targets
-- [ ] Check pool latency and status
-- [ ] Review reward distribution
-- [ ] Monitor network difficulty changes
+print("Profitability Ranking:")
+for i, coin in enumerate(comparison["ranked"], 1):
+    print(f"  {i}. {coin['coin']}: ${coin['daily_profit']:.2f}/day")
+    print(f"     ROI: {coin['roi_days']:.0f} days")
+    print(f"     Efficiency: {coin['efficiency_j_per_gh']:.1f} J/GH")
+```
 
-### Troubleshooting Checklist
-- [ ] Rig not mining: Check pool connection, worker name, network
-- [ ] High temperature: Check fan speed, ambient temp, dust
-- [ ] Low hash rate: Check power limit, clock settings, algorithm
-- [ ] High reject rate: Check difficulty setting, pool config
-- [ ] No rewards: Check pool stats, payout threshold, address
+## Security Considerations
+
+### Pool Connection Security
+
+```
+┌──────────────────────────────────────────────────────┐
+│                Security Checklist                      │
+├──────────────────────────────────────────────────────┤
+│  □ Use TLS/SSL for stratum connections                │
+│  □ Never expose pool credentials in logs              │
+│  □ Use unique worker names (don't use personal info)  │
+│  □ Enable two-factor auth on pool accounts            │
+│  □ Monitor for unauthorized pool switches             │
+│  □ Review pool payout addresses regularly             │
+│  □ Use hardware wallets for large balances            │
+│  □ Rotate pool passwords periodically                 │
+└──────────────────────────────────────────────────────┘
+```
+
+### Hardware Security
+
+- Secure physical access to mining rigs
+- Use IPMI/BMC with strong passwords for remote management
+- Keep firmware updated to prevent exploits
+- Monitor for unauthorized configuration changes
+- Log all rig start/stop/restart events
+
+## Scalability Considerations
+
+### Fleet Scaling Strategy
+
+```
+Phase 1: 1-10 rigs       → Manual management, single pool
+Phase 2: 10-50 rigs      → Automated monitoring, multi-pool
+Phase 3: 50-200 rigs     → Load balancing, automated switching
+Phase 4: 200+ rigs       → Distributed management, redundancy
+```
+
+### Resource Planning
+
+| Fleet Size | Recommended Approach |
+|-----------|---------------------|
+| 1-5 rigs | Single machine, manual monitoring |
+| 6-20 rigs | Central server, automated alerts |
+| 21-100 rigs | Distributed agents, load balancing |
+| 100+ rigs | Multi-site, redundant management |
+
+## Design Patterns
+
+### Observer Pattern for Monitoring
+
+```python
+class TemperatureMonitor:
+    def __init__(self):
+        self._observers = []
+    
+    def register(self, observer):
+        self._observers.append(observer)
+    
+    def notify(self, rig_id, temperature):
+        for obs in self._observers:
+            obs.on_temperature_change(rig_id, temperature)
+```
+
+### Strategy Pattern for Pool Selection
+
+```python
+class PoolSelectionStrategy:
+    def select_pool(self, pools, metrics) -> str:
+        raise NotImplementedError
+
+class LatencyStrategy(PoolSelectionStrategy):
+    def select_pool(self, pools, metrics):
+        return min(pools, key=lambda p: metrics[p]['latency'])
+
+class ProfitabilityStrategy(PoolSelectionStrategy):
+    def select_pool(self, pools, metrics):
+        return max(pools, key=lambda p: metrics[p]['effective_rate'])
+```
+
+### Factory Pattern for Hardware
+
+```python
+class HardwareFactory:
+    @staticmethod
+    def create(hardware_type, model, specs):
+        if hardware_type == HardwareType.ASIC:
+            return ASICRig(model, specs)
+        elif hardware_type == HardwareType.GPU_NVIDIA:
+            return NVIDIARig(model, specs)
+        elif hardware_type == HardwareType.GPU_AMD:
+            return AMDRig(model, specs)
+```
+
+## Configuration
+
+### Agent Configuration
+
+```yaml
+mining_agent:
+  electricity_cost_per_kwh: 0.12
+  max_temperature: 85.0
+  power_budget_w: 5000.0
+  auto_switch_pools: true
+  monitor_poll_interval: 5.0
+  pool_switch_min_interval: 3600  # seconds
+  alert_thresholds:
+    temperature_warning: 70.0
+    temperature_critical: 85.0
+    hash_rate_deviation: 0.10  # 10% below expected
+    reject_rate_warning: 0.05
+    reject_rate_critical: 0.10
+  persistence:
+    store_path: ./data
+    backup_interval: 3600
+```
 
 ## Troubleshooting Guide
 
@@ -409,21 +675,144 @@ while True:
 - Factor in all pool fees and payout thresholds
 - Consider variance in PPLNS pools
 
+### Debug Mode
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Enable detailed subsystem logging
+logging.getLogger("pool_manager").setLevel(logging.DEBUG)
+logging.getLogger("hardware_monitor").setLevel(logging.DEBUG)
+logging.getLogger("profitability").setLevel(logging.DEBUG)
+```
+
+## Checklists
+
+### Pre-Mining Setup Checklist
+
+- [ ] Hardware installed and connected to network
+- [ ] Power supply sized with 20% headroom
+- [ ] Cooling adequate for ambient temperature
+- [ ] Network connection stable (< 1ms to pool)
+- [ ] Pool account created with payout address
+- [ ] Worker names configured
+- [ ] Electricity cost per kWh confirmed
+- [ ] Temperature monitoring enabled
+- [ ] Alert notifications configured
+- [ ] Firewall rules reviewed
+
+### Daily Operations Checklist
+
+- [ ] Review fleet health report
+- [ ] Check for temperature anomalies
+- [ ] Verify share acceptance rate > 99%
+- [ ] Update coin prices for profitability calc
+- [ ] Review energy consumption vs targets
+- [ ] Check pool latency and status
+- [ ] Review reward distribution
+- [ ] Monitor network difficulty changes
+
+### Troubleshooting Checklist
+
+- [ ] Rig not mining: Check pool connection, worker name, network
+- [ ] High temperature: Check fan speed, ambient temp, dust
+- [ ] Low hash rate: Check power limit, clock settings, algorithm
+- [ ] High reject rate: Check difficulty setting, pool config
+- [ ] No rewards: Check pool stats, payout threshold, address
+
 ## Integration Points
 
 ### With Other Agents
+
 - **crypto-web3**: Wallet integration for payout management
 - **data-architecture**: Historical data storage and analysis
 - **customer-success**: Mining service customer management
 
 ### External APIs
+
 - Coin price feeds (CoinGecko, CoinMarketCap)
 - Pool APIs for real-time statistics
 - Hardware monitoring APIs (ASIC firmware, GPU drivers)
 - Electricity pricing APIs
 
 ### File Formats
+
 - Configuration: YAML
 - Reports: JSON
 - Logs: Structured JSON for log aggregation
 - Alerts: JSON webhook payloads
+
+## Performance Benchmarks
+
+### Typical Performance Targets
+
+| Hardware | Algorithm | Hash Rate | Power | Efficiency |
+|----------|-----------|-----------|-------|------------|
+| Bitmain S19 | SHA-256 | 110 TH/s | 3250W | 29.5 J/TH |
+| Bitmain S21 | SHA-256 | 200 TH/s | 3500W | 17.5 J/TH |
+| RTX 4090 | KawPow | 120 MH/s | 450W | 3.75 J/MH |
+| RTX 3080 | KawPow | 65 MH/s | 320W | 4.92 J/MH |
+
+### Monitoring Intervals
+
+| Metric | Recommended Interval | Priority |
+|--------|---------------------|----------|
+| Temperature | 5-10 seconds | Critical |
+| Hash Rate | 30-60 seconds | High |
+| Share Stats | 60 seconds | High |
+| Power Draw | 60 seconds | Medium |
+| Pool Latency | 300 seconds | Medium |
+| Profitability | 300 seconds | Medium |
+
+## Recovery Procedures
+
+### Rig Failure Recovery
+
+```
+Step 1: Identify failed rig
+  → agent.get_rig_status(failed_rig_id)
+
+Step 2: Diagnose failure type
+  → Check error logs and alert history
+
+Step 3: Attempt restart
+  → agent.restart_rig(failed_rig_id)
+
+Step 4: If restart fails, power cycle
+  → Manual or via smart PDU
+
+Step 5: Monitor recovery
+  → agent.get_rig_status(failed_rig_id) until MINING
+
+Step 6: Log incident
+  → Record for capacity planning
+```
+
+### Pool Failure Recovery
+
+```
+Step 1: Detect pool unavailability
+  → agent.get_pool_health() shows OFFLINE
+
+Step 2: Failover to backup pool
+  → agent.evaluate_pool_switch()
+
+Step 3: If no backup, pause affected rigs
+  → agent.stop_rig(rig_id)
+
+Step 4: Monitor pool recovery
+  → Poll pool status every 60 seconds
+
+Step 5: Resume mining when pool returns
+  → agent.start_rig(rig_id)
+```
+
+## Future Enhancements
+
+- Real-time stratum protocol monitoring
+- AI-driven pool switching based on profitability predictions
+- Automated hardware diagnostics and repair suggestions
+- Integration with home automation for cooling control
+- Multi-site fleet management with geographic optimization
+- Predictive maintenance using machine learning

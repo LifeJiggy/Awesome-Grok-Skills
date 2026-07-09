@@ -609,3 +609,263 @@ ecommerce_agent:
 | Property tests | Data invariants | hypothesis |
 | Contract tests | API boundaries | schemathesis |
 | E2E tests | Full checkout | playwright |
+
+### Unit Test Examples
+
+```python
+# Product Catalog Tests
+def test_add_product():
+    catalog = ProductCatalog()
+    product = Product(name="Test", price=9.99)
+    pid = catalog.add_product(product)
+    assert catalog.get_product(pid) is not None
+
+def test_search_products():
+    catalog = ProductCatalog()
+    catalog.add_product(Product(name="Widget", category="Tools"))
+    results = catalog.search_products(query="Widget")
+    assert len(results) == 1
+
+# Inventory Tests
+def test_reserve_stock():
+    inventory = InventoryManager()
+    inventory.adjust_stock("P1", 100)
+    assert inventory.reserve_stock("P1", 10)
+    status = inventory.get_stock_status("P1")
+    assert status["reserved"] == 10
+    assert status["available"] == 90
+
+# Fraud Detection Tests
+def test_fraud_scoring():
+    detector = FraudDetector()
+    detector.add_rule("high_amount", lambda t: 50 if t.get("amount", 0) > 1000 else 0)
+    assessment = detector.assess_transaction({"amount": 1500})
+    assert assessment.risk_score > 0
+```
+
+### Integration Test Examples
+
+```python
+def test_checkout_flow():
+    agent = EcommerceAgent()
+    
+    # Setup
+    pid = agent.catalog.add_product(Product(name="Test", price=29.99))
+    agent.inventory.adjust_stock(pid, 100)
+    
+    # Cart
+    cart = agent.cart_manager.create_cart(user_id="user_001")
+    agent.cart_manager.add_item(cart.cart_id, pid, quantity=2)
+    
+    # Checkout
+    result = agent.checkout(
+        cart_id=cart.cart_id,
+        customer_id="user_001",
+        shipping_address=Address(line1="123 Main St", city="Portland", state="OR", postal_code="97201", country="US"),
+        payment_method=PaymentMethod.CREDIT_CARD,
+    )
+    
+    assert "order_id" in result
+    assert result["total"] > 0
+    
+    # Verify inventory
+    status = agent.inventory.get_stock_status(pid)
+    assert status["quantity"] == 98
+```
+
+### Performance Test Scenarios
+
+| Scenario | Target | Description |
+|----------|--------|-------------|
+| Product search | < 10ms | Search 10K products |
+| Cart calculation | < 5ms | Calculate totals with tax |
+| Order creation | < 20ms | Create order with items |
+| Fraud assessment | < 10ms | Evaluate transaction risk |
+| Checkout flow | < 100ms | End-to-end checkout |
+
+---
+
+## Deployment Architecture
+
+### Single-Instance Deployment
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    APPLICATION SERVER                         │
+├─────────────────────────────────────────────────────────────┤
+│  ┌───────────────────────────────────────────────────────┐ │
+│  │                  EcommerceAgent                        │ │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐    │ │
+│  │  │ Catalog │ │  Cart   │ │  Order  │ │ Pricing │    │ │
+│  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘    │ │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐    │ │
+│  │  │Inventory│ │  Fraud  │ │   Tax   │ │ Customer│    │ │
+│  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘    │ │
+│  └───────────────────────────────────────────────────────┘ │
+│                                                             │
+│  ┌───────────────────────────────────────────────────────┐ │
+│  │                  DATA LAYER                            │ │
+│  │  In-Memory │ Optional DB │ Cache (Redis)              │ │
+│  └───────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Distributed Deployment
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        LOAD BALANCER                              │
+└──────────────────────────────┬──────────────────────────────────┘
+                               │
+       ┌───────────────────────┼───────────────────────┐
+       │                       │                       │
+       ▼                       ▼                       ▼
+┌──────────────┐       ┌──────────────┐       ┌──────────────┐
+│   Server 1   │       │   Server 2   │       │   Server 3   │
+│  Ecommerce   │       │  Ecommerce   │       │  Ecommerce   │
+│    Agent     │       │    Agent     │       │    Agent     │
+└──────┬───────┘       └──────┬───────┘       └──────┬───────┘
+       │                       │                       │
+       └───────────────────────┼───────────────────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   Shared Database    │
+                    │   (PostgreSQL)       │
+                    └─────────────────────┘
+```
+
+---
+
+## Security Architecture
+
+### Authentication Flow
+
+```
+  Client Request
+       │
+       ▼
+  ┌──────────────┐
+  │   API Gateway │
+  │  (Auth Check) │
+  └──────┬───────┘
+         │
+    ┌────┴────┐
+    │ Valid?  │
+    └────┬────┘
+    Yes  │  No
+    │    │   │
+    ▼    │   ▼
+  Process│  401 Unauthorized
+  Request│
+```
+
+### Data Encryption
+
+| Data Type | Encryption | Storage |
+|-----------|------------|---------|
+| Payment tokens | AES-256 | Payment processor |
+| Customer PII | AES-256 | Database |
+| API keys | Hashed | Environment variables |
+| Session data | TLS in transit | Redis/Memory |
+
+### PCI DSS Compliance
+
+- Never store raw card numbers
+- Use tokenization via payment processor
+- Validate CVV on every transaction
+- Implement address verification (AVS)
+- Use HTTPS for all endpoints
+
+---
+
+## Monitoring and Observability
+
+### Key Metrics
+
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| Order success rate | Successful checkouts / attempts | < 95% |
+| Average checkout time | Time from cart to order | > 5 seconds |
+| Fraud block rate | Blocked transactions / total | > 5% |
+| Inventory accuracy | Stock matches system | < 99% |
+| API response time | 95th percentile | > 500ms |
+| Error rate | Errors / total requests | > 1% |
+
+### Logging Strategy
+
+```python
+# Structured logging example
+import logging
+
+logger = logging.getLogger("ecommerce")
+
+# Order creation
+logger.info("order_created", extra={
+    "order_id": order.order_id,
+    "user_id": order.user_id,
+    "total": order.total,
+    "items_count": len(order.items),
+})
+
+# Fraud detection
+logger.warning("fraud_detected", extra={
+    "transaction_id": txn.id,
+    "risk_score": assessment.risk_score,
+    "flags": assessment.flags,
+})
+```
+
+### Health Check Endpoint
+
+```python
+def health_check():
+    return {
+        "status": "healthy",
+        "components": {
+            "catalog": check_catalog(),
+            "inventory": check_inventory(),
+            "orders": check_orders(),
+            "fraud": check_fraud_detector(),
+        },
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+```
+
+---
+
+## Data Retention Policy
+
+| Data Type | Retention | Archive After |
+|-----------|-----------|---------------|
+| Product data | Indefinite | Never |
+| Order data | 7 years | 1 year |
+| Customer data | Until deletion request | 2 years |
+| Fraud assessments | 2 years | 6 months |
+| Audit logs | 3 years | 1 year |
+| Cart data | 30 days | Immediate |
+
+---
+
+## Disaster Recovery
+
+### Backup Strategy
+
+| Data | Frequency | Method | Recovery Time |
+|------|-----------|--------|---------------|
+| Product catalog | Daily | Full dump | < 1 hour |
+| Order database | Real-time | Replication | < 5 minutes |
+| Customer data | Daily | Encrypted backup | < 2 hours |
+| Configuration | On change | Version control | < 15 minutes |
+
+### Recovery Procedures
+
+1. **Data corruption**: Restore from last backup
+2. **Service failure**: Restart and verify state
+3. **Database failure**: Switch to replica
+4. **Full outage**: Deploy to backup region
+
+---
+
+**See Also**: [GROK.md](./GROK.md) for agent identity and capabilities,
+[README.md](./README.md) for quick start and API reference.

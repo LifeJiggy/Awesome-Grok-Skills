@@ -46,6 +46,28 @@ The Full-Stack Planner Agent provides a complete toolkit for managing software d
 
 Built with zero external dependencies — pure Python standard library.
 
+### Key Benefits
+
+- **Zero Dependencies**: Pure Python stdlib, no external packages required
+- **Modular Design**: Use only the components you need
+- **Type-Safe**: Full type hints on all public methods
+- **Extensible**: Easy to add custom estimation strategies, risk models
+- **Auditable**: Complete trail of all decisions and changes
+- **Agile-Native**: Built for Scrum, Kanban, and hybrid methodologies
+
+### Use Cases
+
+| Use Case | Description |
+|----------|-------------|
+| Tech Stack Selection | Compare frameworks, databases, tools |
+| Sprint Planning | Create sprints, assign tasks, track velocity |
+| Resource Allocation | Manage team capacity, balance workloads |
+| Risk Management | Identify, assess, and mitigate risks |
+| Cost Estimation | Budget planning and tracking |
+| Architecture Design | Document decisions and components |
+| Technical Debt | Track and prioritize technical shortcuts |
+| Performance Tracking | Monitor SLA targets and metrics |
+
 ---
 
 ## Features
@@ -61,6 +83,56 @@ Built with zero external dependencies — pure Python standard library.
 | Debt | Interest modeling, severity classification, prioritized backlog |
 | Benchmarks | Target/actual comparison, deviation tracking, status reporting |
 | Roadmap | Milestones, dependencies, critical path, timeline generation |
+
+### Detailed Feature List
+
+**Tech Stack Evaluation**
+- Register multiple technology candidates
+- Evaluate by category (frontend, backend, database, etc.)
+- Compare two options side-by-side
+- Get full stack recommendations
+
+**Sprint Planning**
+- Create sprints with configurable duration
+- Add tasks with story points and estimates
+- Plan sprint based on team capacity
+- Track progress and completion
+- Generate burndown data
+- Predict future sprint completion
+
+**Resource Allocation**
+- Add team members with skills and capacity
+- Calculate team capacity
+- Find best-fit member for tasks
+- Rebalance workloads automatically
+
+**Risk Management**
+- Add risks with probability and impact
+- Classify risks by severity
+- Get mitigation suggestions
+- Track risk register and summary
+
+**Cost Estimation**
+- Add estimates per work stream
+- Calculate budget reports
+- Estimate from task lists
+- Include contingency
+
+**Architecture Design**
+- Document components and data stores
+- Create Architecture Decision Records (ADRs)
+- Generate ASCII diagrams
+- Generate architecture documentation
+
+**Technical Debt**
+- Track debt items with interest rates
+- Prioritize by interest × fix hours
+- Get summary statistics
+
+**Performance Benchmarks**
+- Define SLA targets
+- Track actual performance
+- Report status (met/not met)
 
 ---
 
@@ -99,18 +171,45 @@ python agents/full_stack_planner/agent.py
 
 ## Architecture
 
+### Component Diagram
+
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Full-Stack Planner Agent                       │
-├─────────────────────────────────────────────────────────────────┤
-│  Tech Stack Evaluator │ Sprint Planner │ Resource Allocator      │
-│  Risk Manager         │ Cost Estimator │ Architecture Designer   │
-│  Tech Debt Tracker    │ Benchmarks     │ Project Roadmap         │
-├─────────────────────────────────────────────────────────────────┤
-│              Data Models (Task, Sprint, TeamMember, Risk)        │
-├─────────────────────────────────────────────────────────────────┤
-│              Configuration (ProjectConfig, Enums)                │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                      FULL-STACK PLANNER AGENT                             │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    PROJECT LIFECYCLE                              │   │
+│  │  Discover → Plan → Design → Develop → Monitor → Deliver         │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Tech Stack│ │  Sprint    │ │  Resource  │ │  Risk      │           │
+│  │  Evaluator │ │  Planner   │ │  Allocator │ │  Manager   │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Cost      │ │  Arch      │ │  Tech Debt │ │  Perf      │           │
+│  │  Estimator │ │  Designer  │ │  Tracker   │ │  Benchmarks│           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Project Lifecycle
+
+```
+  Software Project Lifecycle:
+  ══════════════════════════
+
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Discovery│ ─► │ Planning │ ─► │ Design   │ ─► │ Develop  │
+  │          │    │          │    │          │    │          │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+       │               │               │               │
+       ▼               ▼               ▼               ▼
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │  Tech    │    │  Cost    │    │  Arch    │    │  Sprint  │
+  │  Eval    │    │  Estimate│    │  Design  │    │  Execute │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
 ```
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed system design.
@@ -455,6 +554,22 @@ risk_mgr = RiskManager(risk_tolerance="medium")
 9. **Review sprint velocity** — use 3-sprint rolling average
 10. **Maintain the roadmap** — adjust milestones as reality changes
 
+### Agile Best Practices
+
+- Keep sprints time-boxed
+- Conduct daily standups
+- Hold sprint retrospectives
+- Groom backlog regularly
+- Use definition of done
+
+### Architecture Best Practices
+
+- Document all significant decisions
+- Use ADRs for traceability
+- Review architecture quarterly
+- Avoid premature optimization
+- Design for change
+
 ---
 
 ## Troubleshooting
@@ -467,6 +582,18 @@ risk_mgr = RiskManager(risk_tolerance="medium")
 | Budget overrun | Compare actual vs estimated, review scope changes |
 | Architecture drift | Create ADRs for all decisions, review quarterly |
 | Debt backlog growing | Prioritize by interest rate, allocate sprint capacity |
+
+### Debug Mode
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Get detailed sprint info
+sprint = planner.get_sprint("S1")
+print(f"Tasks: {len(sprint.tasks)}")
+print(f"Velocity: {sprint.velocity}")
+```
 
 ---
 
@@ -484,6 +611,8 @@ risk_mgr = RiskManager(risk_tolerance="medium")
 - Docstrings for all classes and public methods
 - Zero external dependencies (stdlib only)
 - Follow existing naming conventions
+- Write tests for new functionality
+- Update documentation for API changes
 
 ---
 

@@ -406,6 +406,8 @@ config = QualityConfig(
 | Defect transition fails | Check the valid transition table for the current state |
 | Quality gate always passes | Review criteria — ensure they test real conditions |
 | Sigma level returns 0 | Check that defects and opportunities are > 0 |
+| Test suite blocked | Verify all entry criteria are met |
+| Metrics show stale data | Ensure metrics are being tracked regularly |
 
 ---
 

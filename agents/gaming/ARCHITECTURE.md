@@ -229,28 +229,28 @@ dmg_mult = 1 + damage_scale × level_diff (capped at max_multiplier)
 ## 3. Data Flow
 
 ```
-  ┌──────────────────────────────────────────────────────┐
-  │                GAME CONFIGURATION                     │
-  │  Genre │ Platform │ Monetization │ Target Audience    │
-  └────────────────────────┬─────────────────────────────┘
+  ┌──────────────────────────────────────────────────────────────┐
+  │                GAME CONFIGURATION                             │
+  │  Genre │ Platform │ Monetization │ Target Audience            │
+  └────────────────────────┬─────────────────────────────────────┘
                            │
                            ▼
-  ┌──────────────────────────────────────────────────────┐
-  │                CORE SYSTEMS                           │
-  │  Combat ←→ Economy ←→ Progression ←→ Loot            │
-  └────────────────────────┬─────────────────────────────┘
+  ┌──────────────────────────────────────────────────────────────┐
+  │                CORE SYSTEMS                                   │
+  │  Combat ←→ Economy ←→ Progression ←→ Loot                    │
+  └────────────────────────┬─────────────────────────────────────┘
                            │
                            ▼
-  ┌──────────────────────────────────────────────────────┐
-  │                PLAYER EXPERIENCE                      │
-  │  Battles │ Rewards │ Leveling │ Items │ Quests        │
-  └────────────────────────┬─────────────────────────────┘
+  ┌──────────────────────────────────────────────────────────────┐
+  │                PLAYER EXPERIENCE                              │
+  │  Battles │ Rewards │ Leveling │ Items │ Quests                │
+  └────────────────────────┬─────────────────────────────────────┘
                            │
                            ▼
-  ┌──────────────────────────────────────────────────────┐
-  │                ANALYTICS & QA                         │
-  │  Engagement │ Retention │ Bugs │ Balance │ Economy    │
-  └──────────────────────────────────────────────────────┘
+  ┌──────────────────────────────────────────────────────────────┐
+  │                ANALYTICS & QA                                 │
+  │  Engagement │ Retention │ Bugs │ Balance │ Economy            │
+  └──────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -399,3 +399,394 @@ Define new segmentation rules beyond the built-in set. Custom segments can trigg
 | Engagement score | < 5ms | Single player |
 | Difficulty scaling | < 2ms | Single encounter |
 | QA release check | < 20ms | All criteria |
+
+---
+
+## 11. Detailed Component Internals
+
+### 11.1 Combat Engine Internals
+
+**Damage Calculation Pipeline:**
+```
+  1. Base Damage = attack × skill_multiplier
+  2. Element Modifier = base_damage × element_modifier
+  3. Crit Check = random() < crit_chance
+  4. If Crit: damage = element_modifier × crit_damage_multiplier
+  5. Defense Reduction = defense / (defense + 100)
+  6. After Defense = damage × (1 - defense_reduction)
+  7. Block Check = random() < block_chance
+  8. If Block: damage = after_defense × 0.5
+  9. Final Damage = max(1, damage)
+```
+
+**Speed and Turn Order:**
+```
+  turn_order = sorted(characters, key=lambda c: c.speed, reverse=True)
+  for character in turn_order:
+      if character.hp > 0:
+          execute_turn(character)
+```
+
+**Balance Score Calculation:**
+```
+  balance_score = 1.0 - abs(win_rate_a - 0.5) × 2
+  # 1.0 = perfectly balanced (50/50)
+  # 0.0 = completely one-sided (100/0)
+```
+
+### 11.2 Economy Manager Internals
+
+**Inflation Calculation:**
+```
+  inflation_rate = (total_earned - total_spent) / total_earned
+```
+
+**Health Check Logic:**
+```
+  health_check():
+      issues = []
+      for currency in currencies:
+          if currency.inflation > 0.15:
+              issues.append(f"{currency.name}: High inflation")
+          if currency.sink_faucet_ratio < 0.5:
+              issues.append(f"{currency.name}: Low sink ratio")
+          if currency.sink_faucet_ratio > 1.5:
+              issues.append(f"{currency.name}: High sink ratio")
+      return {"healthy": len(issues) == 0, "issues": issues}
+```
+
+**Currency Flow Tracking:**
+```
+  earn(currency, amount, source):
+      currency.supply += amount
+      currency.total_earned += amount
+      log_transaction("earn", currency, amount, source)
+  
+  spend(currency, amount, sink):
+      if currency.supply >= amount:
+          currency.supply -= amount
+          currency.total_spent += amount
+          log_transaction("spend", currency, amount, sink)
+          return True
+      return False
+```
+
+### 11.3 Progression System Internals
+
+**Experience Curve Formula:**
+```
+  exp_for_level(N) = base_exp × growth_rate^(N-1)
+  total_exp_to_level(from, to) = Σ exp_for_level(i) for i in range(from, to)
+```
+
+**Time-to-Max Calculation:**
+```
+  total_exp = total_exp_to_level(1, max_level)
+  hours_to_max = total_exp / exp_per_hour
+```
+
+**Unlock Gate Logic:**
+```
+  get_unlock_gates(player_level):
+      gates = []
+      for gate in defined_gates:
+          gates.append({
+              "feature": gate.feature,
+              "level": gate.required_level,
+              "unlocked": player_level >= gate.required_level
+          })
+      return gates
+```
+
+### 11.4 Loot System Internals
+
+**Drop Rate Calculation:**
+```
+  roll = random() × luck_modifier
+  cumulative = 0
+  for entry in sorted_by_rarity_descending:
+      cumulative += entry.rate
+      if roll <= cumulative:
+          return entry
+  return last_entry  # Fallback
+```
+
+**Pity Timer Logic:**
+```
+  open_loot(table_id):
+      table = get_table(table_id)
+      pity_counter[table_id] += 1
+      
+      if pity_counter[table_id] >= table.pity_threshold:
+          # Guarantee highest rarity
+          result = guaranteed_legendary_drop(table)
+          pity_counter[table_id] = 0
+          result.pity_triggered = True
+          return result
+      
+      # Normal roll
+      return normal_roll(table)
+```
+
+**Expected Value Calculation:**
+```
+  calculate_expected_value(table_id, rolls):
+      distribution = {rarity: 0 for rarity in rarities}
+      for _ in range(rolls):
+          drop = normal_roll(table)
+          distribution[drop.rarity] += 1
+      return {r: count/rolls for r, count in distribution.items()}
+```
+
+### 11.5 Engagement Analyzer Internals
+
+**Player Segmentation Logic:**
+```
+  segment_players(players):
+      segments = defaultdict(list)
+      for player in players:
+          if player.total_spent > 100:
+              segments[WHALE].append(player)
+          elif player.playtime_hours < 5:
+              segments[NEW].append(player)
+          elif player.playtime_hours < 20:
+              segments[CASUAL].append(player)
+          elif player.playtime_hours < 100:
+              segments[REGULAR].append(player)
+          else:
+              segments[DEDICATED].append(player)
+      return segments
+```
+
+**Churn Risk Calculation:**
+```
+  predict_churn_risk(player):
+      risk_score = 0.0
+      factors = []
+      
+      if player.days_inactive > 7:
+          risk_score += 0.3
+          factors.append("inactive_7plus_days")
+      if player.days_inactive > 14:
+          risk_score += 0.2
+          factors.append("inactive_14plus_days")
+      if player.session_count < 10:
+          risk_score += 0.15
+          factors.append("low_session_count")
+      if player.total_spent == 0 and player.playtime_hours > 10:
+          risk_score += 0.1
+          factors.append("non_paying_engaged")
+      
+      risk_level = "low" if risk_score < 0.3 else "medium" if risk_score < 0.6 else "high"
+      return {"risk_score": risk_score, "risk_level": risk_level, "factors": factors}
+```
+
+**Engagement Score Formula:**
+```
+  score = (playtime_factor × 0.3) + (session_factor × 0.2) +
+          (spending_factor × 0.2) + (social_factor × 0.15) +
+          (progression_factor × 0.15)
+  
+  # Each factor normalized to 0-100
+  playtime_factor = min(100, playtime_hours)
+  session_factor = min(100, session_count × 2)
+  spending_factor = min(100, total_spent / 5)
+  social_factor = min(100, friend_count × 10)
+  progression_factor = min(100, level × 2)
+```
+
+### 11.6 QA Manager Internals
+
+**Release Readiness Logic:**
+```
+  release_readiness():
+      critical_bugs = count_bugs(severity=CRITICAL, status=OPEN)
+      high_bugs = count_bugs(severity=HIGH, status=OPEN)
+      test_cases_passed = all_tests_passed()
+      
+      ready = critical_bugs == 0 and high_bugs == 0 and test_cases_passed
+      
+      return {
+          "ready": ready,
+          "critical_bugs": critical_bugs,
+          "high_bugs": high_bugs,
+          "test_cases_passed": test_cases_passed,
+          "recommendation": "Ready to ship" if ready else "Fix blocking issues"
+      }
+```
+
+### 11.7 Difficulty Scaler Internals
+
+**Scaling Formula:**
+```
+  level_diff = enemy_level - player_level
+  hp_mult = 1 + hp_scale × level_diff
+  dmg_mult = 1 + damage_scale × level_diff
+  
+  # Cap at max_multiplier
+  hp_mult = min(hp_mult, max_multiplier)
+  dmg_mult = min(dmg_mult, max_multiplier)
+  
+  scaled_hp = base_hp × hp_mult
+  scaled_dmg = base_dmg × dmg_mult
+```
+
+**Adaptive Difficulty Logic:**
+```
+  calculate_recommended_level(player_stats):
+      win_rate = player_stats["win_rate"]
+      avg_turns = player_stats["avg_turns"]
+      current_level = player_stats["current_level"]
+      
+      if win_rate > 0.8:
+          return current_level + 2  # Increase difficulty
+      elif win_rate < 0.4:
+          return max(1, current_level - 2)  # Decrease difficulty
+      else:
+          return current_level  # Maintain
+```
+
+---
+
+## 12. Error Handling Strategy
+
+### 12.1 Input Validation
+
+| Component | Validation | Error Type |
+|-----------|------------|------------|
+| CombatEngine | Positive stats, valid levels | ValueError |
+| EconomyManager | Positive amounts, valid currency | ValueError |
+| ProgressionSystem | Positive level, valid exp | ValueError |
+| LootSystem | Valid table_id, positive count | ValueError |
+| EngagementAnalyzer | Valid player data | ValueError |
+| QAManager | Non-empty title, valid severity | ValueError |
+| DifficultyScaler | Positive base values | ValueError |
+
+### 12.2 Graceful Degradation
+
+- **Invalid stats**: Use defaults with warning
+- **Missing currency**: Create with zero balance
+- **Invalid loot table**: Return empty drops
+- **Insufficient data**: Return partial analytics
+
+---
+
+## 13. Testing Architecture
+
+### 13.1 Test Categories
+
+| Category | Coverage | Tools |
+|----------|----------|-------|
+| Unit Tests | Individual methods | pytest |
+| Integration Tests | System interaction | pytest |
+| Simulation Tests | Balance verification | pytest |
+| Statistical Tests | Drop rate validation | scipy |
+
+### 13.2 Test Data Strategy
+
+- **Synthetic characters**: Known stat distributions
+- **Simulated players**: Varied engagement patterns
+- **Edge cases**: Level 1 vs max, zero stats, empty inventories
+
+---
+
+## 14. Configuration Management
+
+### 14.1 Default Configuration
+
+```python
+DEFAULT_CONFIG = {
+    "combat": {
+        "seed": None,
+        "crit_damage_multiplier": 1.5,
+        "block_damage_reduction": 0.5,
+        "defense_factor": 100,
+    },
+    "economy": {
+        "inflation_warning": 0.05,
+        "inflation_critical": 0.15,
+        "sink_faucet_healthy_range": (0.8, 1.2),
+    },
+    "progression": {
+        "max_level": 100,
+        "base_exp": 100,
+        "exp_growth": 1.15,
+    },
+    "loot": {
+        "default_pity_threshold": 50,
+        "luck_modifier_max": 2.0,
+    },
+    "difficulty": {
+        "hp_scale": 0.15,
+        "damage_scale": 0.10,
+        "max_multiplier": 3.0,
+        "adaptive_threshold_high": 0.8,
+        "adaptive_threshold_low": 0.4,
+    },
+}
+```
+
+---
+
+## 15. Logging and Monitoring
+
+### 15.1 Log Levels
+
+| Level | Usage |
+|-------|-------|
+| DEBUG | Damage calculations, loot rolls |
+| INFO | Battle completion, level ups, purchases |
+| WARNING | Balance issues, inflation alerts |
+| ERROR | Invalid inputs, calculation failures |
+
+### 15.2 Metrics to Monitor
+
+- Battle simulation performance
+- Economy health metrics
+- Player engagement trends
+- Loot drop distributions
+- QA bug resolution rates
+
+---
+
+## 16. Future Roadmap
+
+### 16.1 Short-term Enhancements
+
+- Additional combat formulas (cooldowns, mana)
+- More loot mechanics (crafting, trading)
+- Enhanced analytics (cohort analysis)
+- Export capabilities (CSV, JSON)
+
+### 16.2 Medium-term Enhancements
+
+- Real-time multiplayer simulation
+- AI-controlled opponents
+- Procedural content generation
+- Machine learning for balance
+
+### 16.3 Long-term Vision
+
+- Unity/Unreal integration
+- Live operations dashboard
+- Cross-platform player data
+- Predictive analytics
+
+---
+
+## 17. Comparison with Industry Tools
+
+| Feature | Gaming Agent | Unity | Unreal | Custom |
+|---------|--------------|-------|--------|--------|
+| Dependencies | Zero | Engine | Engine | Varies |
+| Combat Sim | Built-in | Via scripts | Via blueprints | Custom |
+| Economy | Built-in | Via plugins | Via plugins | Custom |
+| Loot | Built-in | Via plugins | Via plugins | Custom |
+| Analytics | Built-in | Via services | Via services | Custom |
+| Cost | Free | Runtime fee | Runtime fee | Dev time |
+| Learning Curve | Low | Medium | High | Varies |
+
+---
+
+**See Also**: [GROK.md](./GROK.md) for agent identity and capabilities,
+[README.md](./README.md) for quick start and API reference.

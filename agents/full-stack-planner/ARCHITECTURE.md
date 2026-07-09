@@ -377,3 +377,266 @@ Add new `ArchitectureStyle` enum variants and update the designer.
 - Portfolio-level planning across projects
 - Real-time collaboration
 - AI-powered project insights
+
+---
+
+## 12. Detailed Component Internals
+
+### 12.1 Tech Stack Evaluator Internals
+
+**Score Calculation:**
+```
+  score = 0.20 × community + 0.25 × performance + 0.15 × learning
+        + 0.25 × ecosystem + 0.15 × (10 - cost/100)
+```
+
+**Ranking Algorithm:**
+1. Filter by required category
+2. Calculate composite score for each candidate
+3. Sort by score descending
+4. Return ranked list with scores
+
+**Comparison Logic:**
+```
+  compare(tech_a, tech_b):
+      score_a = calculate_score(tech_a)
+      score_b = calculate_score(tech_b)
+      difference = score_a - score_b
+      return {
+          "winner": tech_a if difference > 0 else tech_b,
+          "margin": abs(difference),
+          "breakdown": {...}
+      }
+```
+
+### 12.2 Sprint Planner Internals
+
+**Velocity Calculation:**
+```
+  velocity = sum(completed_points) / count(completed_sprints)
+  predicted_sprints = remaining_points / velocity
+```
+
+**Burndown Data:**
+```
+  for each day in sprint:
+      ideal_remaining = total_points × (1 - day / total_days)
+      actual_remaining = sum(remaining_points for incomplete tasks)
+      burndown.append({day, ideal, actual})
+```
+
+**Sprint Completion Logic:**
+```
+  complete_sprint(sprint_id):
+      1. Mark incomplete tasks as carry-over
+      2. Calculate velocity (completed_points)
+      3. Update velocity history
+      4. Generate completion report
+      5. Return metrics
+```
+
+### 12.3 Resource Allocator Internals
+
+**Capacity Calculation:**
+```
+  effective_hours = available_hours × productivity_factor
+  remaining = effective_hours × (1 - current_load_pct)
+```
+
+**Best-Fit Algorithm:**
+```
+  find_best_fit(required_skills, hours_needed):
+      candidates = []
+      for member in team:
+          skill_match = len(set(required_skills) & set(member.skills))
+          if member.remaining_capacity >= hours_needed:
+              candidates.append((member, skill_match, member.remaining_capacity))
+      
+      # Sort by skill match (desc), then remaining capacity (desc)
+      candidates.sort(key=lambda x: (-x[1], -x[2]))
+      return candidates[0] if candidates else None
+```
+
+**Workload Rebalancing:**
+```
+  rebalance_workload():
+      overloaded = [m for m in team if m.load > 0.9]
+      underloaded = [m for m in team if m.load < 0.5]
+      
+      suggestions = []
+      for over in overloaded:
+          transfer_hours = over.overload_hours × 0.2
+          best_match = find_best_match(over.skills, underloaded)
+          if best_match:
+              suggestions.append({
+                  "from": over,
+                  "to": best_match,
+                  "hours": transfer_hours
+              })
+      return suggestions
+```
+
+### 12.4 Risk Manager Internals
+
+**Risk Score Calculation:**
+```
+  risk_score = probability × impact
+```
+
+**Classification Thresholds:**
+```
+  if score >= 7.0: CRITICAL
+  elif score >= 5.0: HIGH
+  elif score >= 3.0: MEDIUM
+  elif score >= 1.0: LOW
+  else: NEGLIGIBLE
+```
+
+**Mitigation Suggestion Logic:**
+```
+  suggest_mitigations(risk_id):
+      risk = get_risk(risk_id)
+      suggestions = []
+      
+      if risk.probability > 0.7:
+          suggestions.append("Reduce probability through controls")
+      if risk.impact > 7:
+          suggestions.append("Reduce impact through redundancy")
+      if risk.probability × risk.impact > 5:
+          suggestions.append("Consider risk transfer (insurance)")
+      
+      return suggestions
+```
+
+---
+
+## 13. Error Handling Strategy
+
+### 13.1 Input Validation
+
+| Component | Validation | Error Type |
+|-----------|------------|------------|
+| SprintPlanner | Valid dates, non-empty tasks | ValueError |
+| ResourceAllocator | Positive hours, valid skills | ValueError |
+| RiskManager | Probability 0-1, impact 0-10 | ValueError |
+| CostEstimator | Positive costs, valid rates | ValueError |
+| ArchitectureDesigner | Non-empty names, valid style | ValueError |
+
+### 13.2 Graceful Degradation
+
+- **Insufficient data**: Return partial results with warnings
+- **Invalid configuration**: Use defaults with notification
+- **Missing dependencies**: Skip dependent calculations
+
+---
+
+## 14. Testing Architecture
+
+### 14.1 Test Categories
+
+| Category | Coverage | Tools |
+|----------|----------|-------|
+| Unit Tests | Individual methods | pytest |
+| Integration Tests | Component interaction | pytest |
+| Property Tests | Mathematical invariants | hypothesis |
+| Edge Cases | Boundary conditions | pytest |
+
+### 14.2 Test Data Strategy
+
+- **Synthetic data**: Generated with known outcomes
+- **Edge cases**: Empty teams, zero capacity, extreme risks
+- **Real-world scenarios**: Based on typical projects
+
+---
+
+## 15. Configuration Management
+
+### 15.1 Default Configuration
+
+```python
+DEFAULT_CONFIG = {
+    "sprint_duration_days": 14,
+    "working_hours_per_day": 8.0,
+    "working_days_per_week": 5,
+    "risk_tolerance": "medium",
+    "default_hourly_rate": 100.0,
+    "contingency_percentage": 0.2,
+    "velocity_history_size": 5,
+}
+```
+
+### 15.2 Risk Tolerance Thresholds
+
+```python
+RISK_THRESHOLDS = {
+    "low": 3.0,
+    "medium": 5.0,
+    "high": 7.0,
+}
+```
+
+---
+
+## 16. Logging and Monitoring
+
+### 16.1 Log Levels
+
+| Level | Usage |
+|-------|-------|
+| DEBUG | Detailed calculation steps |
+| INFO | Sprint creation, task completion |
+| WARNING | Capacity exceeded, risk threshold |
+| ERROR | Invalid inputs, calculation failures |
+
+### 16.2 Metrics to Monitor
+
+- Sprint velocity trends
+- Team utilization rates
+- Risk score distributions
+- Budget variance
+- Technical debt growth rate
+
+---
+
+## 17. Future Roadmap
+
+### 17.1 Short-term Enhancements
+
+- Gantt chart generation
+- Kanban board view
+- Time tracking integration
+- Automated sprint retrospective analysis
+
+### 17.2 Medium-term Enhancements
+
+- Machine learning for effort estimation
+- Natural language task creation
+- Auto-generated architecture diagrams
+- Risk prediction from historical data
+
+### 17.3 Long-term Vision
+
+- Multi-team coordination
+- Portfolio-level planning across projects
+- Real-time collaboration
+- AI-powered project insights
+
+---
+
+## 18. Comparison with Industry Tools
+
+| Feature | Full-Stack Planner | Jira | Asana | Linear |
+|---------|-------------------|------|-------|--------|
+| Dependencies | Zero | Cloud | Cloud | Cloud |
+| Tech Stack Eval | Built-in | Via plugins | No | No |
+| Sprint Planning | Built-in | Built-in | Built-in | Built-in |
+| Resource Mgmt | Built-in | Via plugins | Basic | Basic |
+| Risk Mgmt | Built-in | Via plugins | No | No |
+| Cost Estimation | Built-in | No | No | No |
+| Architecture | Built-in | No | No | No |
+| Cost | Free | $8/user/mo | $11/user/mo | $8/user/mo |
+
+---
+
+**See Also**: [GROK.md](./GROK.md) for agent identity and capabilities,
+[README.md](./README.md) for quick start and API reference.

@@ -44,6 +44,39 @@ The Database Administration Agent is a comprehensive database operations platfor
 5. **Schema safety** — Every schema change is tracked, versioned, and reversible
 6. **Replication reliability** — Monitor lag continuously; failover only when the replica is ready
 
+## Architecture Overview
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                     DatabaseAdminAgent                                    │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Instance Mgr  │  │  Backup Mgr    │  │  Performance Tuner         │  │
+│  │  ├ Register    │  │  ├ Full        │  │  ├ Metrics collection      │  │
+│  │  ├ Status      │  │  ├ Incremental │  │  ├ Slow query detection    │  │
+│  │  ├ Lifecycle   │  │  ├ Differential│  │  ├ Index recommendations   │  │
+│  │  └ Deprovision │  │  ├ Snapshot    │  │  └ Health scoring          │  │
+│  └────────────────┘  │  ├ WAL Archive │  └────────────────────────────┘  │
+│                      │  └ Cleanup     │                                  │
+│                      └────────────────┘                                  │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Replication   │  │  Security      │  │  Capacity Planner          │  │
+│  │  ├ Links       │  │  ├ Audits      │  │  ├ Forecasting             │  │
+│  │  ├ Lag monitor │  │  ├ Findings    │  │  ├ Trend analysis          │  │
+│  │  ├ Failover    │  │  ├ Compliance  │  │  ├ Growth recommendations  │  │
+│  │  └ Status      │  │  └ Remediation │  │  └ Alerts                  │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Schema Mgr    │  │  Monitoring    │  │  Recovery Planner          │  │
+│  │  ├ Changes     │  │  ├ Thresholds  │  │  ├ RTO/RPO targets         │  │
+│  │  ├ History     │  │  ├ Alerts      │  │  ├ Plan creation           │  │
+│  │  ├ Rollback    │  │  └ Dashboard   │  │  ├ Testing                 │  │
+│  │  └ Versioning  │  │               │  │  └ Execution               │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
 ## Capabilities
 
 ### 1. Instance Management
@@ -70,16 +103,43 @@ agent.update_instance_status(primary.instance_id, InstanceStatus.MAINTENANCE)
 
 **Supported Engines:**
 
-| Engine | Port | Use Case |
-|--------|------|----------|
-| PostgreSQL | 5432 | OLTP/OLAP |
-| MySQL | 3306 | Web apps |
-| MongoDB | 27017 | Document store |
-| Redis | 6379 | Cache/sessions |
-| Elasticsearch | 9200 | Search/analytics |
-| ClickHouse | 8123 | OLAP analytics |
-| Cassandra | 9042 | Wide-column |
-| DynamoDB | 443 | Serverless |
+| Engine | Port | Use Case | Backup Method |
+|--------|------|----------|---------------|
+| PostgreSQL | 5432 | OLTP/OLAP | WAL + pg_dump |
+| MySQL | 3306 | Web apps | mysqldump + binlog |
+| MongoDB | 27017 | Document store | mongodump + oplog |
+| Redis | 6379 | Cache/sessions | RDB + AOF |
+| Elasticsearch | 9200 | Search/analytics | Snapshot API |
+| ClickHouse | 8123 | OLAP analytics | ClickHouse backup |
+| Cassandra | 9042 | Wide-column | nodetool snapshot |
+| DynamoDB | 443 | Serverless | Point-in-time recovery |
+
+**Instance Lifecycle:**
+
+```
+  ┌──────────────┐
+  │ PROVISIONING │
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐     ┌──────────────┐
+  │   RUNNING    │────►│ MAINTENANCE  │
+  └──────┬───────┘     └──────┬───────┘
+         │                    │
+         │  ┌──────────────┐  │
+         │  │  SCALING     │◄─┘
+         │  └──────┬───────┘
+         │         │
+         ▼         ▼
+  ┌──────────────┐  ┌──────────────┐
+  │   STOPPED    │  │  RECOVERING  │
+  └──────────────┘  └──────┬───────┘
+                           │
+                           ▼
+                    ┌──────────────┐
+                    │   FAILED     │
+                    └──────────────┘
+```
 
 ### 2. Backup & Recovery
 
@@ -110,6 +170,15 @@ print(f"Removed {result['expired_removed']} expired backups")
 | SNAPSHOT | Fast | Large | Fast | Point-in-time |
 | WAL_ARCHIVE | Continuous | Tiny | Medium | Continuous protection |
 | LOGICAL_DUMP | Medium | Medium | Medium | Migration |
+
+**Backup Strategy Flow:**
+
+```
+Weekly:     FULL ─────────────────────────────────────────────►
+Daily:      ──── INCR ──── INCR ──── INCR ──── INCR ──── INCR ────
+Continuous: ──────────────────────────────────────────────────────► WAL
+Mid-week:   ──────── DIFF ──────── DIFF ──────── DIFF ────────
+```
 
 ### 3. Performance Tuning
 
@@ -142,6 +211,29 @@ slow = agent.get_slow_queries(primary.instance_id, threshold_ms=500)
 | cache_hit_ratio | % | <95% | <80% |
 | lock_wait | ms | >100 | >500 |
 | deadlocks | count | >5 | >20 |
+| replication_lag | seconds | >5 | >30 |
+| iops | count/s | >10000 | >50000 |
+
+**Performance Diagnosis Flow:**
+
+```
+  ┌──────────────┐
+  │ Low Health   │
+  │ Score        │
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+  │ Check Disk   │───►│ Check CPU    │───►│ Check Memory │
+  │ Usage        │    │ Usage        │    │ Usage        │
+  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘
+         │                   │                   │
+         ▼                   ▼                   ▼
+  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+  │ Archive Old  │    │ Optimize     │    │ Increase     │
+  │ Data         │    │ Queries      │    │ Pool Size    │
+  └──────────────┘    └──────────────┘    └──────────────┘
+```
 
 ### 4. Replication Management
 
@@ -161,6 +253,24 @@ print(f"Healthy: {summary['healthy']}, Lagging: {summary['lagging']}")
 
 # Execute failover
 result = agent.failover(primary.instance_id, replica.instance_id)
+```
+
+**Replication Topology:**
+
+```
+                    ┌──────────────┐
+                    │   Primary    │
+                    │  (us-east-1) │
+                    └──────┬───────┘
+                           │
+              ┌────────────┼────────────┐
+              │            │            │
+              ▼            ▼            ▼
+        ┌──────────┐ ┌──────────┐ ┌──────────┐
+        │ Replica  │ │ Replica  │ │ Replica  │
+        │ (us-west)│ │ (eu-west)│ │ (ap-east)│
+        │   READ   │ │   READ   │ │   READ   │
+        └──────────┘ └──────────┘ └──────────┘
 ```
 
 ### 5. Security Auditing
@@ -192,6 +302,7 @@ agent.remediate_finding(findings[0].finding_id)
 | Audit logging | CWE-778 | PCI-DSS, SOC2 |
 | Password policy | CWE-521 | — |
 | No public snapshots | CWE-200 | PCI-DSS, HIPAA, GDPR |
+| Connection encryption | CWE-319 | SOC2, ISO27001 |
 
 ### 6. Capacity Planning
 
@@ -205,6 +316,17 @@ print(f"90-day projection: {forecast.projected_value_90d:.0f}GB")
 print(f"Days until full: {forecast.days_until_full}")
 print(f"Trend: {forecast.trend.value}")
 print(f"Recommendation: {forecast.recommendation}")
+```
+
+**Forecasting Method:**
+
+```
+Linear Regression: y = mx + b
+  m = slope (daily growth rate)
+  b = intercept (current value)
+  
+Projection = current + (m × days)
+Days until limit = (limit - current) / m
 ```
 
 ### 7. Schema Management
@@ -240,6 +362,20 @@ active = agent.get_active_alerts()
 
 # Resolve alert
 agent.resolve_alert(alerts[0].alert_id)
+```
+
+**Alert Severity Matrix:**
+
+```
+┌────────────┬────────────────────────┬─────────────────────────┐
+│  Level     │  Response Time         │  Action                 │
+├────────────┼────────────────────────┼─────────────────────────┤
+│  CRITICAL  │  Immediate (< 15 min)  │  Page on-call DBA       │
+│  HIGH      │  < 1 hour              │  Notify team channel    │
+│  MEDIUM    │  < 4 hours             │  Create ticket          │
+│  LOW       │  < 24 hours            │  Log for review         │
+│  INFO      │  Next business day     │  Include in report      │
+└────────────┴────────────────────────┴─────────────────────────┘
 ```
 
 ### 9. Recovery Planning
@@ -350,6 +486,7 @@ class DatabaseAdminAgent:
 ## Data Models
 
 ### DatabaseEngine
+
 ```python
 class DatabaseEngine(Enum):
     POSTGRESQL = "postgresql"
@@ -363,6 +500,7 @@ class DatabaseEngine(Enum):
 ```
 
 ### InstanceStatus
+
 ```python
 class InstanceStatus(Enum):
     RUNNING = "running"
@@ -375,6 +513,7 @@ class InstanceStatus(Enum):
 ```
 
 ### BackupType
+
 ```python
 class BackupType(Enum):
     FULL = "full"
@@ -385,9 +524,139 @@ class BackupType(Enum):
     LOGICAL_DUMP = "logical_dump"
 ```
 
+### Key Data Classes
+
+```python
+@dataclass
+class DatabaseInstance:
+    instance_id: str
+    name: str
+    engine: DatabaseEngine
+    host: str
+    port: int
+    database: str
+    version: str
+    region: str
+    size: str
+    storage_gb: int
+    status: InstanceStatus
+    tags: Dict[str, str]
+    created_at: datetime
+    last_backup: Optional[datetime]
+
+@dataclass
+class BackupRecord:
+    backup_id: str
+    instance_id: str
+    backup_type: BackupType
+    status: str
+    size_gb: float
+    retention_days: int
+    created_at: datetime
+    expires_at: datetime
+
+@dataclass
+class PerformanceAnalysis:
+    instance_id: str
+    score: float  # 0.0 - 1.0
+    overall_health: str
+    bottlenecks: List[str]
+    index_recommendations: List[str]
+    recommendations: List[str]
+    analyzed_at: datetime
+```
+
+## Security Considerations
+
+### Access Control
+
+```
+┌──────────────────────────────────────────────────────┐
+│               Access Control Matrix                    │
+├──────────────────┬────────┬────────┬────────┬────────┤
+│  Role            │ Read   │ Write  │ Admin  │ Audit  │
+├──────────────────┼────────┼────────┼────────┼────────┤
+│  Viewer          │   ✓    │   ✗    │   ✗    │   ✗    │
+│  Developer       │   ✓    │   ✓    │   ✗    │   ✗    │
+│  DBA             │   ✓    │   ✓    │   ✓    │   ✓    │
+│  Security        │   ✓    │   ✗    │   ✗    │   ✓    │
+│  Admin           │   ✓    │   ✓    │   ✓    │   ✓    │
+└──────────────────┴────────┴────────┴────────┴────────┘
+```
+
+### Data Protection
+
+- Encrypt data at rest (AES-256)
+- Encrypt data in transit (TLS 1.3)
+- Mask sensitive data in logs
+- Rotate credentials regularly
+- Audit all administrative actions
+
+## Scalability
+
+### Instance Scaling Patterns
+
+```
+Vertical Scaling (Scale Up):
+  ┌──────────────┐      ┌──────────────┐
+  │ db.t3.medium │ ────►│ db.r5.xlarge │
+  │  2 vCPU      │      │  4 vCPU      │
+  │  4 GB RAM    │      │  32 GB RAM   │
+  └──────────────┘      └──────────────┘
+
+Horizontal Scaling (Scale Out):
+  ┌──────────────┐      ┌──────────────┐
+  │   Primary    │ ────►│   Primary    │
+  └──────────────┘      └──────┬───────┘
+                               │
+                    ┌──────────┼──────────┐
+                    ▼          ▼          ▼
+              ┌──────────┐ ┌──────────┐ ┌──────────┐
+              │ Replica 1│ │ Replica 2│ │ Replica 3│
+              └──────────┘ └──────────┘ └──────────┘
+```
+
+## Troubleshooting
+
+### "Instance not found" Error
+
+```python
+# Ensure you've registered the instance
+instance = agent.register_instance("my-db", DatabaseEngine.POSTGRESQL, ...)
+# Use the returned instance_id
+agent.analyze_performance(instance.instance_id)
+```
+
+### Backup Fails
+
+- Check that the instance is in RUNNING status
+- Verify storage location is accessible
+- Check for concurrent backup limits (default: 3)
+- Review backup timeout settings
+
+### Performance Analysis Returns "unknown" Health
+
+- Record metrics first using `record_metric`
+- Ensure metrics are recent (within last 5 minutes)
+- Check that the instance is registered
+
+### Replication Lag Growing
+
+- Check network connectivity between primary and replica
+- Verify replica has sufficient resources (CPU, I/O)
+- Consider switching to semi-synchronous replication
+- Review write volume on primary
+
+### Security Audit Finds No Issues
+
+- Verify instance config includes all settings (ssl_enabled, encryption_at_rest, etc.)
+- Check that the instance is properly registered
+- Review config dictionary for missing security settings
+
 ## Checklists
 
 ### Production Instance Onboarding
+
 - [ ] Register instance with correct engine, host, port
 - [ ] Set appropriate storage and size parameters
 - [ ] Tag with environment and team metadata
@@ -400,6 +669,7 @@ class BackupType(Enum):
 - [ ] Add to capacity forecasting
 
 ### Backup Verification
+
 - [ ] Verify backup completed successfully
 - [ ] Check backup size is reasonable
 - [ ] Test restoration to a staging instance
@@ -407,6 +677,7 @@ class BackupType(Enum):
 - [ ] Confirm encryption and compression
 
 ### Security Audit Review
+
 - [ ] Run security audit on all instances
 - [ ] Address all CRITICAL findings immediately
 - [ ] Schedule HIGH findings for remediation
@@ -414,40 +685,86 @@ class BackupType(Enum):
 - [ ] Track remediation progress
 
 ### Performance Review
+
 - [ ] Analyze performance metrics for all instances
 - [ ] Review slow query log
 - [ ] Evaluate index usage and recommendations
 - [ ] Check connection pool utilization
 - [ ] Review disk usage trends
 
-## Troubleshooting
+### Disaster Recovery Testing
 
-### "Instance not found" Error
-```python
-# Ensure you've registered the instance
-instance = agent.register_instance("my-db", DatabaseEngine.POSTGRESQL, ...)
-# Use the returned instance_id
-agent.analyze_performance(instance.instance_id)
+- [ ] Execute recovery plan in staging
+- [ ] Verify RTO target met
+- [ ] Verify RPO target met
+- [ ] Validate data integrity
+- [ ] Document any gaps or issues
+
+## Configuration
+
+```yaml
+database_admin_agent:
+  monitoring:
+    poll_interval_seconds: 300
+    alert_thresholds:
+      disk_usage_warning: 75
+      disk_usage_critical: 90
+      cpu_usage_warning: 70
+      cpu_usage_critical: 90
+      replication_lag_warning: 5
+      replication_lag_critical: 30
+  
+  backup:
+    default_retention_days: 30
+    max_concurrent_backups: 3
+    backup_timeout_minutes: 60
+    
+  security:
+    audit_frequency_days: 90
+    compliance_frameworks:
+      - PCI-DSS
+      - HIPAA
+      - SOC2
+      
+  capacity:
+    forecast_days: 90
+    alert_days_until_full: 30
 ```
 
-### Backup Fails
-- Check that the instance is in RUNNING status
-- Verify storage location is accessible
-- Check for concurrent backup limits (default: 3)
-- Review backup timeout settings
+## Integration Points
 
-### Performance Analysis Returns "unknown" Health
-- Record metrics first using `record_metric`
-- Ensure metrics are recent (within last 5 minutes)
-- Check that the instance is registered
+### With Other Agents
+- **database-admin**: Core database operations
+- **data-governance**: Data quality and compliance
+- **devops**: Infrastructure automation
+- **security**: Vulnerability management
 
-### Replication Lag Growing
-- Check network connectivity between primary and replica
-- Verify replica has sufficient resources (CPU, I/O)
-- Consider switching to semi-synchronous replication
-- Review write volume on primary
+### External Tools
+- pg_dump / pg_restore (PostgreSQL)
+- mysqldump / mysqlpump (MySQL)
+- mongodump / mongorestore (MongoDB)
+- AWS CLI (DynamoDB, RDS)
+- Database-specific monitoring agents
 
-### Security Audit Finds No Issues
-- Verify instance config includes all settings (ssl_enabled, encryption_at_rest, etc.)
-- Check that the instance is properly registered
-- Review config dictionary for missing security settings
+## Performance Benchmarks
+
+### Typical Operations
+
+| Operation | Small (< 100GB) | Medium (< 1TB) | Large (< 10TB) |
+|-----------|-----------------|----------------|----------------|
+| FULL backup | 5 min | 30 min | 4 hours |
+| Restore | 3 min | 20 min | 3 hours |
+| Security audit | 10 sec | 30 sec | 2 min |
+| Capacity forecast | 1 sec | 2 sec | 5 sec |
+| Performance analysis | 5 sec | 15 sec | 1 min |
+
+## Future Enhancements
+
+- Automated index creation based on query patterns
+- Real-time query optimization suggestions
+- Cross-database migration support
+- Cloud-native auto-scaling integration
+- AI-powered anomaly detection
+- Automated compliance reporting
+- Multi-region replication management
+- Cost optimization recommendations

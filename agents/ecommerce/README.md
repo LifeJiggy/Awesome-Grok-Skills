@@ -33,6 +33,26 @@ Each sub-engine (Catalog, Cart, Order, Pricing, Inventory, Fraud, Tax) operates
 independently while being orchestrated by a top-level agent that provides a
 unified checkout flow and store dashboard.
 
+### Key Benefits
+
+- **Zero Dependencies**: Pure Python stdlib, no external packages required
+- **Modular Design**: Use only the components you need
+- **Type-Safe**: Full type hints on all public methods
+- **Extensible**: Easy to add custom fraud rules, pricing strategies, etc.
+- **Auditable**: Complete trail of all financial transactions
+
+### Use Cases
+
+| Use Case | Description |
+|----------|-------------|
+| Product Catalog | CRUD operations, variants, search, bulk updates |
+| Shopping Cart | Create, manage, calculate totals, apply coupons |
+| Order Processing | Full lifecycle from pending to delivered |
+| Inventory Management | Stock tracking, reservations, alerts |
+| Fraud Detection | Rule-based scoring, velocity checks |
+| Tax Calculation | Multi-jurisdiction rates, category handling |
+| Customer Management | Profiles, segments, loyalty programs |
+
 ---
 
 ## Features
@@ -43,6 +63,8 @@ unified checkout flow and store dashboard.
 - Advanced search with text, category, price, and tag filters
 - Bulk status updates
 - Catalog statistics and reporting
+- SKU management with barcode support
+- Image URL tracking per product
 
 ### Shopping Cart
 - Cart creation for authenticated and guest users
@@ -50,6 +72,8 @@ unified checkout flow and store dashboard.
 - Coupon code validation and application
 - Tax and shipping calculation
 - Cart expiry management
+- Multi-currency support
+- Saved cart functionality
 
 ### Order Management
 - Complete order lifecycle (pending → delivered)
@@ -57,6 +81,8 @@ unified checkout flow and store dashboard.
 - Fulfillment queue management
 - Tracking number integration
 - Order cancellation and refund processing
+- Order history and search
+- Export capabilities
 
 ### Dynamic Pricing
 - Percentage and fixed discounts
@@ -64,6 +90,8 @@ unified checkout flow and store dashboard.
 - Tiered discount structures
 - Bundle pricing
 - Coupon validation with usage limits
+- Time-limited promotions
+- Customer-segment pricing
 
 ### Inventory Management
 - Real-time stock tracking
@@ -71,6 +99,8 @@ unified checkout flow and store dashboard.
 - Movement history logging
 - Low-stock and out-of-stock alerts
 - Reorder point management
+- Multi-warehouse support
+- Batch inventory operations
 
 ### Fraud Detection
 - Rule-based risk scoring
@@ -78,25 +108,80 @@ unified checkout flow and store dashboard.
 - Address mismatch detection
 - Configurable risk thresholds
 - Assessment history and statistics
+- Device fingerprinting
+- Geolocation analysis
 
 ### Tax Calculation
 - Multi-jurisdiction tax rates
 - Category-specific tax handling
 - Compound tax support
 - Tax breakdown reporting
+- Tax-inclusive pricing
+- Exemption handling
+- Audit-ready tax reports
+
+### Customer Management
+- Customer profiles with segmentation
+- Loyalty points tracking
+- Purchase history
+- Wishlist management
+- Address book
+- Communication preferences
+- GDPR compliance tools
 
 ---
 
 ## Architecture
 
+### Component Diagram
+
 ```
-┌──────────────────────────────────────────────────────┐
-│                  EcommerceAgent                       │
-├──────────────────────────────────────────────────────┤
-│  ProductCatalog │ ShoppingCartManager │ OrderManager  │
-│  PricingEngine │ InventoryManager │ FraudDetector    │
-│  TaxEngine │ Customer Store                           │
-└──────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         ECOMMERCE AGENT                                   │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                      UNIFIED CHECKOUT FLOW                        │   │
+│  │  Cart → Validate → Tax → Fraud Check → Payment → Order → Ship   │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Product   │ │  Shopping  │ │  Order     │ │  Pricing   │           │
+│  │  Catalog   │ │  Cart Mgr  │ │  Manager   │ │  Engine    │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Inventory │ │  Fraud     │ │  Tax       │ │  Customer  │           │
+│  │  Manager   │ │  Detector  │ │  Engine    │ │  Store     │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow
+
+```
+  Customer Journey:
+  ════════════════
+
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Browse   │ ─► │ Add to   │ ─► │ Checkout │ ─► │ Payment  │
+  │ Products │    │ Cart     │    │          │    │          │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+       │               │               │               │
+       ▼               ▼               ▼               ▼
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Search   │    │ Calculate│    │ Fraud    │    │ Process  │
+  │ Filter   │    │ Totals   │    │ Check    │    │ Payment  │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+```
+
+### Order Lifecycle
+
+```
+  PENDING → CONFIRMED → PROCESSING → SHIPPED → DELIVERED
+       │         │            │
+       │         │            └──► CANCELLED
+       │         └──► REVIEW → CONFIRMED/CANCELLED
+       └──► CANCELLED
 ```
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed component diagrams,
@@ -143,6 +228,17 @@ pip install -r requirements.txt
 python agents/ecommerce/agent.py
 ```
 
+### Requirements
+
+- Python 3.10+
+- No external dependencies (stdlib only)
+
+### Platform Support
+
+- Windows 10+
+- macOS 10.15+
+- Linux (Ubuntu 18.04+, Debian 9+)
+
 ---
 
 ## Usage
@@ -170,6 +266,21 @@ print(agent.get_status())
 dashboard = agent.get_store_dashboard()
 print(f"Products: {dashboard['catalog']['total_products']}")
 print(f"Revenue: ${dashboard['orders']['total_revenue']:,.2f}")
+```
+
+### Using Individual Components
+
+```python
+from agents.ecommerce.agent import ProductCatalog, InventoryManager
+
+# Use catalog independently
+catalog = ProductCatalog()
+product_id = catalog.add_product(product)
+
+# Use inventory independently
+inventory = InventoryManager()
+inventory.adjust_stock(product_id, 100)
+status = inventory.get_stock_status(product_id)
 ```
 
 ---
@@ -270,13 +381,27 @@ print(f"Revenue: ${dashboard['orders']['total_revenue']:,.2f}")
 ### Example 1: Product with Variants
 
 ```python
+from agents.ecommerce.agent import Product, ProductVariant
+
 product = Product(
     name="Running Shoes",
     category="Footwear",
     price=129.99,
     variants=[
-        ProductVariant(sku="RS-BLK-10", name="Black Size 10", attributes={"color": "Black", "size": "10"}, price=129.99, stock_quantity=25),
-        ProductVariant(sku="RS-WHT-10", name="White Size 10", attributes={"color": "White", "size": "10"}, price=129.99, stock_quantity=15),
+        ProductVariant(
+            sku="RS-BLK-10",
+            name="Black Size 10",
+            attributes={"color": "Black", "size": "10"},
+            price=129.99,
+            stock_quantity=25,
+        ),
+        ProductVariant(
+            sku="RS-WHT-10",
+            name="White Size 10",
+            attributes={"color": "White", "size": "10"},
+            price=129.99,
+            stock_quantity=15,
+        ),
     ],
 )
 pid = agent.catalog.add_product(product)
@@ -298,10 +423,18 @@ for order_data in bulk_orders:
 ### Example 3: Custom Fraud Rules
 
 ```python
+# High-value international transaction
 agent.fraud_detector.add_rule(
     name="international_high_value",
     check_fn=lambda t: 40 if t.get("country") != "US" and t.get("amount", 0) > 500 else 0,
     weight=2.0,
+)
+
+# Velocity check
+agent.fraud_detector.add_rule(
+    name="velocity_check",
+    check_fn=lambda t: 30 if t.get("velocity", 0) > 5 else 0,
+    weight=1.5,
 )
 
 assessment = agent.fraud_detector.assess_transaction({
@@ -313,6 +446,7 @@ assessment = agent.fraud_detector.assess_transaction({
 
 ```python
 report = agent.inventory.generate_report()
+
 if report["out_of_stock_count"] > 0:
     print(f"WARNING: {report['out_of_stock_count']} products out of stock!")
 
@@ -320,9 +454,33 @@ for item in report["low_stock_items"]:
     print(f"Low stock: {item['product_id']} ({item['available']} remaining)")
 ```
 
+### Example 5: Discount Campaign
+
+```python
+# Create tiered discount campaign
+agent.pricing.create_discount(
+    code="BLACKFRI2025",
+    name="Black Friday 2025",
+    discount_type=DiscountType.PERCENTAGE,
+    value=25,
+    min_order_amount=100,
+    usage_limit=10000,
+    start_date=datetime(2025, 11, 28),
+    end_date=datetime(2025, 11, 30),
+)
+
+# Validate and apply
+validation = agent.pricing.validate_coupon("BLACKFRI2025")
+if validation["valid"]:
+    result = agent.pricing.apply_discount(validation["discount_id"], subtotal=250)
+    print(f"Discount: ${result['discount_amount']:.2f}")
+```
+
 ---
 
 ## Configuration
+
+### Agent Configuration (YAML)
 
 ```yaml
 ecommerce_agent:
@@ -357,6 +515,23 @@ ecommerce_agent:
       overnight: 24.99
 ```
 
+### Environment Variables
+
+```bash
+# Payment
+STRIPE_API_KEY=sk_test_...
+PAYPAL_CLIENT_ID=...
+
+# Shipping
+SHIPSTATION_API_KEY=...
+
+# Tax
+AVALARA_API_KEY=...
+
+# Analytics
+SEGMENT_WRITE_KEY=...
+```
+
 ---
 
 ## Best Practices
@@ -371,6 +546,24 @@ ecommerce_agent:
 6. **Use bundle pricing** for complementary products to increase AOV.
 7. **Log all inventory movements** for audit trail and discrepancy investigation.
 8. **Test checkout flow** end-to-end before every major sale event.
+9. **Implement idempotency keys** for payment processing.
+10. **Use webhooks** for real-time order status updates.
+
+### Security Best Practices
+
+- Never store raw credit card numbers
+- Use tokenization via payment processor
+- Implement PCI DSS compliance
+- Validate all payment amounts server-side
+- Use HTTPS for all payment endpoints
+
+### Performance Best Practices
+
+- Cache product search results
+- Use database indexing for product queries
+- Implement pagination for large catalogs
+- Use async processing for order emails
+- Optimize inventory queries with batch operations
 
 ---
 
@@ -385,6 +578,21 @@ ecommerce_agent:
 | Stock goes negative | Race condition | Implement stock reservation |
 | Fraud score always high | Thresholds too aggressive | Adjust rule weights |
 | Tax returns $0 | No matching rates | Add rates for that jurisdiction |
+| Payment fails | Invalid card | Validate card details server-side |
+| Shipping cost wrong | Missing address | Ensure full shipping address |
+
+### Debug Mode
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Get detailed error info
+result = agent.checkout(...)
+if "error" in result:
+    print(f"Error: {result['error']}")
+    print(f"Details: {result.get('details', {})}")
+```
 
 ---
 
@@ -395,6 +603,15 @@ ecommerce_agent:
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+### Code Standards
+
+- Full type hints on all public methods
+- Docstrings for all classes and public methods
+- Zero external dependencies (stdlib only)
+- Follow existing naming conventions
+- Write tests for new functionality
+- Update documentation for API changes
 
 ---
 

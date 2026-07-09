@@ -464,3 +464,301 @@ Requires Python 3.10+ for:
 - ~100 bytes per trade record
 - ~8KB per 10K-bar time series
 - Typical portfolio (100 positions): < 1MB total
+
+---
+
+## 12. Detailed Component Internals
+
+### 12.1 Portfolio Manager Internals
+
+**Position Tracking:**
+- Positions stored in dictionary keyed by symbol
+- Average entry price calculated on each buy
+- Unrealized PnL computed lazily via `update_price()`
+- Realized PnL calculated on sell trades
+
+**Trade Execution Flow:**
+```
+  execute_trade(symbol, side, qty, price)
+       │
+       ├── Validate inputs (positive qty, valid side)
+       ├── Check sufficient cash (for buys)
+       ├── Calculate commission and slippage
+       ├── Update position (avg entry price)
+       ├── Deduct cash
+       ├── Log trade (immutable record)
+       └── Record daily snapshot
+```
+
+**Weight Calculation:**
+```
+  total_value = cash + Σ(position.quantity × position.current_price)
+  weight(symbol) = position.market_value / total_value
+```
+
+### 12.2 Risk Analyzer Internals
+
+**VaR Calculation Methods:**
+
+1. **Historical VaR:**
+   ```
+   sorted_returns = sort(returns)
+   index = floor(len(sorted_returns) × (1 - confidence))
+   var = -sorted_returns[index]
+   ```
+
+2. **Parametric VaR:**
+   ```
+   mu = mean(returns)
+   sigma = std(returns)
+   z = norm.ppf(1 - confidence)
+   var = -(mu + z × sigma)
+   ```
+
+3. **Exponential Weighted VaR:**
+   ```
+   weights = [λ^i for i in range(n)]  # λ = 0.94
+   weighted_mean = sum(w × r) / sum(weights)
+   weighted_var = sum(w × (r - weighted_mean)^2) / sum(weights)
+   var = -(weighted_mean + z × sqrt(weighted_var))
+   ```
+
+**Sharpe Ratio:**
+```
+  excess_returns = returns - risk_free_rate / 252
+  sharpe = mean(excess_returns) / std(excess_returns) × sqrt(252)
+```
+
+**Sortino Ratio:**
+```
+  downside_returns = [r for r in excess_returns if r < 0]
+  downside_dev = sqrt(mean(downside_returns^2))
+  sortino = mean(excess_returns) / downside_dev × sqrt(252)
+```
+
+### 12.3 Black-Scholes Internals
+
+**Core Formula:**
+```
+  d1 = (ln(S/K) + (r + σ²/2) × T) / (σ × √T)
+  d2 = d1 - σ × √T
+
+  Call = S × N(d1) - K × e^(-rT) × N(d2)
+  Put = K × e^(-rT) × N(-d2) - S × N(-d1)
+```
+
+**Greeks Formulas:**
+```
+  Delta_Call = N(d1)
+  Delta_Put = N(d1) - 1
+  Gamma = φ(d1) / (S × σ × √T)
+  Theta_Call = -(S × φ(d1) × σ) / (2 × √T) - r × K × e^(-rT) × N(d2)
+  Vega = S × φ(d1) × √T
+  Rho_Call = K × T × e^(-rT) × N(d2)
+```
+
+**Implied Volatility (Newton-Raphson):**
+```
+  σ₀ = 0.3  # initial guess
+  for i in range(max_iterations):
+      price = black_scholes(σ₀)
+      vega = vega(σ₀)
+      if abs(price - market_price) < tolerance:
+          return σ₀
+      σ₀ = σ₀ - (price - market_price) / vega
+```
+
+### 12.4 Technical Analyzer Internals
+
+**SMA Calculation:**
+```
+  SMA(n) = sum(prices[-n:]) / n
+```
+
+**EMA Calculation:**
+```
+  multiplier = 2 / (n + 1)
+  EMA[0] = prices[0]
+  EMA[i] = (prices[i] - EMA[i-1]) × multiplier + EMA[i-1]
+```
+
+**RSI Calculation:**
+```
+  gains = [max(0, prices[i] - prices[i-1]) for i in range(1, n)]
+  losses = [max(0, prices[i-1] - prices[i]) for i in range(1, n)]
+  avg_gain = mean(gains[-period:])
+  avg_loss = mean(losses[-period:])
+  rs = avg_gain / avg_loss
+  rsi = 100 - (100 / (1 + rs))
+```
+
+**MACD Calculation:**
+```
+  macd_line = EMA(12) - EMA(26)
+  signal_line = EMA(macd_line, 9)
+  histogram = macd_line - signal_line
+```
+
+**Bollinger Bands:**
+```
+  middle = SMA(20)
+  std_dev = std(prices[-20:])
+  upper = middle + 2 × std_dev
+  lower = middle - 2 × std_dev
+```
+
+---
+
+## 13. Error Handling Strategy
+
+### 13.1 Input Validation
+
+| Component | Validation | Error Type |
+|-----------|------------|------------|
+| Portfolio | Positive quantity, valid symbol | ValueError |
+| Risk | Non-empty returns, valid confidence | ValueError |
+| Black-Scholes | Positive spot/strike, valid volatility | ValueError |
+| Technical | Sufficient price history | IndexError |
+| Fundamental | Required financial fields | KeyError |
+
+### 13.2 Graceful Degradation
+
+```python
+# Example: Handle insufficient data
+try:
+    rsi = ta.rsi(prices, period=14)
+except InsufficientDataError:
+    rsi = [None] * len(prices)  # Return None for unavailable values
+```
+
+### 13.3 Error Recovery
+
+- **Division by zero**: Return 0 or NaN with warning
+- **Empty data**: Return empty results with status indicator
+- **Invalid parameters**: Clamp to valid range with warning
+- **Convergence failure**: Return best estimate with warning
+
+---
+
+## 14. Testing Architecture
+
+### 14.1 Test Categories
+
+| Category | Coverage | Tools |
+|----------|----------|-------|
+| Unit Tests | Individual functions | pytest |
+| Integration Tests | Component interaction | pytest |
+| Property Tests | Mathematical invariants | hypothesis |
+| Edge Cases | Boundary conditions | pytest |
+| Performance | Benchmark tests | pytest-benchmark |
+
+### 14.2 Test Data Strategy
+
+- **Synthetic data**: Generated with known parameters
+- **Historical data**: Real market data for validation
+- **Edge cases**: Empty, single-element, extreme values
+- **Random data**: Seeded for reproducibility
+
+### 14.3 Validation Approach
+
+- Compare against published tables (Black-Scholes)
+- Validate against industry benchmarks (VaR)
+- Check mathematical properties (weights sum to 1.0)
+- Verify Put-Call parity for options
+
+---
+
+## 15. Configuration Management
+
+### 15.1 Default Configuration
+
+```python
+DEFAULT_CONFIG = {
+    "risk_free_rate": 0.05,
+    "trading_days_per_year": 252,
+    "var_confidence": 0.95,
+    "var_method": "historical",
+    "ewm_lambda": 0.94,
+    "bs_max_iterations": 100,
+    "bs_tolerance": 1e-6,
+    "rsi_period": 14,
+    "macd_fast": 12,
+    "macd_slow": 26,
+    "macd_signal": 9,
+    "bb_period": 20,
+    "bb_std": 2.0,
+}
+```
+
+### 15.2 Environment Variables
+
+```bash
+FINANCE_RISK_FREE_RATE=0.05
+FINANCE_TRADING_DAYS=252
+FINANCE_VAR_CONFIDENCE=0.95
+```
+
+---
+
+## 16. Logging and Monitoring
+
+### 16.1 Log Levels
+
+| Level | Usage |
+|-------|-------|
+| DEBUG | Detailed calculation steps |
+| INFO | Trade executions, portfolio updates |
+| WARNING | Data quality issues, convergence warnings |
+| ERROR | Calculation failures, invalid inputs |
+
+### 16.2 Metrics to Monitor
+
+- Trade execution latency
+- VaR calculation time
+- Monte Carlo simulation duration
+- Memory usage per portfolio size
+- Error rates by component
+
+---
+
+## 17. Future Roadmap
+
+### 17.1 Short-term Enhancements
+
+- Additional technical indicators (Stochastic, Williams %R)
+- American option pricing (binomial tree)
+- Multi-asset correlation analysis
+- Portfolio optimization (mean-variance)
+
+### 17.2 Medium-term Enhancements
+
+- Real-time data feed integration
+- WebSocket support for live prices
+- Database persistence layer
+- REST API for external access
+
+### 17.3 Long-term Vision
+
+- Machine learning for signal generation
+- Natural language processing for sentiment
+- High-frequency trading support
+- Multi-currency portfolio management
+
+---
+
+## 18. Comparison with Industry Tools
+
+| Feature | Finance Agent | Bloomberg | QuantLib |
+|---------|---------------|-----------|----------|
+| Dependencies | Zero | Proprietary | C++ required |
+| Options Pricing | Black-Scholes | Full suite | Full suite |
+| Risk Metrics | VaR, CVaR, Sharpe | Comprehensive | Comprehensive |
+| Technical Analysis | 7 indicators | 100+ | 50+ |
+| Backtesting | Built-in | Via add-ons | Via add-ons |
+| Cost | Free | $24K/year | Free (open source) |
+| Learning Curve | Low | High | High |
+
+---
+
+**See Also**: [GROK.md](./GROK.md) for agent identity and capabilities,
+[README.md](./README.md) for quick start and API reference.

@@ -12,9 +12,19 @@ analytics, and multi-touch attribution modeling.
 - [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Usage](#usage)
+  - [Campaign Management](#campaign-management)
+  - [Channel Strategy](#channel-strategy)
+  - [Performance Analytics](#performance-analytics)
+  - [Attribution](#attribution)
+  - [Email Marketing](#email-marketing)
+  - [Social Media](#social-media)
+  - [SEO](#seo)
 - [API Reference](#api-reference)
 - [Examples](#examples)
 - [Configuration](#configuration)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
@@ -94,13 +104,32 @@ and cross-channel insights.
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                  DigitalMarketingAgent                       │
-├──────────────────────────────────────────────────────────────┤
-│  CampaignManager │ ChannelStrategyEngine │ PerformanceAnalytics│
-│  AttributionEngine │ EmailMarketingEngine │ SocialMediaManager │
-│  SEOManager                                                   │
-└──────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                     DigitalMarketingAgent                                  │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Campaign      │  │  Channel       │  │  Performance               │  │
+│  │  Manager       │  │  Strategy      │  │  Analytics                 │  │
+│  │  ├ Create      │  │  ├ Recommend   │  │  ├ Touchpoints             │  │
+│  │  ├ Activate    │  │  ├ Allocate    │  │  ├ Dashboard               │  │
+│  │  ├ Pause       │  │  ├ Optimize    │  │  ├ Trends                  │  │
+│  │  └ Complete    │  │  └ Score       │  │  └ Alerts                  │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Attribution   │  │  Email         │  │  Social                    │  │
+│  │  Engine        │  │  Marketing     │  │  Media                     │  │
+│  │  ├ 8 models    │  │  ├ Campaigns   │  │  ├ 10 platforms            │  │
+│  │  ├ Compare     │  │  ├ Events      │  │  ├ Engagement              │  │
+│  │  ├ Channel     │  │  ├ Metrics     │  │  ├ Analytics               │  │
+│  │  └ Customer    │  │  └ ROI         │  │  └ Scheduling              │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────────┐│
+│  │  SEO Manager                                                         ││
+│  │  ├ Keywords  │ Rankings  │ Audits  │ Scorecard  │ Recommendations   ││
+│  └──────────────────────────────────────────────────────────────────────┘│
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed component diagrams,
@@ -186,6 +215,206 @@ agent.campaign_manager.activate_campaign(campaign.campaign_id)
 
 # Get dashboard
 dashboard = agent.get_marketing_dashboard()
+```
+
+### Campaign Management
+
+```python
+# Create campaign
+campaign = agent.campaign_manager.create_campaign(
+    name="Q4 Push",
+    objective=ObjectiveType.CONVERSION,
+    channels=[ChannelType.PAID_SEARCH, ChannelType.EMAIL],
+    budget_total=25000,
+)
+
+# Lifecycle management
+agent.campaign_manager.activate_campaign(campaign.campaign_id)
+agent.campaign_manager.pause_campaign(campaign.campaign_id)
+agent.campaign_manager.complete_campaign(campaign.campaign_id)
+
+# Health check
+health = agent.campaign_manager.get_campaign_health(campaign.campaign_id)
+```
+
+**Campaign States:**
+
+```
+  ┌────────┐     ┌──────────┐     ┌────────┐
+  │ DRAFT  │────►│ SCHEDULED│────►│ ACTIVE │
+  └────────┘     └──────────┘     └────────┘
+                                      │
+                              ┌───────┴───────┐
+                              ▼               ▼
+                        ┌────────┐      ┌──────────┐
+                        │ PAUSED │      │COMPLETED │
+                        └────────┘      └──────────┘
+                                            │
+                                            ▼
+                                      ┌──────────┐
+                                      │ ARCHIVED │
+                                      └──────────┘
+```
+
+### Channel Strategy
+
+```python
+strategy = agent.channel_strategy.develop_strategy(
+    objective=ObjectiveType.AWARENESS,
+    total_budget=50000,
+    target_audience=audience,
+)
+
+# Get recommendations
+recs = agent.channel_strategy.get_channel_recommendations(
+    objective=ObjectiveType.CONVERSION,
+    audience=audience,
+    budget=50000,
+)
+```
+
+**Channel Fit Matrix:**
+
+```
+┌─────────────────┬────────────┬────────────┬────────────┬────────────┐
+│  Channel        │ Awareness  │ Consider   │ Conversion │ Retention  │
+├─────────────────┼────────────┼────────────┼────────────┼────────────┤
+│  Paid Search    │    Low     │   Medium   │   High     │    Low     │
+│  Paid Social    │   High     │   Medium   │   Medium   │    Low     │
+│  Display        │   High     │    Low     │    Low     │    Low     │
+│  Video          │   High     │   High     │   Medium   │   Medium   │
+│  Email          │    Low     │   Medium   │   High     │   High     │
+│  Organic Search │   Medium   │   High     │   Medium   │   Medium   │
+│  Social Organic │   High     │   Medium   │    Low     │   Medium   │
+│  Affiliate      │   Medium   │   Medium   │   High     │    Low     │
+└─────────────────┴────────────┴────────────┴────────────┴────────────┘
+```
+
+### Performance Analytics
+
+```python
+# Record touchpoints
+touchpoint = Touchpoint(
+    channel=ChannelType.PAID_SEARCH,
+    campaign_id=campaign.campaign_id,
+    impressions=50000,
+    clicks=2500,
+    conversions=125,
+    cost=5000,
+    revenue=25000,
+)
+agent.analytics.record_touchpoint(touchpoint)
+
+# Get dashboard
+dashboard = agent.analytics.create_dashboard()
+print(f"ROAS: {dashboard.overall_roas:.2f}x")
+
+# Get trend
+trend = agent.analytics.get_performance_trend(days=30)
+```
+
+### Attribution
+
+```python
+# Add touchpoints
+agent.attribution_engine.add_touchpoints(all_touchpoints)
+
+# Compare models
+comparison = agent.attribution_engine.compare_models()
+for model_name, result in comparison.items():
+    print(f"{model_name}: ROAS={result.roas:.2f}")
+
+# Get channel attribution
+channel_attr = agent.attribution_engine.get_channel_attribution(
+    AttributionModel.TIME_DECAY
+)
+```
+
+**Attribution Models:**
+
+| Model | Best For | Consideration |
+|-------|----------|---------------|
+| First Touch | Acquisition | Ignores nurturing |
+| Last Touch | Conversion | Ignores awareness |
+| Linear | Balanced | Equal credit |
+| Time Decay | Long cycles | Recent weighted |
+| Position-Based | First/last | 40/20/40 split |
+| Data-Driven | Algorithmic | Needs data |
+| Markov Chain | Removal impact | Complex |
+| Shapley Value | Fair distribution | Expensive |
+
+### Email Marketing
+
+```python
+# Create campaign
+email_campaign = agent.email_engine.create_campaign(
+    name="Welcome Series",
+    subject_line="Welcome to our community!",
+    from_email="hello@company.com",
+    html_content="<h1>Welcome!</h1>",
+)
+
+# Send and track
+agent.email_engine.send_campaign(email_campaign.email_id, 5000)
+agent.email_engine.record_event(email_campaign.email_id, EmailEventType.OPENED, 2500)
+agent.email_engine.record_event(email_campaign.email_id, EmailEventType.CLICKED, 500)
+
+# Get metrics
+metrics = agent.email_engine.get_campaign_metrics(email_campaign.email_id)
+print(f"Open rate: {metrics.open_rate:.1%}")
+print(f"Click rate: {metrics.click_rate:.1%}")
+```
+
+**Email Benchmarks:**
+
+| Metric | Good | Average | Poor |
+|--------|------|---------|------|
+| Open Rate | > 25% | 15-25% | < 15% |
+| Click Rate | > 5% | 2-5% | < 2% |
+| Bounce Rate | < 1% | 1-3% | > 3% |
+
+### Social Media
+
+```python
+# Create post
+post = agent.social_manager.create_post(
+    platform=SocialPlatform.INSTAGRAM,
+    content="Excited to announce our new product!",
+    media_urls=["https://cdn.example.com/product.jpg"],
+    hashtags=["newlaunch", "product"],
+)
+
+# Publish
+agent.social_manager.publish_post(post.post_id)
+
+# Track engagement
+agent.social_manager.record_engagement(post.post_id, "like", count=1500)
+agent.social_manager.record_engagement(post.post_id, "comment", count=200)
+
+# Get summary
+summary = agent.social_manager.get_platform_summary(SocialPlatform.INSTAGRAM)
+```
+
+### SEO
+
+```python
+# Track keywords
+kw = agent.seo_manager.add_keyword(
+    keyword="best running shoes",
+    url="https://shop.example.com/running-shoes",
+    position=12,
+    search_volume=14800,
+)
+
+# Update positions
+agent.seo_manager.update_keyword_position(kw.keyword_id, new_position=8)
+
+# Run audit
+audit = agent.seo_manager.run_site_audit("shop.example.com")
+print(f"Overall Score: {audit.overall_score}/100")
+
+# Get scorecard
+scorecard = agent.seo_manager.get_seo_scorecard()
 ```
 
 ---
@@ -350,6 +579,32 @@ for platform in [SocialPlatform.INSTAGRAM, SocialPlatform.TIKTOK]:
 summary = social.get_platform_summary()
 ```
 
+### Example 4: SEO Audit and Optimization
+
+```python
+from agents.digital_marketing.agent import *
+
+seo = agent.seo_manager
+
+# Add keywords to track
+keywords = [
+    ("running shoes", "https://shop.example.com/running", 12, 14800),
+    ("best sneakers", "https://shop.example.com/sneakers", 8, 22000),
+    ("athletic footwear", "https://shop.example.com/athletic", 15, 8500),
+]
+
+for kw, url, pos, vol in keywords:
+    seo.add_keyword(kw, url, position=pos, search_volume=vol)
+
+# Run audit
+audit = seo.run_site_audit("shop.example.com")
+print(f"Score: {audit.overall_score}/100")
+
+# Get recommendations
+for rec in audit.recommendations:
+    print(f"  - {rec}")
+```
+
 ---
 
 ## Configuration
@@ -383,6 +638,96 @@ digital_marketing_agent:
 
 ---
 
+## Design Patterns
+
+### Strategy Pattern for Attribution
+
+```python
+class AttributionStrategy:
+    def compute(self, touchpoints: List[Touchpoint]) -> Dict[str, float]:
+        raise NotImplementedError
+
+class FirstTouchStrategy(AttributionStrategy):
+    def compute(self, touchpoints):
+        # Give all credit to first touchpoint
+        pass
+
+class TimeDecayStrategy(AttributionStrategy):
+    def compute(self, touchpoints):
+        # Weight by recency
+        pass
+```
+
+### Observer Pattern for Campaign Events
+
+```python
+class CampaignObserver:
+    def on_campaign_activated(self, campaign: Campaign):
+        self.notify_stakeholders(campaign)
+    
+    def on_budget_exhausted(self, campaign: Campaign):
+        self.alert_team(campaign)
+```
+
+### Factory Pattern for Channel Creation
+
+```python
+class ChannelFactory:
+    @staticmethod
+    def create(channel_type: ChannelType, config: Dict) -> Channel:
+        if channel_type == ChannelType.PAID_SEARCH:
+            return PaidSearchChannel(config)
+        elif channel_type == ChannelType.EMAIL:
+            return EmailChannel(config)
+        # ... etc
+```
+
+---
+
+## Security
+
+### Data Protection
+
+- PII handling for customer data
+- GDPR compliance for EU audiences
+- Secure API key storage
+- Encrypted data transmission
+
+### Access Control
+
+```
+┌─────────────────┬────────┬────────┬────────┬────────┐
+│  Role           │Campaign│Email   │Social  │SEO     │
+├─────────────────┼────────┼────────┼────────┼────────┤
+│  Viewer         │   ✓    │   ✓    │   ✓    │   ✓    │
+│  Editor         │   ✓    │   ✓    │   ✓    │   ✗    │
+│  Admin          │   ✓    │   ✓    │   ✓    │   ✓    │
+└─────────────────┴────────┴────────┴────────┴────────┘
+```
+
+---
+
+## Scalability
+
+### Performance Considerations
+
+| Operation | Small (< 1K) | Medium (< 100K) | Large (< 1M) |
+|-----------|---------------|-----------------|--------------|
+| Touchpoint recording | 10ms | 50ms | 200ms |
+| Dashboard generation | 100ms | 1s | 10s |
+| Attribution analysis | 200ms | 2s | 30s |
+| Report generation | 500ms | 5s | 60s |
+
+### Scaling Strategies
+
+- Batch touchpoint recording for high-volume campaigns
+- Cache dashboard snapshots for frequently accessed data
+- Use incremental attribution updates
+- Archive old touchpoints for performance
+- Parallelize report generation
+
+---
+
 ## Best Practices
 
 1. **Always validate before activating** — run `campaign.validate()` to catch
@@ -407,6 +752,7 @@ digital_marketing_agent:
 | Attribution credits != 1.0 | Floating point rounding | Normalize manually if needed |
 | Dashboard shows no data | Empty analytics | Record touchpoints first |
 | SEO scores random | Placeholder implementation | Connect real SEO API |
+| Duplicate campaigns created | Calling create in a loop | Use `duplicate_campaign()` |
 
 ---
 

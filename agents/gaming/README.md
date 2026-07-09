@@ -42,6 +42,28 @@ The Gaming Agent provides a complete toolkit for game design and development:
 
 Built with zero external dependencies — pure Python standard library.
 
+### Key Benefits
+
+- **Zero Dependencies**: Pure Python stdlib, no external packages required
+- **Reproducible**: Seeded random generators for consistent testing
+- **Modular Design**: Use only the components you need
+- **Type-Safe**: Full type hints on all public methods
+- **Extensible**: Easy to add custom formulas, loot tables, difficulty curves
+- **Auditable**: Complete logs of all game events
+
+### Use Cases
+
+| Use Case | Description |
+|----------|-------------|
+| Combat Simulation | Balance characters, test damage formulas |
+| Economy Design | Track currencies, monitor inflation |
+| Progression Design | Create level curves, feature gates |
+| Loot Mechanics | Design drop rates, implement pity timers |
+| Player Analytics | Segment players, predict churn |
+| QA Testing | Track bugs, assess release readiness |
+| Difficulty Scaling | Create adaptive difficulty systems |
+| Event Management | Design seasonal content and rewards |
+
 ---
 
 ## Features
@@ -56,6 +78,51 @@ Built with zero external dependencies — pure Python standard library.
 | QA | Bug tracking, severity classification, test case generation, release readiness |
 | Difficulty | Adaptive scaling, encounter balancing, difficulty curves |
 | Events | Limited-time events, seasonal content, multipliers |
+
+### Detailed Feature List
+
+**Combat Engine**
+- Formula-driven damage calculation
+- Critical hits, dodges, blocks
+- Element modifiers
+- Balance simulation (10K+ battles)
+- Custom damage formulas
+
+**Economy Manager**
+- Multiple currency types (soft, premium, event)
+- Faucet and sink tracking
+- Inflation monitoring
+- Health checks with thresholds
+
+**Progression System**
+- Exponential level curves
+- Feature unlock gates
+- Time-to-max estimation
+- Curve visualization data
+
+**Loot System**
+- Configurable drop rates
+- Pity timer mechanics
+- Rarity tiers
+- Expected value calculations
+
+**Engagement Analytics**
+- Player segmentation (New, Casual, Regular, Dedicated, Whale, Churned)
+- Churn risk prediction
+- Engagement scoring
+- Analytics summaries
+
+**QA Management**
+- Bug reporting with severity
+- Status tracking
+- Test case generation
+- Release readiness checks
+
+**Difficulty Scaling**
+- Adaptive difficulty
+- Encounter balancing
+- Difficulty curve generation
+- Level recommendations
 
 ---
 
@@ -89,15 +156,39 @@ python agents/gaming/agent.py
 
 ## Architecture
 
+### Component Diagram
+
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      Gaming Agent                            │
-├─────────────────────────────────────────────────────────────┤
-│  Combat Engine │ Economy Manager │ Progression System        │
-│  Loot System   │ Engagement      │ QA Manager │ Difficulty   │
-├─────────────────────────────────────────────────────────────┤
-│     Data Models (Player, Item, Quest, Bug, Level, Event)    │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         GAMING AGENT                                      │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    CORE GAME SYSTEMS                              │   │
+│  │  Combat ←→ Economy ←→ Progression ←→ Loot                        │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Combat    │ │  Economy   │ │  Progression│ │  Loot      │           │
+│  │  Engine    │ │  Manager   │ │  System     │ │  System    │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Engagement│ │  QA        │ │  Difficulty │ │  Events    │           │
+│  │  Analyzer  │ │  Manager   │ │  Scaler     │ │  Config    │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Game Systems Flow
+
+```
+  Player Experience Flow:
+  ══════════════════════
+
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Battle   │ ─► │ Earn     │ ─► │ Level Up │ ─► │ Unlock   │
+  │ Combat   │    │ Rewards  │    │ Progress │    │ Content  │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
 ```
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed system design.
@@ -381,6 +472,26 @@ qa = QAManager()
 assert qa.release_readiness()["ready"], "Cannot ship with open critical bugs"
 ```
 
+### Balance Testing Workflow
+
+```python
+# 1. Define characters
+warrior = CharacterStats(level=10, health=500, attack=50, defense=20, speed=1.0)
+mage = CharacterStats(level=10, health=300, attack=80, defense=10, speed=1.2)
+
+# 2. Run simulation
+balance = combat.run_balance_simulation(warrior, mage, iterations=10000)
+
+# 3. Analyze results
+print(f"Balance score: {balance.balance_score:.3f}")
+print(f"Win rates: {balance.winner_distribution}")
+
+# 4. Tune if needed
+if balance.balance_score < 0.7:
+    warrior.attack = 45
+    balance = combat.run_balance_simulation(warrior, mage, iterations=10000)
+```
+
 ---
 
 ## Configuration
@@ -421,6 +532,22 @@ table = LootTable("id", "name", pity_threshold=50, entries=[...])
 9. **Provide transparent drop rates** to players
 10. **Design ethical monetization** that adds value
 
+### Combat Design Best Practices
+
+- Balance for fun, not realism
+- Give players meaningful choices
+- Ensure counter-play exists
+- Test with large populations
+- Iterate based on data
+
+### Economy Design Best Practices
+
+- Monitor inflation regularly
+- Create meaningful sinks
+- Balance free and paid paths
+- Avoid pay-to-win mechanics
+- Test with simulated player behavior
+
 ---
 
 ## Troubleshooting
@@ -434,6 +561,17 @@ table = LootTable("id", "name", pity_threshold=50, entries=[...])
 | QA has too many bugs | Prioritize by severity, automate testing, add CI/CD checks |
 | Difficulty spikes | Smooth the curve, add catch-up mechanics, provide difficulty options |
 
+### Debug Mode
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Get detailed combat log
+result = combat.simulate_battle(warrior, mage)
+print(f"Winner: {result['winner']}, Turns: {result['turns']}")
+```
+
 ---
 
 ## Contributing
@@ -444,6 +582,14 @@ table = LootTable("id", "name", pity_threshold=50, entries=[...])
 4. Ensure all tests pass
 5. Update documentation
 6. Submit a pull request
+
+### Code Standards
+- Full type hints on all public methods
+- Docstrings for all classes and public methods
+- Zero external dependencies (stdlib only)
+- Follow existing naming conventions
+- Write tests for new functionality
+- Update documentation for API changes
 
 ---
 

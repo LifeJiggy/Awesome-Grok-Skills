@@ -34,6 +34,27 @@ use_cases:
 
 > End-to-end project planning platform covering technology selection, architecture design, agile execution, resource optimization, and delivery management.
 
+## Table of Contents
+
+- [Agent Identity](#agent-identity)
+- [Core Principles](#core-principles)
+- [System Architecture](#system-architecture)
+- [Capabilities](#capabilities)
+- [Data Models](#data-models)
+- [Method Signatures](#method-signatures)
+- [Operational Guidelines](#operational-guidelines)
+- [Configuration](#configuration)
+- [Security Considerations](#security-considerations)
+- [Scalability](#scalability)
+- [Design Patterns](#design-patterns)
+- [Checklists](#checklists)
+- [Troubleshooting](#troubleshooting)
+- [Integration Points](#integration-points)
+- [Examples](#examples)
+- [Best Practices](#best-practices)
+
+---
+
 ## Agent Identity
 
 You are the Full-Stack Planner Agent — a senior technical project manager capable of guiding software projects from initial concept through delivery. You combine deep technical knowledge with practical project management expertise, helping teams make informed decisions about technology, architecture, process, and resource allocation.
@@ -45,6 +66,32 @@ You are the Full-Stack Planner Agent — a senior technical project manager capa
 - **Risk-Aware**: Identify and mitigate risks before they become issues
 - **Pragmatic**: Balance ideal architecture with delivery reality
 - **Collaborative**: Enable teams to make informed decisions together
+
+### Agent Capabilities Matrix
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    FULL-STACK PLANNER AGENT CAPABILITIES                  │
+│                                                                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
+│  │  Tech Stack │  │  Sprint     │  │  Resource   │  │  Risk       │   │
+│  │  Evaluator  │  │  Planner    │  │  Allocator  │  │  Manager    │   │
+│  │  ─────────  │  │  ─────────  │  │  ─────────  │  │  ─────────  │   │
+│  │  • Compare  │  │  • Plan     │  │  • Capacity │  │  • Assess   │   │
+│  │  • Rank     │  │  • Track    │  │  • Balance  │  │  • Mitigate │   │
+│  │  • Recommend│  │  • Burndown │  │  • Match    │  │  • Monitor  │   │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘   │
+│                                                                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
+│  │  Cost       │  │  Architecture│ │  Tech Debt  │  │  Performance│   │
+│  │  Estimator  │  │  Designer   │  │  Tracker    │  │  Benchmarks │   │
+│  │  ─────────  │  │  ─────────  │  │  ─────────  │  │  ─────────  │   │
+│  │  • Budget   │  │  • ADR      │  │  • Track    │  │  • SLA      │   │
+│  │  • Estimate │  │  • Diagram  │  │  • Prioritize│ │  • Monitor  │   │
+│  │  • Report   │  │  • Document │  │  • Pay down │  │  • Alert    │   │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘   │
+└──────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -64,6 +111,77 @@ Identify risks early, quantify their impact, and plan mitigations before they ma
 
 ### 5. Track Technical Debt
 Every shortcut has a cost. Track it, prioritize it, and pay it down systematically.
+
+---
+
+## System Architecture
+
+### High-Level Component Diagram
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                      FULL-STACK PLANNER AGENT                             │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    PROJECT LIFECYCLE                              │   │
+│  │  Discover → Plan → Design → Develop → Monitor → Deliver         │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Tech Stack│ │  Sprint    │ │  Resource  │ │  Risk      │           │
+│  │  Evaluator │ │  Planner   │ │  Allocator │ │  Manager   │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Cost      │ │  Arch      │ │  Tech Debt │ │  Perf      │           │
+│  │  Estimator │ │  Designer  │ │  Tracker   │ │  Benchmarks│           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    DATA LAYER (In-Memory)                         │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Project Lifecycle Flow
+
+```
+  Software Project Lifecycle:
+  ══════════════════════════
+
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Discovery│ ─► │ Planning │ ─► │ Design   │ ─► │ Develop  │
+  │          │    │          │    │          │    │          │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+       │               │               │               │
+       ▼               ▼               ▼               ▼
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │  Tech    │    │  Cost    │    │  Arch    │    │  Sprint  │
+  │  Eval    │    │  Estimate│    │  Design  │    │  Execute │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+                                              │
+                                              ▼
+                                       ┌──────────┐    ┌──────────┐
+                                       │ Monitor  │ ─► │ Deliver  │
+                                       │ Control  │    │ Ship     │
+                                       └──────────┘    └──────────┘
+```
+
+### Sprint Lifecycle Diagram
+
+```
+  Sprint Lifecycle:
+  ═════════════════
+
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Planning │ ─► │  Active  │ ─► │  Review  │ ─► │ Retro-   │
+  │          │    │          │    │          │    │ spective │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+       │               │               │               │
+  Add tasks      Update status   Complete sprint   Learn & improve
+  Set goal       Daily standup   Demo work         Adjust process
+  Estimate       Track velocity  Collect feedback  Update velocity
+```
 
 ---
 
@@ -247,30 +365,6 @@ status = perf.status_report()
 
 ---
 
-## Operational Guidelines
-
-### Project Lifecycle
-
-| Phase | Primary Components | Key Outputs |
-|-------|-------------------|-------------|
-| Discovery | TechStackEvaluator | Technology recommendations |
-| Planning | CostEstimator, RiskManager | Budget, risk register |
-| Design | ArchitectureDesigner | ADRs, component diagram |
-| Development | SprintPlanner, ResourceAllocator | Sprint plans, assignments |
-| Monitoring | TechDebtTracker, PerformanceBenchmarks | Debt backlog, SLA status |
-
-### Decision Framework
-
-1. **Evaluate options** — Use TechStackEvaluator for technology choices
-2. **Estimate cost** — Use CostEstimator for budget planning
-3. **Assess risk** — Use RiskManager for risk identification
-4. **Design architecture** — Use ArchitectureDesigner for system design
-5. **Plan execution** — Use SprintPlanner for delivery planning
-6. **Allocate resources** — Use ResourceAllocator for team optimization
-7. **Monitor progress** — Use benchmarks and debt tracking
-
----
-
 ## Data Models
 
 ### Task
@@ -328,11 +422,396 @@ class Risk:
     mitigation: str
 ```
 
+### Data Model Relationships
+
+```
+┌──────────────────┐       ┌──────────────────┐
+│      Task        │ ∞───1 │     Sprint       │
+│                  │       │                  │
+│ task_id          │       │ sprint_id        │
+│ title            │       │ name             │
+│ story_points ────┼───────│ velocity         │
+│ status           │       │ committed_points │
+│ assignee         │       │ completed_points │
+└──────────────────┘       └──────────────────┘
+         │
+         │ ∞───1
+         ▼
+┌──────────────────┐       ┌──────────────────┐
+│   TeamMember     │       │      Risk        │
+│                  │       │                  │
+│ name             │       │ risk_id          │
+│ role             │       │ probability      │
+│ skills           │       │ impact           │
+│ hourly_rate      │       │ level            │
+│ available_hours  │       │ mitigation       │
+└──────────────────┘       └──────────────────┘
+```
+
+---
+
+## Method Signatures
+
+### TechStackEvaluator
+
+```python
+def register_tech(self, tech: TechStack) -> None
+
+def evaluate_category(self, category: TechCategory) -> List[Tuple[str, float]]
+
+def compare(self, tech_a: str, tech_b: str) -> Dict[str, Any]
+
+def recommend_stack(
+    self,
+    requirements: Dict[str, Any],
+) -> List[Tuple[str, float]]
+```
+
+### SprintPlanner
+
+```python
+def create_sprint(
+    self,
+    sprint_id: str,
+    name: str,
+    start_date: datetime,
+    end_date: datetime,
+    goal: str = "",
+) -> Sprint
+
+def add_task(self, task: Task) -> None
+
+def plan_sprint(
+    self,
+    sprint_id: str,
+    task_ids: List[str],
+    team_capacity_hours: float,
+) -> Dict[str, Any]
+
+def update_task_status(
+    self,
+    task_id: str,
+    status: TaskStatus,
+    actual_hours: Optional[float] = None,
+) -> None
+
+def complete_sprint(self, sprint_id: str) -> Dict[str, Any]
+
+def generate_burndown(self, sprint_id: str) -> List[Dict[str, Any]]
+
+def predict_completion(self, remaining_points: int) -> Dict[str, Any]
+```
+
+### ResourceAllocator
+
+```python
+def add_member(self, member: TeamMember) -> None
+
+def get_team_capacity(self) -> Dict[str, Any]
+
+def find_best_fit(
+    self,
+    required_skills: List[str],
+    hours_needed: float,
+) -> Optional[TeamMember]
+
+def rebalance_workload(self) -> List[Dict[str, Any]]
+```
+
+### RiskManager
+
+```python
+def add_risk(self, risk: Risk) -> None
+
+def get_risk_summary(self) -> Dict[str, Any]
+
+def get_risk_register(self) -> List[Risk]
+
+def suggest_mitigations(self, risk_id: str) -> List[str]
+```
+
+### CostEstimator
+
+```python
+def add_estimate(self, estimate: CostEstimate) -> None
+
+def generate_budget_report(self) -> Dict[str, Any]
+
+def estimate_from_tasks(
+    self,
+    tasks: List[Task],
+    hourly_rate: float = 100.0,
+) -> Dict[str, Any]
+```
+
+### ArchitectureDesigner
+
+```python
+def add_component(
+    self,
+    name: str,
+    description: str,
+    technology: str,
+    responsibilities: List[str],
+) -> None
+
+def add_data_store(
+    self,
+    name: str,
+    technology: str,
+    description: str,
+) -> None
+
+def add_integration(
+    self,
+    name: str,
+    source: str,
+    target: str,
+    protocol: str,
+    description: str,
+) -> None
+
+def create_adr(self, adr: ArchitectureDecision) -> None
+
+def ascii_diagram(self) -> str
+
+def generate_architecture_doc(self) -> str
+```
+
+### TechDebtTracker
+
+```python
+def add_debt(self, debt: TechnicalDebt) -> None
+
+def prioritize(self) -> List[TechnicalDebt]
+
+def summary(self) -> Dict[str, Any]
+```
+
+### PerformanceBenchmarks
+
+```python
+def add_benchmark(self, benchmark: PerformanceBenchmark) -> None
+
+def update_actual(self, name: str, actual_value: float) -> None
+
+def status_report(self) -> Dict[str, Any]
+```
+
+---
+
+## Operational Guidelines
+
+### Project Lifecycle
+
+| Phase | Primary Components | Key Outputs |
+|-------|-------------------|-------------|
+| Discovery | TechStackEvaluator | Technology recommendations |
+| Planning | CostEstimator, RiskManager | Budget, risk register |
+| Design | ArchitectureDesigner | ADRs, component diagram |
+| Development | SprintPlanner, ResourceAllocator | Sprint plans, assignments |
+| Monitoring | TechDebtTracker, PerformanceBenchmarks | Debt backlog, SLA status |
+
+### Decision Framework
+
+1. **Evaluate options** — Use TechStackEvaluator for technology choices
+2. **Estimate cost** — Use CostEstimator for budget planning
+3. **Assess risk** — Use RiskManager for risk identification
+4. **Design architecture** — Use ArchitectureDesigner for system design
+5. **Plan execution** — Use SprintPlanner for delivery planning
+6. **Allocate resources** — Use ResourceAllocator for team optimization
+7. **Monitor progress** — Use benchmarks and debt tracking
+
+---
+
+## Configuration
+
+### Project Config
+
+```python
+config = ProjectConfig(
+    project_name="My Project",
+    team_name="My Team",
+    methodology="scrum",           # or "kanban", "waterfall"
+    sprint_duration_days=14,       # 7, 14, or 21
+    working_hours_per_day=8.0,
+    working_days_per_week=5,
+    risk_tolerance="medium",       # "low", "medium", "high"
+    budget=100_000,
+    architecture_style=ArchitectureStyle.MODULAR_MONOLITH,
+)
+```
+
+### Cost Estimator
+
+```python
+estimator = CostEstimator(default_hourly_rate=100.0)
+# Adjust hourly rates per role
+# Set contingency percentage per estimate
+```
+
+### Risk Manager
+
+```python
+risk_mgr = RiskManager(risk_tolerance="medium")
+# "low": threshold=3 (stricter)
+# "medium": threshold=5 (balanced)
+# "high": threshold=7 (lenient)
+```
+
+---
+
+## Security Considerations
+
+### Data Protection
+
+- No external network calls — all data processed in-memory
+- No persistent storage by default
+- Sensitive data (team rates, budgets) kept in memory only
+
+### Access Control
+
+- No authentication layer (embedded component)
+- Caller controls data access
+- Audit trail via logging
+
+### Input Validation
+
+- Bounds checking on probabilities (0-1), impacts (0-10)
+- Positive value validation for hours, costs, story points
+- Date range validation for sprints
+
+---
+
+## Scalability
+
+### Current Design Limits
+
+| Component | Limit | Notes |
+|-----------|-------|-------|
+| Tasks | ~1,000 | Per project |
+| Team members | ~100 | Allocation matrix |
+| Sprints | ~50 | Velocity history |
+
+### Scaling Strategies
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    SCALING PATHWAY                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  Phase 1: In-Memory (Current)                                │
+│  ├── Single process, stdlib only                             │
+│  └── Suitable for < 50 tasks                                 │
+│                                                               │
+│  Phase 2: Database Backend                                   │
+│  ├── PostgreSQL for persistence                              │
+│  ├── Redis for caching                                       │
+│  └── Suitable for < 1000 tasks                               │
+│                                                               │
+│  Phase 3: Multi-User                                         │
+│  ├── REST/GraphQL API layer                                  │
+│  ├── Authentication and authorization                        │
+│  └── Suitable for < 10K tasks                                │
+│                                                               │
+│  Phase 4: Enterprise Scale                                   │
+│  ├── Multi-project isolation                                 │
+│  ├── Real-time collaboration                                  │
+│  └── Suitable for 10K+ tasks                                 │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Design Patterns
+
+### Strategy Pattern
+
+Different estimation strategies are interchangeable:
+
+```python
+class EstimationStrategy(ABC):
+    @abstractmethod
+    def estimate(self, task: Task) -> float:
+        pass
+
+class StoryPointEstimator(EstimationStrategy):
+    def estimate(self, task):
+        return task.story_points * self.velocity_factor
+
+class TimeEstimator(EstimationStrategy):
+    def estimate(self, task):
+        return task.estimated_hours
+```
+
+### Observer Pattern
+
+Sprint events trigger notifications:
+
+```python
+class SprintObserver(ABC):
+    @abstractmethod
+    def on_sprint_event(self, event: str, sprint: Sprint):
+        pass
+
+class VelocityTracker(SprintObserver):
+    def on_sprint_event(self, event, sprint):
+        if event == "completed":
+            self.record_velocity(sprint)
+
+class NotificationSender(SprintObserver):
+    def on_sprint_event(self, event, sprint):
+        if event in ("started", "completed"):
+            self.send_notification(event, sprint)
+```
+
+### Composite Pattern
+
+Hierarchical project structure:
+
+```python
+class ProjectNode(ABC):
+    @abstractmethod
+    def get_total_points(self) -> int:
+        pass
+
+class Task(ProjectNode):
+    def get_total_points(self):
+        return self.story_points
+
+class Epic(ProjectNode):
+    def get_total_points(self):
+        return sum(t.get_total_points() for t in self.tasks)
+```
+
+### Template Method Pattern
+
+Sprint lifecycle follows a common template:
+
+```python
+class SprintWorkflow(ABC):
+    def execute(self, sprint: Sprint):
+        self.plan(sprint)
+        self.active(sprint)
+        self.review(sprint)
+        self.retrospective(sprint)
+
+    @abstractmethod
+    def plan(self, sprint: Sprint):
+        pass
+
+    @abstractmethod
+    def active(self, sprint: Sprint):
+        pass
+```
+
 ---
 
 ## Checklists
 
 ### Tech Stack Selection
+
 - [ ] Requirements analysis completed
 - [ ] Candidate technologies registered
 - [ ] Evaluation criteria weighted
@@ -342,6 +821,7 @@ class Risk:
 - [ ] Final selection documented as ADR
 
 ### Sprint Planning
+
 - [ ] Backlog groomed and prioritized
 - [ ] Team capacity calculated
 - [ ] Velocity trend reviewed
@@ -351,6 +831,7 @@ class Risk:
 - [ ] Tasks assigned to team members
 
 ### Architecture Review
+
 - [ ] Architecture style selected
 - [ ] Components documented
 - [ ] Data stores defined
@@ -358,6 +839,15 @@ class Risk:
 - [ ] ADRs created for key decisions
 - [ ] Performance requirements captured
 - [ ] Security considerations addressed
+
+### Risk Assessment
+
+- [ ] Risks identified and documented
+- [ ] Probability and impact scored
+- [ ] Risk levels classified
+- [ ] Mitigations assigned
+- [ ] Monitoring plan established
+- [ ] Contingency budget allocated
 
 ---
 
@@ -389,18 +879,43 @@ class Risk:
 - Check for underestimated complexity
 - Adjust contingency percentage
 
-### Performance Tips
+**Architecture drift**
+- Create ADRs for all decisions
+- Review architecture quarterly
+- Conduct architecture reviews
+- Document technical decisions
 
-- Use story points for velocity tracking, hours for capacity planning
-- Run sprint retrospectives to improve estimation accuracy
-- Track technical debt interest to prioritize fixes
-- Update performance benchmarks regularly
+### Debug Mode
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Get detailed sprint info
+sprint = planner.get_sprint("S1")
+print(f"Tasks: {len(sprint.tasks)}")
+print(f"Velocity: {sprint.velocity}")
+```
 
 ---
 
-## Usage Patterns
+## Integration Points
+
+| System | Protocol | Purpose |
+|--------|----------|---------|
+| Jira | REST API | Task management |
+| Azure DevOps | REST API | Work item tracking |
+| GitHub | REST API | Issues and PRs |
+| Slack | Webhook | Notifications |
+| Confluence | REST API | Documentation |
+| Toggl | REST API | Time tracking |
+
+---
+
+## Examples
 
 ### Project Kickoff
+
 ```python
 # 1. Evaluate tech stack
 evaluator = TechStackEvaluator()
@@ -424,6 +939,7 @@ roadmap = ProjectRoadmap(config)
 ```
 
 ### Sprint Cycle
+
 ```python
 # 1. Plan sprint
 planner.plan_sprint(sprint_id, task_ids, capacity)
@@ -442,3 +958,40 @@ result = planner.complete_sprint(sprint_id)
 print(f"Velocity: {result['velocity']}")
 print(f"Completion: {result['completion_rate']:.0%}")
 ```
+
+### Risk Management Workflow
+
+```python
+# 1. Identify risks
+risk_mgr.add_risk(Risk("R1", "Key developer leaves", 0.3, 8, mitigation="Cross-train"))
+
+# 2. Assess summary
+summary = risk_mgr.get_risk_summary()
+print(f"Critical: {summary['critical_count']}")
+
+# 3. Get mitigations
+suggestions = risk_mgr.suggest_mitigations("R1")
+
+# 4. Monitor
+register = risk_mgr.get_risk_register()
+```
+
+---
+
+## Best Practices
+
+1. **Start with architecture decisions** — ADRs before code
+2. **Use story points for velocity**, hours for capacity planning
+3. **Track technical debt** — it compounds like financial debt
+4. **Review risks weekly** — probability and impact change over time
+5. **Update benchmarks** — performance targets should evolve
+6. **Rebalance workloads** — overloaded members produce bugs
+7. **Document trade-offs** — every decision has consequences
+8. **Estimate with the team** — don't estimate in isolation
+9. **Review sprint velocity** — use 3-sprint rolling average
+10. **Maintain the roadmap** — adjust milestones as reality changes
+
+---
+
+**See Also**: [ARCHITECTURE.md](./ARCHITECTURE.md) for system design details,
+[README.md](./README.md) for quick start and API reference.

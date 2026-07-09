@@ -416,6 +416,9 @@ def run(self) -> Dict[str, Any]
 | Compliance items not expiring | Check `expiration_date` is set and `auto_renew` flag |
 | Recruitment metrics wrong | Verify candidate stages are set correctly |
 | Onboarding tasks not tracked | Ensure `plan_id` and `task_id` are valid |
+| Pay equity false positives | Check benchmark data is current and matches job level |
+| Org chart cycles detected | Verify no circular manager references exist |
+| Duplicate employee IDs | System auto-generates UUID; never manually assign |
 
 ---
 
@@ -429,3 +432,404 @@ def run(self) -> Dict[str, Any]
 6. **Use the orchestrator** (`HRAgent`) for cross-component analytics
 7. **Review attrition risks quarterly** and update retention actions
 8. **Complete onboarding plans** within 90 days for best new hire outcomes
+9. **Run pay equity audits** quarterly to catch drift early
+10. **Document all terminations** with reason codes for exit analytics
+
+---
+
+## Integration Patterns
+
+### HRIS Integration
+
+```python
+# Connect to external HRIS systems
+from agents.hr.agent import HRAgent
+
+agent = HRAgent()
+
+# Import employees from Workday
+workday_config = {
+    "source": "workday",
+    "api_url": "https://wd5.myworkday.com/api/v1",
+    "auth_type": "oauth2",
+    "tenant_id": "your_tenant",
+}
+
+# Export employee data to ADP
+adp_config = {
+    "destination": "adp",
+    "api_url": "https://api.adp.com/hr/v2",
+    "auth_type": "bearer",
+    "company_code": "YOUR_COMPANY",
+}
+
+# Sync flow
+agent.sync.import_from_hris(workday_config)
+agent.sync.export_to_payroll(adp_config)
+```
+
+### Webhook Notifications
+
+```python
+# Register webhooks for real-time events
+agent.webhooks.register(
+    url="https://your-app.com/webhooks/hr",
+    events=[
+        "employee.hired",
+        "employee.terminated",
+        "leave.request_submitted",
+        "leave.request_approved",
+        "compliance.item_expiring",
+        "training.completed",
+    ],
+    secret="your_webhook_secret",
+)
+```
+
+---
+
+## Advanced Usage Patterns
+
+### Bulk Operations
+
+```python
+# Bulk hire employees
+bulk_hires = [
+    {"first_name": "Alice", "last_name": "Smith", "email": "alice@co.com", ...},
+    {"first_name": "Bob", "last_name": "Jones", "email": "bob@co.com", ...},
+    {"first_name": "Carol", "last_name": "Williams", "email": "carol@co.com", ...},
+]
+results = mgr.hire_bulk(bulk_hires)
+
+# Bulk update salaries (annual review)
+salary_updates = [
+    {"employee_id": "EMP001", "new_salary": 130000, "reason": "Annual review"},
+    {"employee_id": "EMP002", "new_salary": 115000, "reason": "Annual review"},
+]
+mgr.update_salaries_bulk(salary_updates)
+```
+
+### Custom Reports
+
+```python
+# Generate custom HR report
+report = agent.reports.generate(
+    report_type="headcount_by_department",
+    filters={
+        "status": "active",
+        "hire_date_after": "2024-01-01",
+        "department": ["engineering", "product"],
+    },
+    group_by="job_level",
+    include_metrics=["avg_salary", "avg_tenure", "avg_performance"],
+    output_format="json",
+)
+```
+
+### Automation Rules
+
+```python
+# Set up automated alerts
+agent.automation.add_rule(
+    name="Compliance Expiration Alert",
+    trigger="compliance.item.expiring",
+    conditions={"days_until_expiry": "<= 30"},
+    actions=[
+        {"type": "email", "to": "hr@company.com", "template": "compliance_alert"},
+        {"type": "slack", "channel": "#hr-alerts", "message": "Compliance item expiring"},
+        {"type": "task_create", "assignee": "hr_manager", "title": "Renew {item_name}"},
+    ],
+)
+
+agent.automation.add_rule(
+    name="High Attrition Risk Alert",
+    trigger="attrition.risk.score_change",
+    conditions={"new_risk_level": "high"},
+    actions=[
+        {"type": "email", "to": "hr_director@company.com"},
+        {"type": "flag_employee", "flag": "retention_review_needed"},
+    ],
+)
+
+---
+
+## Data Export and Reporting
+
+### Export Formats
+
+```python
+# Export employee data in various formats
+agent.exports.export_employees(
+    format="csv",
+    filters={"department": "engineering", "status": "active"},
+    fields=["employee_id", "full_name", "email", "job_title", "salary"],
+    filename="engineering_team.csv",
+)
+
+# Export to JSON for API integration
+agent.exports.export_employees(
+    format="json",
+    filters={"status": "active"},
+    include_nested=["reviews", "training", "compliance"],
+    filename="full_employee_export.json",
+)
+
+# Generate PDF report
+agent.reports.generate_pdf(
+    report_type="quarterly_hr_summary",
+    period="Q1 2024",
+    sections=["headcount", "turnover", "engagement", "compliance"],
+    output="hr_q1_2024_report.pdf",
+)
+```
+
+### Custom Report Builder
+
+```python
+# Build custom reports with flexible parameters
+report = agent.reports.build(
+    name="Department Comparison Report",
+    type="comparison",
+    entities=["engineering", "product", "marketing"],
+    metrics=[
+        "headcount",
+        "avg_salary",
+        "avg_tenure",
+        "avg_performance_score",
+        "avg_engagement_score",
+        "attrition_rate",
+        "training_completion_rate",
+    ],
+    period="2024",
+    group_by="quarter",
+    output_format="xlsx",
+)
+
+print(f"Report generated: {report.filename}")
+print(f"Size: {report.file_size:,} bytes")
+```
+
+---
+
+## API Authentication
+
+### OAuth2 Configuration
+
+```python
+# Configure OAuth2 for HR system access
+agent.auth.configure_oauth2(
+    client_id="hr-agent-client",
+    client_secret="your_client_secret",
+    authorization_url="https://auth.company.com/authorize",
+    token_url="https://auth.company.com/token",
+    scopes=["employees:read", "employees:write", "reviews:read"],
+)
+
+# Token refresh is handled automatically
+# Access protected endpoints
+employees = agent.employees.get_all()  # Auto-refreshes token if needed
+```
+
+### API Key Authentication
+
+```python
+# For simpler integrations
+agent.auth.configure_api_key(
+    key="your_api_key",
+    header="X-API-Key",
+)
+
+# Rate limiting is enforced automatically
+# Limits: 100 requests per minute
+```
+
+---
+
+## Data Validation Rules
+
+### Employee Data Validation
+
+```python
+# Validation rules for employee data
+validation_rules = {
+    "email": {
+        "required": True,
+        "pattern": r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+        "unique": True,
+        "max_length": 254,
+    },
+    "salary": {
+        "required": True,
+        "type": "float",
+        "min": 0,
+        "max": 10000000,
+    },
+    "hire_date": {
+        "required": True,
+        "type": "datetime",
+        "not_future": True,
+    },
+    "department": {
+        "required": True,
+        "enum": ["engineering", "marketing", "sales", "hr", "finance", "operations"],
+    },
+}
+
+# Validate employee data
+def validate_employee(data):
+    errors = []
+    for field, rules in validation_rules.items():
+        value = data.get(field)
+        if rules["required"] and not value:
+            errors.append(f"{field} is required")
+        if value and "pattern" in rules:
+            if not re.match(rules["pattern"], value):
+                errors.append(f"{field} format is invalid")
+        if value and "min" in rules and value < rules["min"]:
+            errors.append(f"{field} must be >= {rules['min']}")
+        if value and "max" in rules and value > rules["max"]:
+            errors.append(f"{field} must be <= {rules['max']}")
+    return errors
+```
+
+### Leave Request Validation
+
+```python
+# Validation rules for leave requests
+leave_validation_rules = {
+    "start_date": {
+        "required": True,
+        "type": "datetime",
+        "not_past": True,
+    },
+    "end_date": {
+        "required": True,
+        "type": "datetime",
+        "must_be_after": "start_date",
+    },
+    "leave_type": {
+        "required": True,
+        "enum": ["vacation", "sick", "personal", "parental", "bereavement"],
+    },
+    "reason": {
+        "required": False,
+        "max_length": 500,
+    },
+}
+
+# Validate leave request
+def validate_leave_request(data):
+    errors = []
+    for field, rules in leave_validation_rules.items():
+        value = data.get(field)
+        if rules.get("required") and not value:
+            errors.append(f"{field} is required")
+        if value and "enum" in rules and value not in rules["enum"]:
+            errors.append(f"{field} must be one of: {rules['enum']}")
+        if value and "max_length" in rules and len(str(value)) > rules["max_length"]:
+            errors.append(f"{field} must be <= {rules['max_length']} characters")
+    return errors
+```
+
+---
+
+## Advanced Search
+
+### Full-Text Search
+
+```python
+# Advanced employee search with filters
+results = agent.employees.search(
+    query="engineer",
+    filters={
+        "department": ["engineering", "product"],
+        "status": "active",
+        "min_salary": 100000,
+        "max_tenure_years": 5,
+        "performance_score_min": 4.0,
+    },
+    sort_by="salary",
+    sort_order="desc",
+    limit=20,
+)
+
+for emp in results:
+    print(f"{emp.full_name} - {emp.job_title}")
+    print(f"  Department: {emp.department.value}")
+    print(f"  Salary: ${emp.salary:,.0f}")
+    print(f"  Tenure: {emp.tenure_years:.1f} years")
+    print(f"  Performance: {emp.performance_score}/5.0")
+    print()
+```
+
+### Saved Searches
+
+```python
+# Save frequently used searches
+agent.searches.save(
+    name="High Performers in Engineering",
+    query="",
+    filters={
+        "department": "engineering",
+        "performance_score_min": 4.0,
+        "status": "active",
+    },
+    sort_by="performance_score",
+    sort_order="desc",
+)
+
+# Use saved search
+results = agent.searches.run("High Performers in Engineering")
+```
+
+---
+
+## Advanced Search
+
+### Full-Text Search
+
+```python
+# Advanced employee search with filters
+results = agent.employees.search(
+    query="engineer",
+    filters={
+        "department": ["engineering", "product"],
+        "status": "active",
+        "min_salary": 100000,
+        "max_tenure_years": 5,
+        "performance_score_min": 4.0,
+    },
+    sort_by="salary",
+    sort_order="desc",
+    limit=20,
+)
+
+for emp in results:
+    print(f"{emp.full_name} - {emp.job_title}")
+    print(f"  Department: {emp.department.value}")
+    print(f"  Salary: ${emp.salary:,.0f}")
+    print(f"  Tenure: {emp.tenure_years:.1f} years")
+    print(f"  Performance: {emp.performance_score}/5.0")
+    print()
+```
+
+### Saved Searches
+
+```python
+# Save frequently used searches
+agent.searches.save(
+    name="High Performers in Engineering",
+    query="",
+    filters={
+        "department": "engineering",
+        "performance_score_min": 4.0,
+        "status": "active",
+    },
+    sort_by="performance_score",
+    sort_order="desc",
+)
+
+# Use saved search
+results = agent.searches.run("High Performers in Engineering")
+```
+```

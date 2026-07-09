@@ -75,11 +75,9 @@ market = agent.strategy.market_sizing({
     "serviceable_addressable_market": 10_000_000_000,
     "serviceable_obtainable_market": 500_000_000,
 })
-# Result: {'capture_rate': 0.01, 'sam_to_tam_ratio': 0.2, ...}
 
 # SWOT analysis
 swot = agent.strategy.swot_analysis()
-# Result: {'strengths': [...], 'weaknesses': [...], 'opportunities': [...], 'threats': [...]}
 ```
 
 ### 2. Roadmap Planning
@@ -87,7 +85,6 @@ swot = agent.strategy.swot_analysis()
 ```python
 from agents.product.agent import Feature, Priority, FeatureStatus, RoadmapHorizon
 
-# Add features to roadmap
 feature = Feature(
     feature_id="f001",
     name="AI Report Generator",
@@ -95,26 +92,15 @@ feature = Feature(
     priority=Priority.P0_CRITICAL,
     status=FeatureStatus.PLANNED,
     horizon=RoadmapHorizon.NOW,
-    effort=8,
-    value=9,
-    impact=0.9,
-    confidence=0.8,
-    owner="product-lead",
-    tags=["ai", "reports"],
-    dependencies=[],
+    effort=8, value=9, impact=0.9, confidence=0.8,
+    owner="product-lead", tags=["ai", "reports"], dependencies=[],
     success_criteria=["50% of users try within 2 weeks"],
-    created_at=datetime.utcnow(),
-    updated_at=datetime.utcnow(),
+    created_at=datetime.utcnow(), updated_at=datetime.utcnow(),
 )
 agent.roadmap.add_feature(feature)
 
-# Get roadmap
 roadmap = agent.roadmap.get_roadmap()
-# Result: {'now': [Feature], 'next': [], 'later': [], 'future': []}
-
-# Check capacity
 capacity = agent.roadmap.capacity_check(RoadmapHorizon.NOW, max_effort=40)
-# Result: {'is_overloaded': False, 'utilization': 0.2, ...}
 ```
 
 ### 3. Feature Prioritization
@@ -124,19 +110,9 @@ from agents.product.agent import FeaturePrioritizer
 
 prioritizer = FeaturePrioritizer()
 
-# RICE scoring
 rice_score = prioritizer.rice_score(feature, reach=10000, impact=3, confidence=0.8)
-# Result: 3000.0
-
-# MoSCoW classification
 moscow = prioritizer.moscow_classification([feature], must_haves=["f001"])
-# Result: {'must_have': [feature], 'should_have': [], 'could_have': [], 'wont_have': []}
-
-# Value vs Effort matrix
 matrix = prioritizer.value_vs_effort_matrix([feature])
-# Result: {'quick_wins': [feature], 'big_bets': [], 'fill_ins': [], 'money_pits': []}
-
-# Stack ranking
 ranked = prioritizer.stack_ranking([feature])
 ```
 
@@ -147,7 +123,6 @@ from agents.product.agent import UserStoryManager
 
 stories = UserStoryManager()
 
-# Create story
 story = stories.create_story(
     user_role="business owner",
     action="generate financial reports automatically",
@@ -157,16 +132,10 @@ story = stories.create_story(
         "Supports PDF and Excel formats",
         "Includes charts and summaries",
     ],
-    priority=Priority.P1_HIGH,
-    estimate=5.0,
-    tags=["reports", "automation"],
+    priority=Priority.P1_HIGH, estimate=5.0, tags=["reports", "automation"],
 )
 
-# Validate INVEST
 invest = stories.validate_invest(story)
-# Result: {'independent': True, 'negotiable': True, 'valuable': True, 'estimable': True, 'small': True, 'testable': True}
-
-# Transition status
 stories.transition(story.story_id, StoryStatus.READY)
 ```
 
@@ -177,29 +146,17 @@ from agents.product.agent import OKRManager
 
 okr = OKRManager()
 
-# Create objective
 objective = okr.create_objective(
     statement="Increase product adoption by 50%",
-    owner="vp-product",
-    quarter="Q1 2024",
+    owner="vp-product", quarter="Q1 2024",
     key_results=[
         {"statement": "Reach 10K MAU", "metric": "mau", "start_value": 5000, "target_value": 10000},
         {"statement": "Achieve NPS > 50", "metric": "nps", "start_value": 35, "target_value": 50},
-        {"statement": "Reduce churn to < 5%", "metric": "churn", "start_value": 8, "target_value": 5},
     ],
 )
 
-# Check in
-okr.check_in(
-    objective_id=objective.objective_id,
-    kr_updates={"kr001": 7500, "kr002": 45, "kr003": 6},
-    confidence=0.7,
-    notes="Strong growth from new onboarding flow",
-)
-
-# Get progress
+okr.check_in(objective_id=objective.objective_id, kr_updates={"kr001": 7500, "kr002": 45}, confidence=0.7)
 progress = okr.progress(objective.objective_id)
-# Result: {'overall_progress': 58.3, 'confidence': 0.7, 'status': 'on_track', ...}
 ```
 
 ### 6. Product Analytics
@@ -209,18 +166,9 @@ from agents.product.agent import ProductAnalytics, MetricType
 
 analytics = ProductAnalytics()
 
-# Track metrics
 analytics.track_metric("daily_active_users", 1250, MetricType.GAUGE)
-analytics.track_metric("signup_count", 45, MetricType.COUNTER)
-
-# Define and analyze funnel
 analytics.define_funnel("activation", ["visit", "signup", "first_action", "activated"])
-analytics.record_event({"event_type": "visit", "user_id": "u1"})
-analytics.record_event({"event_type": "signup", "user_id": "u1"})
-analytics.record_event({"event_type": "first_action", "user_id": "u1"})
-
 funnel = analytics.analyze_funnel("activation")
-# Result: {'overall_conversion': 33.3, 'steps': [...]}
 ```
 
 ### 7. A/B Testing
@@ -230,25 +178,17 @@ from agents.product.agent import ABTestManager
 
 ab = ABTestManager()
 
-# Create experiment
 exp = ab.create_experiment(
     name="New Onboarding Flow",
     hypothesis="Simplified onboarding increases activation by 15%",
     metric="activation_rate",
     control={"description": "Current flow", "traffic": 50},
     treatments=[{"name": "new_flow", "description": "Simplified 3-step", "traffic": 50}],
-    sample_size=5000,
-    confidence_level=0.95,
+    sample_size=5000, confidence_level=0.95,
 )
 
-# Start and analyze
 ab.start_experiment(exp.experiment_id)
-results = ab.analyze_results(
-    exp.experiment_id,
-    control_data=[0.32, 0.35, 0.33, 0.34],
-    treatment_data={"new_flow": [0.42, 0.45, 0.43, 0.44]},
-)
-# Result: {'winner': 'new_flow', 'recommendation': 'Deploy winner: new_flow', ...}
+results = ab.analyze_results(exp.experiment_id, control_data=[0.32, 0.35], treatment_data={"new_flow": [0.42, 0.45]})
 ```
 
 ### 8. Go-to-Market
@@ -259,17 +199,12 @@ from agents.product.agent import GTMManager, GTMPhase
 gtm = GTMManager()
 
 plan = gtm.create_plan(
-    feature_id="f001",
-    phase=GTMPhase.PREPARE,
+    feature_id="f001", phase=GTMPhase.PREPARE,
     activities=[
         {"name": "Write blog post", "owner": "marketing"},
         {"name": "Create demo video", "owner": "product"},
-        {"name": "Update docs", "owner": "engineering"},
     ],
-    timeline={"launch": datetime(2024, 3, 1)},
-    budget=50000,
-    owner="gtm-lead",
-    success_metrics=["1000 signups in first week", "Press coverage in 3 outlets"],
+    budget=50000, owner="gtm-lead",
 )
 ```
 
@@ -437,7 +372,6 @@ class Objective:
 ### Daily Standup
 ```python
 status = agent.full_status()
-# Get today's priorities
 urgent = [f for f in agent.roadmap.get_roadmap().get("now", []) if f.priority == Priority.P0_CRITICAL]
 ```
 
@@ -453,6 +387,495 @@ feedback_summary = agent.feedback.sentiment_summary()
 roadmap = agent.roadmap.roadmap_summary()
 competitive = agent.strategy.competitive_analysis()
 goals = agent.okr.goals_status()
+```
+
+---
+
+---
+
+## Advanced Usage Patterns
+
+### Multi-Product Management
+
+```python
+# Manage multiple products from one agent
+agent = ProductAgent(products=["app", "api", "dashboard"])
+
+# View consolidated roadmap
+roadmap = agent.get_consolidated_roadmap()
+
+# Cross-product dependencies
+deps = agent.find_cross_product_dependencies()
+for dep in deps:
+    print(f"  {dep['blocking_product']} blocks {dep['blocked_product']}: {dep['feature']}")
+
+# Product-specific OKRs
+app_okrs = agent.okr.dashboard(product="app")
+api_okrs = agent.okr.dashboard(product="api")
+```
+
+### Custom Prioritization Framework
+
+```python
+# Register a custom prioritization framework
+class CustomPrioritizer:
+    def score(self, feature, context):
+        # Your custom scoring logic
+        market_size = context.get("market_size", 0)
+        technical_risk = feature.effort / 13  # Normalize
+        strategic_value = self.calculate_strategic_value(feature, context)
+        return market_size * strategic_value * (1 - technical_risk)
+
+agent.prioritizer.register_framework("custom", CustomPrioritizer())
+
+# Use custom framework
+ranked = agent.prioritizer.rank_features(features, framework="custom", context={
+    "market_size": market_data,
+    "strategic_goals": company_goals,
+})
+```
+
+### Feedback Loop Integration
+
+```python
+# Connect feedback to roadmap
+feedback_themes = agent.feedback.get_top_themes(last_days=30)
+for theme in feedback_themes:
+    print(f"\nTheme: {theme['name']} ({theme['count']} mentions)")
+    print(f"  Sentiment: {theme['sentiment']:.1f}")
+    print(f"  Impact Score: {theme['impact_score']:.1f}")
+
+    # Auto-create feature request if theme is strong enough
+    if theme['count'] >= 10 and theme['sentiment'] < -0.3:
+        feature = agent.roadmap.add_feature_from_feedback(
+            feedback_theme=theme,
+            source="customer_feedback",
+        )
+        print(f"  → Auto-created feature: {feature.feature_id}")
+```
+
+---
+
+## Product Management Templates
+
+### Product Brief Template
+
+```markdown
+# Product Brief: [Feature Name]
+
+## Problem Statement
+[What problem are we solving? For whom?]
+
+## Proposed Solution
+[High-level description of the solution]
+
+## Success Metrics
+- Metric 1: [What] [Target] [Timeline]
+- Metric 2: [What] [Target] [Timeline]
+
+## Target Users
+- Primary: [User persona]
+- Secondary: [User persona]
+
+## Scope
+### In Scope
+- [ ] [Item 1]
+- [ ] [Item 2]
+
+### Out of Scope
+- [ ] [Item 1]
+- [ ] [Item 2]
+
+## Dependencies
+- [Team/Feature 1]
+- [Team/Feature 2]
+
+## Timeline
+- Discovery: [Date]
+- Design: [Date]
+- Development: [Date]
+- Launch: [Date]
+```
+
+### PRD Template
+
+```markdown
+# Product Requirements Document: [Feature Name]
+
+## Overview
+[2-3 sentence summary]
+
+## Goals and Background
+### Goals
+1. [Goal 1]
+2. [Goal 2]
+
+### Background
+[Context and rationale]
+
+## Requirements
+
+### Functional Requirements
+1. [FR-001] [Requirement description]
+   - Acceptance Criteria:
+     - [ ] [Criterion 1]
+     - [ ] [Criterion 2]
+
+### Non-Functional Requirements
+1. Performance: [Requirements]
+2. Security: [Requirements]
+3. Accessibility: [Requirements]
+
+## Design
+[Link to design files]
+
+## Technical Requirements
+[Engineering notes]
+
+## Launch Plan
+[Rollout strategy]
+
+## Open Questions
+1. [Question 1]
+2. [Question 2]
+```
+
+---
+
+## Advanced Analytics
+
+### Cohort Analysis
+
+```python
+# Analyze customer cohorts by signup month
+cohort_analysis = agent.analytics.cohort_analysis(
+    cohort_field="signup_month",
+    metric="retention_rate",
+    periods=12,
+)
+
+# Visualize cohort retention
+for cohort, retention_data in cohort_analysis.items():
+    print(f"Cohort {cohort}: {[f'{r:.1f}%' for r in retention_data]}")
+```
+
+### Revenue Forecasting
+
+```python
+# Forecast revenue based on current trends
+forecast = agent.metrics.forecast_revenue(
+    current_mrr=8840,
+    growth_rate=0.15,
+    churn_rate=0.05,
+    months=12,
+    scenarios={
+        "optimistic": {"growth": 0.25, "churn": 0.03},
+        "base": {"growth": 0.15, "churn": 0.05},
+        "pessimistic": {"growth": 0.08, "churn": 0.08},
+    },
+)
+
+print(f"12-month forecast:")
+print(f"  Optimistic: ${forecast['optimistic']['mrr']:,.0f}/mo")
+print(f"  Base:       ${forecast['base']['mrr']:,.0f}/mo")
+print(f"  Pessimistic: ${forecast['pessimistic']['mrr']:,.0f}/mo")
+```
+
+### Customer Segmentation Deep Dive
+
+```python
+# RFM Analysis (Recency, Frequency, Monetary)
+rfm_segments = agent.segmenter.rfm_analysis(
+    customers=active_customers,
+    recency_bins=5,
+    frequency_bins=5,
+    monetary_bins=5,
+)
+
+# Segment definitions
+segments = {
+    "champions": {"recency": "5", "frequency": "5", "monetary": "5"},
+    "loyal": {"recency": "4-5", "frequency": "4-5", "monetary": "3-5"},
+    "at_risk": {"recency": "1-2", "frequency": "3-5", "monetary": "3-5"},
+    "hibernating": {"recency": "1-2", "frequency": "1-2", "monetary": "1-2"},
+    "new_customers": {"recency": "5", "frequency": "1", "monetary": "1"},
+}
+```
+
+---
+
+## Growth Playbooks
+
+### Launch Playbook
+
+```
+Week -4: Pre-Launch
+├── Set up analytics (Mixpanel/GA4)
+├── Create landing page with email capture
+├── Build waitlist of 100+ interested users
+└── Prepare launch content (blog, social, email)
+
+Week -2: Soft Launch
+├── Invite beta testers (10-20 users)
+├── Collect feedback and fix critical bugs
+├── Optimize onboarding flow
+└── Prepare support documentation
+
+Week 0: Launch
+├── Product Hunt launch (schedule for Tuesday)
+├── Hacker News Show HN post
+├── Email waitlist
+├── Social media announcements
+└── Reach out to press/influencers
+
+Week +1: Post-Launch
+├── Monitor metrics hourly
+├── Respond to all feedback within 24 hours
+├── Fix critical bugs immediately
+├── Share launch results publicly
+└── Follow up with early adopters
+```
+
+### Retention Playbook
+
+```
+Day 0: Welcome
+├── Send welcome email with quick start guide
+├── Trigger onboarding automation
+└── Schedule 3-day check-in
+
+Day 3: Engagement
+├── Check if user completed first value action
+├── If not, send helpful tips email
+└── If yes, celebrate and suggest next feature
+
+Day 7: Habit Formation
+├── Review usage patterns
+├── Send "Here's what you've accomplished" email
+└── Introduce advanced features
+
+Day 14: Value Reinforcement
+├── Share ROI metrics (time saved, etc.)
+├── Ask for feedback (NPS survey)
+└── Offer help if usage is low
+
+Day 30: Loyalty
+├── Review monthly usage report
+├── Offer upgrade if hitting limits
+├── Invite to community/slack
+└── Ask for testimonial/referral
+```
+
+---
+
+## Feedback Processing
+
+### Sentiment Analysis Engine
+
+```python
+# Configure sentiment analysis
+sentiment_config = {
+    "positive_words": [
+        "great", "excellent", "amazing", "love", "best", "fantastic",
+        "awesome", "perfect", "wonderful", "outstanding", "superb",
+    ],
+    "negative_words": [
+        "bad", "terrible", "awful", "hate", "worst", "horrible",
+        "poor", "disappointing", "frustrating", "broken", "useless",
+    ],
+    "neutral_weight": 0.5,
+    "minimum_words": 3,
+}
+
+# Analyze feedback sentiment
+feedback_items = [
+    "This feature is amazing, I love it!",
+    "The product is terrible and buggy.",
+    "It works okay, nothing special.",
+]
+
+for item in feedback_items:
+    result = agent.feedback.analyze_sentiment(item, config=sentiment_config)
+    print(f"Text: {item}")
+    print(f"  Score: {result['score']:.2f}")
+    print(f"  Label: {result['label']}")
+    print()
+```
+
+### Feedback Categorization
+
+```python
+# Auto-categorize feedback
+categories = {
+    "feature_request": ["wish", "would be nice", "please add", "should have"],
+    "bug_report": ["broken", "error", "crash", "doesn't work", "bug"],
+    "praise": ["love", "great", "amazing", "best", "excellent"],
+    "complaint": ["hate", "terrible", "worst", "frustrating", "annoying"],
+    "question": ["how do", "what is", "can I", "is it possible"],
+}
+
+for item in feedback_items:
+    category = agent.feedback.categorize(item, categories)
+    print(f"Text: {item}")
+    print(f"  Category: {category['primary']}")
+    print(f"  Confidence: {category['confidence']:.2f}")
+    print()
+```
+
+---
+
+## Roadmap Visualization
+
+### ASCII Roadmap
+
+```python
+# Generate ASCII roadmap visualization
+roadmap = agent.roadmap.get_roadmap()
+
+print("=" * 60)
+print("PRODUCT ROADMAP")
+print("=" * 60)
+
+for horizon, features in roadmap.items():
+    print(f"\n{horizon.upper()} ({len(features)} features)")
+    print("-" * 40)
+    for f in features:
+        priority_icon = "🔴" if f.priority == "P0" else "🟡" if f.priority == "P1" else "🟢"
+        print(f"  {priority_icon} {f.name}")
+        print(f"     Effort: {f.effort} pts | Value: {f.value}/10 | Owner: {f.owner}")
+
+print("\n" + "=" * 60)
+print(f"Total Features: {sum(len(f) for f in roadmap.values())}")
+print(f"Total Effort: {sum(f.effort for features in roadmap.values() for f in features)} points")
+print("=" * 60)
+```
+
+### Release Planning
+
+```python
+# Plan releases based on capacity
+releases = agent.roadmap.plan_releases(
+    team_velocity=40,  # points per sprint
+    sprint_duration=2,  # weeks
+    sprints_per_release=3,
+    buffer_percent=20,
+)
+
+for release in releases:
+    print(f"\nRelease: {release['name']}")
+    print(f"  Date: {release['target_date']}")
+    print(f"  Features: {len(release['features'])}")
+    print(f"  Total Effort: {release['total_effort']} points")
+    print(f"  Capacity: {release['capacity']} points")
+    print(f"  Utilization: {release['utilization']:.1f}%")
+    for f in release['features']:
+        print(f"    - {f.name} ({f.effort} pts)")
+```
+
+---
+
+## Feedback Processing
+
+### Sentiment Analysis Engine
+
+```python
+# Configure sentiment analysis
+sentiment_config = {
+    "positive_words": [
+        "great", "excellent", "amazing", "love", "best", "fantastic",
+        "awesome", "perfect", "wonderful", "outstanding", "superb",
+    ],
+    "negative_words": [
+        "bad", "terrible", "awful", "hate", "worst", "horrible",
+        "poor", "disappointing", "frustrating", "broken", "useless",
+    ],
+    "neutral_weight": 0.5,
+    "minimum_words": 3,
+}
+
+# Analyze feedback sentiment
+feedback_items = [
+    "This feature is amazing, I love it!",
+    "The product is terrible and buggy.",
+    "It works okay, nothing special.",
+]
+
+for item in feedback_items:
+    result = agent.feedback.analyze_sentiment(item, config=sentiment_config)
+    print(f"Text: {item}")
+    print(f"  Score: {result['score']:.2f}")
+    print(f"  Label: {result['label']}")
+    print()
+```
+
+### Feedback Categorization
+
+```python
+# Auto-categorize feedback
+categories = {
+    "feature_request": ["wish", "would be nice", "please add", "should have"],
+    "bug_report": ["broken", "error", "crash", "doesn't work", "bug"],
+    "praise": ["love", "great", "amazing", "best", "excellent"],
+    "complaint": ["hate", "terrible", "worst", "frustrating", "annoying"],
+    "question": ["how do", "what is", "can I", "is it possible"],
+}
+
+for item in feedback_items:
+    category = agent.feedback.categorize(item, categories)
+    print(f"Text: {item}")
+    print(f"  Category: {category['primary']}")
+    print(f"  Confidence: {category['confidence']:.2f}")
+    print()
+```
+
+---
+
+## Roadmap Visualization
+
+### ASCII Roadmap
+
+```python
+# Generate ASCII roadmap visualization
+roadmap = agent.roadmap.get_roadmap()
+
+print("=" * 60)
+print("PRODUCT ROADMAP")
+print("=" * 60)
+
+for horizon, features in roadmap.items():
+    print(f"\n{horizon.upper()} ({len(features)} features)")
+    print("-" * 40)
+    for f in features:
+        priority_icon = "🔴" if f.priority == "P0" else "🟡" if f.priority == "P1" else "🟢"
+        print(f"  {priority_icon} {f.name}")
+        print(f"     Effort: {f.effort} pts | Value: {f.value}/10 | Owner: {f.owner}")
+
+print("\n" + "=" * 60)
+print(f"Total Features: {sum(len(f) for f in roadmap.values())}")
+print(f"Total Effort: {sum(f.effort for features in roadmap.values() for f in features)} points")
+print("=" * 60)
+```
+
+### Release Planning
+
+```python
+# Plan releases based on capacity
+releases = agent.roadmap.plan_releases(
+    team_velocity=40,  # points per sprint
+    sprint_duration=2,  # weeks
+    sprints_per_release=3,
+    buffer_percent=20,
+)
+
+for release in releases:
+    print(f"\nRelease: {release['name']}")
+    print(f"  Date: {release['target_date']}")
+    print(f"  Features: {len(release['features'])}")
+    print(f"  Total Effort: {release['total_effort']} points")
+    print(f"  Capacity: {release['capacity']} points")
+    print(f"  Utilization: {release['utilization']:.1f}%")
+    for f in release['features']:
+        print(f"    - {f.name} ({f.effort} pts)")
 ```
 
 ---

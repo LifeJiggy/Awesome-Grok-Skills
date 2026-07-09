@@ -112,6 +112,23 @@ Supports:
 
 State machine: `CLOSED → OPEN → HALF_OPEN → CLOSED`.
 
+```
+                    ┌──────────┐
+         failures   │          │  success
+        ┌──────────▶│   OPEN   │──────────┐
+        │           │          │          │
+        │           └──────────┘          │
+        │                │                │
+        │                │ timeout        │
+        │                ▼                │
+  ┌─────┴─────┐    ┌──────────┐    ┌─────┴──────┐
+  │  CLOSED   │◀───│HALF_OPEN │◀───│  testing   │
+  │           │    │          │    │            │
+  └───────────┘    └──────────┘    └────────────┘
+       │                                │
+       └── failures exceed threshold ───┘
+```
+
 Uses a sliding monitoring window to count failures in the last `monitoring_window_seconds`.
 - **CLOSED**: Requests pass; failures tracked.
 - **OPEN**: Requests immediately rejected for `timeout_seconds`.
@@ -304,20 +321,36 @@ Composite health endpoint reporting:
 
 ## 8. Security Architecture
 
-### 7.2 Defense in Depth
-1. **Network Layer**: IP whitelist/blacklist at rate limiter level.
-2. **Authentication Layer**: Per-endpoint auth enforcement.
-3. **Authorization Layer**: Scopes and roles in JWT claims.
-4. **Input Validation**: Method, size, content-type, CORS.
-5. **Output Sanitization**: Response transformation, security headers.
-6. **Audit Logging**: Every request logged with identity and outcome.
+### 8.1 Defense in Depth
 
-### 7.3 CORS Handling
+```
+┌─────────────────────────────────────────┐
+│ Layer 1: Network                        │
+│  IP whitelist/blacklist at rate limiter │
+├─────────────────────────────────────────┤
+│ Layer 2: Authentication                 │
+│  Per-endpoint auth enforcement          │
+├─────────────────────────────────────────┤
+│ Layer 3: Authorization                  │
+│  Scopes and roles in JWT claims         │
+├─────────────────────────────────────────┤
+│ Layer 4: Input Validation               │
+│  Method, size, content-type, CORS       │
+├─────────────────────────────────────────┤
+│ Layer 5: Output Sanitization            │
+│  Response transformation, security hdrs │
+├─────────────────────────────────────────┤
+│ Layer 6: Audit Logging                  │
+│  Every request logged with identity     │
+└─────────────────────────────────────────┘
+```
+
+### 8.2 CORS Handling
 - Preflight `OPTIONS` requests automatically answered.
 - `Access-Control-Allow-Origin` dynamically set from `cors_origins`.
 - `Access-Control-Allow-Credentials` configurable per endpoint.
 
-### 7.4 Security Headers
+### 8.3 Security Headers
 - `Strict-Transport-Security: max-age=31536000; includeSubDomains`
 - `X-Frame-Options: DENY`
 - `X-Content-Type-Options: nosniff`
@@ -406,10 +439,467 @@ Composite health endpoint reporting:
 | 401 on valid requests | JWT expiry or key mismatch | Check `jwt_secret`, token `exp`, and `authorization` header format |
 | Cache stale | TTL too long | Reduce `cache_ttl_seconds` or use `invalidate_cache()` |
 | High latency | Upstream slow | Review upstream service performance or decrease `timeout_ms` |
+| CORS errors | Origin not in allowed list | Add origin to `cors_origins` in endpoint config |
+| Circuit breaker open | Upstream failing | Wait for timeout or fix upstream service |
 
-## 13. Future Roadmap
+## 13. Design Patterns
+
+### 13.1 Pipeline Pattern
+Every request flows through a sequential pipeline of middleware stages. Each stage can modify, reject, or pass the request forward.
+
+### 13.2 Circuit Breaker Pattern
+Prevents cascade failures by wrapping upstream calls in a state machine that opens the circuit after consecutive failures.
+
+### 13.3 Strategy Pattern
+Rate limiting, load balancing, and authentication each use interchangeable strategy implementations.
+
+### 13.4 Plugin Pattern
+Middleware-like hooks at request/response/error boundaries allow custom behavior without modifying core gateway logic.
+
+## 14. Future Roadmap
 
 - **Phase 1**: Full-rate-limiting, auth, routing, circuit breaker, caching (completed).
 - **Phase 2**: Distributed cache (Redis), cluster state sharing, gRPC gateway support.
 - **Phase 3**: API keys management UI, service mesh integration (Istio/Linkerd).
 - **Phase 4**: AI-driven anomaly detection, auto-tuned rate limits, predictive circuit breaking.
+
+---
+
+## 15. Rate Limiting Algorithm Details
+
+### Token Bucket
+
+```
+Capacity: 10 tokens
+Refill Rate: 2 tokens/second
+
+Time 0: [●●●●●●●●●●] 10 tokens
+Time 1: Request 3 → [●●●●●●●●] 7 tokens
+Time 2: Request 5 → [●●●●] 2 tokens
+Time 3: Refill +2 → [●●●●●●] 6 tokens
+Time 4: Request 8 → [●●] 2 tokens (7 allowed, 1 rejected)
+```
+
+Configuration:
+```python
+TokenBucketConfig(
+    capacity=100,           # Max burst size
+    refill_rate=10,         # Tokens per second
+    refill_interval=1.0,    # Seconds between refills
+)
+```
+
+### Sliding Window
+
+```
+Window Size: 60 seconds
+Max Requests: 100
+
+Request Log (sorted timestamps):
+[1000, 1200, 1500, 2000, 2500, ...]
+
+Current Time: 5000
+Window Start: 5000 - 60000 = -55000
+
+Count requests where timestamp > window_start:
+Result: 45 requests → ALLOW (45 < 100)
+```
+
+### Fixed Window
+
+```
+Window Size: 60 seconds
+Max Requests: 100
+Window Start: Every 60 seconds (0, 60, 120, ...)
+
+Window [0-60]: 87 requests → ALLOW
+Window [60-120]: 102 requests → REJECT (2 over limit)
+```
+
+### Leaky Bucket
+
+```
+Bucket Capacity: 10
+Leak Rate: 2/second
+
+Input: [5, 3, 8, 2] requests at t=0,1,2,3
+
+t=0: Add 5 → [●●●●●] (5 in bucket)
+t=1: Leak 2, Add 3 → [●●●●●●] (6 in bucket)
+t=2: Leak 2, Add 8 → [●●●●●●●●●●] (10, full; 4 rejected)
+t=3: Leak 2, Add 2 → [●●●●●●●●] (8 in bucket)
+```
+
+---
+
+## 16. Authentication Flow Details
+
+### API Key Authentication
+
+```
+Request: Authorization: Bearer ak_abc123def456
+
+1. Extract key from header
+2. Hash key → lookup in registered_keys dict
+3. Check:
+   - expired? → 401
+   - ip_restricted? → 403 if IP not in allowed list
+   - scope includes endpoint? → 403 if not
+4. Attach key metadata to request context
+5. Proceed to next middleware
+```
+
+### JWT Authentication
+
+```
+Request: Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+
+1. Split header → extract token
+2. Base64-decode header → verify algorithm
+3. Base64-decode payload → check:
+   - exp > now? → 401 if expired
+   - iss matches expected issuer? → 401 if not
+   - aud includes this service? → 401 if not
+   - nbf <= now? → 401 if not yet valid
+4. Verify signature (HMAC or RSA)
+5. Extract claims → attach to request context
+6. Proceed to next middleware
+```
+
+### OAuth2 Bearer Token
+
+```
+Request: Authorization: Bearer oauth2_token_xyz
+
+1. Extract token from header
+2. Pass to external IdP for validation
+3. IdP returns:
+   - User identity
+   - Scopes/roles
+   - Token expiry
+4. Cache validation result (TTL: 5 minutes)
+5. Attach to request context
+6. Proceed to next middleware
+```
+
+---
+
+## 17. Cache Implementation Details
+
+### Cache Key Generation
+
+```python
+def generate_cache_key(request):
+    """Generate deterministic cache key from request."""
+    parts = [
+        request.method,
+        request.path,
+        sorted(request.query_params.items()),
+        # Headers that affect response (Accept, Accept-Language)
+        request.headers.get("Accept", ""),
+    ]
+    return hashlib.sha256(json.dumps(parts).encode()).hexdigest()
+```
+
+### Cache Invalidation Patterns
+
+```python
+# Exact key
+cache.invalidate("GET:/api/users/123")
+
+# Pattern match (regex)
+cache.invalidate(r"GET:/api/users/.*")
+
+# By prefix
+cache.invalidate_prefix("GET:/api/")
+
+# Full flush
+cache.clear()
+```
+
+### Stale-While-Revalidate
+
+```
+Cache Entry:
+  key: "GET:/api/products"
+  value: {"products": [...]}
+  created_at: 2026-07-06T10:00:00Z
+  ttl: 300 seconds
+  stale_ttl: 60 seconds  # Serve stale for 60s after TTL
+
+Request at T+350s (within stale window):
+  → Return stale data immediately
+  → Trigger background revalidation
+  → Update cache with fresh data
+
+Request at T+370s (beyond stale window):
+  → Return 503 or revalidate synchronously
+```
+
+---
+
+## 18. Circuit Breaker Configuration Guide
+
+### Failure Threshold Tuning
+
+| Scenario | failure_threshold | success_threshold | timeout_seconds |
+|----------|-------------------|-------------------|-----------------|
+| Critical service | 3 | 2 | 30 |
+| Standard service | 5 | 3 | 60 |
+| Non-critical | 10 | 5 | 120 |
+| External API | 5 | 3 | 120 |
+
+### Monitoring Window
+
+```python
+CircuitBreakerConfig(
+    failure_threshold=5,
+    success_threshold=3,
+    timeout_seconds=60,
+    half_open_requests=3,
+    monitoring_window_seconds=300,  # 5-minute rolling window
+)
+```
+
+### State Transition Rules
+
+```
+CLOSED → OPEN:
+  When: failures_in_window >= failure_threshold
+  Effect: All requests rejected for timeout_seconds
+
+OPEN → HALF_OPEN:
+  When: timeout_seconds elapsed
+  Effect: Allow half_open_requests probe requests
+
+HALF_OPEN → CLOSED:
+  When: success_count >= success_threshold
+  Effect: Resume normal traffic
+
+HALF_OPEN → OPEN:
+  When: any probe request fails
+  Effect: Reset timeout, reject all again
+```
+
+---
+
+## 19. Load Balancer Strategy Selection
+
+| Strategy | Use Case | Pros | Cons |
+|----------|----------|------|------|
+| Round Robin | Equal-capacity servers | Simple, fair | Ignores load |
+| Weighted RR | Heterogeneous servers | Proportional | Weight management |
+| Least Connections | Variable request times | Balanced load | Connection counting overhead |
+| IP Hash | Session affinity | Sticky sessions | Uneven distribution |
+| Consistent Hash | Cache affinity | Minimal reshuffling | Hash function dependency |
+| Random | Stateless services | Zero overhead | Potential imbalance |
+
+### Health Check Integration
+
+```python
+# Health check configuration per upstream
+upstream = UpstreamServer(
+    url="http://service-a:8080",
+    health_check_path="/health",
+    health_check_interval=30,  # seconds
+    healthy_threshold=3,       # consecutive successes
+    unhealthy_threshold=2,     # consecutive failures
+)
+```
+
+---
+
+## 20. Request/Response Transformation Examples
+
+### JSON Field Renaming
+
+```python
+# Request transform: rename "user_id" to "userId"
+request_transform = {
+    "type": "rename_fields",
+    "mappings": {"user_id": "userId", "created_at": "createdAt"}
+}
+```
+
+### Value Mapping
+
+```python
+# Response transform: map status codes
+response_transform = {
+    "type": "value_map",
+    "field": "status",
+    "mapping": {"active": "ACTIVE", "inactive": "INACTIVE"}
+}
+```
+
+### Field Masking
+
+```python
+# Mask sensitive fields in response
+response_transform = {
+    "type": "mask_fields",
+    "fields": ["email", "phone", "ssn"],
+    "mask_char": "*",
+    "show_first": 3,
+    "show_last": 2
+}
+# "john.doe@example.com" → "joh***@e***.com"
+```
+
+### Base64 Encoding
+
+```python
+# Request transform: encode body
+request_transform = {
+    "type": "base64_encode",
+    "field": "body"
+}
+```
+
+---
+
+## 21. Security Headers Reference
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` | Force HTTPS |
+| `X-Frame-Options` | `DENY` | Prevent clickjacking |
+| `X-Content-Type-Options` | `nosniff` | Prevent MIME sniffing |
+| `X-XSS-Protection` | `1; mode=block` | XSS filter |
+| `Content-Security-Policy` | `default-src 'self'` | Resource policy |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Referrer control |
+| `Permissions-Policy` | `camera=(), microphone=()` | Feature policy |
+
+---
+
+## 22. CORS Configuration Guide
+
+### Simple Request
+
+```
+Request:
+  Origin: https://app.example.com
+  Method: GET
+  Headers: Content-Type
+
+Response:
+  Access-Control-Allow-Origin: https://app.example.com
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE
+  Access-Control-Allow-Headers: Content-Type, Authorization
+  Access-Control-Max-Age: 86400
+```
+
+### Preflight Request
+
+```
+Request (OPTIONS):
+  Origin: https://app.example.com
+  Access-Control-Request-Method: POST
+  Access-Control-Request-Headers: Content-Type, Authorization
+
+Response:
+  Access-Control-Allow-Origin: https://app.example.com
+  Access-Control-Allow-Methods: POST
+  Access-Control-Allow-Headers: Content-Type, Authorization
+  Access-Control-Max-Age: 86400
+```
+
+### CORS Misconfiguration Prevention
+
+```python
+# Bad: wildcard with credentials
+cors_origins = ["*"]  # NEVER with credentials
+
+# Good: explicit origins
+cors_origins = ["https://app.example.com", "https://admin.example.com"]
+
+# Good: regex for subdomains
+cors_origins = [r"https://.*\.example\.com"]
+```
+
+---
+
+## 23. Plugin Development Guide
+
+### Creating a Custom Plugin
+
+```python
+from agents.api_gateway.plugins import Plugin
+
+class RateTrackingPlugin(Plugin):
+    """Track request rates per endpoint for custom analytics."""
+
+    def __init__(self):
+        self.request_counts = {}
+
+    def on_request(self, request):
+        endpoint = request.path
+        self.request_counts[endpoint] = self.request_counts.get(endpoint, 0) + 1
+        return request
+
+    def on_response(self, request, response):
+        # Add rate header
+        endpoint = request.path
+        response.headers["X-Request-Count"] = str(self.request_counts.get(endpoint, 0))
+        return response
+
+    def on_error(self, request, error):
+        # Log error for rate tracking
+        return {"error": str(error), "status": 500}
+```
+
+### Plugin Registration
+
+```python
+from agents.api_gateway.plugins import PluginManager
+
+manager = PluginManager()
+manager.register(RateTrackingPlugin())
+manager.register(AuthLoggingPlugin())
+manager.register(CustomMetricsPlugin())
+
+# Plugins execute in registration order
+gateway = APIGateway(plugin_manager=manager)
+```
+
+---
+
+## 24. Analytics Dashboard Metrics
+
+### Request Distribution
+
+```
+Endpoint Breakdown (Last Hour):
+┌─────────────────────┬────────┬──────────┬──────────┐
+│ Endpoint            │ Count  │ Avg (ms) │ Errors   │
+├─────────────────────┼────────┼──────────┼──────────┤
+│ GET /api/users      │ 1,247  │ 12ms     │ 3 (0.2%) │
+│ POST /api/orders    │   892  │ 45ms     │ 12 (1.3%)│
+│ GET /api/products   │ 3,456  │ 8ms      │ 0 (0.0%) │
+│ PUT /api/cart       │   234  │ 23ms     │ 5 (2.1%) │
+└─────────────────────┴────────┴──────────┴──────────┘
+```
+
+### Latency Percentiles
+
+```
+Latency Distribution (GET /api/users):
+  p50:  10ms
+  p75:  15ms
+  p90:  22ms
+  p95:  35ms
+  p99:  89ms
+  max: 234ms
+```
+
+### Cache Performance
+
+```
+Cache Stats:
+  Total Keys: 1,456
+  Hit Rate: 87.3%
+  Miss Rate: 12.7%
+  Evictions: 234
+  Memory Used: 45.2 MB
+  Memory Limit: 100 MB
+```

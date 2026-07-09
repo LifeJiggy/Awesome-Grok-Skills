@@ -405,4 +405,423 @@ The agent integrates with:
 
 ---
 
+## Advanced Analytics
+
+### Cohort Analysis
+
+```python
+# Analyze customer cohorts by signup month
+cohort_analysis = agent.analytics.cohort_analysis(
+    cohort_field="signup_month",
+    metric="retention_rate",
+    periods=12,
+)
+# Returns retention curves for each cohort
+
+# Visualize cohort retention
+for cohort, retention_data in cohort_analysis.items():
+    print(f"Cohort {cohort}: {[f'{r:.1f}%' for r in retention_data]}")
+```
+
+### Revenue Forecasting
+
+```python
+# Forecast revenue based on current trends
+forecast = agent.metrics.forecast_revenue(
+    current_mrr=8840,
+    growth_rate=0.15,
+    churn_rate=0.05,
+    months=12,
+    scenarios={
+        "optimistic": {"growth": 0.25, "churn": 0.03},
+        "base": {"growth": 0.15, "churn": 0.05},
+        "pessimistic": {"growth": 0.08, "churn": 0.08},
+    },
+}
+```
+
+---
+
+## Advanced Analytics
+
+### Cohort Analysis
+
+```python
+# Analyze customer cohorts by signup month
+cohort_analysis = agent.analytics.cohort_analysis(
+    cohort_field="signup_month",
+    metric="retention_rate",
+    periods=12,
+)
+
+# Visualize cohort retention
+for cohort, retention_data in cohort_analysis.items():
+    print(f"Cohort {cohort}: {[f'{r:.1f}%' for r in retention_data]}")
+```
+
+### Revenue Forecasting
+
+```python
+# Forecast revenue based on current trends
+forecast = agent.metrics.forecast_revenue(
+    current_mrr=8840,
+    growth_rate=0.15,
+    churn_rate=0.05,
+    months=12,
+    scenarios={
+        "optimistic": {"growth": 0.25, "churn": 0.03},
+        "base": {"growth": 0.15, "churn": 0.05},
+        "pessimistic": {"growth": 0.08, "churn": 0.08},
+    },
+)
+
+print(f"12-month forecast:")
+print(f"  Optimistic: ${forecast['optimistic']['mrr']:,.0f}/mo")
+print(f"  Base:       ${forecast['base']['mrr']:,.0f}/mo")
+print(f"  Pessimistic: ${forecast['pessimistic']['mrr']:,.0f}/mo")
+```
+
+### Customer Segmentation Deep Dive
+
+```python
+# RFM Analysis (Recency, Frequency, Monetary)
+rfm_segments = agent.segmenter.rfm_analysis(
+    customers=active_customers,
+    recency_bins=5,
+    frequency_bins=5,
+    monetary_bins=5,
+)
+
+# Segment definitions
+segments = {
+    "champions": {"recency": "5", "frequency": "5", "monetary": "5"},
+    "loyal": {"recency": "4-5", "frequency": "4-5", "monetary": "3-5"},
+    "at_risk": {"recency": "1-2", "frequency": "3-5", "monetary": "3-5"},
+    "hibernating": {"recency": "1-2", "frequency": "1-2", "monetary": "1-2"},
+    "new_customers": {"recency": "5", "frequency": "1", "monetary": "1"},
+}
+```
+
+---
+
+## Growth Playbooks
+
+### Launch Playbook
+
+```
+Week -4: Pre-Launch
+├── Set up analytics (Mixpanel/GA4)
+├── Create landing page with email capture
+├── Build waitlist of 100+ interested users
+└── Prepare launch content (blog, social, email)
+
+Week -2: Soft Launch
+├── Invite beta testers (10-20 users)
+├── Collect feedback and fix critical bugs
+├── Optimize onboarding flow
+└── Prepare support documentation
+
+Week 0: Launch
+├── Product Hunt launch (schedule for Tuesday)
+├── Hacker News Show HN post
+├── Email waitlist
+├── Social media announcements
+└── Reach out to press/influencers
+
+Week +1: Post-Launch
+├── Monitor metrics hourly
+├── Respond to all feedback within 24 hours
+├── Fix critical bugs immediately
+├── Share launch results publicly
+└── Follow up with early adopters
+```
+
+### Retention Playbook
+
+```
+Day 0: Welcome
+├── Send welcome email with quick start guide
+├── Trigger onboarding automation
+└── Schedule 3-day check-in
+
+Day 3: Engagement
+├── Check if user completed first value action
+├── If not, send helpful tips email
+└── If yes, celebrate and suggest next feature
+
+Day 7: Habit Formation
+├── Review usage patterns
+├── Send "Here's what you've accomplished" email
+└── Introduce advanced features
+
+Day 14: Value Reinforcement
+├── Share ROI metrics (time saved, etc.)
+├── Ask for feedback (NPS survey)
+└── Offer help if usage is low
+
+Day 30: Loyalty
+├── Review monthly usage report
+├── Offer upgrade if hitting limits
+├── Invite to community/slack
+└── Ask for testimonial/referral
+```
+
+---
+
+## Monetization Strategies
+
+### Pricing Model Comparison
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              Pricing Model Decision Matrix                   │
+├──────────────┬──────────────┬──────────────┬────────────────┤
+│ Model        │ Best For     │ Pros         │ Cons           │
+├──────────────┼──────────────┼──────────────┼────────────────┤
+│ Freemium     │ Viral growth │ Low CAC      │ Low conversion │
+│ Free Trial   │ B2B SaaS     │ Quality leads│ High support   │
+│ Usage-Based  │ API/Infra    │ Scales w/    │ Revenue unsure │
+│              │              │ value        │                │
+│ Seat-Based   │ Team tools   │ Predictable  │ Limits adoption│
+│ Flat Rate    │ Simple tools │ Easy to sell │ Leaves money   │
+│              │              │              │ on table       │
+│ Tiered       │ Most SaaS    │ Captures all │ Complex to     │
+│              │              │ segments     │ manage         │
+└──────────────┴──────────────┴──────────────┴────────────────┘
+```
+
+### Price Optimization Framework
+
+```python
+def optimize_pricing(agent, current_tiers):
+    """Run price optimization analysis."""
+
+    # 1. Analyze current conversion rates by tier
+    conversions = agent.pricing.get_conversion_rates()
+
+    # 2. Survey willingness to pay
+    wtp = agent.pricing.willingness_to_pay_survey(
+        sample_size=100,
+        questions=["How much would you pay for X?"],
+    )
+
+    # 3. Competitive analysis
+    competitors = agent.pricing.compare_competitor_pricing([
+        {"name": "Competitor A", "price": 29},
+        {"name": "Competitor B", "price": 49},
+        {"name": "Competitor C", "price": 99},
+    ])
+
+    # 4. Calculate price elasticity
+    elasticity = agent.pricing.calculate_price_elasticity(
+        current_price=current_tiers["pro"]["price"],
+        new_price=current_tiers["pro"]["price"] * 1.2,
+        current_demand=conversions["pro"]["count"],
+    )
+
+    # 5. Generate recommendations
+    recommendations = agent.pricing.generate_recommendations(
+        conversions=conversions,
+        wtp=wtp,
+        competitors=competitors,
+        elasticity=elasticity,
+    )
+
+    return recommendations
+```
+
+---
+
+## Technical Architecture
+
+### Data Flow Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         Data Flow Architecture                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  External Sources                    Internal Processing                     │
+│  ┌──────────────┐                   ┌──────────────────┐                    │
+│  │ Stripe       │──── webhooks ────►│ Event Processor  │                    │
+│  │ Analytics    │──── API ─────────►│                  │                    │
+│  │ CRM          │──── sync ────────►│ ┌──────────────┐ │                    │
+│  └──────────────┘                   │ │ Validation   │ │                    │
+│                                     │ └──────┬───────┘ │                    │
+│                                     │        │         │                    │
+│                                     │ ┌──────▼───────┐ │                    │
+│                                     │ │ Transform    │ │                    │
+│                                     │ └──────┬───────┘ │                    │
+│                                     │        │         │                    │
+│                                     │ ┌──────▼───────┐ │                    │
+│                                     │ │ Enrich       │ │                    │
+│                                     │ └──────┬───────┘ │                    │
+│                                     │        │         │                    │
+│                                     │ ┌──────▼───────┐ │                    │
+│                                     │ │ Store        │ │                    │
+│                                     │ └──────────────┘ │                    │
+│                                     └──────────────────┘                    │
+│                                              │                              │
+│                                     ┌────────▼────────┐                     │
+│                                     │   Analytics     │                     │
+│                                     │   Engine        │                     │
+│                                     └────────┬────────┘                     │
+│                                              │                              │
+│                              ┌───────────────┼───────────────┐              │
+│                              │               │               │              │
+│                         ┌────▼────┐    ┌─────▼────┐   ┌─────▼────┐        │
+│                         │ Dashboard│   │ Reports  │   │ Alerts   │        │
+│                         └─────────┘    └──────────┘   └──────────┘        │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Event-Driven Architecture
+
+```python
+# Event types and handlers
+event_handlers = {
+    "customer.signup": [
+        "send_welcome_email",
+        "create_trial_subscription",
+        "add_to_onboarding_sequence",
+        "update_metrics",
+    ],
+    "customer.churn": [
+        "send_winback_email",
+        "update_churn_metrics",
+        "trigger_retention_analysis",
+        "notify_success_team",
+    ],
+    "subscription.upgraded": [
+        "send_upgrade_confirmation",
+        "update_mrr",
+        "track_conversion",
+        "unlock_features",
+    ],
+    "experiment.completed": [
+        "analyze_results",
+        "notify_stakeholders",
+        "update_recommendations",
+        "archive_experiment",
+    ],
+}
+```
+
+---
+
+## Scaling Strategies
+
+### From $0 to $1K MRR
+
+```
+Focus: Product-Market Fit
+├── Talk to 50+ potential customers
+├── Build MVP in 2-4 weeks
+├── Launch to small audience
+├── Iterate based on feedback
+└── Target: 10 paying customers
+
+Key Metrics:
+- Activation rate > 40%
+- Day 7 retention > 30%
+- NPS > 30
+```
+
+### From $1K to $10K MRR
+
+```
+Focus: Growth Channels
+├── Double down on what works
+├── Build content marketing machine
+├── Implement referral program
+├── Optimize conversion funnel
+└── Target: 100 paying customers
+
+Key Metrics:
+- CAC < $100
+- LTV > $300
+- Payback < 3 months
+```
+
+### From $10K to $100K MRR
+
+```
+Focus: Scaling Operations
+├── Hire first employees
+├── Build customer success function
+├── Implement advanced analytics
+├── Expand to adjacent markets
+└── Target: 1000 paying customers
+
+Key Metrics:
+- Quick Ratio > 4
+- Net Revenue Retention > 110%
+- Gross Margin > 70%
+```
+
+---
+
+## Advanced Analytics
+
+### Cohort Analysis
+
+```python
+# Analyze customer cohorts by signup month
+cohort_analysis = agent.analytics.cohort_analysis(
+    cohort_field="signup_month",
+    metric="retention_rate",
+    periods=12,
+)
+
+# Visualize cohort retention
+for cohort, retention_data in cohort_analysis.items():
+    print(f"Cohort {cohort}: {[f'{r:.1f}%' for r in retention_data]}")
+```
+
+### Revenue Forecasting
+
+```python
+# Forecast revenue based on current trends
+forecast = agent.metrics.forecast_revenue(
+    current_mrr=8840,
+    growth_rate=0.15,
+    churn_rate=0.05,
+    months=12,
+    scenarios={
+        "optimistic": {"growth": 0.25, "churn": 0.03},
+        "base": {"growth": 0.15, "churn": 0.05},
+        "pessimistic": {"growth": 0.08, "churn": 0.08},
+    },
+)
+
+print(f"12-month forecast:")
+print(f"  Optimistic: ${forecast['optimistic']['mrr']:,.0f}/mo")
+print(f"  Base:       ${forecast['base']['mrr']:,.0f}/mo")
+print(f"  Pessimistic: ${forecast['pessimistic']['mrr']:,.0f}/mo")
+```
+
+### Customer Segmentation Deep Dive
+
+```python
+# RFM Analysis (Recency, Frequency, Monetary)
+rfm_segments = agent.segmenter.rfm_analysis(
+    customers=active_customers,
+    recency_bins=5,
+    frequency_bins=5,
+    monetary_bins=5,
+)
+
+# Segment definitions
+segments = {
+    "champions": {"recency": "5", "frequency": "5", "monetary": "5"},
+    "loyal": {"recency": "4-5", "frequency": "4-5", "monetary": "3-5"},
+    "at_risk": {"recency": "1-2", "frequency": "3-5", "monetary": "3-5"},
+    "hibernating": {"recency": "1-2", "frequency": "1-2", "monetary": "1-2"},
+    "new_customers": {"recency": "5", "frequency": "1", "monetary": "1"},
+}
+```
+
+---
+
 *Empowering indie hackers to build better businesses, one decision at a time.*

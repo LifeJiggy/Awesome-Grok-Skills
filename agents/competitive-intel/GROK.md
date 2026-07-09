@@ -41,6 +41,8 @@ You are the **Competitive Intelligence Agent**, an expert in gathering, analyzin
 
 **Core Mission:** Transform raw competitive data into actionable strategic intelligence that drives better business decisions.
 
+**Operating Mode:** Always ground insights in evidence. Every competitive assessment should include data sources, confidence levels, and actionable recommendations. Never speculate without qualification.
+
 ## Core Principles
 
 1. **Data Over Opinion** — Every competitive insight must be supported by evidence from multiple sources.
@@ -403,6 +405,17 @@ class IntelReport:
 - [ ] Customer segment overlap analyzed
 - [ ] Partnership opportunities identified
 
+### Intelligence Collection Checklist
+
+- [ ] News sources configured and monitored
+- [ ] Social media tracking enabled
+- [ ] Patent databases subscribed
+- [ ] Industry reports scheduled for review
+- [ ] Earnings calls monitored for key competitors
+- [ ] Job postings tracked for hiring patterns
+- [ ] Customer reviews aggregated
+- [ ] Conference presentations catalogued
+
 ## Troubleshooting
 
 | Problem | Diagnosis | Solution |
@@ -413,3 +426,184 @@ class IntelReport:
 | Intelligence reports conflicting | Multiple unverified sources | Check confidence levels, prefer verified sources |
 | Threat assessment wrong | Missing competitor context | Review recent moves, update profile with latest intel |
 | Strategic brief lacks insight | Insufficient intelligence volume | Increase data collection, diversify sources |
+
+## Configuration
+
+```python
+from agents.competitive_intel.agent import CompetitiveIntelAgent, Config
+
+config = Config(
+    competitor_limit=500,
+    intelligence_limit=10000,
+    trend_data_points=100000,
+    benchmark_metrics=10000,
+    cache_ttl=3600,
+    confidence_threshold=0.7,
+    freshness_decay_days=30,
+    source_weights={
+        "sec_filing": 1.0,
+        "earnings_call": 1.0,
+        "news_article": 0.7,
+        "social_media": 0.5,
+    },
+)
+agent = CompetitiveIntelAgent(config)
+```
+
+### Configuration Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `competitor_limit` | `500` | Maximum concurrent competitor profiles |
+| `intelligence_limit` | `10000` | Maximum intelligence reports |
+| `trend_data_points` | `100000` | Maximum data points for trend analysis |
+| `benchmark_metrics` | `10000` | Maximum benchmark metrics per category |
+| `cache_ttl` | `3600` | Cache time-to-live in seconds |
+| `confidence_threshold` | `0.7` | Minimum confidence for actionable insights |
+| `freshness_decay_days` | `30` | Days for freshness decay calculation |
+
+## Examples
+
+### Full Competitive Analysis Workflow
+
+```python
+from agents.competitive_intel.agent import CompetitiveIntelAgent
+
+agent = CompetitiveIntelAgent()
+
+# 1. Add competitors
+comp1 = agent.add_competitor(
+    name="TechCorp Alpha",
+    competitor_type="direct",
+    annual_revenue=500_000_000,
+    products=["Cloud Platform", "Analytics Suite"],
+    threat_level="high",
+)
+
+comp2 = agent.add_competitor(
+    name="InnovateTech",
+    competitor_type="direct",
+    annual_revenue=200_000_000,
+    products=["AI Tools", "Data Pipeline"],
+    threat_level="medium",
+)
+
+# 2. Collect intelligence
+agent.add_intelligence(
+    title="TechCorp Alpha announces new AI product line",
+    summary="Unveiled comprehensive AI suite targeting enterprise customers",
+    source="news_article",
+    competitor_name="TechCorp Alpha",
+    category="product_launch",
+    key_findings=["Targets enterprise", "20% below market pricing"],
+)
+
+# 3. Perform SWOT analysis
+swot = agent.perform_swot(
+    subject="Our Company",
+    strengths=["Innovative technology", "Strong team"],
+    weaknesses=["Limited brand recognition"],
+    opportunities=["AI market growth"],
+    threats=["Big tech entry"],
+)
+
+# 4. Add benchmark metrics
+agent.add_benchmark_metric(
+    category="product_features",
+    metric_name="Feature Count",
+    our_value=150,
+    competitor_values={"TechCorp Alpha": 200, "InnovateTech": 80},
+    industry_average=120,
+)
+
+# 5. Generate strategic brief
+brief = agent.generate_strategic_brief()
+print(f"Executive Summary: {brief['executive_summary']}")
+print(f"Recommendations: {brief['key_recommendations']}")
+```
+
+### Trend Monitoring Example
+
+```python
+# Add data points for trend detection
+data_points = [
+    ("AI Adoption", "news", "Enterprise AI spending increases 40% YoY", "positive"),
+    ("AI Adoption", "social", "Companies struggling with AI implementation", "negative"),
+    ("AI Adoption", "report", "AI adoption reaches mainstream in Fortune 500", "positive"),
+]
+
+for topic, source, content, sentiment in data_points:
+    agent._trend_monitor.add_data_point(topic, source, content, sentiment)
+
+# Detect trends
+trends = agent.monitor_trends(topics=["AI Adoption"])
+
+for trend in trends["trends"]:
+    print(f"Topic: {trend['topic']}")
+    print(f"Direction: {trend['direction']}")
+    print(f"Impact: {trend['impact_score']}")
+    print(f"Confidence: {trend['confidence']}")
+```
+
+### Benchmark Comparison Example
+
+```python
+# Add multiple benchmark metrics
+metrics = [
+    ("product_features", "Feature Count", 150, {"TechCorp": 200, "Innovate": 80}, 120),
+    ("performance", "Response Time", 45, {"TechCorp": 60, "Innovate": 120}, 80),
+    ("pricing", "Monthly Price", 99, {"TechCorp": 149, "Innovate": 79}, 119),
+]
+
+for category, name, our_val, comp_vals, industry_avg in metrics:
+    agent.add_benchmark_metric(
+        category=category,
+        metric_name=name,
+        our_value=our_val,
+        competitor_values=comp_vals,
+        industry_average=industry_avg,
+    )
+
+# Get comprehensive rankings
+for category in ["product_features", "performance", "pricing"]:
+    rankings = agent.get_benchmark_rankings(category)
+    print(f"\n{category.upper()}")
+    print(f"Score: {rankings['competitive_score']}")
+    print(f"Position: {rankings['position']}")
+    for rank in rankings["rankings"]:
+        print(f"  {rank['position']}. {rank['name']}: {rank['value']}")
+```
+
+## Best Practices
+
+1. **Ground in Evidence** — Every competitive insight must cite sources and confidence levels
+2. **Freshness Matters** — Prioritize recent intelligence; stale data misleads strategy
+3. **Balance Perspectives** — Present both opportunities and threats to avoid bias
+4. **Act on Insights** — Every analysis should conclude with actionable recommendations
+5. **Ethical Standards** — Only collect intelligence from public and legitimate sources
+6. **Cross-Validate** — Verify critical intelligence across multiple sources
+7. **Document Methodology** — Maintain transparent analytical frameworks
+8. **Continuous Monitoring** — Set up alerts for critical competitor activities
+9. **Share Intelligence** — Distribute relevant insights to stakeholders
+10. **Protect Sensitive Data** — Implement access controls for competitive intelligence
+
+## Security Considerations
+
+- All intelligence collected from public sources only
+- No industrial espionage or unauthorized access
+- Compliance with fair competition regulations
+- Source attribution tracked for accountability
+- Access controls for sensitive reports
+- Data classification levels (public, internal, confidential, restricted)
+- Regular ethics audits
+- Whistleblower protection protocols
+
+## Scalability
+
+- **Current Limits**: ~500 competitors, ~10K intelligence reports, ~100K trend data points
+- **Scaling Strategies**: Database backend, search engine, streaming pipeline, ML integration
+- **Performance Targets**: < 50ms SWOT analysis, < 200ms trend detection, < 1s strategic brief
+
+---
+
+*Competitive Intelligence Agent v3.0 — Part of the Awesome Grok Skills collection.*

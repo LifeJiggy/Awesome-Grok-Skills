@@ -16,6 +16,11 @@
 - [Configuration](#configuration)
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
+- [Security Considerations](#security-considerations)
+- [Performance](#performance)
+- [Design Patterns](#design-patterns)
+- [Scalability](#scalability)
+- [Files](#files)
 - [License](#license)
 
 ---
@@ -31,6 +36,17 @@ The Hunting Agent provides a complete threat hunting toolkit for security operat
 - **MITRE-Aligned**: Map activity to ATT&CK framework
 - **Actionable**: Clear recommendations for every finding
 - **Measurable**: Track hunt metrics for program improvement
+
+### When to Use
+
+| Scenario | Component |
+|----------|-----------|
+| Investigating suspicious network traffic | NetworkAnalyzer + LogAnalyzer |
+| Correlating IOCs across data sources | IOCManager + ThreatIntelCorrelator |
+| Building detection rules | DetectionEngine |
+| Managing a threat hunt from hypothesis to report | HuntOrchestrator |
+| Triaging incoming security alerts | AlertManager |
+| Analyzing anomalous log patterns | LogAnalyzer |
 
 ---
 
@@ -106,14 +122,25 @@ report = orch.generate_report(hunt.hunt_id)
 │                                                                   │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────┐  │
 │  │  IOCManager       │  │  LogAnalyzer      │  │NetworkAnalyzer│  │
+│  │                   │  │                   │  │               │  │
+│  │ • Add/Remove IOCs │  │ • Ingest logs     │  │ • Flow track  │  │
+│  │ • Search/Filter   │  │ • Anomaly detect  │  │ • JA3 match   │  │
+│  │ • STIX export     │  │ • Volume analysis │  │ • Lateral move│  │
+│  │ • Stats           │  │ • Source tracking │  │ • Top talkers │  │
 │  └──────────────────┘  └──────────────────┘  └───────────────┘  │
 │                                                                   │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────┐  │
 │  │DetectionEngine    │  │HuntOrchestrator   │  │ AlertManager  │  │
+│  │                   │  │                   │  │               │  │
+│  │ • Sigma rules     │  │ • Hypotheses      │  │ • Triage      │  │
+│  │ • Log matching    │  │ • Phase tracking  │  │ • Assignment  │  │
+│  │ • Rule stats      │  │ • Report gen      │  │ • Resolution  │  │
+│  │ • Effectiveness   │  │ • MITRE mapping   │  │ • SLA track   │  │
 │  └──────────────────┘  └──────────────────┘  └───────────────┘  │
 │                                                                   │
 │  ┌───────────────────────────────────────────────────────────┐   │
 │  │              ThreatIntelCorrelator                         │   │
+│  │  • Actor profiles  • IOC correlation  • Active tracking   │   │
 │  └───────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -358,6 +385,66 @@ The agent uses sensible defaults. Key configurable parameters:
 | Alert fatigue | Adjust severity thresholds; batch low-severity alerts |
 | Hunt stalls | Add additional log sources; broaden data collection |
 | Report incomplete | Review hunt documentation; ensure findings are recorded |
+| STIX export errors | Verify IOC format matches STIX specification |
+| JA3 hash mismatch | Check TLS version and cipher suite compatibility |
+| Network flow data missing | Ensure pcap capture covers full time range |
+| Duplicate alerts | Check dedup window settings; increase if needed |
+| Actor correlation fails | Verify IOC format matches actor profile IOCs |
+| Rule match rate low | Review log source coverage; adjust pattern matching |
+
+---
+
+## Security Considerations
+
+- IOCs may contain sensitive infrastructure details — handle with care
+- Hunt reports may contain classified detection capabilities
+- Threat actor profiles should not reveal sources
+- STIX exports should be encrypted in transit
+- Access to hunt data should be role-based
+- Audit trail for all IOC additions and modifications
+- Sensitive IOCs (internal IPs) should not be exported to external STIX feeds
+
+---
+
+## Performance
+
+| Operation | Target |
+|-----------|--------|
+| IOC search | < 10ms for 10K IOCs |
+| Anomaly detection | < 100ms per 1K log entries |
+| JA3 fingerprint lookup | < 5ms per flow |
+| Rule matching | < 50ms per log entry |
+| Hunt report generation | < 200ms |
+| Alert triage | < 10ms per alert |
+| Threat intel correlation | < 50ms per IOC batch |
+
+---
+
+## Design Patterns
+
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Repository** | IOC storage and retrieval | IOCManager |
+| **Strategy** | Multiple anomaly detection algorithms | LogAnalyzer |
+| **Observer** | Alert generation on anomaly detection | AlertManager |
+| **State Machine** | Hunt lifecycle management | HuntOrchestrator |
+| **Template Method** | Report generation | HuntOrchestrator |
+| **Facade** | Unified API surface | All components via orchestrator |
+| **Chain of Responsibility** | Detection rule matching pipeline | DetectionEngine |
+
+---
+
+## Scalability
+
+| Dimension | Strategy |
+|-----------|----------|
+| IOC volume | Hash-based indexing for O(1) lookup |
+| Log volume | Stream processing with batch aggregation |
+| Flow volume | Time-bucketed storage with sampling |
+| Rule count | Compiled rule cache for fast matching |
+| Alert volume | Severity-based batching and dedup |
+| Hunt count | Independent hunt sessions |
+| Actor profiles | Indexed by technique and IOC |
 
 ---
 
@@ -378,4 +465,371 @@ MIT License — see [LICENSE](../../LICENSE) for details.
 
 ---
 
-*Hunt proactively, detect early, respond decisively.*
+---
+
+## MITRE ATT&CK Mapping
+
+### Tactic Coverage
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    MITRE ATT&CK Coverage Matrix                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Reconnaissance          Resource Development       Initial Access           │
+│  ├── T1595 Active Scan   ├── T1583 Acquire Infra   ├── T1190 Exploit Pub   │
+│  ├── T1592 Gather Host   ├── T1586 Compromise Acct ├── T1566 Phishing      │
+│  └── T1589 Gather Identities                       └── T1133 External Rem   │
+│                                                                              │
+│  Execution               Persistence               Privilege Escalation     │
+│  ├── T1059 Cmd/Script   ├── T1053 Scheduled Task  ├── T1068 Exploitation  │
+│  ├── T1203 Exploitation ├── T1547 Boot/Logon      └── T1548 Abuse Elevation│
+│  └── T1204 User Exec    └── T1136 Create Account                         │
+│                                                                              │
+│  Defense Evasion         Credential Access         Discovery                │
+│  ├── T1027 Obfuscation  ├── T1003 OS Cred Dump    ├── T1087 Account Disc  │
+│  ├── T1070 Indicator    ├── T1110 Brute Force     ├── T1082 System Info   │
+│  └── T1562 Impair Defs  └── T1557 Adversary-in-   └── T1046 Network Scan  │
+│                              Middle                                        │
+│                                                                              │
+│  Lateral Movement        Collection                Command and Control      │
+│  ├── T1021 Remote Svc   ├── T1005 Data from Local ├── T1071 App Layer P   │
+│  ├── T1550 Use Alt Auth ├── T1114 Email Collect   ├── T1572 Protocol Tun  │
+│  └── T1570 Lateral Tool ├── T1560 Archive Collected└── T1090 Proxy         │
+│                                                                              │
+│  Exfiltration            Impact                                                   │
+│  ├── T1041 Exfil Over C2├── T1486 Data Encrypted for Impact              │
+│  ├── T1567 Exfil Over WS├── T1489 Service Stop                           │
+│  └── T1048 Exfil Over Alt└── T1490 Inhibit System Recovery                │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Technique-to-Component Mapping
+
+| MITRE Technique | Hunting Component | Detection Method |
+|-----------------|-------------------|------------------|
+| T1566 Phishing | LogAnalyzer + IOCManager | Email header analysis, URL reputation |
+| T1071 C2 | NetworkAnalyzer + LogAnalyzer | JA3 fingerprint, unusual ports |
+| T1053 Scheduled Task | DetectionEngine | Registry key monitoring |
+| T1003 Credential Dump | DetectionEngine | Process monitoring, file access |
+| T1021 Remote Services | NetworkAnalyzer | Lateral movement detection |
+| T1046 Network Scan | LogAnalyzer | Port scan detection, volume spikes |
+| T1110 Brute Force | LogAnalyzer + AlertManager | Auth failure aggregation |
+| T1059 Command Execution | DetectionEngine | Process creation monitoring |
+| T1070 Indicator Removal | LogAnalyzer | Log gap detection |
+| T1048 Exfiltration | NetworkAnalyzer | Data volume anomaly |
+
+---
+
+## IOC Types Reference
+
+### Supported IOC Formats
+
+| Type | Format Example | Use Case |
+|------|----------------|----------|
+| IP Address | `198.51.100.23` | C2 server, scanner |
+| Domain | `evil-domain.com` | Phishing, C2 |
+| URL | `https://evil.com/payload` | Malware download |
+| MD5 Hash | `d41d8cd98f00b204e9800998ecf8427e` | File identification |
+| SHA1 Hash | `da39a3ee5e6b4b0d3255bfef95601890afd80709` | File identification |
+| SHA256 Hash | `e3b0c44298fc1c149afbf4c8996fb924...` | File identification |
+| Email | `attacker@evil.com` | Phishing sender |
+| CVE | `CVE-2024-12345` | Vulnerability reference |
+| JA3 Hash | `e7d705a3286e19ea42f587b344ee6865` | TLS fingerprint |
+| CIDR Block | `198.51.100.0/24` | Network range |
+| Mutex | `Global\my_mutex` | Malware artifact |
+| Registry Key | `HKLM\Software\ Evil` | Persistence mechanism |
+| File Path | `C:\Users\Public\svchost.exe` | Malware location |
+| User Agent | `Mozilla/4.0 (compatible; evil)` | C2 communication |
+
+### IOC Confidence Scoring
+
+```
+Confidence Score = Source_Weight × Age_Decay × Corroboration_Factor
+
+Source Weights:
+  Internal detection:     1.0
+  Threat intel feed:      0.9
+  OSINT research:         0.7
+  User reported:          0.5
+  Automated scan:         0.6
+
+Age Decay:
+  < 24 hours:             1.0
+  < 7 days:               0.9
+  < 30 days:              0.7
+  < 90 days:              0.5
+  > 90 days:              0.3
+
+Corroboration:
+  Single source:          1.0
+  Two sources:            1.2
+  Three+ sources:         1.5
+```
+
+---
+
+## Sigma Rule Template
+
+```yaml
+title: Suspicious Outbound Connection to Known C2 Port
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+status: stable
+description: Detects outbound connections to commonly used C2 ports
+author: Threat Hunting Team
+date: 2024/01/15
+modified: 2024/01/20
+tags:
+  - attack.command_and_control
+  - attack.t1071
+logsource:
+  category: firewall
+  product: network
+detection:
+  selection:
+    action: allow
+    dst_port:
+      - 4444
+      - 5555
+      - 6666
+      - 8443
+      - 443
+    direction: outbound
+  filter:
+    dst_ip:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+  condition: selection and not filter
+falsepositives:
+  - Legitimate admin tools using these ports
+  - Development environments
+level: high
+```
+
+---
+
+## Network Forensics Deep Dive
+
+### JA3 Fingerprint Analysis
+
+```
+JA3 Hash = MD5(TLSVersion,Ciphers,Extensions,EllipticCurves,EllipticCurvePointFormats)
+
+Example JA3 Calculation:
+  Client Hello:
+    TLS Version: 769 (TLS 1.2)
+    Ciphers: 4865-4866-4867-49195-49199
+    Extensions: 0-23-65281-10-11-35-16-5-13-18-51-45-43-27-21
+    Curves: 29-23-24
+    Point Formats: 0
+
+  JA3 String: 769,4865-4866-4867-49195-49199,0-23-65281-10-11-35-16-5-13-18-51-45-43-27-21,29-23-24,0
+  JA3 Hash: a0e9f5d64349fb13191bc781f81f42e1
+```
+
+### Common JA3 Signatures
+
+| JA3 Hash | Application | Risk Level |
+|----------|-------------|------------|
+| `a0e9f5d64349fb13191bc781f81f42e1` | Chrome | Low |
+| `b32309a26951912be7dba376398abc3b` | Firefox | Low |
+| `e7d705a3286e19ea42f587b344ee6865` | Cobalt Strike | Critical |
+| `72a589da586844d7f0818ce684948eea` | Metasploit | Critical |
+| `3b5074b1b5d032e5620f69f9f700ff0e` | Empire | High |
+| `未知` | Unknown TLS stack | Investigate |
+
+### Lateral Movement Detection
+
+```
+Detection Signals:
+  1. Internal host → multiple internal hosts on same port
+  2. Unusual service connections (SMB, RDP, WMI between non-admin hosts)
+  3. New internal connection pairs not seen in baseline
+  4. Connections during unusual hours
+  5. Failed authentication followed by successful connection
+
+Scoring:
+  score = Σ (signal_weight × signal_confidence)
+
+  Signal Weights:
+    New internal pair:        +30
+    Unusual hours:            +20
+    Failed auth + success:    +25
+    High-privilege port:      +15
+    Multiple targets:         +20
+
+  Threshold:
+    score >= 60 → ALERT (lateral movement suspected)
+    score >= 40 → INVESTIGATE
+    score < 40  → MONITOR
+```
+
+---
+
+## Threat Intelligence Integration
+
+### STIX 2.1 Export Format
+
+```json
+{
+  "type": "bundle",
+  "id": "bundle--a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "objects": [
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--12345678-1234-1234-1234-123456789abc",
+      "created": "2024-01-15T10:00:00.000Z",
+      "modified": "2024-01-15T10:00:00.000Z",
+      "name": "C2 IP Address",
+      "description": "Known Cobalt Strike C2 server",
+      "pattern": "[ipv4-addr:value = '198.51.100.23']",
+      "pattern_type": "stix",
+      "valid_from": "2024-01-15T10:00:00.000Z",
+      "indicator_types": ["malicious-activity"],
+      "confidence": 85,
+      "labels": ["c2", "cobalt-strike"]
+    }
+  ]
+}
+```
+
+### IOC Enrichment Sources
+
+| Source | Data Type | Refresh Rate | Confidence |
+|--------|-----------|--------------|------------|
+| Internal Logs | Network flows, auth events | Real-time | High |
+| OSINT Feeds | IP/domain reputation | Hourly | Medium |
+| Commercial TI | Advanced threat data | Daily | High |
+| Industry ISACs | Sector-specific intel | Daily | High |
+| DNS Intelligence | Domain resolution history | Hourly | Medium |
+| Certificate Transparency | TLS certificate data | Daily | Medium |
+
+### Threat Actor Profile Template
+
+```yaml
+actor_profile:
+  name: "APT28"
+  aliases: ["Fancy Bear", "Sofacy", "Pawn Storm", "Sednit"]
+  country: "Russia"
+  sophistication: "advanced"
+  motivation: "espionage"
+  first_seen: "2004"
+  last_active: "2024"
+  targets:
+    - sectors: ["government", "defense", "media"]
+    - regions: ["eastern-europe", "central-asia"]
+  techniques:
+    - tactic: "initial-access"
+      technique: "T1566"
+      subtechnique: "T1566.001"
+      description: "Spearphishing with malicious attachments"
+    - tactic: "execution"
+      technique: "T1204"
+      subtechnique: "T1204.002"
+      description: "User execution of malicious document"
+  infrastructure:
+    - type: "c2"
+      indicators: ["198.51.100.0/24"]
+    - type: "phishing"
+      indicators: ["*.targeted-org.com"]
+    tools_used:
+      - "X-Agent"
+      - "X-Tunnel"
+      - "Koadic"
+      - "Mimikatz"
+```
+
+---
+
+## Log Analysis Deep Dive
+
+### Anomaly Detection Algorithms
+
+```python
+# Volume spike detection
+def detect_volume_spike(log_counts, baseline_window=24, spike_threshold=3.0):
+    """
+    Detect volume spikes using z-score method.
+
+    Args:
+        log_counts: List of hourly log counts
+        baseline_window: Hours to use for baseline calculation
+        spike_threshold: Number of standard deviations for spike detection
+
+    Returns:
+        List of flagged hours with spike details
+    """
+    import statistics
+
+    flagged = []
+    for i in range(baseline_window, len(log_counts)):
+        window = log_counts[i-baseline_window:i]
+        mean = statistics.mean(window)
+        stdev = statistics.stdev(window) if len(window) > 1 else 0
+
+        if stdev > 0:
+            z_score = (log_counts[i] - mean) / stdev
+            if z_score > spike_threshold:
+                flagged.append({
+                    "hour": i,
+                    "count": log_counts[i],
+                    "baseline_mean": mean,
+                    "z_score": round(z_score, 2),
+                    "severity": "high" if z_score > 5 else "medium",
+                })
+
+    return flagged
+
+# Example usage
+hourly_counts = [100, 120, 110, 95, 105, 500, 110, 100]  # Spike at hour 5
+spikes = detect_volume_spike(hourly_counts)
+```
+
+### DNS Tunnel Detection
+
+```python
+# Detect DNS tunneling based on query characteristics
+def detect_dns_tunnel(dns_queries):
+    """
+    Detect DNS tunneling based on:
+    - Query length (longer than normal)
+    - Subdomain entropy (random characters)
+    - Query frequency (high volume to single domain)
+    """
+    suspicious = []
+    for query in dns_queries:
+        domain = query["query"]
+        subdomain = domain.split(".")[0]
+
+        # Check query length
+        if len(domain) > 50:
+            suspicious.append({
+                "domain": domain,
+                "reason": "excessive_length",
+                "length": len(domain),
+                "risk": "high",
+            })
+
+        # Check entropy (random characters)
+        entropy = calculate_entropy(subdomain)
+        if entropy > 3.5:  # High entropy indicates random data
+            suspicious.append({
+                "domain": domain,
+                "reason": "high_entropy",
+                "entropy": round(entropy, 2),
+                "risk": "high",
+            })
+
+        # Check for encoded data patterns
+        if re.match(r'^[a-z0-9]{30,}\.[a-z]+$', domain):
+            suspicious.append({
+                "domain": domain,
+                "reason": "encoded_data_pattern",
+                "risk": "medium",
+            })
+
+    return suspicious
+```

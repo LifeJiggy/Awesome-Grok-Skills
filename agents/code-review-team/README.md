@@ -7,16 +7,21 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Features](#features)
-3. [Quick Start](#quick-start)
-4. [Installation](#installation)
-5. [Usage](#usage)
-6. [API Reference](#api-reference)
-7. [Examples](#examples)
-8. [Configuration](#configuration)
-9. [Best Practices](#best-practices)
-10. [Troubleshooting](#troubleshooting)
-11. [License](#license)
+2. [Architecture](#architecture)
+3. [Features](#features)
+4. [Quick Start](#quick-start)
+5. [Installation](#installation)
+6. [Usage](#usage)
+7. [API Reference](#api-reference)
+8. [Data Models](#data-models)
+9. [Examples](#examples)
+10. [Configuration](#configuration)
+11. [Best Practices](#best-practices)
+12. [Security](#security)
+13. [Scalability](#scalability)
+14. [Design Patterns](#design-patterns)
+15. [Troubleshooting](#troubleshooting)
+16. [License](#license)
 
 ---
 
@@ -32,6 +37,37 @@ The Code Review Team Agent combines four analysis engines into a unified code re
 - **Architecture Review**: SOLID principle violations, design pattern issues, god classes
 - **Quality Gates**: Configurable pass/fail thresholds for CI/CD integration
 - **Reporting**: Markdown, JSON, HTML, and plain text output formats
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    Code Review Team Agent                            │
+├─────────────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │
+│  │   Linter     │  │  Security    │  │  Complexity  │             │
+│  │ Integrator   │  │  Scanner     │  │  Analyzer    │             │
+│  └──────────────┘  └──────────────┘  └──────────────┘             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │
+│  │ Architecture │  │   Quality    │  │   Report     │             │
+│  │  Reviewer    │  │    Gate      │  │  Generator   │             │
+│  └──────────────┘  └──────────────┘  └──────────────┘             │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Review Pipeline Flow
+
+```
+Source Code ──▶ Linting ──▶ Security Scan ──▶ Complexity ──▶ Architecture
+                                                              │
+                                                              ▼
+                                            Score Calculation ──▶ Quality Gate
+                                                                      │
+                                                                      ▼
+                                                              Report Generation
+```
 
 ---
 
@@ -293,6 +329,54 @@ print(report)
 
 ---
 
+## Data Models
+
+### ReviewResult
+
+```python
+@dataclass
+class ReviewResult:
+    file_path: str                  # Reviewed file path
+    language: Language              # Source language
+    score: float                    # Quality score (0-100)
+    issues: List[CodeIssue]         # All detected issues
+    summary: ReviewSummary          # Aggregated summary
+    complexity: ComplexityMetrics   # Complexity metrics
+    reviewed_at: datetime           # Review timestamp
+```
+
+### CodeIssue
+
+```python
+@dataclass
+class CodeIssue:
+    issue_id: str                   # Unique identifier
+    rule_id: str                    # Rule that triggered
+    severity: Severity              # CRITICAL, ERROR, WARNING, INFO, HINT
+    category: ReviewCategory        # SYNTAX, SECURITY, etc.
+    line_number: int                # Line in source
+    code_snippet: str               # Relevant code
+    message: str                    # Issue description
+    suggestion: str                 # Recommended fix
+    cwe_id: Optional[str]           # CWE reference (security)
+```
+
+### ComplexityMetrics
+
+```python
+@dataclass
+class ComplexityMetrics:
+    cyclomatic_complexity: int      # Branching count + 1
+    cognitive_complexity: int       # Nesting-weighted count
+    lines_of_code: int              # Non-blank, non-comment
+    max_function_length: int        # Longest function
+    functions_count: int            # Function definitions
+    classes_count: int              # Class definitions
+    max_nesting_depth: int          # Deepest nesting
+```
+
+---
+
 ## Examples
 
 ### Detect Security Vulnerabilities
@@ -479,6 +563,136 @@ agent = CodeReviewTeamAgent(config=config)
 
 ---
 
+## Security
+
+### Scanner Security
+
+- Patterns are pre-compiled regex — no user-supplied regex execution
+- Findings include CWE references for industry alignment
+- Suppression rules prevent false positive fatigue
+- Code snippets are truncated to prevent data leakage in reports
+
+### Data Handling
+
+- Source code processed in-memory only
+- No code sent to external services
+- Reports stored locally with configurable paths
+- No persistent storage of reviewed code
+
+---
+
+## Scalability
+
+### Performance Targets
+
+| Operation | Latency (p99) | Throughput |
+|-----------|---------------|------------|
+| Single file lint | < 100ms | 100 files/sec |
+| Security scan | < 200ms | 50 files/sec |
+| Complexity analysis | < 50ms | 200 files/sec |
+| Quality gate check | < 10ms | 1,000/sec |
+| Report generation | < 500ms | 20 reports/sec |
+
+### Scaling Strategies
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Single    │────▶│  Parallel   │────▶│  Distributed│
+│   File      │     │  Files      │     │  Cluster    │
+└─────────────┘     └─────────────┘     └─────────────┘
+      │                    │                    │
+      ▼                    ▼                    ▼
+  < 10K LOC         10K-100K LOC        100K+ LOC
+  < 5 files         5-50 files          50+ files
+```
+
+### Memory Management
+
+```python
+# For large codebases
+config = Config(
+    review_config=ReviewConfig(
+        excluded_files=["*.test.*", "node_modules/*"],  # Reduce scope
+        max_file_length=500,                              # Limit per-file
+    ),
+)
+```
+
+---
+
+## Design Patterns
+
+### Pipeline Pattern — Review Flow
+
+```python
+class ReviewPipeline:
+    def __init__(self):
+        self.stages = [
+            LintingStage(),
+            SecurityStage(),
+            ComplexityStage(),
+            ArchitectureStage(),
+            ScoringStage(),
+            GateStage(),
+            ReportStage(),
+        ]
+
+    def execute(self, code, language):
+        context = {"code": code, "language": language}
+        for stage in self.stages:
+            context = stage.process(context)
+        return context["result"]
+```
+
+### Strategy Pattern — Language Support
+
+```python
+class LanguageStrategy:
+    def get_patterns(self):
+        raise NotImplementedError
+
+class PythonStrategy(LanguageStrategy):
+    def get_patterns(self):
+        return PYTHON_PATTERNS
+
+class JavaScriptStrategy(LanguageStrategy):
+    def get_patterns(self):
+        return JS_PATTERNS
+```
+
+### Chain of Responsibility — Quality Gates
+
+```python
+class QualityGate:
+    def __init__(self):
+        self.gates = [
+            NoCriticalGate(),
+            MinScoreGate(),
+            MaxErrorsGate(),
+        ]
+
+    def check(self, results):
+        for gate in self.gates:
+            if not gate.passes(results):
+                return GateResult.FAIL
+        return GateResult.PASS
+```
+
+### Observer Pattern — Issue Notification
+
+```python
+class IssueObserver:
+    def on_issue_found(self, issue):
+        pass
+
+class SecurityAlertObserver(IssueObserver):
+    def on_issue_found(self, issue):
+        if issue.severity == Severity.CRITICAL:
+            send_security_alert(issue)
+```
+
+---
+
 ## Troubleshooting
 
 | Problem | Cause | Resolution |
@@ -493,6 +707,106 @@ agent = CodeReviewTeamAgent(config=config)
 | Quality gate always failing | Thresholds too strict | Adjust gate rules in Config |
 
 ---
+
+## Advanced Usage
+
+### Filtering Issues by Category
+
+```python
+results = agent.review_multiple(files, language="python")
+
+for result in results:
+    # Only security issues
+    security_issues = [i for i in result.issues if i.category.value == "security"]
+    if security_issues:
+        print(f"Security issues in {result.file_path}:")
+        for issue in security_issues:
+            print(f"  [{issue.severity.value}] {issue.message}")
+
+    # Only high-complexity functions
+    if result.complexity.cyclomatic_complexity > 15:
+        print(f"High complexity in {result.file_path}: {result.complexity.cyclomatic_complexity}")
+```
+
+### Custom Quality Gates
+
+```python
+from agents.code_review_team.agent import QualityGate, GateCondition
+
+# Define custom gates
+custom_gates = [
+    GateCondition(
+        name="No Security Issues",
+        check=lambda results: all(
+            len([i for i in r.issues if i.category.value == "security"]) == 0
+            for r in results
+        ),
+    ),
+    GateCondition(
+        name="Average Score Above 80",
+        check=lambda results: sum(r.score for r in results) / len(results) >= 80,
+    ),
+    GateCondition(
+        name="No Critical or Error",
+        check=lambda results: all(
+            i.severity.value not in ("CRITICAL", "ERROR")
+            for r in results
+            for i in r.issues
+        ),
+    ),
+]
+
+gate = QualityGate(custom_gates)
+result = gate.check(results)
+```
+
+### Exclude Files by Pattern
+
+```python
+# Exclude specific patterns
+config = Config(
+    review_config=ReviewConfig(
+        excluded_files=[
+            "*.test.py",
+            "tests/*",
+            "migrations/*",
+            "__pycache__/*",
+            "venv/*",
+            ".git/*",
+            "node_modules/*",
+            "dist/*",
+            "build/*",
+            "*.min.js",
+            "*.generated.*",
+        ]
+    )
+)
+```
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| Cyclomatic Complexity | Number of independent paths through code |
+| Cognitive Complexity | Nesting-weighted complexity measure |
+| CWE | Common Weakness Enumeration — vulnerability taxonomy |
+| OWASP | Open Web Application Security Project |
+| SOLID | Single Responsibility, Open/Closed, Liskov, Interface Segregation, Dependency Inversion |
+| DRY | Don't Repeat Yourself |
+| KISS | Keep It Simple, Stupid |
+| YAGNI | You Aren't Gonna Need It |
+| LOC | Lines of Code |
+| CI/CD | Continuous Integration / Continuous Deployment |
+| PR | Pull Request |
+| Lint | Static analysis for code style and errors |
+| AST | Abstract Syntax Tree — code structure representation |
+| Regex | Regular Expression — pattern matching |
+| False Positive | Incorrect alert on benign code |
+| False Negative | Missed actual issue |
+| Suppression | Intentionally ignoring a specific finding |
+| Threshold | Configurable limit for quality gates |
+| Metrics | Quantitative measurements of code characteristics |
+| Gate | Pass/fail checkpoint in review pipeline |
 
 ## Files
 

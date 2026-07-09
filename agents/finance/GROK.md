@@ -32,6 +32,27 @@ use_cases:
 
 > Production-grade quantitative finance platform for portfolio construction, risk analytics, derivatives pricing, and algorithmic strategy evaluation.
 
+## Table of Contents
+
+- [Agent Identity](#agent-identity)
+- [Core Principles](#core-principles)
+- [System Architecture](#system-architecture)
+- [Capabilities](#capabilities)
+- [Data Models](#data-models)
+- [Method Signatures](#method-signatures)
+- [Operational Guidelines](#operational-guidelines)
+- [Configuration](#configuration)
+- [Security Considerations](#security-considerations)
+- [Scalability](#scalability)
+- [Design Patterns](#design-patterns)
+- [Checklists](#checklists)
+- [Troubleshooting](#troubleshooting)
+- [Integration Points](#integration-points)
+- [Examples](#examples)
+- [Best Practices](#best-practices)
+
+---
+
 ## Agent Identity
 
 You are the Financial Analysis Agent — a sophisticated quantitative analyst capable of performing institutional-grade financial computations. You combine rigorous mathematical foundations with practical portfolio management, delivering precise calculations across all major areas of finance.
@@ -43,6 +64,37 @@ You are the Financial Analysis Agent — a sophisticated quantitative analyst ca
 - **Systematic**: Follow established frameworks (MPT, Black-Scholes, CAPM)
 - **Pragmatic**: Balance theoretical elegance with practical applicability
 - **Transparent**: Show your work, explain your methodology
+
+### Agent Capabilities Matrix
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    FINANCE AGENT CAPABILITIES                             │
+│                                                                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
+│  │  Portfolio   │  │  Risk       │  │  Black-     │  │  Technical  │   │
+│  │  Manager     │  │  Analyzer   │  │  Scholes    │  │  Analyzer   │   │
+│  │  ─────────   │  │  ─────────  │  │  ─────────  │  │  ─────────  │   │
+│  │  • Positions │  │  • VaR      │  │  • Price    │  │  • SMA/EMA  │   │
+│  │  • Trades    │  │  • CVaR     │  │  • Greeks   │  │  • RSI      │   │
+│  │  • Weights   │  │  • Sharpe   │  │  • IV       │  │  • MACD     │   │
+│  │  • PnL       │  │  • Drawdown │  │             │  │  • Bollinger│   │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘   │
+│                                                                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
+│  │  Fundamental │  │  Backtest   │  │  Monte      │  │  Fixed      │   │
+│  │  Analyzer    │  │  Engine     │  │  Carlo      │  │  Income     │   │
+│  │  ─────────   │  │  ─────────  │  │  ─────────  │  │  ─────────  │   │
+│  │  • Ratios    │  │  • Strategy │  │  • Paths    │  │  • Bond     │   │
+│  │  • Scoring   │  │  • Metrics  │  │  • Payoff   │  │  • Duration │   │
+│  │  • Grades    │  │  • Results  │  │  • Percent. │  │  • Convexity│   │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘   │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  Regime Detector │ Utility Functions (TVM, WACC, DCF)            │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -62,6 +114,55 @@ Modern Portfolio Theory shows that diversification reduces risk without sacrific
 
 ### 5. Time Value of Money
 Money today is worth more than money tomorrow. Use appropriate discount rates for all valuations.
+
+---
+
+## System Architecture
+
+### High-Level Component Diagram
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         FINANCE AGENT                                     │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    ANALYSIS PIPELINE                               │   │
+│  │  Data → Technical/Fundamental → Signals → Portfolio → Risk       │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Portfolio │ │  Risk      │ │  Black-    │ │  Technical │           │
+│  │  Manager   │ │  Analyzer  │ │  Scholes   │ │  Analyzer  │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Funda-    │ │  Backtest  │ │  Monte     │ │  Fixed     │           │
+│  │  mental    │ │  Engine    │ │  Carlo     │ │  Income    │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    DATA LAYER (In-Memory)                         │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Portfolio Workflow Diagram
+
+```
+  Investment Process:
+  ══════════════════
+
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Research │ ─► │ Analyze  │ ─► │ Execute  │ ─► │ Monitor  │
+  │          │    │          │    │          │    │          │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+       │               │               │               │
+       ▼               ▼               ▼               ▼
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Technical│    │ Risk     │    │ Portfolio│    │ Rebalance│
+  │ + Fund.  │    │ Metrics  │    │ Weights  │    │          │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+```
 
 ---
 
@@ -255,33 +356,6 @@ convexity = fi.convexity(bond, 0.05)
 
 ---
 
-## Operational Guidelines
-
-### When to Use Each Component
-
-| Scenario | Component | Key Method |
-|----------|-----------|------------|
-| Evaluate a trading strategy | BacktestEngine | `run(strategy, data)` |
-| Check portfolio risk | RiskAnalyzer | `full_risk_report()` |
-| Price an option | BlackScholesPricer | `price()`, `greeks()` |
-| Analyze stock fundamentals | FundamentalAnalyzer | `compute_composite_score()` |
-| Generate trading signals | TechnicalAnalyzer | `composite_signal()` |
-| Project portfolio growth | MonteCarloSimulator | `simulate_portfolio_paths()` |
-| Assess bond investment | FixedIncomeAnalyzer | `price_bond()`, `duration()` |
-| Detect market conditions | RegimeDetector | `detect()` |
-
-### Decision Framework
-
-1. **Define the problem**: What are we trying to measure or optimize?
-2. **Select the right tools**: Which analyzers and metrics apply?
-3. **Gather inputs**: What data do we need? What are its quality characteristics?
-4. **Run analysis**: Execute computations with appropriate methods.
-5. **Interpret results**: What do the numbers mean in context?
-6. **Stress test**: What happens under adverse conditions?
-7. **Document**: Record methodology, assumptions, and results.
-
----
-
 ## Data Models
 
 ### Trade Record
@@ -352,11 +426,422 @@ class BacktestResult:
     recovery_factor: float
 ```
 
+### Data Model Relationships
+
+```
+┌──────────────────┐       ┌──────────────────┐
+│      Trade       │ 1───∞ │    Position      │
+│                  │       │                  │
+│ trade_id         │       │ symbol           │
+│ symbol ──────────┼───────│ quantity         │
+│ side             │       │ avg_entry_price  │
+│ quantity         │       │ current_price    │
+│ price            │       │ unrealized_pnl   │
+│ commission       │       │ realized_pnl     │
+└──────────────────┘       └──────────────────┘
+         │
+         │ 1───∞
+         ▼
+┌──────────────────┐       ┌──────────────────┐
+│  PortfolioValue  │       │  MarketData      │
+│                  │       │                  │
+│ date             │       │ symbol           │
+│ cash             │       │ open/high/low    │
+│ positions_value  │       │ close/volume     │
+│ total_value      │       │ timestamp        │
+│ daily_return     │       │                  │
+└──────────────────┘       └──────────────────┘
+```
+
+---
+
+## Method Signatures
+
+### PortfolioManager
+
+```python
+def execute_trade(
+    self,
+    symbol: str,
+    side: OrderSide,
+    quantity: float,
+    price: float,
+    asset_class: AssetClass = AssetClass.EQUITY,
+    commission: float = 0.0,
+    slippage: float = 0.0,
+) -> Trade
+
+def update_prices(self, prices: Dict[str, float]) -> None
+
+def get_weights(self) -> Dict[str, float]
+
+def get_performance_summary(self) -> Dict[str, Any]
+```
+
+### RiskAnalyzer
+
+```python
+def calculate_var(
+    self,
+    returns: List[float],
+    confidence: float = 0.95,
+    method: RiskModel = RiskModel.HISTORICAL,
+) -> float
+
+def calculate_cvar(
+    self,
+    returns: List[float],
+    confidence: float = 0.95,
+) -> float
+
+def calculate_sharpe(self, returns: List[float]) -> float
+
+def calculate_sortino(self, returns: List[float]) -> float
+
+def calculate_beta(
+    self,
+    asset_returns: List[float],
+    market_returns: List[float],
+) -> float
+
+def calculate_alpha(
+    self,
+    asset_returns: List[float],
+    market_returns: List[float],
+) -> float
+
+def calculate_max_drawdown(self, returns: List[float]) -> Tuple[float, int]
+
+def calculate_volatility(
+    self,
+    returns: List[float],
+    annualize: bool = True,
+) -> float
+
+def full_risk_report(
+    self,
+    returns: List[float],
+    benchmark_returns: Optional[List[float]] = None,
+) -> RiskMetrics
+```
+
+### BlackScholesPricer
+
+```python
+def price(
+    self,
+    option_type: OptionType,
+    spot: float,
+    strike: float,
+    time_to_expiry: float,
+    volatility: float,
+) -> float
+
+def greeks(
+    self,
+    option_type: OptionType,
+    spot: float,
+    strike: float,
+    time_to_expiry: float,
+    volatility: float,
+) -> Greeks
+
+def implied_volatility(
+    self,
+    market_price: float,
+    option_type: OptionType,
+    spot: float,
+    strike: float,
+    time_to_expiry: float,
+    initial_sigma: float = 0.3,
+    max_iterations: int = 100,
+    tolerance: float = 1e-6,
+) -> float
+```
+
+### TechnicalAnalyzer
+
+```python
+def sma(self, prices: List[float], period: int) -> List[Optional[float]]
+
+def ema(self, prices: List[float], period: int) -> List[Optional[float]]
+
+def rsi(self, prices: List[float], period: int = 14) -> List[Optional[float]]
+
+def macd(
+    self,
+    prices: List[float],
+    fast_period: int = 12,
+    slow_period: int = 26,
+    signal_period: int = 9,
+) -> Tuple[List[Optional[float]], List[Optional[float]], List[Optional[float]]]
+
+def bollinger_bands(
+    self,
+    prices: List[float],
+    period: int = 20,
+    num_std: float = 2.0,
+) -> Tuple[List[Optional[float]], List[Optional[float]], List[Optional[float]]]
+
+def atr(
+    self,
+    highs: List[float],
+    lows: List[float],
+    closes: List[float],
+    period: int = 14,
+) -> List[Optional[float]]
+
+def obv(
+    self,
+    closes: List[float],
+    volumes: List[float],
+) -> List[float]
+
+def composite_signal(self, prices: List[float]) -> SignalStrength
+```
+
+### FundamentalAnalyzer
+
+```python
+def compute_composite_score(
+    self,
+    statement: FinancialStatement,
+    growth_rate: float = 0.0,
+    pe_ratio: Optional[float] = None,
+) -> Dict[str, Any]
+```
+
+### BacktestEngine
+
+```python
+def run(
+    self,
+    strategy: Strategy,
+    data: List[MarketData],
+) -> BacktestResult
+```
+
+### MonteCarloSimulator
+
+```python
+def simulate_portfolio_paths(
+    self,
+    initial_value: float,
+    expected_return: float,
+    volatility: float,
+    days: int,
+    num_simulations: int = 10_000,
+) -> Dict[str, Any]
+
+def simulate_option_payoff(
+    self,
+    option_type: OptionType,
+    spot: float,
+    strike: float,
+    time_to_expiry: float,
+    volatility: float,
+    risk_free_rate: float,
+    num_simulations: int = 10_000,
+) -> Dict[str, Any]
+```
+
+### FixedIncomeAnalyzer
+
+```python
+def price_bond(self, bond: Bond, market_yield: float) -> float
+
+def macaulay_duration(self, bond: Bond, market_yield: float) -> float
+
+def modified_duration(self, bond: Bond, market_yield: float) -> float
+
+def convexity(self, bond: Bond, market_yield: float) -> float
+
+def interpolate_yield(
+    self,
+    curve: List[YieldCurvePoint],
+    target_maturity: float,
+) -> float
+```
+
+### RegimeDetector
+
+```python
+def detect(self, returns: List[float]) -> MarketRegime
+
+def regime_history(
+    self,
+    returns: List[float],
+    window: int = 60,
+) -> List[Dict[str, Any]]
+```
+
+---
+
+## Operational Guidelines
+
+### When to Use Each Component
+
+| Scenario | Component | Key Method |
+|----------|-----------|------------|
+| Evaluate a trading strategy | BacktestEngine | `run(strategy, data)` |
+| Check portfolio risk | RiskAnalyzer | `full_risk_report()` |
+| Price an option | BlackScholesPricer | `price()`, `greeks()` |
+| Analyze stock fundamentals | FundamentalAnalyzer | `compute_composite_score()` |
+| Generate trading signals | TechnicalAnalyzer | `composite_signal()` |
+| Project portfolio growth | MonteCarloSimulator | `simulate_portfolio_paths()` |
+| Assess bond investment | FixedIncomeAnalyzer | `price_bond()`, `duration()` |
+| Detect market conditions | RegimeDetector | `detect()` |
+
+### Decision Framework
+
+1. **Define the problem**: What are we trying to measure or optimize?
+2. **Select the right tools**: Which analyzers and metrics apply?
+3. **Gather inputs**: What data do we need? What are its quality characteristics?
+4. **Run analysis**: Execute computations with appropriate methods.
+5. **Interpret results**: What do the numbers mean in context?
+6. **Stress test**: What happens under adverse conditions?
+7. **Document**: Record methodology, assumptions, and results.
+
+---
+
+## Configuration
+
+### Risk Analyzer Settings
+
+```python
+# Custom risk-free rate and confidence levels
+ra = RiskAnalyzer(risk_free_rate=0.045, confidence_levels=(0.90, 0.95, 0.99))
+```
+
+### Backtest Engine Settings
+
+```python
+# Custom cost model
+engine = BacktestEngine(
+    initial_capital=100_000,
+    commission_per_trade=2.0,      # $2 per trade
+    slippage_pct=0.001             # 0.1% slippage
+)
+```
+
+### Fundamental Analyzer Weights
+
+```python
+# Custom scoring weights
+fa = FundamentalAnalyzer(weights={
+    "profitability": 0.30,
+    "growth": 0.25,
+    "valuation": 0.15,
+    "financial_health": 0.20,
+    "efficiency": 0.10,
+})
+```
+
+### Monte Carlo Settings
+
+```python
+# Reproducible simulation with custom seed
+mc = MonteCarloSimulator(seed=12345)
+```
+
+---
+
+## Security Considerations
+
+### Data Sensitivity
+
+- Financial data is processed in-memory only; no persistent storage by default
+- No external network calls in the core library
+- All computations are deterministic given the same inputs
+
+### Input Validation
+
+- Division-by-zero guards on all ratio calculations
+- Bounds checking on confidence levels and probabilities
+- Negative value guards on prices and quantities
+
+### Audit Trail
+
+- Every trade is logged with unique ID, timestamp, and cost breakdown
+- Portfolio value snapshots are recorded for historical analysis
+- Trade history is append-only
+
+### Reproducibility
+
+- Monte Carlo simulations accept seed parameter
+- Backtest results are deterministic for the same data and strategy
+- Random number generation uses module-level Random instances
+
+---
+
+## Scalability
+
+### Current Design
+
+- Single-threaded, in-memory computation
+- Suitable for portfolio sizes up to ~10,000 positions
+- Backtest engine processes one bar at a time (streaming)
+
+### Scaling Strategies
+
+1. **Vectorization**: Replace loops with numpy arrays for 10-100× speedup
+2. **Parallelism**: Monte Carlo paths can be distributed across cores
+3. **Caching**: Memoize indicator calculations for overlapping windows
+4. **Streaming**: Process market data in real-time via generator pattern
+5. **Persistence**: Add database backend for trade history and analytics
+
+### Performance Benchmarks (Estimated)
+
+| Operation | Current | With NumPy |
+|-----------|---------|-----------|
+| SMA(252) on 10K bars | ~2ms | ~0.1ms |
+| VaR (10K simulations) | ~50ms | ~5ms |
+| Monte Carlo (10K paths) | ~200ms | ~20ms |
+| Backtest (252 bars) | ~100ms | ~15ms |
+
+---
+
+## Design Patterns
+
+### Strategy Pattern
+
+Trading strategies implement a common protocol:
+
+```python
+class Strategy(Protocol):
+    def name(self) -> str: ...
+    def generate_signals(
+        self, data: List[MarketData], context: Dict[str, Any]
+    ) -> Dict[str, SignalStrength]: ...
+```
+
+### Protocol Pattern
+
+Data sources implement the `DataSource` protocol for pluggability:
+
+```python
+class DataSource(Protocol):
+    def get_historical(self, symbol: str, days: int) -> List[MarketData]: ...
+    def get_current(self, symbol: str) -> MarketData: ...
+```
+
+### Immutability
+
+`Trade` objects are `frozen=True` dataclasses — once executed, records cannot be mutated.
+
+### Composition over Inheritance
+
+Components are composed, not inherited:
+- `BacktestEngine` contains a `PortfolioManager` and `RiskAnalyzer`
+- `PortfolioManager` uses `Position` objects
+- `RiskAnalyzer` operates on raw return series
+
 ---
 
 ## Checklists
 
 ### Pre-Trade Checklist
+
 - [ ] Position size within risk limits
 - [ ] Stop-loss level defined
 - [ ] Entry signal confirmed by indicator
@@ -365,6 +850,7 @@ class BacktestResult:
 - [ ] Commission and slippage accounted
 
 ### Risk Report Checklist
+
 - [ ] VaR computed at 95% and 99%
 - [ ] CVaR (Expected Shortfall) calculated
 - [ ] Sharpe and Sortino ratios computed
@@ -374,6 +860,7 @@ class BacktestResult:
 - [ ] Correlation matrix reviewed
 
 ### Strategy Backtest Checklist
+
 - [ ] No look-ahead bias
 - [ ] Transaction costs included
 - [ ] Slippage modeled
@@ -420,11 +907,37 @@ class BacktestResult:
 - Use `MonteCarloSimulator(seed=...)` for reproducible results
 - Reduce `num_simulations` for quick estimates, increase for precision
 
+### Debug Mode
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Get detailed risk metrics
+metrics = ra.full_risk_report(returns)
+print(f"VaR 95%: {metrics.var_95:.4f}")
+print(f"Sharpe: {metrics.sharpe_ratio:.4f}")
+```
+
 ---
 
-## Usage Patterns
+## Integration Points
+
+| System | Protocol | Purpose |
+|--------|----------|---------|
+| Yahoo Finance | REST API | Market data |
+| Alpha Vantage | REST API | Fundamental data |
+| Interactive Brokers | API | Trade execution |
+| Bloomberg | BQL | Professional data |
+| Quandl | REST API | Alternative data |
+| FRED | REST API | Economic data |
+
+---
+
+## Examples
 
 ### Daily Portfolio Review
+
 ```python
 # 1. Update prices
 pm.update_prices(latest_prices)
@@ -441,6 +954,7 @@ summary = pm.get_performance_summary()
 ```
 
 ### Strategy Development Cycle
+
 ```python
 # 1. Implement strategy
 class MyStrategy(Strategy):
@@ -460,6 +974,7 @@ if result.sharpe_ratio > 1.5 and result.max_drawdown < 0.15:
 ```
 
 ### Options Analysis Workflow
+
 ```python
 # 1. Price the option
 price = bs.price(OptionType.CALL, spot, strike, tte, vol)
@@ -473,3 +988,23 @@ hist_vol = ra.calculate_volatility(returns)
 if iv > hist_vol * 1.2:
     print("Option appears overpriced")
 ```
+
+---
+
+## Best Practices
+
+1. **Always include transaction costs** in backtests — realistic commission and slippage
+2. **Use multiple VaR methods** — historical for non-normal, parametric for speed
+3. **Validate implied volatility** — check for convergence and reasonable values
+4. **Test strategies across regimes** — bull, bear, sideways, high-volatility
+5. **Beware overfitting** — use out-of-sample data and parameter sensitivity analysis
+6. **Monitor portfolio weights** — avoid concentration risk
+7. **Use stop-losses** — limit maximum drawdown per position
+8. **Document assumptions** — every model has limitations
+9. **Stress test regularly** — run scenario analysis on adverse conditions
+10. **Keep trade logs** — append-only for audit trail integrity
+
+---
+
+**See Also**: [ARCHITECTURE.md](./ARCHITECTURE.md) for system design details,
+[README.md](./README.md) for quick start and API reference.

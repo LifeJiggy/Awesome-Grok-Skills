@@ -21,6 +21,9 @@ Developer relations management — community building, content strategy, event m
 - [API Reference](#api-reference)
 - [Examples](#examples)
 - [Configuration](#configuration)
+- [Design Patterns](#design-patterns)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
@@ -62,12 +65,32 @@ The DevRel Agent provides a comprehensive platform for managing developer relati
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│                      DEVREL AGENT                         │
-├──────────────────────────────────────────────────────────┤
-│  Community → Content → Events → Feedback                 │
-│  → Documentation → DX Metrics → Journey → Reporting      │
-└──────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                          DevRel Agent                                      │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Community     │  │  Content       │  │  Events                    │  │
+│  │  Manager       │  │  Strategist    │  │  Manager                   │  │
+│  │  ├ Members     │  │  ├ Create      │  │  ├ Plan                    │  │
+│  │  ├ Journey     │  │  ├ Track       │  │  ├ Execute                 │  │
+│  │  ├ Metrics     │  │  ├ Analyze     │  │  ├ Feedback                │  │
+│  │  └ NPS         │  │  └ Optimize    │  │  └ Analytics               │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Feedback      │  │  Documentation │  │  DX Metrics                │  │
+│  │  Analyzer      │  │  Assessor      │  │  Tracker                   │  │
+│  │  ├ Categorize  │  │  ├ Quality     │  │  ├ Score                   │  │
+│  │  ├ Sentiment   │  │  ├ Freshness   │  │  ├ Targets                 │  │
+│  │  ├ Priority    │  │  ├ Coverage    │  │  ├ Trends                  │  │
+│  │  └ Resolve     │  │  └ Issues      │  │  └ Benchmarks              │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────────┐│
+│  │  Reporting Engine                                                    ││
+│  │  ├ Weekly snapshots  │ Monthly reports  │ Quarterly reviews          ││
+│  └──────────────────────────────────────────────────────────────────────┘│
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for full system architecture.
@@ -146,6 +169,23 @@ print(f"Top contributors: {metrics.top_contributors}")
 print(f"By platform: {metrics.platform_breakdown}")
 ```
 
+**Community Health Dashboard:**
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                  Community Health Metrics                       │
+├───────────────────┬───────────────────┬────────────────────────┤
+│  Total Members    │  Active (30d)     │  Retention Rate        │
+│       2,450       │       1,820       │        74%             │
+├───────────────────┼───────────────────┼────────────────────────┤
+│  New This Month   │  Churned          │  NPS Score             │
+│       180         │       45          │        62              │
+├───────────────────┼───────────────────┼────────────────────────┤
+│  Questions/Day    │  Response Time    │  Resolution Rate       │
+│       25          │      2.5 hrs      │        89%             │
+└───────────────────┴───────────────────┴────────────────────────┘
+```
+
 ### Content Strategy
 
 ```python
@@ -181,6 +221,22 @@ print(f"Total views: {analytics['total_views']}")
 print(f"Engagement rate: {analytics['engagement_rate']:.2%}")
 for ctype, data in analytics['by_type'].items():
     print(f"  {ctype}: {data['count']} posts, {data['total_views']} views")
+```
+
+**Content Performance Matrix:**
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                   Content Performance                            │
+├───────────────────┬───────────┬───────────┬────────────────────┤
+│  Type             │  Posts    │  Views    │  Engagement Rate   │
+├───────────────────┼───────────┼───────────┼────────────────────┤
+│  Tutorial         │  12       │  45,000   │  6.2%              │
+│  How-To           │  18       │  32,000   │  4.8%              │
+│  Quickstart       │  8        │  28,000   │  7.5%              │
+│  API Reference    │  25       │  15,000   │  2.1%              │
+│  Video            │  6        │  52,000   │  8.9%              │
+└───────────────────┴───────────┴───────────┴────────────────────┘
 ```
 
 ### Event Management
@@ -243,6 +299,18 @@ print(f"Resolution rate: {analytics['resolution_rate']:.0%}")
 agent.resolve_feedback(f2.feedback_id)
 ```
 
+**Feedback Category Distribution:**
+
+```
+  ┌─────────────────────────────────────────────────────────────┐
+  │  Bug Reports        ████████████████              35%       │
+  │  Feature Requests   ██████████████                30%       │
+  │  Questions          ████████                      18%       │
+  │  General            ██████                        12%       │
+  │  Praise             ██                             5%       │
+  └─────────────────────────────────────────────────────────────┘
+```
+
 ### Documentation Assessment
 
 ```python
@@ -274,6 +342,21 @@ print(f"Quality: {assessment['quality_distribution']}")
 print(f"Pages needing update: {assessment['pages_needing_update']}")
 for page in assessment['worst_pages']:
     print(f"  {page.title}: {page.quality.value} - {page.issues[:2]}")
+```
+
+**Documentation Quality Matrix:**
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                 Documentation Quality                           │
+├───────────────────┬───────────┬────────────────────────────────┤
+│  Rating           │  Pages    │  Criteria                      │
+├───────────────────┼───────────┼────────────────────────────────┤
+│  Excellent (90+)  │  12       │  Complete, current, examples   │
+│  Good (70-89)     │  18       │  Mostly complete, recent       │
+│  Adequate (50-69) │  8        │  Basic coverage                │
+│  Needs Work (<50) │  4        │  Missing sections              │
+└───────────────────┴───────────┴────────────────────────────────┘
 ```
 
 ### DX Metrics
@@ -319,6 +402,21 @@ analytics = agent.compute_journey_analytics()
 print(f"Total developers: {analytics['total_developers']}")
 print(f"Stage distribution: {analytics['stage_distribution']}")
 print(f"At advocacy: {analytics['at_advocacy']}")
+```
+
+**Developer Journey Funnel:**
+
+```
+  ┌─────────────────────────────────────────────────────────────┐
+  │  AWARENESS          ████████████████████████████  100%      │
+  │  INTEREST           █████████████████████         75%       │
+  │  EVALUATION         ████████████████              55%       │
+  │  ONBOARDING         █████████████                 45%       │
+  │  FIRST SUCCESS      ██████████                    35%       │
+  │  REGULAR USAGE      ███████                       25%       │
+  │  ADVOCACY           ████                          15%       │
+  │  CONTRIBUTION       ██                            8%        │
+  └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Reporting
@@ -421,6 +519,29 @@ print(f"Feedback: {report.feedback_summary['total_feedback']} items, "
       f"positive: {report.feedback_summary['positive_ratio']:.0%}")
 ```
 
+### Example 3: Content Performance Analysis
+
+```python
+analytics = agent.compute_content_analytics()
+
+# Find top performing content
+top_content = sorted(
+    analytics['by_content'],
+    key=lambda x: x['engagement_rate'],
+    reverse=True
+)[:5]
+
+print("Top 5 Content by Engagement:")
+for i, content in enumerate(top_content, 1):
+    print(f"  {i}. {content['title']} - {content['engagement_rate']:.1%}")
+
+# Identify content gaps
+type_performance = analytics['by_type']
+for ctype, data in type_performance.items():
+    if data['engagement_rate'] < 0.03:
+        print(f"  Low engagement: {ctype} ({data['engagement_rate']:.1%})")
+```
+
 ---
 
 ## Configuration
@@ -440,6 +561,134 @@ config = DevRelConfig(
 )
 agent = DevRelAgent(config)
 ```
+
+**Configuration Options:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `min_response_time_hours` | float | 4.0 | Target response time |
+| `target_retention_rate` | float | 0.70 | Target retention rate |
+| `target_nps` | float | 50.0 | Target NPS score |
+| `target_posts_per_week` | int | 3 | Content publishing target |
+| `target_satisfaction_score` | float | 4.0 | Event satisfaction target |
+| `response_sla_hours` | float | 24.0 | Feedback response SLA |
+| `freshness_days` | int | 90 | Documentation freshness |
+
+---
+
+## Design Patterns
+
+### Observer Pattern for Engagement Events
+
+```python
+class EngagementObserver:
+    def on_content_published(self, content: ContentItem):
+        self.notify_followers(content)
+    
+    def on_event_created(self, event: DeveloperEvent):
+        self.notify_community(event)
+    
+    def on_feedback_received(self, feedback: FeedbackItem):
+        self.route_to_team(feedback)
+```
+
+### Strategy Pattern for Sentiment Analysis
+
+```python
+class SentimentStrategy:
+    def analyze(self, text: str) -> Sentiment:
+        raise NotImplementedError
+
+class LexiconStrategy(SentimentStrategy):
+    def analyze(self, text):
+        # Word-based sentiment analysis
+        positive_words = {"love", "great", "awesome", "intuitive"}
+        negative_words = {"crash", "broken", "confusing", "hate"}
+        # ... scoring logic
+        pass
+
+class MLStrategy(SentimentStrategy):
+    def analyze(self, text):
+        # Machine learning model
+        pass
+```
+
+### Factory Pattern for Content Creation
+
+```python
+class ContentFactory:
+    @staticmethod
+    def create(content_type: ContentType, **kwargs) -> ContentItem:
+        if content_type == ContentType.TUTORIAL:
+            return TutorialContent(**kwargs)
+        elif content_type == ContentType.QUICKSTART:
+            return QuickstartContent(**kwargs)
+        elif content_type == ContentType.HOW_TO:
+            return HowToContent(**kwargs)
+```
+
+---
+
+## Security
+
+### Data Protection
+
+- PII handling in community member data
+- Consent management for email communications
+- GDPR compliance for EU developers
+- Data retention policies for feedback
+- Secure storage of API keys for platform integrations
+
+### Platform Security
+
+- OAuth token management for platform APIs
+- Rate limiting for API calls
+- Webhook signature verification
+- Secure credential storage
+
+### Access Control
+
+```
+┌─────────────────┬────────┬────────┬────────┬────────┐
+│  Role           │ Member │ Content│ Event  │ Admin  │
+├─────────────────┼────────┼────────┼────────┼────────┤
+│  Viewer         │   ✓    │   ✓    │   ✓    │   ✗    │
+│  Contributor    │   ✓    │   ✓    │   ✗    │   ✗    │
+│  Moderator      │   ✓    │   ✓    │   ✓    │   ✗    │
+│  Admin          │   ✓    │   ✓    │   ✓    │   ✓    │
+└─────────────────┴────────┴────────┴────────┴────────┘
+```
+
+---
+
+## Scalability
+
+### Community Growth Scaling
+
+| Size | Strategy |
+|------|----------|
+| < 100 | Manual engagement, personal touch |
+| 100-1K | Automated responses, community guidelines |
+| 1K-10K | Moderation teams, self-service resources |
+| 10K+ | AI-assisted moderation, community programs |
+
+### Content Scaling
+
+| Volume | Approach |
+|--------|----------|
+| 1-5 posts/week | Individual author |
+| 5-20 posts/week | Editorial calendar, multiple authors |
+| 20+ posts/week | Content team, syndication |
+
+### Performance Considerations
+
+| Operation | Small (< 100) | Medium (< 10K) | Large (< 100K) |
+|-----------|---------------|----------------|----------------|
+| Member analytics | 50ms | 500ms | 5s |
+| Content analytics | 30ms | 300ms | 3s |
+| Feedback analysis | 20ms | 200ms | 2s |
+| Journey analysis | 40ms | 400ms | 4s |
+| Report generation | 100ms | 1s | 10s |
 
 ---
 
@@ -468,6 +717,8 @@ agent = DevRelAgent(config)
 | Documentation quality declining | Set freshness alerts, add code examples, include troubleshooting |
 | Low event attendance | Promote earlier, choose better times, offer recordings |
 | DX score below target | Review individual metrics, prioritize lowest-scoring areas |
+| High churn risk | Identify at-risk developers, proactive outreach, personalized content |
+| NPS declining | Analyze detractor feedback, address common complaints |
 
 ---
 

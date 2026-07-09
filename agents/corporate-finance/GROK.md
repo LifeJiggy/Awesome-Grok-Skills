@@ -384,3 +384,101 @@ def export_report(self, format: str = "json") -> Dict[str, Any]:
 | Monte Carlo results unstable | Too few simulations | Increase simulation count to 5000+ |
 | Ratios show NaN | Division by zero in input data | Validate financial data for completeness and positivity |
 | Forecast lags actuals | Moving average window too large | Reduce window size or switch to exponential smoothing |
+
+## Configuration
+
+```python
+from agents.corporate_finance.agent import CorporateFinanceAgent, Config
+
+config = Config(
+    currency="USD",
+    forecast_method="exponential_smoothing",
+    budget_cycle="annual",
+    scenario_bull_multiplier=1.2,
+    scenario_bear_multiplier=0.8,
+    monte_carlo_simulations=1000,
+    confidence_level=0.95,
+    default_tax_rate=0.21,
+)
+agent = CorporateFinanceAgent(config)
+```
+
+### Configuration Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `currency` | `"USD"` | Currency for all calculations |
+| `forecast_method` | `"exponential_smoothing"` | Default forecasting method |
+| `budget_cycle` | `"annual"` | Default budget period |
+| `scenario_bull_multiplier` | `1.2` | Bullish scenario growth factor |
+| `scenario_bear_multiplier` | `0.8` | Bearish scenario decline factor |
+| `monte_carlo_simulations` | `1000` | Number of Monte Carlo simulations |
+| `confidence_level` | `0.95` | Confidence interval level (95%) |
+| `default_tax_rate` | `0.21` | Default corporate tax rate |
+
+## Examples
+
+### Full Financial Planning Workflow
+
+```python
+from agents.corporate_finance.agent import CorporateFinanceAgent
+
+agent = CorporateFinanceAgent()
+
+# 1. Create departmental budgets
+eng_budget = agent.create_budget("engineering", 2024, 1_200_000, "operating", owner="CTO")
+mkt_budget = agent.create_budget("marketing", 2024, 800_000, "operating", owner="CMO")
+
+# 2. Track spending
+agent._budget_manager.update_budget_spend(eng_budget.budget_id, spent=300_000, committed=50_000)
+agent._budget_manager.update_budget_spend(mkt_budget.budget_id, spent=200_000, committed=30_000)
+
+# 3. Forecast revenue
+historical = {"Q1": 1_200_000, "Q2": 1_350_000, "Q3": 1_500_000}
+forecast = agent.forecast(historical, periods=4, method="exponential_smoothing")
+
+# 4. Analyze financials
+analysis = agent.analyze_financials({
+    "revenue": 5_000_000, "gross_profit": 3_000_000,
+    "net_income": 800_000, "total_assets": 10_000_000,
+    "total_equity": 6_000_000, "total_liabilities": 4_000_000,
+    "current_assets": 3_000_000, "current_liabilities": 2_000_000,
+})
+
+# 5. Optimize costs
+cost_opt = agent.optimize_costs("cloud_hosting", 250_000)
+
+# 6. Allocate capital
+allocation = agent.allocate_capital("R&D", 500_000, ["AI Platform", "Data Pipeline"])
+
+# 7. Generate report
+report = agent.export_report("json")
+```
+
+## Best Practices
+
+1. **Review Budgets Monthly** — Track spend vs. forecast regularly to catch variances early
+2. **Multiple Forecast Methods** — Compare methods for best accuracy; use ensemble approaches
+3. **Stress Test Assumptions** — Use scenario analysis for risk management and planning
+4. **Document Assumptions** — Record all forecasting assumptions for audit trail
+5. **Act on Variances** — Investigate and address budget variances promptly; don't let them compound
+6. **Optimize Continuously** — Regular cost optimization reviews; target 5-15% annual savings
+7. **Align Capital to Strategy** — Ensure allocations support strategic goals, not just departmental requests
+8. **Monitor Key Ratios** — Track financial ratios quarterly; address trends before they become problems
+9. **Use Conservative Estimates** — When uncertain, err on the side of caution in forecasts
+10. **Maintain Audit Trail** — Log all financial decisions with rationale and timestamps
+
+## Security Considerations
+
+- Financial data is sensitive; implement access controls
+- All calculations logged for audit trail
+- Budget approvals require proper authorization
+- Financial reports restricted to authorized personnel
+- Data encryption at rest for financial records
+- Regular backup of financial data
+- Compliance with financial regulations (SOX, GAAP, IFRS)
+- Segregation of duties for financial operations
+
+---
+
+*Corporate Finance Agent v2.0 — Part of the Awesome Grok Skills collection.*

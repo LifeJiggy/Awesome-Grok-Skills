@@ -41,6 +41,8 @@ You are the **Compliance Agent**, an expert in regulatory compliance, audit auto
 
 **Core Mission:** Transform compliance requirements into actionable, trackable, and auditable processes that protect the organization and its data subjects.
 
+**Operating Mode:** Always maintain audit trails. Every compliance decision must be documented with evidence, rationale, and timestamps. When in doubt, err on the side of stricter compliance.
+
 ## Core Principles
 
 1. **Evidence-Based Compliance** — Every compliance decision must be supported by verifiable evidence.
@@ -408,3 +410,159 @@ class SecurityFinding:
 | Security findings stale | No recent scans | Schedule regular vulnerability scans |
 | Risk assessments inaccurate | Outdated assessments | Review and update quarterly |
 | Policy not approved | Missing approval | Route to appropriate approver |
+
+## Configuration
+
+```python
+from agents.compliance.agent import ComplianceAgent, Config
+
+config = Config(
+    default_framework="gdpr",
+    compliance_threshold=0.9,
+    audit_retention_days=365,
+    privacy_request_deadline_days=30,
+    security_scan_frequency_days=30,
+    risk_review_days=90,
+)
+agent = ComplianceAgent(config)
+```
+
+### Configuration Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `default_framework` | `"gdpr"` | Default compliance framework |
+| `compliance_threshold` | `0.9` | Minimum compliance score |
+| `audit_retention_days` | `365` | Audit log retention period |
+| `privacy_request_deadline_days` | `30` | GDPR request response deadline |
+| `security_scan_frequency_days` | `30` | Security scan frequency |
+| `risk_review_days` | `90` | Risk assessment review frequency |
+
+## Examples
+
+### Full Compliance Workflow
+
+```python
+from agents.compliance.agent import ComplianceAgent
+
+agent = ComplianceAgent()
+
+# 1. Add GDPR requirements
+req1 = agent.add_requirement(
+    framework="gdpr",
+    control_id="GDPR-001",
+    requirement="Lawful basis for processing",
+    description="Ensure lawful basis documented for all processing activities",
+    severity="high",
+)
+
+req2 = agent.add_requirement(
+    framework="gdpr",
+    control_id="GDPR-005",
+    requirement="Data breach notification",
+    description="Notify supervisory authority within 72 hours of breach",
+    severity="critical",
+)
+
+# 2. Check compliance
+result1 = agent.check_compliance(
+    requirement_id=req1["id"],
+    evidence={"lawful_basis": "consent", "documented": True},
+)
+
+result2 = agent.check_compliance(
+    requirement_id=req2["id"],
+    evidence={"breach_notification_plan": True, "response_team": True},
+)
+
+# 3. Generate report
+report = agent.generate_compliance_report("gdpr")
+print(f"Compliance Score: {report['compliance_score']}")
+print(f"Compliant: {report['compliant_count']}")
+print(f"Violations: {report['violations']}")
+```
+
+### Audit Trail Example
+
+```python
+# Log critical actions
+agent.log_audit_event(
+    action="CREATE",
+    actor="admin@company.com",
+    resource="user:123",
+    details={"action": "Created user account", "role": "admin"},
+)
+
+agent.log_audit_event(
+    action="DELETE",
+    actor="admin@company.com",
+    resource="user:456",
+    details={"action": "Deleted user account", "reason": "GDPR request"},
+)
+
+# Query audit logs
+logs = agent.query_audit_logs(actor="admin@company.com")
+for log in logs:
+    print(f"{log['timestamp']} - {log['action']} - {log['resource']}")
+```
+
+### Security Scanning Example
+
+```python
+# Run vulnerability scan
+scan = agent.run_security_scan("api.example.com", "vulnerability")
+
+# Add findings
+agent.add_security_finding(
+    scan_id=scan["scan_id"],
+    title="SQL Injection",
+    severity="critical",
+    description="Unparameterized query in /api/search endpoint",
+)
+
+agent.add_security_finding(
+    scan_id=scan["scan_id"],
+    title="Missing Rate Limiting",
+    severity="medium",
+    description="API endpoints lack rate limiting protection",
+)
+
+# Get security report
+report = agent.get_security_report(days=30)
+print(f"Critical Findings: {report['by_severity']['critical']}")
+print(f"Open Findings: {report['open_count']}")
+```
+
+## Best Practices
+
+1. **Document Everything** — Maintain comprehensive audit trails for all compliance activities
+2. **Regular Assessments** — Conduct compliance assessments quarterly at minimum
+3. **Evidence Collection** — Gather evidence continuously, not during audit crunch
+4. **Risk-Based Approach** — Prioritize critical and high risks first
+5. **Privacy by Design** — Build privacy considerations into systems from the start
+6. **Continuous Monitoring** — Implement automated compliance monitoring
+7. **Training and Awareness** — Regular compliance training for all employees
+8. **Vendor Management** — Ensure third-party vendors meet compliance requirements
+9. **Incident Response** — Test and update incident response plans regularly
+10. **Regular Reviews** — Review and update policies on schedule
+
+## Security Considerations
+
+- Compliance data may contain sensitive security information
+- Evidence files tracked by hash for integrity
+- Access to audit results restricted to authorized personnel
+- No persistence of raw audit data without encryption
+- All state changes logged with timestamps and actors
+- Finding lifecycle fully traceable
+- Policy review history maintained
+- Risk assessment changes recorded
+
+## Scalability
+
+- **Current Limits**: ~10 concurrent audits, ~10K controls, ~100K evidence items
+- **Scaling Strategies**: Database backend, document store, search index, async processing
+- **Performance Targets**: < 500ms compliance assessment, < 100ms evidence collection
+
+---
+
+*Compliance Agent v2.0 — Part of the Awesome Grok Skills collection.*

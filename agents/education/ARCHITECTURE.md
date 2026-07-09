@@ -554,3 +554,264 @@ education_agent:
 | Load tests | Throughput | locust |
 | Property tests | Data invariants | hypothesis |
 | E2E tests | Full learner journey | playwright |
+
+### Unit Test Examples
+
+```python
+# Course Manager Tests
+def test_create_course():
+    manager = CourseManager()
+    course = manager.create_course("Test Course", "Description", "inst_001")
+    assert course.title == "Test Course"
+    assert course.status == CourseStatus.DRAFT
+
+def test_publish_course():
+    manager = CourseManager()
+    course = manager.create_course("Test", "Desc", "inst_001")
+    manager.add_module(course.course_id, "Module 1")
+    assert manager.publish_course(course.course_id)
+
+# Quiz Engine Tests
+def test_grade_quiz():
+    engine = QuizEngine()
+    quiz = engine.create_quiz("Test Quiz", "course_001", passing_score=70)
+    engine.add_question(quiz.quiz_id, "What is 2+2?", ["3", "4", "5"], 1, points=10)
+    attempt = engine.grade_quiz(quiz.quiz_id, "learner_001", {"q_1": 1})
+    assert attempt.percentage == 100.0
+    assert attempt.passed
+
+# Spaced Repetition Tests
+def test_sm2_algorithm():
+    srs = SpacedRepetitionEngine()
+    item = srs.add_item("learner_001", "content_001")
+    
+    # Quality 5 (easy recall)
+    updated = srs.record_review(item.item_id, quality=5)
+    assert updated.interval_days > item.interval_days
+    assert updated.ease_factor >= 2.5
+```
+
+### Integration Test Examples
+
+```python
+def test_learner_journey():
+    agent = EducationAgent()
+    
+    # Create course
+    result = agent.create_course_with_content(
+        title="Test Course",
+        description="Test",
+        instructor_id="inst_001",
+        modules_data=[{
+            "title": "Module 1",
+            "lessons": [
+                {"title": "Lesson 1", "type": "text", "duration": 10},
+            ],
+        }],
+    )
+    course_id = result["course_id"]
+    
+    # Learner enrolls
+    profile = agent.learner_manager.create_learner_profile("Test User", "test@example.com")
+    enrollment = agent.learner_manager.enroll_learner(course_id, profile.learner_id)
+    
+    # Complete lesson
+    agent.learner_manager.update_progress(enrollment.enrollment_id, "lesson_001")
+    
+    # Verify progress
+    dashboard = agent.learner_manager.get_learner_dashboard(profile.learner_id)
+    assert dashboard["completed"] >= 1
+```
+
+### Performance Test Scenarios
+
+| Scenario | Target | Description |
+|----------|--------|-------------|
+| Course search | < 10ms | Search 1K courses |
+| Quiz grading | < 50ms | Grade 50 questions |
+| Progress update | < 5ms | Update lesson completion |
+| Analytics query | < 100ms | Platform overview |
+| Certificate verify | < 10ms | Verify certificate |
+
+---
+
+## Deployment Architecture
+
+### Single-Instance Deployment
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    APPLICATION SERVER                         │
+├─────────────────────────────────────────────────────────────┤
+│  ┌───────────────────────────────────────────────────────┐ │
+│  │                  EducationAgent                        │ │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐    │ │
+│  │  │ Course  │ │ Learner │ │  Quiz   │ │  Cert   │    │ │
+│  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘    │ │
+│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐    │ │
+│  │  │  SRS    │ │  Path   │ │  Game   │ │Analytics│    │ │
+│  │  └─────────┘ └─────────┘ └─────────┘ └─────────┘    │ │
+│  └───────────────────────────────────────────────────────┘ │
+│                                                             │
+│  ┌───────────────────────────────────────────────────────┐ │
+│  │                  DATA LAYER                            │ │
+│  │  In-Memory │ Optional DB │ Cache (Redis)              │ │
+│  └───────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Video Content Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    VIDEO PIPELINE                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  Upload → Transcode → Store → Deliver                        │
+│    │         │          │         │                          │
+│    ▼         ▼          ▼         ▼                          │
+│  ┌─────┐  ┌─────┐   ┌─────┐  ┌─────┐                      │
+│  │ S3  │  │ FFmpeg│  │ CDN │  │ HLS │                      │
+│  └─────┘  └─────┘   └─────┘  └─────┘                      │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Security Architecture
+
+### Authentication Flow
+
+```
+  Learner Login
+       │
+       ▼
+  ┌──────────────┐
+  │   Auth Service│
+  │  (JWT Tokens) │
+  └──────┬───────┘
+         │
+    ┌────┴────┐
+    │ Valid?  │
+    └────┬────┘
+    Yes  │  No
+    │    │   │
+    ▼    │   ▼
+  Access│  401 Unauthorized
+  Content│
+```
+
+### Data Protection
+
+| Data Type | Protection | Storage |
+|-----------|------------|---------|
+| Learner PII | AES-256 | Database |
+| Course content | DRM | CDN |
+| Quiz answers | Hashed | Database |
+| Certificates | Digital signature | Database |
+| Payment data | Tokenized | Payment processor |
+
+### Assessment Integrity
+
+- Randomize question order per attempt
+- Implement time limits
+- Limit attempts to prevent brute-force
+- Use question banks for large pools
+- Track suspicious patterns
+
+---
+
+## Monitoring and Observability
+
+### Key Metrics
+
+| Metric | Description | Alert Threshold |
+|--------|-------------|-----------------|
+| Course completion rate | Completions / enrollments | < 30% |
+| Quiz pass rate | Passed / attempted | < 50% |
+| Average quiz score | Mean score across quizzes | < 60% |
+| Learner activity | Active learners / total | < 20% |
+| API response time | 95th percentile | > 500ms |
+| Error rate | Errors / total requests | > 1% |
+
+### Learning Analytics Dashboard
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    LEARNING DASHBOARD                         │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │  Courses    │  │  Learners   │  │ Completion  │         │
+│  │    150      │  │   5,000     │  │    65%      │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+│                                                               │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
+│  │  Quizzes    │  │ Avg Score   │  │ At-Risk     │         │
+│  │    500      │  │    78%      │  │    12%      │         │
+│  └─────────────┘  └─────────────┘  └─────────────┘         │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Data Retention Policy
+
+| Data Type | Retention | Archive After |
+|-----------|-----------|---------------|
+| Course content | Indefinite | Never |
+| Learner progress | 5 years | 2 years |
+| Quiz attempts | 2 years | 1 year |
+| Certificates | Indefinite | Never |
+| Analytics data | 3 years | 1 year |
+| Session data | 30 days | Immediate |
+
+---
+
+## Disaster Recovery
+
+### Backup Strategy
+
+| Data | Frequency | Method | Recovery Time |
+|------|-----------|--------|---------------|
+| Course content | Daily | Full dump | < 1 hour |
+| Learner data | Real-time | Replication | < 5 minutes |
+| Quiz data | Daily | Encrypted backup | < 2 hours |
+| Certificates | Daily | Encrypted backup | < 2 hours |
+
+### Recovery Procedures
+
+1. **Data corruption**: Restore from last backup
+2. **Service failure**: Restart and verify state
+3. **Database failure**: Switch to replica
+4. **Full outage**: Deploy to backup region
+
+---
+
+## Accessibility Features
+
+### WCAG 2.1 Compliance
+
+| Feature | Status | Level |
+|---------|--------|-------|
+| Keyboard navigation | Supported | AA |
+| Screen reader support | Supported | AA |
+| Color contrast | 4.5:1 minimum | AA |
+| Alt text for images | Required | A |
+| Captions for video | Supported | AA |
+| Focus indicators | Visible | AA |
+
+### Responsive Design Breakpoints
+
+| Breakpoint | Width | Usage |
+|------------|-------|-------|
+| Mobile | < 768px | Single column |
+| Tablet | 768-1024px | Two columns |
+| Desktop | > 1024px | Full layout |
+
+---
+
+**See Also**: [GROK.md](./GROK.md) for agent identity and capabilities,
+[README.md](./README.md) for quick start and API reference.

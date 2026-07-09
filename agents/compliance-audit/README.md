@@ -45,6 +45,12 @@ The Compliance Audit Agent is a Python-based system for managing the full compli
 - Finding lifecycle tracking with remediation management
 - Unified compliance dashboard
 
+**Ideal For:**
+- Compliance officers managing multiple regulatory frameworks
+- Security teams tracking audit readiness
+- Risk managers assessing and mitigating compliance risks
+- Organizations preparing for external audits
+
 ## Features
 
 | Feature | Description |
@@ -339,8 +345,84 @@ config = {
     "default_framework": "SOC2",
     "compliance_threshold": 0.9,
     "risk_review_days": 90,
+    "evidence_retention_days": 365,
+    "audit_retention_days": 2555,  # 7 years
+    "max_concurrent_audits": 10,
+    "evidence_hash_algorithm": "sha256",
+    "auto_escalation_enabled": True,
+    "escalation_threshold_days": 7,
 }
 agent = ComplianceAuditAgent(config)
+```
+
+### Configuration Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `default_framework` | `"SOC2"` | Default compliance framework |
+| `compliance_threshold` | `0.9` | Minimum compliance score |
+| `risk_review_days` | `90` | Risk assessment review frequency |
+| `evidence_retention_days` | `365` | Evidence retention period |
+| `audit_retention_days` | `2555` | Audit record retention (7 years) |
+| `max_concurrent_audits` | `10` | Maximum simultaneous audits |
+| `evidence_hash_algorithm` | `"sha256"` | Hash algorithm for evidence integrity |
+| `auto_escalation_enabled` | `True` | Enable automatic escalation |
+| `escalation_threshold_days` | `7` | Days before escalation |
+
+## Examples
+
+### Full Compliance Workflow
+
+```python
+from agents.compliance_audit.agent import ComplianceAuditAgent
+
+agent = ComplianceAuditAgent()
+
+# 1. Assess compliance
+assessment = agent.assess_compliance(
+    framework="SOC2",
+    control_scores={
+        "CC1.1": 0.9,
+        "CC6.1": 0.3,
+        "CC7.1": 0.7,
+    },
+)
+
+# 2. Record risks
+risk = agent.record_risk(
+    asset="Customer Database",
+    threat="Data Breach",
+    vulnerability="Weak access controls",
+    likelihood=0.4,
+    impact=0.9,
+)
+
+# 3. Collect evidence
+evidence = agent.collect_evidence(
+    name="Access Control Policy",
+    evidence_type="policy",
+    control_ids=["CC6.1"],
+)
+
+# 4. Add finding
+from agents.compliance_audit.agent import Finding, Severity
+finding = Finding(
+    title="Weak access controls",
+    description="Customer database lacks RBAC",
+    severity=Severity.HIGH,
+)
+finding_id = agent._remediation_tracker.add_finding(finding)
+
+# 5. Track remediation
+agent._remediation_tracker.assign_remediation(
+    finding_id=finding_id,
+    owner="Security Team",
+    deadline_days=14,
+)
+
+# 6. Generate dashboard
+dashboard = agent.get_compliance_dashboard()
+print(f"Compliance Status: {dashboard['overall_status']}")
 ```
 
 ## Best Practices
@@ -351,6 +433,10 @@ agent = ComplianceAuditAgent(config)
 4. **Accountable Remediation** — Every finding needs an owner and a deadline
 5. **Policy Lifecycle** — Review and update policies on schedule
 6. **Continuous Monitoring** — Compliance is a process, not a point-in-time event
+7. **Cross-Framework Mapping** — Leverage control mappings to reduce duplication
+8. **Automation First** — Automate evidence collection and verification where possible
+9. **Regular Training** — Ensure all stakeholders understand compliance requirements
+10. **Document Everything** — Maintain comprehensive audit trails
 
 ## Troubleshooting
 
@@ -362,6 +448,8 @@ agent = ComplianceAuditAgent(config)
 | Finding keeps reopening | Address root cause, not just symptoms |
 | Framework mismatch | Use cross-framework mapping |
 | Audit timeline slipping | Narrow scope, increase resources |
+| Risk assessments outdated | Schedule quarterly risk assessments |
+| Policy not enforced | Implement mandatory compliance training |
 
 ## Files
 

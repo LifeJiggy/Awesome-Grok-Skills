@@ -315,6 +315,9 @@ config = {
     "moderation_threshold": 0.7,
     "default_platform": "website",
     "enable_auto_moderation": True,
+    "content_store_limit": 10000,
+    "calendar_entry_limit": 5000,
+    "performance_record_limit": 100000,
 }
 agent = ContentAgent(config)
 ```
@@ -331,6 +334,9 @@ agent = ContentAgent(config)
 | `moderation_threshold` | `0.7` | Minimum score to approve content |
 | `default_platform` | `"website"` | Default platform for publishing |
 | `enable_auto_moderation` | `True` | Auto-moderate on generation |
+| `content_store_limit` | `10000` | Maximum content pieces in store |
+| `calendar_entry_limit` | `5000` | Maximum calendar entries |
+| `performance_record_limit` | `100000` | Maximum performance records |
 
 ## Examples
 

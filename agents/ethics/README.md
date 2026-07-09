@@ -34,6 +34,28 @@ tracks accountability chains, maintains audit trails, and assesses model risk.
 Built with modular sub-engines, each component operates independently while
 being orchestrated by a top-level agent for unified assessments and dashboards.
 
+### Key Benefits
+
+- **Zero Dependencies**: Pure Python stdlib, no external packages required
+- **Statistical Rigor**: Bias claims backed by evidence, not intuition
+- **Multi-Framework**: EU AI Act, GDPR, CCPA, NIST, ISO 42001 support
+- **Modular Design**: Use only the components you need
+- **Type-Safe**: Full type hints on all public methods
+- **Extensible**: Easy to add custom bias rules, compliance frameworks
+
+### Use Cases
+
+| Use Case | Description |
+|----------|-------------|
+| Bias Detection | Analyze predictions across protected attributes |
+| Fairness Metrics | Calculate DP, EO, EOpp metrics |
+| Compliance | Track requirements across multiple frameworks |
+| Transparency | Create model cards and impact assessments |
+| Accountability | Assign roles and track sign-offs |
+| Audit Trails | Log events and manage audits |
+| Risk Assessment | Score and classify model risk |
+| Incident Reporting | Track and resolve ethics incidents |
+
 ---
 
 ## Features
@@ -44,6 +66,8 @@ being orchestrated by a top-level agent for unified assessments and dashboards.
 - Confidence intervals and statistical significance
 - Automatic recommendation generation
 - Analysis history and trending
+- Custom bias rule support
+- Real-time monitoring capabilities
 
 ### Fairness Metrics
 - Demographic Parity calculation
@@ -51,6 +75,8 @@ being orchestrated by a top-level agent for unified assessments and dashboards.
 - Equal Opportunity (TPR parity)
 - Multi-metric comparison
 - Per-group fairness values
+- Threshold customization
+- Historical metric tracking
 
 ### Compliance Management
 - 10+ frameworks (EU AI Act, GDPR, CCPA, NIST, ISO 42001, etc.)
@@ -58,6 +84,8 @@ being orchestrated by a top-level agent for unified assessments and dashboards.
 - Compliance checking with evidence
 - Overdue requirement alerts
 - Compliance rate reporting
+- Custom framework support
+- Evidence attachment
 
 ### Transparency Documentation
 - Model card generation
@@ -65,43 +93,96 @@ being orchestrated by a top-level agent for unified assessments and dashboards.
 - Document approval workflow
 - Public disclosure management
 - Version tracking
+- Template customization
+- Bulk document generation
 
 ### Accountability
 - Role-based responsibility assignment
 - Sign-off tracking
 - Accountability chain visualization
 - Model ownership mapping
+- Escalation procedures
+- Deadline management
+- Notification system
 
 ### Audit Trail
 - Event logging with timestamps
 - Audit lifecycle management (start → complete)
 - Audit report generation
 - History querying and filtering
+- Immutable records
+- Export capabilities
+- Compliance evidence
 
 ### Risk Assessment
 - Multi-factor risk scoring
 - Risk level classification (Minimal to Critical)
 - Automated recommendation generation
 - High-risk model identification
+- Risk trend analysis
+- Mitigation tracking
+- Executive summaries
 
 ### Ethics Guidelines
 - 7 core AI ethics principles
 - Domain-specific additions (healthcare, finance, criminal justice)
 - Custom principle support
 - Domain-specific checklists
+- Best practice recommendations
+- Training materials
+- Regular updates
 
 ---
 
 ## Architecture
 
+### Component Diagram
+
 ```
-┌──────────────────────────────────────────────────────┐
-│                  EthicsAgent                          │
-├──────────────────────────────────────────────────────┤
-│  BiasDetector │ FairnessMetrics │ ComplianceManager  │
-│  TransparencyManager │ AccountabilityTracker         │
-│  AuditTrail │ GuidelinesEngine │ RiskManager         │
-└──────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         ETHICS AGENT                                      │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    GOVERNANCE WORKFLOW                             │   │
+│  │  Detect → Assess → Document → Approve → Monitor → Audit          │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Bias      │ │  Fairness  │ │  Compliance│ │  Trans-    │           │
+│  │  Detector  │ │  Metrics   │ │  Manager   │ │  parency   │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Account-  │ │  Audit     │ │  Risk      │ │  Guidelines│           │
+│  │  ability   │ │  Trail     │ │  Manager   │ │  Engine    │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Governance Flow
+
+```
+  Pre-Deployment Assessment:
+  ═════════════════════════
+
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Collect  │ ─► │ Analyze  │ ─► │ Assess   │ ─► │ Document │
+  │ Predict- │    │ Bias     │    │ Risk     │    │ Findings │
+  │ ions     │    │          │    │          │    │          │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+       │               │               │               │
+       ▼               ▼               ▼               ▼
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Protected│    │ Fairness │    │ Compliance│   │ Model    │
+  │ Attrs    │    │ Metrics  │    │ Check    │    │ Card     │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+```
+
+### Bias Detection Pipeline
+
+```
+  Input Predictions → Group by Attribute → Calculate Rates →
+  Compute Disparity → Apply Thresholds → Flag/Recommend
 ```
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed component diagrams,
@@ -144,6 +225,17 @@ pip install -r requirements.txt
 python agents/ethics/agent.py
 ```
 
+### Requirements
+
+- Python 3.10+
+- No external dependencies (stdlib only)
+
+### Platform Support
+
+- Windows 10+
+- macOS 10.15+
+- Linux (Ubuntu 18.04+, Debian 9+)
+
 ---
 
 ## Usage
@@ -171,6 +263,20 @@ print(agent.get_status())
 dashboard = agent.get_ethics_dashboard()
 print(f"Bias analyses: {dashboard['bias']['total_analyses']}")
 print(f"Compliance rate: {dashboard['compliance']['compliance_rate']}%")
+```
+
+### Using Individual Components
+
+```python
+from agents.ethics.agent import BiasDetector, FairnessMetrics
+
+# Use bias detector independently
+detector = BiasDetector()
+results = detector.analyze_predictions(predictions, ["gender"])
+
+# Use fairness metrics independently
+fairness = FairnessMetrics()
+dp = fairness.calculate_demographic_parity(predictions, "gender")
 ```
 
 ---
@@ -346,6 +452,8 @@ print(f"All signed off: {chain['all_signed_off']}")
 
 ## Configuration
 
+### Agent Configuration (YAML)
+
 ```yaml
 ethics_agent:
   bias_detector:
@@ -388,6 +496,20 @@ ethics_agent:
     reassessment_interval_days: 90
 ```
 
+### Environment Variables
+
+```bash
+# Model Registry
+MLFLOW_TRACKING_URI=...
+
+# Notification
+SLACK_WEBHOOK_URL=...
+EMAIL_SMTP_HOST=...
+
+# Storage
+AUDIT_STORAGE_PATH=/var/audit
+```
+
 ---
 
 ## Best Practices
@@ -400,6 +522,24 @@ ethics_agent:
 6. **Conduct regular audits** — quarterly minimum, monthly for high-risk.
 7. **Report incidents immediately** — don't wait for the next audit cycle.
 8. **Monitor continuously** — bias can emerge over time as data drifts.
+9. **Engage diverse stakeholders** — include affected communities in review.
+10. **Stay current** — regulations evolve; update compliance frameworks.
+
+### Governance Best Practices
+
+- Establish an AI ethics board
+- Create clear escalation procedures
+- Maintain audit trails for all decisions
+- Provide regular training on responsible AI
+- Document all model changes
+
+### Compliance Best Practices
+
+- Map requirements to specific model components
+- Maintain evidence of compliance
+- Track deadline adherence
+- Conduct regular compliance reviews
+- Prepare for external audits
 
 ---
 
@@ -413,6 +553,20 @@ ethics_agent:
 | Risk score too high | Multiple issues found | Address highest-severity first |
 | Audit trail gaps | Events not logged | Ensure log_event() called |
 | Model card missing | Not created | Call create_model_card() |
+| At-risk list empty | No high-risk models | Lower risk threshold |
+| Incident not resolving | Missing resolution | Set resolved_at timestamp |
+
+### Debug Mode
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Get detailed bias analysis
+results = agent.bias_detector.analyze_predictions(predictions, ["gender"])
+for attr, result in results.items():
+    print(f"{attr}: {result.group_rates}")
+```
 
 ---
 
@@ -423,6 +577,15 @@ ethics_agent:
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+### Code Standards
+
+- Full type hints on all public methods
+- Docstrings for all classes and public methods
+- Zero external dependencies (stdlib only)
+- Follow existing naming conventions
+- Write tests for new functionality
+- Update documentation for API changes
 
 ---
 

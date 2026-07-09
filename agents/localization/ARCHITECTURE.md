@@ -4,17 +4,17 @@
 
 The Localization Agent is a comprehensive internationalization and localization platform that manages the complete lifecycle of shipping software across languages and regions. It provides translation memory management with fuzzy matching, i18n engineering with locale-aware formatting, cultural adaptation with style guide enforcement, automated quality assurance, terminology consistency, and multi-market project orchestration.
 
-The platform is designed for product teams managing large-scale translation projects across 50+ languages, where consistency, quality, and efficiency are paramount. It supports the full workflow from string extraction through translation, review, QA, integration, and launch.
+The platform is designed for product teams managing large-scale translation projects across 50+ languages, where consistency, quality, and efficiency are paramount.
 
 ## Design Principles
 
-**Translation Memory First.** Every translated string is stored in the TM for future leverage. The system aggressively matches new strings against existing translations, reducing cost and improving consistency.
+**Translation Memory First.** Every translated string is stored in the TM for future leverage.
 
-**Quality is Automated.** Manual review catches nuance; automated QA catches mechanics. The system runs placeholder checks, glossary compliance, length limits, and encoding validation before human reviewers see the text.
+**Quality is Automated.** Manual review catches nuance; automated QA catches mechanics.
 
-**Locale-Aware Formatting.** Numbers, dates, currencies, and lists must respect local conventions. The system provides locale configuration for formatting and validates that translations preserve format placeholders.
+**Locale-Aware Formatting.** Numbers, dates, currencies, and lists must respect local conventions.
 
-**Terminology is Sacred.** Inconsistent terminology destroys user trust. The glossary system enforces correct terms and flags forbidden alternatives.
+**Terminology is Sacred.** Inconsistent terminology destroys user trust.
 
 ## Architecture Diagram
 
@@ -25,7 +25,6 @@ The platform is designed for product teams managing large-scale translation proj
 │                                                                                   │
 │  ┌────────────────────────────────────────────────────────────────────────────┐  │
 │  │                   Translation Memory Layer                                  │  │
-│  │                                                                            │  │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │  │
 │  │  │TM Store  │ │Fuzzy     │ │Leverage  │ │TM        │ │Cost      │       │  │
 │  │  │& Retrieval│ │Matching  │ │Analysis  │ │Maint.    │ │Savings   │       │  │
@@ -35,17 +34,14 @@ The platform is designed for product teams managing large-scale translation proj
 │                                                                                   │
 │  ┌────────────────────────────────────────────────────────────────────────────┐  │
 │  │                   i18n Engineering Layer                                    │  │
-│  │                                                                            │  │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │  │
 │  │  │Locale    │ │Pseudo-   │ │Number/   │ │RTL       │ │Resource  │       │  │
 │  │  │Config    │ │localize  │ │Date/Curr │ │Support   │ │File Mgmt │       │  │
-│  │  │          │ │          │ │Format    │ │          │ │          │       │  │
 │  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘       │  │
 │  └────────────────────────────────────────────────────────────────────────────┘  │
 │                                                                                   │
 │  ┌────────────────────────────────────────────────────────────────────────────┐  │
 │  │                  Cultural Adaptation Layer                                  │  │
-│  │                                                                            │  │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐                     │  │
 │  │  │Style     │ │Cultural  │ │Content   │ │Tone &    │                     │  │
 │  │  │Guide     │ │Rules     │ │Adaptation│ │Formality │                     │  │
@@ -54,7 +50,6 @@ The platform is designed for product teams managing large-scale translation proj
 │                                                                                   │
 │  ┌────────────────────────────────────────────────────────────────────────────┐  │
 │  │                  Quality Assurance Layer                                    │  │
-│  │                                                                            │  │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │  │
 │  │  │Missing   │ │Placeholder│ │Length    │ │Glossary  │ │Style     │       │  │
 │  │  │Translation│ │Check     │ │Check     │ │Compliance│ │Check     │       │  │
@@ -64,7 +59,6 @@ The platform is designed for product teams managing large-scale translation proj
 │                                                                                   │
 │  ┌────────────────────────────────────────────────────────────────────────────┐  │
 │  │                  Terminology Management Layer                               │  │
-│  │                                                                            │  │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐                                  │  │
 │  │  │Glossary  │ │Termbase  │ │Forbidden │                                  │  │
 │  │  │Manager   │ │Enforce   │ │Terms     │                                  │  │
@@ -73,13 +67,11 @@ The platform is designed for product teams managing large-scale translation proj
 │                                                                                   │
 │  ┌────────────────────────────────────────────────────────────────────────────┐  │
 │  │                  Project Management Layer                                   │  │
-│  │                                                                            │  │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │  │
 │  │  │Workflow  │ │Progress  │ │Deadline  │ │Team      │ │Portfolio │       │  │
 │  │  │Orchestr. │ │Tracking  │ │Mgmt      │ │Coord.    │ │Overview  │       │  │
 │  │  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘       │  │
 │  └────────────────────────────────────────────────────────────────────────────┘  │
-│                                                                                   │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -87,16 +79,12 @@ The platform is designed for product teams managing large-scale translation proj
 
 ### Translation Memory Engine
 
-Stores previous translations and finds matches for new strings to maximize leverage and consistency.
+Stores previous translations and finds matches for new strings.
 
 **Fuzzy Match Algorithm (Jaccard Similarity):**
 ```
 tokenize(text) → set of words (lowercased)
 score = |intersection(words_a, words_b)| / |union(words_a, words_b)|
-
-Example:
-  "Hello World" vs "Hello World!" → {"hello", "world"} vs {"hello", "world", "!"}
-  score = |{"hello", "world"}| / |{"hello", "world", "!"}| = 2/3 = 0.667
 ```
 
 **Match Type Classification:**
@@ -111,29 +99,8 @@ Example:
 
 **Leverage Calculation:**
 ```
-For each source string:
-  matches = find_matches(source_text, src_lang, tgt_lang, limit=1)
-  if matches[0].score >= 0.95:
-    exact_count += 1
-  elif matches[0].score >= 0.75:
-    fuzzy_count += 1
-  else:
-    new_count += 1
-
 leverage = (exact_count + fuzzy_count × 0.75) / total_strings × 100
 cost_savings = leverage% (approximately)
-```
-
-**TM Maintenance Report:**
-```python
-report = tm_engine.maintenance_report()
-# Returns:
-# - total_entries: 100,000
-# - approved_entries: 90,000
-# - pending_review: 10,000
-# - by_language_pair: {"en-es": 30000, "en-fr": 25000, ...}
-# - by_domain: {"greeting": 5000, "technical": 15000, ...}
-# - utilization_rate: 45.0 (avg uses per entry)
 ```
 
 **TM Data Model:**
@@ -169,7 +136,6 @@ locale: "es-ES"
   decimal_separator: ","
   thousands_separator: "."
   first_day_of_week: 1 (Monday)
-  plural_rules: "spanish"
 ```
 
 **RTL Language Support:**
@@ -178,7 +144,6 @@ Languages requiring RTL: ar, he, fa, ur
   → HTML: <html dir="rtl" lang="ar">
   → CSS: logical properties (margin-inline-start vs margin-left)
   → Layout: mirrored navigation and icons
-  → Text: right-aligned by default
 ```
 
 **Pseudo-Localization Algorithm:**
@@ -187,8 +152,8 @@ For each source string:
   1. Expand vowels: "Hello" → "Ĥéľľó"
   2. Add padding: "Hello" → "¡Ĥéľľó!"
   3. For RTL: add RTL marks
-  
-Purpose: Test UI layout with longer, expanded text before real translations exist
+
+Purpose: Test UI layout with longer text before real translations exist
 ```
 
 **Format Handling by Locale:**
@@ -203,7 +168,7 @@ Purpose: Test UI layout with longer, expanded text before real translations exis
 
 ### Cultural Adaptation Engine
 
-Ensures content is culturally appropriate, not just linguistically correct.
+Ensures content is culturally appropriate.
 
 **Style Guide Components:**
 ```python
@@ -214,12 +179,10 @@ guide = StyleGuide(
     rules=[
         {"type": "pronoun", "rule": "Use keigo (honorific) in B2B"},
         {"type": "avoidance", "rule": "Never use direct refusal"},
-        {"type": "seasonal", "rule": "Seasonal references appreciated"},
     ],
     brand_voices={
         "product": "Friendly but professional",
         "marketing": "Aspirational and warm",
-        "support": "Patient and helpful",
     },
 )
 ```
@@ -228,8 +191,8 @@ guide = StyleGuide(
 | Language | Rule Type | Description |
 |----------|-----------|-------------|
 | ja | honorifics | Use keigo for B2B contexts |
-| ja | avoidance | Avoid direct "no" — use softer alternatives |
-| de | formality | Use "Sie" in business communications |
+| ja | avoidance | Avoid direct "no" |
+| de | formality | Use "Sie" in business |
 | de | precision | Technical compound words are standard |
 | zh | numerology | Avoid number 4, prefer 8 |
 | ar | religious | Avoid pork/alcohol references |
@@ -238,7 +201,7 @@ guide = StyleGuide(
 
 ### Quality Assurance Engine
 
-Runs automated checks before human review to catch mechanical errors.
+Runs automated checks before human review.
 
 **QA Check Matrix:**
 | Check Type | Severity | Auto-Fix | Detection Logic |
@@ -246,17 +209,12 @@ Runs automated checks before human review to catch mechanical errors.
 | MISSING_TRANSLATION | CRITICAL | No | Empty target_text |
 | PLACEHOLDER_MISMATCH | HIGH | Partial | {var} in source not in target |
 | LENGTH_ISSUE | MEDIUM | No | len(target) > character_limit |
-| GLOSSARY_VIOLATION | HIGH | No | Wrong term used for glossary match |
+| GLOSSARY_VIOLATION | HIGH | No | Wrong term used |
 | STYLE_VIOLATION | MEDIUM | No | Formality/tone mismatch |
 | ENCODING_ERROR | CRITICAL | Yes | Invalid Unicode characters |
-| PLURAL_FORM | HIGH | Missing plural variants |
+| PLURAL_FORM | HIGH | No | Missing plural variants |
 | NUMERIC_FORMAT | MEDIUM | Yes | Wrong number formatting |
 | PUNCTUATION | LOW | Yes | Trailing/leading punctuation mismatch |
-
-**QA Pass Rate Calculation:**
-```
-pass_rate = (1 - total_issues / total_units) × 100%
-```
 
 **Severity Distribution:**
 ```
@@ -267,8 +225,6 @@ LOW issues      → Track for next cycle
 ```
 
 ### Terminology Management
-
-Enforces consistent terminology across all translations.
 
 **Glossary Entry Model:**
 
@@ -286,8 +242,6 @@ Enforces consistent terminology across all translations.
 
 ### Project Management
 
-Orchestrates the complete localization workflow across languages.
-
 **Project Phases:**
 ```
 PLANNING → EXTRACTION → TRANSLATION → REVIEW → QA → INTEGRATION → LAUNCH → POST_LAUNCH
@@ -303,17 +257,6 @@ PLANNING → EXTRACTION → TRANSLATION → REVIEW → QA → INTEGRATION → LA
 | QA_CHECK | Automated quality checks | Translations | QA report |
 | INTEGRATE | Merge into codebase | Translations | Updated code |
 | PUBLISH | Deploy to production | Code | Live product |
-
-**Progress Tracking:**
-```python
-status = project_manager.get_project_status(project_id)
-# Returns:
-# - overall_progress: 65.0%
-# - translated: 3250/5000
-# - reviewed: 2500/5000
-# - approved: 2000/5000
-# - days_remaining: 45
-```
 
 ## Data Flow
 
@@ -371,8 +314,7 @@ Translated units → QA Engine
                         │
                   ┌─────▼─────┐
                   │ Manual    │
-                  │ review for│
-                  │ rest      │
+                  │ review    │
                   └───────────┘
 ```
 
@@ -410,17 +352,14 @@ Translated units → QA Engine
 
 ## Design Patterns
 
-### Cache-Aside Pattern
-TM entries are cached for fast lookup, with cache invalidation on updates.
-
-### Pipeline Pattern
-QA checks run as a pipeline of independent validators, each handling a specific check type.
-
-### Strategy Pattern
-Multiple fuzzy matching strategies can be swapped based on content type and language.
-
-### Observer Pattern
-Project phase transitions trigger notifications to team members and downstream systems.
+| Pattern | Usage | Component |
+|---------|-------|-----------|
+| **Cache-Aside** | TM entries cached for fast lookup | TranslationMemoryEngine |
+| **Pipeline** | QA checks as independent validators | QualityAssuranceEngine |
+| **Strategy** | Multiple fuzzy matching algorithms | TranslationMemoryEngine |
+| **Observer** | Phase transitions trigger notifications | ProjectManager |
+| **Facade** | Unified API surface | LocalizationAgent |
+| **Repository** | In-memory registries | All engines |
 
 ## Configuration Reference
 
@@ -453,4 +392,459 @@ project_management:
   max_languages_per_project: 50
   deadline_reminder_days: [30, 14, 7, 3, 1]
   progress_update_frequency: "daily"
+
+---
+
+## Advanced i18n Patterns
+
+### Pluralization Rules
+
+```python
+# ICU Message Format for plurals
+plural_rules = {
+    "en": {
+        "one": "You have {count} new message",
+        "other": "You have {count} new messages",
+    },
+    "ar": {
+        "zero": "ليس لديك رسائل جديدة",
+        "one": "لديك رسالة جديدة واحدة",
+        "two": "لديك رسالتان جديدتان",
+        "few": "لديك {count} رسائل جديدة",
+        "many": "لديك {count} رسالة جديدة",
+        "other": "لديك {count} رسالة جديدة",
+    },
+    "ja": {
+        "other": "{count}件の新しいメッセージがあります",
+    },
+    "ru": {
+        "one": "{count} новое сообщение",
+        "few": "{count} новых сообщения",
+        "many": "{count} новых сообщений",
+        "other": "{count} новые сообщения",
+    },
+}
+```
+
+### Gender-Aware Translation
+
+```python
+# Gender-aware translations
+gender_rules = {
+    "de": {
+        "user_greeting": {
+            "male": "Willkommen, {name}!",
+            "female": "Willkommen, {name}!",
+            "neutral": "Willkommen, {name}!",
+        },
+        "task_assigned": {
+            "male": "{name} hat eine neue Aufgabe",
+            "female": "{name} hat eine neue Aufgabe",
+            "neutral": "{name} hat eine neue Aufgabe",
+        },
+    },
+    "fr": {
+        "user_greeting": {
+            "male": "Bienvenue, {name}!",
+            "female": "Bienvenue, {name}!",
+            "neutral": "Bienvenue, {name}!",
+        },
+    },
+}
+```
+
+### Context-Aware Translation
+
+```python
+# Different translations based on context
+context_translations = {
+    "en": {
+        "button.save": {
+            "default": "Save",
+            "dialog": "Save Changes",
+            "toolbar": "Save Document",
+            "settings": "Save Settings",
+        },
+    },
+    "ja": {
+        "button.save": {
+            "default": "保存",
+            "dialog": "変更を保存",
+            "toolbar": "ドキュメントを保存",
+            "settings": "設定を保存",
+        },
+    },
+}
+```
+
+---
+
+## Quality Metrics Dashboard
+
+### Key Performance Indicators
+
+```python
+# Get localization quality dashboard
+dashboard = agent.get_quality_dashboard()
+
+print(f"Translation Quality Metrics:")
+print(f"  Overall QA Pass Rate: {dashboard['qa_pass_rate']:.1f}%")
+print(f"  Critical Issues: {dashboard['critical_issues']}")
+print(f"  High Issues: {dashboard['high_issues']}")
+print(f"  Medium Issues: {dashboard['medium_issues']}")
+print(f"  Low Issues: {dashboard['low_issues']}")
+
+print(f"\nTranslation Memory Stats:")
+print(f"  Total Entries: {dashboard['tm_entries']:,}")
+print(f"  Exact Matches: {dashboard['exact_matches']:,}")
+print(f"  Fuzzy Matches: {dashboard['fuzzy_matches']:,}")
+print(f"  New Translations: {dashboard['new_translations']:,}")
+print(f"  Leverage: {dashboard['leverage_percent']:.1f}%")
+
+print(f"\nProject Status:")
+for project in dashboard['projects']:
+    print(f"  {project['name']}: {project['progress']:.1f}% complete")
+    print(f"    Languages: {', '.join(project['languages'])}")
+    print(f"    Deadline: {project['deadline']}")
+    print(f"    Days Remaining: {project['days_remaining']}")
+```
+
+---
+
+## Testing Strategy
+
+### Unit Test Coverage
+
+```python
+# Translation Memory Tests
+class TestTranslationMemory:
+    def test_exact_match(self):
+        tm = TranslationMemoryEngine()
+        tm.add_entry("Hello", "Hola", "en", "es")
+        matches = tm.find_matches("Hello", "en", "es")
+        assert len(matches) == 1
+        assert matches[0].score == 1.0
+        assert matches[0].match_type == "EXACT"
+
+    def test_fuzzy_match(self):
+        tm = TranslationMemoryEngine()
+        tm.add_entry("Hello World", "Hola Mundo", "en", "es")
+        matches = tm.find_matches("Hello Worlds", "en", "es")
+        assert len(matches) == 1
+        assert 0.8 <= matches[0].score <= 1.0
+
+    def test_leverage_calculation(self):
+        tm = TranslationMemoryEngine()
+        tm.add_entry("Hello", "Hola", "en", "es")
+        tm.add_entry("Goodbye", "Adios", "en", "es")
+        leverage = tm.get_leverage_stats("en", "es", ["Hello", "New"])
+        assert leverage["leverage_percent"] == 50.0
+```
+
+### Integration Tests
+
+```python
+class TestLocalizationWorkflow:
+    def test_full_localization_flow(self):
+        agent = LocalizationAgent()
+
+        # Set up TM
+        agent.tm_engine.add_entry("Hello", "Hola", "en", "es")
+
+        # Register locale
+        agent.i18n_engine.register_locale("es-ES", "es", "ES", currency="EUR")
+
+        # Create project
+        project = agent.project_manager.create_project(
+            name="Test Project",
+            source_language="en",
+            target_languages=["es"],
+            total_strings=10,
+        )
+
+        # Process translations
+        units = [
+            TranslationUnit("U1", "greeting", "Hello {name}", "es", "Hola {name}"),
+            TranslationUnit("U2", "farewell", "Goodbye", "es", "Adios"),
+        ]
+
+        # Run QA
+        qa = agent.qa_engine.run_full_qa(units)
+        assert qa["pass_rate"] == 100.0
+
+        # Update progress
+        agent.project_manager.update_progress(project.project_id, "es", translated=10, reviewed=10, approved=10)
+
+        # Verify completion
+        status = agent.project_manager.get_project_status(project.project_id)
+        assert status["progress"] == 100.0
+```
+
+---
+
+## Advanced Configuration
+
+### Custom Locale Configurations
+
+```python
+# Define custom locale configurations
+custom_locales = {
+    "pt-BR": {
+        "language": "pt",
+        "region": "BR",
+        "direction": "LTR",
+        "date_format": "DD/MM/YYYY",
+        "time_format": "HH:mm",
+        "number_format": "1.234,56",
+        "currency_code": "BRL",
+        "currency_symbol": "R$",
+        "decimal_separator": ",",
+        "thousands_separator": ".",
+        "first_day_of_week": 0,  # Sunday
+        "plural_rules": "portuguese",
+    },
+    "ko-KR": {
+        "language": "ko",
+        "region": "KR",
+        "direction": "LTR",
+        "date_format": "YYYY-MM-DD",
+        "time_format": "HH:mm",
+        "number_format": "1,234.56",
+        "currency_code": "KRW",
+        "currency_symbol": "₩",
+        "decimal_separator": ".",
+        "thousands_separator": ",",
+        "first_day_of_week": 0,  # Sunday
+        "plural_rules": "korean",
+    },
+    "th-TH": {
+        "language": "th",
+        "region": "TH",
+        "direction": "LTR",
+        "date_format": "DD/MM/YYYY",
+        "time_format": "HH:mm",
+        "number_format": "1,234.56",
+        "currency_code": "THB",
+        "currency_symbol": "฿",
+        "decimal_separator": ".",
+        "thousands_separator": ",",
+        "first_day_of_week": 0,  # Sunday
+        "plural_rules": "thai",
+    },
+}
+
+# Register custom locales
+for locale_code, config in custom_locales.items():
+    agent.i18n_engine.register_locale(locale_code, **config)
+```
+
+### Translation Memory Optimization
+
+```python
+# Optimize TM for better performance
+optimization_config = {
+    "deduplication": {
+        "enabled": True,
+        "similarity_threshold": 0.95,
+        "strategy": "keep_approved",
+    },
+    "consolidation": {
+        "enabled": True,
+        "min_usage_count": 10,
+        "consolidate_similar": True,
+    },
+    "cleanup": {
+        "enabled": True,
+        "remove_outdated_days": 365,
+        "remove_low_quality": True,
+        "quality_threshold": 0.7,
+    },
+    "indexing": {
+        "enabled": True,
+        "index_fields": ["source_text", "target_text", "domain"],
+        "update_interval_hours": 24,
+    },
+}
+
+# Run TM optimization
+results = agent.tm_engine.optimize(optimization_config)
+print(f"Optimization Results:")
+print(f"  Duplicates Removed: {results['duplicates_removed']}")
+print(f"  Entries Consolidated: {results['entries_consolidated']}")
+print(f"  Outdated Entries Removed: {results['outdated_removed']}")
+print(f"  Index Rebuilt: {results['index_rebuilt']}")
+print(f"  Performance Improvement: {results['performance_improvement']:.1f}%")
+```
+
+---
+
+## Advanced Translation Features
+
+### Context-Aware Translation
+
+```python
+# Different translations based on context
+context_translations = {
+    "en": {
+        "button.save": {
+            "default": "Save",
+            "dialog": "Save Changes",
+            "toolbar": "Save Document",
+            "settings": "Save Settings",
+        },
+    },
+    "ja": {
+        "button.save": {
+            "default": "保存",
+            "dialog": "変更を保存",
+            "toolbar": "ドキュメントを保存",
+            "settings": "設定を保存",
+        },
+    },
+}
+```
+
+### Pluralization Rules
+
+```python
+# ICU Message Format for plurals
+plural_rules = {
+    "en": {
+        "one": "You have {count} new message",
+        "other": "You have {count} new messages",
+    },
+    "ar": {
+        "zero": "ليس لديك رسائل جديدة",
+        "one": "لديك رسالة جديدة واحدة",
+        "two": "لديك رسالتان جديدتان",
+        "few": "لديك {count} رسائل جديدة",
+        "many": "لديك {count} رسالة جديدة",
+        "other": "لديك {count} رسالة جديدة",
+    },
+    "ja": {
+        "other": "{count}件の新しいメッセージがあります",
+    },
+}
+```
+
+### Gender-Aware Translation
+
+```python
+# Gender-aware translations
+gender_rules = {
+    "de": {
+        "user_greeting": {
+            "male": "Willkommen, {name}!",
+            "female": "Willkommen, {name}!",
+            "neutral": "Willkommen, {name}!",
+        },
+    },
+    "fr": {
+        "user_greeting": {
+            "male": "Bienvenue, {name}!",
+            "female": "Bienvenue, {name}!",
+            "neutral": "Bienvenue, {name}!",
+        },
+    },
+}
+```
+
+### String Interpolation Patterns
+
+```python
+# Handle various interpolation patterns
+interpolation_patterns = {
+    "named": "Hello {name}, you have {count} messages",
+    "positional": "Hello {0}, you have {1} messages",
+    "icu": "{gender, select, male{He} female{She} other{They}} has {count, plural, one{# message} other{# messages}}",
+    "python": "Hello %(name)s, you have %(count)d messages",
+    "sprintf": "Hello %s, you have %d messages",
+}
+```
+
+---
+
+## Advanced Translation Features
+
+### Context-Aware Translation
+
+```python
+# Different translations based on context
+context_translations = {
+    "en": {
+        "button.save": {
+            "default": "Save",
+            "dialog": "Save Changes",
+            "toolbar": "Save Document",
+            "settings": "Save Settings",
+        },
+    },
+    "ja": {
+        "button.save": {
+            "default": "保存",
+            "dialog": "変更を保存",
+            "toolbar": "ドキュメントを保存",
+            "settings": "設定を保存",
+        },
+    },
+}
+```
+
+### Pluralization Rules
+
+```python
+# ICU Message Format for plurals
+plural_rules = {
+    "en": {
+        "one": "You have {count} new message",
+        "other": "You have {count} new messages",
+    },
+    "ar": {
+        "zero": "ليس لديك رسائل جديدة",
+        "one": "لديك رسالة جديدة واحدة",
+        "two": "لديك رسالتان جديدتان",
+        "few": "لديك {count} رسائل جديدة",
+        "many": "لديك {count} رسالة جديدة",
+        "other": "لديك {count} رسالة جديدة",
+    },
+    "ja": {
+        "other": "{count}件の新しいメッセージがあります",
+    },
+}
+```
+
+### Gender-Aware Translation
+
+```python
+# Gender-aware translations
+gender_rules = {
+    "de": {
+        "user_greeting": {
+            "male": "Willkommen, {name}!",
+            "female": "Willkommen, {name}!",
+            "neutral": "Willkommen, {name}!",
+        },
+    },
+    "fr": {
+        "user_greeting": {
+            "male": "Bienvenue, {name}!",
+            "female": "Bienvenue, {name}!",
+            "neutral": "Bienvenue, {name}!",
+        },
+    },
+}
+```
+
+### String Interpolation Patterns
+
+```python
+# Handle various interpolation patterns
+interpolation_patterns = {
+    "named": "Hello {name}, you have {count} messages",
+    "positional": "Hello {0}, you have {1} messages",
+    "icu": "{gender, select, male{He} female{She} other{They}} has {count, plural, one{# message} other{# messages}}",
+    "python": "Hello %(name)s, you have %(count)d messages",
+    "sprintf": "Hello %s, you have %d messages",
+}
+```
 ```

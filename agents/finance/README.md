@@ -44,6 +44,29 @@ The Finance Agent provides a comprehensive suite of financial computation tools 
 - **Fixed Income**: Bond pricing, duration, convexity, yield curve interpolation
 - **Market Regime Detection**: Bull/bear/volatility classification from return series
 
+### Key Benefits
+
+- **Zero Dependencies**: Pure Python stdlib, no external packages required
+- **Mathematically Rigorous**: Established formulas (Black-Scholes, CAPM, MPT)
+- **Reproducible**: Seeded random generators for consistent results
+- **Type-Safe**: Full type hints on all public methods
+- **Auditable**: Complete trade logs and portfolio snapshots
+- **Extensible**: Easy to add new indicators, strategies, and risk models
+
+### Use Cases
+
+| Use Case | Description |
+|----------|-------------|
+| Portfolio Management | Track positions, execute trades, analyze allocation |
+| Risk Management | Calculate VaR, CVaR, Sharpe ratios, drawdowns |
+| Options Pricing | Black-Scholes pricing with Greeks and implied vol |
+| Technical Analysis | Generate signals from price-based indicators |
+| Fundamental Analysis | Score companies from financial statements |
+| Strategy Backtesting | Evaluate trading strategies on historical data |
+| Monte Carlo | Simulate portfolio paths and option payoffs |
+| Fixed Income | Price bonds, calculate duration and convexity |
+| Regime Detection | Classify market conditions from return series |
+
 ---
 
 ## Features
@@ -104,18 +127,45 @@ python agents/finance/agent.py
 
 ## Architecture
 
+### Component Diagram
+
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      Finance Agent                           │
-├─────────────────────────────────────────────────────────────┤
-│  Portfolio Manager │ Risk Analyzer │ Black-Scholes Pricer    │
-│  Technical Analyzer│ Fundamental   │ Fixed Income Analyzer   │
-│  Backtest Engine   │ Monte Carlo   │ Regime Detector         │
-├─────────────────────────────────────────────────────────────┤
-│              Utility Functions (TVM, WACC, DCF)              │
-├─────────────────────────────────────────────────────────────┤
-│        Data Models (Trade, Position, MarketData, Bond)       │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         FINANCE AGENT                                     │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    ANALYSIS PIPELINE                               │   │
+│  │  Data → Technical/Fundamental → Signals → Portfolio → Risk       │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Portfolio │ │  Risk      │ │  Black-    │ │  Technical │           │
+│  │  Manager   │ │  Analyzer  │ │  Scholes   │ │  Analyzer  │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Funda-    │ │  Backtest  │ │  Monte     │ │  Fixed     │           │
+│  │  mental    │ │  Engine    │ │  Carlo     │ │  Income    │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow
+
+```
+  Investment Process:
+  ══════════════════
+
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Research │ ─► │ Analyze  │ ─► │ Execute  │ ─► │ Monitor  │
+  │          │    │          │    │          │    │          │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+       │               │               │               │
+       ▼               ▼               ▼               ▼
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Technical│    │ Risk     │    │ Portfolio│    │ Rebalance│
+  │ + Fund.  │    │ Metrics  │    │ Weights  │    │          │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
 ```
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed system design.
@@ -470,6 +520,22 @@ mc = MonteCarloSimulator(seed=12345)
 9. **Stress test regularly** — run scenario analysis on adverse conditions
 10. **Keep trade logs** — append-only for audit trail integrity
 
+### Risk Management Best Practices
+
+- Set position size limits
+- Use risk budgets per strategy
+- Monitor correlation across positions
+- Review risk metrics daily
+- Stress test with historical crises
+
+### Backtesting Best Practices
+
+- Avoid overfitting to historical data
+- Include realistic transaction costs
+- Test across multiple market regimes
+- Use walk-forward analysis
+- Validate with out-of-sample data
+
 ---
 
 ## Troubleshooting
@@ -482,6 +548,18 @@ mc = MonteCarloSimulator(seed=12345)
 | Implied vol doesn't converge | Market price may be below intrinsic; try different starting sigma |
 | Weights don't sum to 1.0 | Include cash position in weight calculation |
 | NaN in results | Check for zero division in ratio calculations |
+
+### Debug Mode
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Get detailed risk metrics
+metrics = ra.full_risk_report(returns)
+print(f"VaR 95%: {metrics.var_95:.4f}")
+print(f"Sharpe: {metrics.sharpe_ratio:.4f}")
+```
 
 ---
 
@@ -499,6 +577,8 @@ mc = MonteCarloSimulator(seed=12345)
 - Docstrings for all classes and public methods
 - Follow existing naming conventions
 - Zero external dependencies (stdlib only)
+- Write tests for new functionality
+- Update documentation for API changes
 
 ---
 

@@ -6,32 +6,32 @@
 
 ---
 
----
-
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Key Features](#key-features)
-3. [Quick Start](#quick-start)
-4. [Installation](#installation)
-5. [Configuration](#configuration)
-6. [Core Concepts](#core-concepts)
-7. [API Reference](#api-reference)
-8. [Usage Patterns](#usage-patterns)
-9. [Report Formats](#report-formats)
-10. [Visualizations](#visualizations)
-11. [Anomaly Detection](#anomaly-detection)
-12. [Alerts & Monitoring](#alerts--monitoring)
-13. [Batch Operations](#batch-operations)
-14. [Integration Hooks](#integration-hooks)
-15. [Performance Tuning](#performance-tuning)
-16. [Security & Privacy](#security--privacy)
-17. [Extending the Agent](#extending-the-agent)
-18. [Troubleshooting](#troubleshooting)
-19. [FAQ](#faq)
-20. [Contributing](#contributing)
-
----
+2. [Architecture](#architecture)
+3. [Key Features](#key-features)
+4. [Quick Start](#quick-start)
+5. [Installation](#installation)
+6. [Configuration](#configuration)
+7. [Core Concepts](#core-concepts)
+8. [API Reference](#api-reference)
+9. [Data Models](#data-models)
+10. [Usage Patterns](#usage-patterns)
+11. [Report Formats](#report-formats)
+12. [Visualizations](#visualizations)
+13. [Anomaly Detection](#anomaly-detection)
+14. [Alerts & Monitoring](#alerts--monitoring)
+15. [Batch Operations](#batch-operations)
+16. [Integration Hooks](#integration-hooks)
+17. [Performance Tuning](#performance-tuning)
+18. [Security & Privacy](#security--privacy)
+19. [Scalability](#scalability)
+20. [Design Patterns](#design-patterns)
+21. [Extending the Agent](#extending-the-agent)
+22. [Troubleshooting](#troubleshooting)
+23. [FAQ](#faq)
+24. [Contributing](#contributing)
 
 ---
 
@@ -57,6 +57,80 @@ The Analytics Agent is a comprehensive data analytics and reporting platform. It
 
 ---
 
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        Analytics Agent                              │
+├─────────────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │
+│  │  Analytics   │  │   Report     │  │ Visualization│             │
+│  │   Engine     │  │  Generator   │  │  Generator   │             │
+│  │              │  │              │  │              │             │
+│  │ • Ingest     │  │ • HTML       │  │ • Line       │             │
+│  │ • Clean      │  │ • JSON       │  │ • Bar        │             │
+│  │ • Aggregate  │  │ • CSV        │  │ • Pie        │             │
+│  │ • KPI Calc   │  │ • PDF        │  │ • Scatter    │             │
+│  └──────────────┘  └──────────────┘  │ • Heatmap    │             │
+│                                      └──────────────┘             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │
+│  │   Anomaly    │  │   Alerting   │  │   Plugin     │             │
+│  │  Detector    │  │   Engine     │  │   Manager    │             │
+│  │              │  │              │  │              │             │
+│  │ • Threshold  │  │ • Email      │  │ • Custom     │             │
+│  │ • Baseline   │  │ • Slack      │  │   Sources    │             │
+│  │ • Z-Score    │  │ • Webhook    │  │ • Custom     │             │
+│  │ • Rolling    │  │ • SMS        │  │   Metrics    │             │
+│  └──────────────┘  └──────────────┘  └──────────────┘             │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow Diagram
+
+```
+                    ┌───────────────┐
+                    │  Data Sources │
+                    │  ─────────── │
+                    │  • Database   │
+                    │  • API        │
+                    │  • CSV/JSON   │
+                    └───────┬───────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │   Ingestion   │
+                    │  (Clean &     │
+                    │   Validate)   │
+                    └───────┬───────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │  Aggregation  │
+                    │  (Group-by,   │
+                    │   Sum, Avg)   │
+                    └───────┬───────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │  KPI Engine   │
+                    │  (Formulas)   │
+                    └───────┬───────┘
+                            │
+              ┌─────────────┼─────────────┐
+              │             │             │
+              ▼             ▼             ▼
+        ┌──────────┐  ┌──────────┐  ┌──────────┐
+        │  Report  │  │  Chart   │  │ Anomaly  │
+        │  Gen     │  │  Gen     │  │ Detector │
+        └────┬─────┘  └────┬─────┘  └────┬─────┘
+             │             │             │
+             ▼             ▼             ▼
+        ┌──────────┐  ┌──────────┐  ┌──────────┐
+        │  Output  │  │  Visual  │  │  Alert   │
+        │  Files   │  │  Configs │  │  Events  │
+        └──────────┘  └──────────┘  └──────────┘
+```
+
 ---
 
 ## Key Features
@@ -73,8 +147,6 @@ The Analytics Agent is a comprehensive data analytics and reporting platform. It
 | **Anomaly Detection** | Threshold and baseline-based anomaly checks. |
 | **Alerting** | Email, Slack, webhook dispatch. |
 | **Scheduled Reporting** | Cron-based report generation and distribution. |
-
----
 
 ---
 
@@ -125,8 +197,6 @@ print(f"Anomaly detected: {anomaly['is_anomaly']}")
 
 ---
 
----
-
 ## Installation
 
 ```bash
@@ -141,8 +211,6 @@ pip install matplotlib seaborn  # visualization
 pip install sqlalchemy  # database connectivity
 pip install aiohttp  # async API calls
 ```
-
----
 
 ---
 
@@ -172,7 +240,20 @@ config = Config(
 )
 ```
 
----
+### Configuration Reference
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `default_report_format` | str | "html" | Default output format |
+| `output_directory` | str | "./reports" | Report output path |
+| `max_report_rows` | int | 10000 | Maximum rows in reports |
+| `anomaly_threshold` | float | 0.1 | Anomaly sensitivity |
+| `baseline_samples` | int | 30 | Samples for baseline calc |
+| `alert_channels` | List[str] | ["email"] | Active alert channels |
+| `alert_on_anomaly` | bool | True | Auto-alert on anomaly |
+| `enable_cache` | bool | True | Enable query caching |
+| `data_source_timeout` | int | 30 | Query timeout (seconds) |
+| `retention_days` | int | 90 | Data retention period |
 
 ---
 
@@ -202,15 +283,13 @@ Data Sources → AnalyticsEngine → Aggregations → KPIs
 
 ### Aggregation Functions
 
-| Function | Description |
-|----------|-------------|
-| `sum` | Sum of values |
-| `avg` | Average of values |
-| `min` | Minimum value |
-| `max` | Maximum value |
-| `count` | Count of records |
-
----
+| Function | Description | Example |
+|----------|-------------|---------|
+| `sum` | Sum of values | Total revenue |
+| `avg` | Average of values | Average order value |
+| `min` | Minimum value | Lowest daily sales |
+| `max` | Maximum value | Peak traffic |
+| `count` | Count of records | Number of orders |
 
 ---
 
@@ -218,37 +297,109 @@ Data Sources → AnalyticsEngine → Aggregations → KPIs
 
 ### AnalyticsEngine
 
-- `add_data_source(name, connection_str, source_type="database") -> None` - Add data source.
-- `query(data_source, query, params=None) -> List[Dict]` - Execute query.
-- `aggregate(data, group_by, aggregations) -> Dict` - Aggregate data.
-- `calculate_kpis(data, kpi_definitions) -> Dict` - Calculate KPIs.
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `add_data_source` | `(name, connection_str, source_type="database") -> None` | Add data source |
+| `query` | `(data_source, query, params=None) -> List[Dict]` | Execute query |
+| `aggregate` | `(data, group_by, aggregations) -> Dict` | Aggregate data |
+| `calculate_kpis` | `(data, kpi_definitions) -> Dict` | Calculate KPIs |
 
 ### ReportGenerator
 
-- `create_report(name, report_type, metrics, filters=None) -> str` - Create report definition.
-- `schedule_report(report_id, cron_expression, recipients) -> None` - Schedule report.
-- `generate_report(report_id, data) -> Report` - Generate report.
-- `export_report(report_id, fmt, path) -> str` - Export report to file.
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `create_report` | `(name, report_type, metrics, filters=None) -> str` | Create report definition |
+| `schedule_report` | `(report_id, cron_expression, recipients) -> None` | Schedule report |
+| `generate_report` | `(report_id, data) -> Report` | Generate report |
+| `export_report` | `(report_id, fmt, path) -> str` | Export report to file |
 
 ### VisualizationGenerator
 
-- `generate_chart_config(chart_type, data, x_field, y_field, title=None) -> Dict` - Generate chart config.
-- `export_to_image(chart_config, format="png", width=800, height=600) -> bytes` - Export to image.
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `generate_chart_config` | `(chart_type, data, x_field, y_field, title=None) -> Dict` | Generate chart config |
+| `export_to_image` | `(chart_config, format="png", width=800, height=600) -> bytes` | Export to image |
 
 ### AnomalyDetector
 
-- `set_threshold(metric, upper, lower=0) -> None` - Set anomaly threshold.
-- `set_baseline(metric, mean, std, samples=30) -> None` - Set baseline.
-- `check_anomaly(metric, value) -> Dict` - Check if value is anomalous.
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `set_threshold` | `(metric, upper, lower=0) -> None` | Set anomaly threshold |
+| `set_baseline` | `(metric, mean, std, samples=30) -> None` | Set baseline |
+| `check_anomaly` | `(metric, value) -> Dict` | Check if value is anomalous |
 
 ### AlertingEngine
 
-- `add_rule(name, condition, channel) -> None` - Add alert rule.
-- `evaluate(result) -> List[Alert]` - Evaluate anomaly results.
-- `acknowledge_alert(alert_id) -> bool` - Acknowledge alert.
-- `get_alerts(status="open") -> List[Alert]` - Get alerts by status.
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `add_rule` | `(name, condition, channel) -> None` | Add alert rule |
+| `evaluate` | `(result) -> List[Alert]` | Evaluate anomaly results |
+| `acknowledge_alert` | `(alert_id) -> bool` | Acknowledge alert |
+| `get_alerts` | `(status="open") -> List[Alert]` | Get alerts by status |
 
 ---
+
+## Data Models
+
+### DataSource
+
+```python
+@dataclass
+class DataSource:
+    name: str                     # Unique identifier
+    connection_str: str           # Connection string
+    source_type: str              # "database", "api", "file"
+    last_sync: Optional[datetime] # Last data sync
+    status: str                   # "active", "error", "stale"
+    row_count: int                # Total rows available
+```
+
+### Report
+
+```python
+@dataclass
+class Report:
+    report_id: str               # Unique identifier
+    name: str                    # Report name
+    report_type: ReportType      # DAILY, WEEKLY, MONTHLY, QUARTERLY, CUSTOM
+    metrics: List[str]           # Included metrics
+    generated_at: datetime       # Generation timestamp
+    format: str                  # Output format
+    data: Dict                   # Report data
+    summary: Dict                # Summary statistics
+    charts: List[Dict]           # Associated chart configs
+```
+
+### AnomalyResult
+
+```python
+@dataclass
+class AnomalyResult:
+    metric: str          # Metric name
+    value: float         # Checked value
+    is_anomaly: bool     # Whether anomalous
+    severity: str        # "low", "medium", "high", "critical"
+    baseline_mean: float # Baseline mean
+    baseline_std: float  # Baseline std dev
+    z_score: float       # Standard deviations from mean
+    checked_at: datetime # Check timestamp
+```
+
+### Alert
+
+```python
+@dataclass
+class Alert:
+    alert_id: str            # Unique identifier
+    name: str                # Alert name
+    severity: str            # "info", "warning", "critical"
+    channel: str             # "email", "slack", "webhook"
+    condition: str           # Trigger condition
+    triggered_at: datetime   # Trigger timestamp
+    acknowledged: bool       # Whether acknowledged
+    acknowledged_by: Optional[str]  # Acknowledger
+    message: str             # Alert message
+```
 
 ---
 
@@ -290,7 +441,23 @@ kpis = engine.calculate_kpis(data, {
 display_dashboard(kpis)
 ```
 
----
+### Pattern 4: Multi-Source Aggregation
+
+```python
+# Combine data from multiple sources
+sales_data = engine.query("sales_db", "SELECT * FROM sales")
+marketing_data = engine.query("marketing_api", "/campaigns/performance")
+
+# Merge on common key
+merged = engine.merge(sales_data, marketing_data, on="campaign_id")
+
+# Aggregate combined dataset
+result = engine.aggregate(merged, "campaign_id", {
+    "revenue": "sum",
+    "ad_spend": "sum",
+    "roi": "avg"
+})
+```
 
 ---
 
@@ -325,20 +492,18 @@ Placeholder. In production, pipe JSON/CSV into a PDF renderer.
 
 ---
 
----
-
 ## Visualizations
 
 ### Supported Chart Types
 
-| Type | Use Case |
-|------|----------|
-| `line` | Trends over time |
-| `bar` | Comparisons across categories |
-| `pie` | Proportions |
-| `scatter` | Correlation analysis |
-| `histogram` | Distribution analysis |
-| `heatmap` | Matrix intensity |
+| Type | Use Case | Best For |
+|------|----------|----------|
+| `line` | Trends over time | Revenue trends, user growth |
+| `bar` | Comparisons across categories | Product sales, regional comparison |
+| `pie` | Proportions | Market share, traffic sources |
+| `scatter` | Correlation analysis | Price vs. demand |
+| `histogram` | Distribution analysis | Response time distribution |
+| `heatmap` | Matrix intensity | Hourly traffic patterns |
 
 ### Chart Configuration
 
@@ -355,16 +520,14 @@ chart = visualizer.generate_chart_config(
 
 ---
 
----
-
 ## Anomaly Detection
 
 ### Detection Methods
 
-| Method | Description |
-|--------|-------------|
-| `set_threshold` | Fixed upper/lower bounds. |
-| `set_baseline` | Statistical baseline with z-score. |
+| Method | Description | When to Use |
+|--------|-------------|-------------|
+| `set_threshold` | Fixed upper/lower bounds | Known acceptable ranges |
+| `set_baseline` | Statistical baseline with z-score | Normal distributions |
 
 ### Interpreting Results
 
@@ -376,7 +539,14 @@ else:
     print("Normal")
 ```
 
----
+### Z-Score Interpretation
+
+| Z-Score | Severity | Action |
+|---------|----------|--------|
+| 2.0 - 3.0 | Low | Log for review |
+| 3.0 - 4.0 | Medium | Alert team |
+| 4.0 - 5.0 | High | Immediate investigation |
+| > 5.0 | Critical | Emergency response |
 
 ---
 
@@ -395,7 +565,14 @@ for alert in alerter.get_alerts(status="open"):
     alerter.acknowledge_alert(alert.alert_id)
 ```
 
----
+### Alert Channels
+
+| Channel | Use Case | Latency |
+|---------|----------|---------|
+| Email | Non-urgent reports | Minutes |
+| Slack | Team notifications | Seconds |
+| Webhook | System integration | Milliseconds |
+| SMS | Critical alerts | Seconds |
 
 ---
 
@@ -417,8 +594,6 @@ for metric in metrics_to_check:
     for value in daily_values[metric]:
         detector.check_anomaly(metric, value)
 ```
-
----
 
 ---
 
@@ -444,16 +619,12 @@ for alert in alerter.get_alerts():
 
 ---
 
----
-
 ## Performance Tuning
 
 - Use `fmt="csv"` for large data exports.
 - Enable caching for repeated queries.
 - Limit `max_report_rows` to reduce serialization cost.
 - Use batch operations for bulk processing.
-
----
 
 ---
 
@@ -464,6 +635,106 @@ for alert in alerter.get_alerts():
 - Reports may contain sensitive data; restrict export access.
 
 ---
+
+## Scalability
+
+### Performance Targets
+
+| Operation | Latency (p99) | Throughput |
+|-----------|---------------|------------|
+| Data query | < 500ms | 1,000/sec |
+| Aggregation | < 200ms | 5,000/sec |
+| KPI calculation | < 100ms | 10,000/sec |
+| Report generation | < 2s | 100/sec |
+| Anomaly check | < 50ms | 20,000/sec |
+
+### Scaling Strategies
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Single    │────▶│  Read       │────▶│  Distributed│
+│   Node      │     │  Replicas   │     │  Cluster    │
+└─────────────┘     └─────────────┘     └─────────────┘
+      │                    │                    │
+      ▼                    ▼                    ▼
+  < 10K rows/day    10K-1M rows/day    1M+ rows/day
+  < 5 data sources  5-50 data sources  50+ data sources
+```
+
+### Caching Strategy
+
+```python
+# Cache raw query results (TTL: 5 minutes)
+# Cache aggregated results (TTL: 15 minutes)
+# Cache KPI calculations (TTL: 1 hour)
+# Cache report templates (TTL: until data changes)
+```
+
+### Memory Management
+
+```python
+# Large dataset handling
+config = Config(
+    max_report_rows=10000,       # Limit output size
+    enable_cache=True,           # Cache repeated queries
+    data_source_timeout=30,      # Prevent hanging queries
+    retention_days=90,           # Auto-cleanup old data
+)
+```
+
+---
+
+## Design Patterns
+
+### Strategy Pattern — Aggregation
+
+```python
+class AggregationStrategy:
+    def aggregate(self, data: List[Dict], field: str) -> float:
+        raise NotImplementedError
+
+class SumAggregation(AggregationStrategy):
+    def aggregate(self, data, field):
+        return sum(row[field] for row in data)
+
+class AvgAggregation(AggregationStrategy):
+    def aggregate(self, data, field):
+        return sum(row[field] for row in data) / len(data)
+```
+
+### Observer Pattern — Alerting
+
+```python
+class AlertObserver:
+    def on_anomaly(self, result: AnomalyResult):
+        raise NotImplementedError
+
+class SlackAlertObserver(AlertObserver):
+    def on_anomaly(self, result):
+        send_slack_message(f"Anomaly: {result.metric} = {result.value}")
+```
+
+### Pipeline Pattern — Data Processing
+
+```python
+pipeline = DataPipeline([
+    IngestionStage(),
+    CleaningStage(),
+    AggregationStage(),
+    KPICalculationStage(),
+    ReportGenerationStage(),
+])
+result = pipeline.execute(raw_data)
+```
+
+### Template Method — Report Generation
+
+```python
+class ReportGenerator:
+    def generate(self, report_id, data, fmt="html"):
+        template = self._get_template(fmt)
+        return template.render(data)
+```
 
 ---
 
@@ -507,8 +778,6 @@ class CustomAlertChannel:
 
 ---
 
----
-
 ## Troubleshooting
 
 ### Problem: Query returns empty results
@@ -529,7 +798,17 @@ class CustomAlertChannel:
 - Verify `AnomalyDetector` thresholds are set.
 - Ensure `evaluate()` is called after `check_anomaly()`.
 
----
+### Problem: Anomaly detection too sensitive
+
+- Increase `anomaly_threshold`.
+- Increase `baseline_samples` for more stable baselines.
+- Use `set_threshold()` instead of `set_baseline()` for fixed ranges.
+
+### Problem: Memory usage growing
+
+- Reduce `retention_days`.
+- Enable cache eviction.
+- Process data in batches instead of loading all at once.
 
 ---
 
@@ -544,7 +823,23 @@ A: The model supports batch and streaming patterns. Add a streaming data source 
 **Q: How accurate is anomaly detection?**
 A: It uses simplified statistical methods. For production, consider dedicated libraries (Evidently, Arize).
 
----
+**Q: How do I handle very large datasets?**
+A: Use pagination in queries, aggregate before reporting, and set `max_report_rows` limits.
+
+**Q: Can I customize report templates?**
+A: Yes, extend `ReportGenerator` with custom template methods for your preferred format.
+
+**Q: How do I handle time zones in reports?**
+A: Store all timestamps in UTC. Convert to local time zones in the report template based on recipient preferences.
+
+**Q: Can I integrate with external visualization tools?**
+A: Yes, export chart configurations as JSON and import into tools like Grafana, Tableau, or custom dashboards.
+
+**Q: What's the maximum dataset size supported?**
+A: In-memory processing supports up to ~1M rows. For larger datasets, use batch processing and streaming patterns.
+
+**Q: How do I add custom aggregation functions?**
+A: Extend the `AnalyticsEngine.aggregate()` method with your custom function and register it in the aggregation registry.
 
 ---
 
@@ -554,16 +849,12 @@ See [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ---
 
----
-
 ## License
 
 MIT License - see [LICENSE](../../LICENSE).
 
 ---
 
----
-
 *Analytics Agent v2.1.0 - Part of the Awesome Grok Skills collection.*
 
-*"Data to wisdom, accelerated."* 📊
+*"Data to wisdom, accelerated."*

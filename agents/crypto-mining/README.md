@@ -23,7 +23,10 @@ A comprehensive cryptocurrency mining operations platform with multi-algorithm s
 - [Supported Algorithms](#supported-algorithms)
 - [Hardware Compatibility](#hardware-compatibility)
 - [Best Practices](#best-practices)
+- [Security](#security)
+- [Scalability](#scalability)
 - [Troubleshooting](#troubleshooting)
+- [Design Patterns](#design-patterns)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -55,20 +58,33 @@ The agent is designed for both individual miners managing a few rigs and large-s
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                    CryptoMiningAgent                          │
-│  ┌────────────┐ ┌──────────────┐ ┌────────────────────────┐ │
-│  │ Pool Mgr   │ │ Hardware Mon │ │ Profitability Calc     │ │
-│  ├────────────┤ ├──────────────┤ ├────────────────────────┤ │
-│  │ Switch Eng │ │ Temp Monitor │ │ Energy Tracker         │ │
-│  ├────────────┤ ├──────────────┤ ├────────────────────────┤ │
-│  │ Reward An  │ │ Hash Tracker │ │ Rig Manager            │ │
-│  └────────────┘ └──────────────┘ └────────────────────────┘ │
-│  ┌────────────┐ ┌──────────────┐ ┌────────────────────────┐ │
-│  │ Algorithm  │ │ Optimizer    │ │ Economics              │ │
-│  │ Selector   │ │              │ │                        │ │
-│  └────────────┘ └──────────────┘ └────────────────────────┘ │
-└──────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                        CryptoMiningAgent                                  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌────────────────────────────────┐  │
+│  │  Pool Mgr    │  │  Hardware    │  │  Profitability Engine          │  │
+│  │  ├ Register  │  │  Monitor     │  │  ├ Multi-coin comparison       │  │
+│  │  ├ Connect   │  │  ├ Temp      │  │  ├ ROI / break-even           │  │
+│  │  ├ Switch    │  │  ├ HashRate  │  │  ├ Cash flow projection       │  │
+│  │  └ Health    │  │  ├ Fan       │  │  └ Difficulty analysis        │  │
+│  └──────────────┘  │  └ Alerts    │  └────────────────────────────────┘  │
+│                    └──────────────┘                                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌────────────────────────────────┐  │
+│  │  Rig Mgr     │  │  Energy      │  │  Algorithm Selector           │  │
+│  │  ├ Register  │  │  Tracker     │  │  ├ HW compatibility           │  │
+│  │  ├ Lifecycle │  │  ├ KWh/cost  │  │  ├ Memory requirements        │  │
+│  │  ├ Fleet     │  │  ├ Carbon    │  │  ├ Power budgets              │  │
+│  │  └ Status    │  │  └ Optimize  │  │  └ Coin mapping               │  │
+│  └──────────────┘  └──────────────┘  └────────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────┐  ┌──────────────┐                                      │
+│  │  Economics   │  │  Optimizer   │                                      │
+│  │  ├ Revenue   │  │  ├ Fleet     │                                      │
+│  │  ├ Costs     │  │  ├ Power     │                                      │
+│  │  ├ ROI       │  │  └ Pool      │                                      │
+│  │  └ Risk      │  │             │                                      │
+│  └──────────────┘  └──────────────┘                                      │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Quick Start
@@ -391,6 +407,51 @@ risk = agent._economics.get_risk_analysis(volatility=0.15, difficulty_growth=0.0
 4. **Payout Threshold**: Align with your mining scale
 5. **Diversification**: Use 2-3 pools for redundancy
 
+## Security
+
+### Pool Connection Security
+- Use TLS/SSL for stratum connections
+- Never expose pool credentials in logs
+- Use unique worker names (don't use personal info)
+- Enable two-factor auth on pool accounts
+- Monitor for unauthorized pool switches
+- Review pool payout addresses regularly
+- Use hardware wallets for large balances
+- Rotate pool passwords periodically
+
+### Hardware Security
+- Secure physical access to mining rigs
+- Use IPMI/BMC with strong passwords for remote management
+- Keep firmware updated to prevent exploits
+- Monitor for unauthorized configuration changes
+- Log all rig start/stop/restart events
+
+### Network Security
+- Use VLANs to isolate mining traffic
+- Implement firewall rules for stratum connections only
+- Monitor for DDoS attacks targeting mining pools
+- Use VPN for remote management access
+
+## Scalability
+
+### Fleet Scaling Strategy
+
+| Phase | Fleet Size | Approach |
+|-------|-----------|----------|
+| 1 | 1-10 rigs | Manual management, single pool |
+| 2 | 10-50 rigs | Automated monitoring, multi-pool |
+| 3 | 50-200 rigs | Load balancing, automated switching |
+| 4 | 200+ rigs | Distributed management, redundancy |
+
+### Resource Planning
+
+| Fleet Size | Recommended Approach |
+|-----------|---------------------|
+| 1-5 rigs | Single machine, manual monitoring |
+| 6-20 rigs | Central server, automated alerts |
+| 21-100 rigs | Distributed agents, load balancing |
+| 100+ rigs | Multi-site, redundant management |
+
 ## Troubleshooting
 
 ### Common Issues
@@ -439,6 +500,53 @@ logging.basicConfig(level=logging.DEBUG)
 # - Temperature readings
 # - Profitability calculations
 # - Pool switching decisions
+```
+
+## Design Patterns
+
+### Observer Pattern for Monitoring
+
+```python
+class TemperatureMonitor:
+    def __init__(self):
+        self._observers = []
+    
+    def register(self, observer):
+        self._observers.append(observer)
+    
+    def notify(self, rig_id, temperature):
+        for obs in self._observers:
+            obs.on_temperature_change(rig_id, temperature)
+```
+
+### Strategy Pattern for Pool Selection
+
+```python
+class PoolSelectionStrategy:
+    def select_pool(self, pools, metrics) -> str:
+        raise NotImplementedError
+
+class LatencyStrategy(PoolSelectionStrategy):
+    def select_pool(self, pools, metrics):
+        return min(pools, key=lambda p: metrics[p]['latency'])
+
+class ProfitabilityStrategy(PoolSelectionStrategy):
+    def select_pool(self, pools, metrics):
+        return max(pools, key=lambda p: metrics[p]['effective_rate'])
+```
+
+### Factory Pattern for Hardware
+
+```python
+class HardwareFactory:
+    @staticmethod
+    def create(hardware_type, model, specs):
+        if hardware_type == HardwareType.ASIC:
+            return ASICRig(model, specs)
+        elif hardware_type == HardwareType.GPU_NVIDIA:
+            return NVIDIARig(model, specs)
+        elif hardware_type == HardwareType.GPU_AMD:
+            return AMDRig(model, specs)
 ```
 
 ## Contributing

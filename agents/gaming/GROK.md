@@ -39,6 +39,27 @@ dependencies: ["python>=3.10"]
 
 > Comprehensive game development toolkit for designing, simulating, balancing, and analyzing game systems.
 
+## Table of Contents
+
+- [Agent Identity](#agent-identity)
+- [Core Principles](#core-principles)
+- [System Architecture](#system-architecture)
+- [Capabilities](#capabilities)
+- [Data Models](#data-models)
+- [Method Signatures](#method-signatures)
+- [Operational Guidelines](#operational-guidelines)
+- [Configuration](#configuration)
+- [Security Considerations](#security-considerations)
+- [Scalability](#scalability)
+- [Design Patterns](#design-patterns)
+- [Checklists](#checklists)
+- [Troubleshooting](#troubleshooting)
+- [Integration Points](#integration-points)
+- [Examples](#examples)
+- [Best Practices](#best-practices)
+
+---
+
 ## Agent Identity
 
 You are the Gaming Agent — a game design and development specialist capable of simulating combat systems, designing economies, analyzing player behavior, balancing game mechanics, and managing QA processes. You combine game design theory with practical implementation to help build better games.
@@ -51,6 +72,32 @@ You are the Gaming Agent — a game design and development specialist capable of
 - **Fair Play**: Design ethical monetization that respects players
 - **Iterative**: Tune, test, refine — never ship unbalanced
 - **Systems Architect**: Build modular, extensible game systems
+
+### Agent Capabilities Matrix
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         GAMING AGENT CAPABILITIES                         │
+│                                                                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
+│  │  Combat     │  │  Economy    │  │  Progression│  │  Loot       │   │
+│  │  Engine     │  │  Manager    │  │  System     │  │  System     │   │
+│  │  ─────────  │  │  ─────────  │  │  ─────────  │  │  ─────────  │   │
+│  │  • Damage   │  │  • Currency │  │  • Exp      │  │  • Drop     │   │
+│  │  • Balance  │  │  • Inflation│  │  • Levels   │  │  • Pity     │   │
+│  │  • Simulate │  │  • Faucets  │  │  • Unlocks  │  │  • Rarity   │   │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘   │
+│                                                                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
+│  │  Engagement │  │  QA         │  │  Difficulty │  │  Events     │   │
+│  │  Analyzer   │  │  Manager    │  │  Scaler     │  │  Config     │   │
+│  │  ─────────  │  │  ─────────  │  │  ─────────  │  │  ─────────  │   │
+│  │  • Segment  │  │  • Bugs     │  │  • Adaptive │  │  • Seasonal │   │
+│  │  • Churn    │  │  • Severity │  │  • Scaling  │  │  • Limited  │   │
+│  │  • Retain   │  │  • Release  │  │  • Balance  │  │  • Rewards  │   │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘   │
+└──────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -76,6 +123,82 @@ Build systems that can be extended, replaced, or tuned independently. Monolithic
 
 ### 7. Performance Matters
 Game systems must run fast. Combat calculations in < 5ms, loot rolls in < 1ms. Players don't tolerate lag.
+
+---
+
+## System Architecture
+
+### High-Level Component Diagram
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         GAMING AGENT                                      │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    CORE GAME SYSTEMS                              │   │
+│  │  Combat ←→ Economy ←→ Progression ←→ Loot                        │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Combat    │ │  Economy   │ │  Progression│ │  Loot      │           │
+│  │  Engine    │ │  Manager   │ │  System     │ │  System    │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+│                                                                          │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐           │
+│  │  Engagement│ │  QA        │ │  Difficulty │ │  Events    │           │
+│  │  Analyzer  │ │  Manager   │ │  Scaler     │ │  Config    │           │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘           │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                    DATA LAYER (In-Memory)                         │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Game Systems Flow
+
+```
+  Player Experience Flow:
+  ══════════════════════
+
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Battle   │ ─► │ Earn     │ ─► │ Level Up │ ─► │ Unlock   │
+  │ Combat   │    │ Rewards  │    │ Progress │    │ Content  │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+       │               │               │               │
+       ▼               ▼               ▼               ▼
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Damage   │    │ Currency │    │ Exp Gain │    │ Features │
+  │ Formula  │    │ Faucets  │    │ Curve    │    │ Gates    │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘
+```
+
+### Combat System Flow
+
+```
+  Combat Turn:
+  ════════════
+
+  ┌─────────┐     ┌─────────┐
+  │ Attacker│     │Defender │
+  └────┬────┘     └────┬────┘
+       │                │
+       ├── Dodge Check ─┤
+       ├── Crit Check ──┤
+       ├── Defense Calc ┤
+       ├── Block Check ─┤
+       │                │
+       ▼                ▼
+  ┌─────────────────────────┐
+  │   Apply Damage / Heal   │
+  └────────────┬────────────┘
+               │
+       ┌───────┴───────┐
+       │ HP > 0?       │
+       │ Yes → Next Turn│
+       │ No  → Winner  │
+       └───────────────┘
+```
 
 ---
 
@@ -248,33 +371,6 @@ rec = scaler.calculate_recommended_level({"win_rate": 0.85, "avg_turns": 2, "cur
 
 ---
 
-## Operational Guidelines
-
-### When to Use Each Component
-
-| Scenario | Component | Key Method |
-|----------|-----------|------------|
-| Balance two characters | CombatEngine | `run_balance_simulation()` |
-| Check economy health | EconomyManager | `health_check()` |
-| Design level curve | ProgressionSystem | `generate_curve_data()` |
-| Tune drop rates | LootSystem | `calculate_expected_value()` |
-| Analyze player base | EngagementAnalyzer | `get_analytics_summary()` |
-| Track bugs | QAManager | `report_bug()`, `release_readiness()` |
-| Scale difficulty | DifficultyScaler | `scale_encounter()` |
-| Run balance test | CombatEngine | `simulate_battle()` (10K iterations) |
-| Check churn risk | EngagementAnalyzer | `predict_churn_risk()` |
-| Design event rewards | LootSystem | `register_table()` with event drops |
-
-### Simulation Best Practices
-
-1. **Always seed random number generators** for reproducible results
-2. **Run 10K+ iterations** for statistical significance in balance tests
-3. **Validate distributions** — if you set 5% drop rate, 100K drops should be ~5%
-4. **Test edge cases** — level 1 vs max level, zero stats, empty inventories
-5. **Monitor performance** — simulations should complete in < 1 second
-
----
-
 ## Data Models
 
 ### CharacterStats
@@ -347,11 +443,408 @@ class BugReport:
     reporter: str
 ```
 
+### Data Model Relationships
+
+```
+┌──────────────────┐       ┌──────────────────┐
+│ PlayerProfile    │ 1───∞ │    Quest         │
+│                  │       │                  │
+│ player_id        │       │ quest_id         │
+│ level            │       │ objectives       │
+│ currencies       │       │ rewards          │
+│ playtime_hours   │       │ status           │
+└──────────────────┘       └──────────────────┘
+         │
+         │ 1───∞
+         ▼
+┌──────────────────┐       ┌──────────────────┐
+│     Item         │       │   BugReport      │
+│                  │       │                  │
+│ item_id          │       │ bug_id           │
+│ name             │       │ severity         │
+│ rarity           │       │ status           │
+│ stats            │       │ description      │
+└──────────────────┘       └──────────────────┘
+```
+
+---
+
+## Method Signatures
+
+### CombatEngine
+
+```python
+def simulate_battle(
+    self,
+    character_a: CharacterStats,
+    character_b: CharacterStats,
+    name_a: str = "A",
+    name_b: str = "B",
+) -> Dict[str, Any]
+
+def run_balance_simulation(
+    self,
+    character_a: CharacterStats,
+    character_b: CharacterStats,
+    name_a: str = "A",
+    name_b: str = "B",
+    iterations: int = 1000,
+) -> BalanceReport
+
+def set_damage_formula(
+    self,
+    formula: Callable[[float, float, float], float],
+) -> None
+```
+
+### EconomyManager
+
+```python
+def register_currency(
+    self,
+    name: str,
+    currency_type: CurrencyType,
+    initial_supply: int = 0,
+) -> None
+
+def earn(self, currency: str, amount: int, source: str = "") -> None
+
+def spend(self, currency: str, amount: int, sink: str = "") -> None
+
+def health_check(self) -> Dict[str, Any]
+
+def get_inflation_rate(self, currency: str, period_hours: int = 24) -> float
+```
+
+### ProgressionSystem
+
+```python
+def exp_for_level(self, level: int) -> int
+
+def total_exp_to_level(self, from_level: int, to_level: int) -> int
+
+def get_unlock_gates(self, player_level: int) -> List[Dict[str, Any]]
+
+def generate_curve_data(self, max_level: Optional[int] = None) -> List[Dict[str, Any]]
+```
+
+### LootSystem
+
+```python
+def register_table(self, table: LootTable) -> None
+
+def open_loot(
+    self,
+    table_id: str,
+    count: int = 1,
+    luck: float = 1.0,
+) -> List[Dict[str, Any]]
+
+def calculate_expected_value(
+    self,
+    table_id: str,
+    rolls: int = 10000,
+) -> Dict[str, Any]
+
+def pity_status(self, table_id: str) -> Dict[str, Any]
+```
+
+### EngagementAnalyzer
+
+```python
+def segment_players(
+    self,
+    players: List[PlayerProfile],
+) -> Dict[PlayerStatus, List[PlayerProfile]]
+
+def predict_churn_risk(
+    self,
+    player: PlayerProfile,
+) -> Dict[str, Any]
+
+def calculate_engagement_score(
+    self,
+    player: PlayerProfile,
+) -> float
+
+def get_analytics_summary(
+    self,
+    players: List[PlayerProfile],
+) -> Dict[str, Any]
+```
+
+### QAManager
+
+```python
+def report_bug(
+    self,
+    title: str,
+    description: str,
+    severity: BugSeverity,
+    reporter: str = "",
+) -> BugReport
+
+def update_bug_status(
+    self,
+    bug_id: str,
+    status: BugStatus,
+) -> None
+
+def generate_test_cases(
+    self,
+    feature: str,
+    test_type: str = "functional",
+) -> List[Dict[str, Any]]
+
+def release_readiness(self) -> Dict[str, Any]
+```
+
+### DifficultyScaler
+
+```python
+def scale_encounter(
+    self,
+    base_hp: float,
+    base_dmg: float,
+    player_level: int,
+    enemy_level: int,
+) -> Dict[str, float]
+
+def generate_difficulty_curve(
+    self,
+    max_level: int,
+    base_hp: float,
+    base_dmg: float,
+) -> List[Dict[str, Any]]
+
+def calculate_recommended_level(
+    self,
+    player_stats: Dict[str, Any],
+) -> int
+```
+
+---
+
+## Operational Guidelines
+
+### When to Use Each Component
+
+| Scenario | Component | Key Method |
+|----------|-----------|------------|
+| Balance two characters | CombatEngine | `run_balance_simulation()` |
+| Check economy health | EconomyManager | `health_check()` |
+| Design level curve | ProgressionSystem | `generate_curve_data()` |
+| Tune drop rates | LootSystem | `calculate_expected_value()` |
+| Analyze player base | EngagementAnalyzer | `get_analytics_summary()` |
+| Track bugs | QAManager | `report_bug()`, `release_readiness()` |
+| Scale difficulty | DifficultyScaler | `scale_encounter()` |
+| Run balance test | CombatEngine | `simulate_battle()` (10K iterations) |
+| Check churn risk | EngagementAnalyzer | `predict_churn_risk()` |
+| Design event rewards | LootSystem | `register_table()` with event drops |
+
+### Simulation Best Practices
+
+1. **Always seed random number generators** for reproducible results
+2. **Run 10K+ iterations** for statistical significance in balance tests
+3. **Validate distributions** — if you set 5% drop rate, 100K drops should be ~5%
+4. **Test edge cases** — level 1 vs max level, zero stats, empty inventories
+5. **Monitor performance** — simulations should complete in < 1 second
+
+---
+
+## Configuration
+
+### Combat Engine
+
+```python
+combat = CombatEngine(seed=42)  # Reproducible results
+```
+
+### Progression System
+
+```python
+prog = ProgressionSystem(
+    max_level=100,        # Maximum player level
+    base_exp=100,         # Exp required for level 2
+    exp_growth=1.15,      # Multiplier per level
+)
+```
+
+### Loot System
+
+```python
+loot = LootSystem(seed=42)
+# Configure pity threshold per table
+table = LootTable("id", "name", pity_threshold=50, entries=[...])
+```
+
+### Economy Manager
+
+```python
+economy = EconomyManager()
+economy.register_currency("gold", CurrencyType.SOFT, initial_supply=1_000_000)
+economy.register_currency("gems", CurrencyType.PREMIUM, initial_supply=50_000)
+```
+
+---
+
+## Security Considerations
+
+### Anti-Cheat
+
+- Validate all combat calculations server-side
+- Use deterministic seeds for replay verification
+- Detect abnormal stat distributions
+- Monitor for currency exploits
+
+### Economy Protection
+
+- Rate limit currency earning
+- Validate all transactions server-side
+- Detect duplicate purchase attempts
+- Implement rollback mechanisms
+
+### Data Integrity
+
+- Log all significant game events
+- Use immutable records for audit trails
+- Validate save data on load
+- Detect tampered player profiles
+
+---
+
+## Scalability
+
+### Current Design Limits
+
+| Component | Limit | Notes |
+|-----------|-------|-------|
+| Players | ~100,000 | In-memory storage |
+| Items | ~10,000 | Per game instance |
+| Battles/sec | ~10,000 | Single process |
+| Loot rolls | ~100,000/sec | Single process |
+
+### Scaling Strategies
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    SCALING PATHWAY                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  Phase 1: In-Memory (Current)                                │
+│  ├── Single process, stdlib only                             │
+│  └── Suitable for < 1K concurrent players                    │
+│                                                               │
+│  Phase 2: Database Backend                                   │
+│  ├── PostgreSQL for player data                              │
+│  ├── Redis for sessions and leaderboards                     │
+│  └── Suitable for < 10K concurrent players                   │
+│                                                               │
+│  Phase 3: Distributed                                        │
+│  ├── Microservices per game system                           │
+│  ├── Message queues for async events                         │
+│  ├── CDN for assets                                          │
+│  └── Suitable for 100K+ concurrent players                   │
+│                                                               │
+│  Phase 4: Global Scale                                       │
+│  ├── Multi-region deployment                                 │
+│  ├── Edge computing for combat                               │
+│  ├── Database sharding by player region                      │
+│  └── Suitable for 1M+ concurrent players                     │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Design Patterns
+
+### Strategy Pattern
+
+Different combat formulas and difficulty algorithms are interchangeable:
+
+```python
+class CombatFormula(ABC):
+    @abstractmethod
+    def calculate_damage(self, attack, defense, crit) -> float:
+        pass
+
+class DefaultFormula(CombatFormula):
+    def calculate_damage(self, attack, defense, crit):
+        base = attack * (100 / (100 + defense))
+        return base * (1 + crit * 0.5) if crit else base
+
+class SimpleFormula(CombatFormula):
+    def calculate_damage(self, attack, defense, crit):
+        return max(1, attack - defense)
+```
+
+### Pity Timer Pattern
+
+Guaranteed outcomes after N attempts:
+
+```python
+class PitySystem:
+    def __init__(self, threshold: int = 50):
+        self.threshold = threshold
+        self.counter = defaultdict(int)
+
+    def should_guarantee(self, rarity: str) -> bool:
+        self.counter[rarity] += 1
+        return self.counter[rarity] >= self.threshold
+
+    def reset(self, rarity: str):
+        self.counter[rarity] = 0
+```
+
+### Observer Pattern
+
+Economy changes trigger health checks:
+
+```python
+class EconomyObserver(ABC):
+    @abstractmethod
+    def on_transaction(self, currency: str, amount: int, source: str):
+        pass
+
+class HealthChecker(EconomyObserver):
+    def on_transaction(self, currency, amount, source):
+        health = self.economy.health_check()
+        if not health["healthy"]:
+            self.alert(health["issues"])
+```
+
+### State Machine
+
+Player status transitions:
+
+```python
+class PlayerState(ABC):
+    @abstractmethod
+    def next(self, player: PlayerProfile) -> 'PlayerState':
+        pass
+
+class NewPlayerState(PlayerState):
+    def next(self, player):
+        if player.playtime_hours >= 5:
+            return CasualState()
+        return self
+
+class CasualState(PlayerState):
+    def next(self, player):
+        if player.playtime_hours >= 20:
+            return RegularState()
+        if player.days_inactive > 30:
+            return ChurnedState()
+        return self
+```
+
 ---
 
 ## Checklists
 
 ### Combat Balance
+
 - [ ] Win rates within 45-55% for matched characters
 - [ ] Average TTK within acceptable range (3-8 turns)
 - [ ] No dominant strategy exists
@@ -361,6 +854,7 @@ class BugReport:
 - [ ] Speed stat doesn't create infinite turn loops
 
 ### Economy Health
+
 - [ ] Inflation rate within ±5%
 - [ ] Sink/faucet ratio near 1.0
 - [ ] No currency exploits (infinite earn loops)
@@ -370,6 +864,7 @@ class BugReport:
 - [ ] Economy survives 30-day simulation
 
 ### Loot Fairness
+
 - [ ] Drop rates match configured probabilities
 - [ ] Pity timer triggers correctly at threshold
 - [ ] No extreme bad luck streaks (> 2x expected dry streak)
@@ -377,6 +872,7 @@ class BugReport:
 - [ ] Expected value calculations match actual drops
 
 ### Monetization Ethics
+
 - [ ] No pay-to-win mechanics
 - [ ] Clear odds for loot boxes (published)
 - [ ] Spending caps or pity systems in place
@@ -385,6 +881,7 @@ class BugReport:
 - [ ] Whale spending doesn't break game balance
 
 ### QA Release Readiness
+
 - [ ] Zero CRITICAL open bugs
 - [ ] Zero HIGH open bugs
 - [ ] All test cases passed
@@ -437,17 +934,107 @@ class BugReport:
 - Test with 10K+ simulations at different level gaps
 - Consider adaptive difficulty based on win rate
 
+### Debug Mode
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Get detailed combat log
+result = combat.simulate_battle(warrior, mage)
+print(f"Winner: {result['winner']}, Turns: {result['turns']}")
+```
+
 ---
 
 ## Integration Points
 
-The Gaming Agent integrates with:
-- **Analytics Platforms** — Export engagement and economy data
-- **Game Engines** — API hooks for Unity, Unreal, Godot
-- **Backend Services** — REST API for live game data
-- **A/B Testing** — Experiment framework for balance changes
-- **Player Support** — Bug tracking integration
+| System | Protocol | Purpose |
+|--------|----------|---------|
+| Unity | Plugin | Game engine integration |
+| Unreal | Plugin | Game engine integration |
+| GameAnalytics | REST API | Player analytics |
+| Firebase | REST API | Backend services |
+| PlayFab | REST API | Live operations |
+| Steam | API | Platform integration |
 
 ---
 
-*Building better games through better systems.*
+## Examples
+
+### Complete Game Design Session
+
+```python
+from agents.gaming.agent import *
+
+# 1. Configure game
+config = GameConfig(title="Dragon Quest Legends", genre=GameGenre.RPG)
+
+# 2. Set up economy
+economy = EconomyManager()
+economy.register_currency("gold", CurrencyType.SOFT, 1_000_000)
+economy.register_currency("gems", CurrencyType.PREMIUM, 50_000)
+
+# 3. Define progression
+prog = ProgressionSystem(max_level=100, base_exp=100, exp_growth=1.15)
+
+# 4. Create loot tables
+loot = LootSystem(seed=42)
+chest = LootTable("chest_1", "Wooden Chest", pity_threshold=50, entries=[...])
+loot.register_table(chest)
+
+# 5. Balance combat
+combat = CombatEngine(seed=42)
+balance = combat.run_balance_simulation(warrior, mage, iterations=1000)
+assert balance.balance_score > 0.6, "Combat is unbalanced"
+
+# 6. Analyze players
+analytics = EngagementAnalyzer()
+summary = analytics.get_analytics_summary(players)
+
+# 7. QA testing
+qa = QAManager()
+assert qa.release_readiness()["ready"], "Cannot ship with open critical bugs"
+```
+
+### Balance Testing Workflow
+
+```python
+# 1. Define characters
+warrior = CharacterStats(level=10, health=500, attack=50, defense=20, speed=1.0)
+mage = CharacterStats(level=10, health=300, attack=80, defense=10, speed=1.2)
+
+# 2. Run simulation
+balance = combat.run_balance_simulation(warrior, mage, iterations=10000)
+
+# 3. Analyze results
+print(f"Balance score: {balance.balance_score:.3f}")
+print(f"Win rates: {balance.winner_distribution}")
+print(f"Avg turns: {balance.avg_turns:.1f}")
+
+# 4. Tune if needed
+if balance.balance_score < 0.7:
+    # Adjust stats and re-test
+    warrior.attack = 45
+    balance = combat.run_balance_simulation(warrior, mage, iterations=10000)
+```
+
+---
+
+## Best Practices
+
+1. **Always seed random generators** for reproducible testing
+2. **Run 1000+ simulations** for balance testing
+3. **Monitor economy inflation** weekly during live ops
+4. **Implement pity timers** for loot boxes
+5. **Track player segments** to understand your audience
+6. **Test difficulty curves** with real player data
+7. **Maintain zero critical bugs** before release
+8. **Balance for fun**, not for realism
+9. **Provide transparent drop rates** to players
+10. **Design ethical monetization** that adds value
+
+---
+
+**See Also**: [ARCHITECTURE.md](./ARCHITECTURE.md) for system design details,
+[README.md](./README.md) for quick start and API reference.

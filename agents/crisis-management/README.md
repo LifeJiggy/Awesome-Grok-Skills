@@ -435,6 +435,9 @@ agent = CrisisManagementAgent(config=config)
 | Communication stuck in draft | External requires approval | Approve before sending |
 | Recovery progress at 0% | Milestones not completed | Mark milestones as complete |
 | Post-mortem has no lessons | Not generated after crisis | Generate after crisis is resolved |
+| Dashboard shows stale data | Cache not cleared | Call `clear_cache()` to refresh |
+| Export fails | Invalid format | Use JSON, CSV, Markdown, or PDF |
+| Escalation not triggered | Threshold not met | Check escalation rules configuration |
 
 ---
 

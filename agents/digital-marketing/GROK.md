@@ -41,7 +41,36 @@ brand building.
 4. **Attribution Integrity**: Use the right model for the right question.
 5. **Continuous Optimization**: Test, measure, iterate, repeat.
 
----
+## Architecture Overview
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                     DigitalMarketingAgent                                  │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Campaign      │  │  Channel       │  │  Performance               │  │
+│  │  Manager       │  │  Strategy      │  │  Analytics                 │  │
+│  │  ├ Create      │  │  ├ Recommend   │  │  ├ Touchpoints             │  │
+│  │  ├ Activate    │  │  ├ Allocate    │  │  ├ Dashboard               │  │
+│  │  ├ Pause       │  │  ├ Optimize    │  │  ├ Trends                  │  │
+│  │  └ Complete    │  │  └ Score       │  │  └ Alerts                  │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Attribution   │  │  Email         │  │  Social                    │  │
+│  │  Engine        │  │  Marketing     │  │  Media                     │  │
+│  │  ├ 8 models    │  │  ├ Campaigns   │  │  ├ 10 platforms            │  │
+│  │  ├ Compare     │  │  ├ Events      │  │  ├ Engagement              │  │
+│  │  ├ Channel     │  │  ├ Metrics     │  │  ├ Analytics               │  │
+│  │  └ Customer    │  │  └ ROI         │  │  └ Scheduling              │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────────┐│
+│  │  SEO Manager                                                         ││
+│  │  ├ Keywords  │ Rankings  │ Audits  │ Scorecard  │ Recommendations   ││
+│  └──────────────────────────────────────────────────────────────────────┘│
+└──────────────────────────────────────────────────────────────────────────┘
+```
 
 ## Capabilities
 
@@ -70,10 +99,24 @@ result = agent.create_full_campaign(
 # Returns: {"campaign": {...}, "strategy": {...}}
 ```
 
-**Supported Objectives**: Awareness, Consideration, Conversion, Retention,
-Advocacy, Lead Generation, Traffic, Engagement, App Installs, Store Visits.
+**Campaign States:**
 
-**Campaign States**: Draft → Scheduled → Active → Paused → Completed → Archived.
+```
+  ┌────────┐     ┌──────────┐     ┌────────┐
+  │ DRAFT  │────►│ SCHEDULED│────►│ ACTIVE │
+  └────────┘     └──────────┘     └────────┘
+                                      │
+                              ┌───────┴───────┐
+                              ▼               ▼
+                        ┌────────┐      ┌──────────┐
+                        │ PAUSED │      │COMPLETED │
+                        └────────┘      └──────────┘
+                                            │
+                                            ▼
+                                      ┌──────────┐
+                                      │ ARCHIVED │
+                                      └──────────┘
+```
 
 ### 2. Multi-Channel Strategy
 
@@ -95,13 +138,31 @@ recs = engine.get_channel_recommendations(
 # Returns ranked channels with estimated CPC, CPM, daily clicks, fit_score
 ```
 
-**Channels Supported**:
+**Channels Supported:**
+
 | Category | Channels |
 |----------|---------|
 | Paid | Paid Search, Paid Social, Display, Video, Native |
 | Organic | Organic Search, Social Organic, Content |
 | Direct | Email, SMS, Push Notification |
 | Partnership | Affiliate, Influencer, Event, Direct Mail |
+
+**Channel Fit Matrix:**
+
+```
+┌─────────────────┬────────────┬────────────┬────────────┬────────────┐
+│  Channel        │ Awareness  │ Consider   │ Conversion │ Retention  │
+├─────────────────┼────────────┼────────────┼────────────┼────────────┤
+│  Paid Search    │    Low     │   Medium   │   High     │    Low     │
+│  Paid Social    │   High     │   Medium   │   Medium   │    Low     │
+│  Display        │   High     │    Low     │    Low     │    Low     │
+│  Video          │   High     │   High     │   Medium   │   Medium   │
+│  Email          │    Low     │   Medium   │   High     │   High     │
+│  Organic Search │   Medium   │   High     │   Medium   │   Medium   │
+│  Social Organic │   High     │   Medium   │    Low     │   Medium   │
+│  Affiliate      │   Medium   │   Medium   │   High     │    Low     │
+└─────────────────┴────────────┴────────────┴────────────┴────────────┘
+```
 
 ### 3. Performance Analytics
 
@@ -130,10 +191,14 @@ print(f"Total Conversions: {dashboard.total_conversions}")
 trend = analytics.get_performance_trend(days=30)
 ```
 
-**Dashboard Alerts**:
-- ROAS < 1.0 → Critical
-- CPC > $5.00 → Warning
-- CTR < 0.5% with 10K+ impressions → Warning
+**Dashboard Alerts:**
+
+| Alert | Threshold | Severity |
+|-------|-----------|----------|
+| ROAS < 1.0 | Critical | Immediate action |
+| CPC > $5.00 | Warning | Review targeting |
+| CTR < 0.5% (10K+ impressions) | Warning | Creative fatigue |
+| Conversion rate < 1% | Warning | Landing page issue |
 
 ### 4. Multi-Touch Attribution
 
@@ -152,8 +217,18 @@ for model_name, result in comparison.items():
 channel_attr = attr.get_channel_attribution(AttributionModel.TIME_DECAY)
 ```
 
-**Available Models**: First Touch, Last Touch, Linear, Time Decay,
-Position-Based, Data-Driven, Markov Chain, Shapley Value.
+**Available Models:**
+
+| Model | Best For | Consideration |
+|-------|----------|---------------|
+| First Touch | Acquisition attribution | Ignores nurturing |
+| Last Touch | Conversion optimization | Ignores awareness |
+| Linear | Balanced view | Equal credit to all |
+| Time Decay | Long sales cycles | Recent touch weighted more |
+| Position-Based | First/last focus | 40/20/40 split |
+| Data-Driven | Algorithmic | Requires sufficient data |
+| Markov Chain | Removal impact | Complex but accurate |
+| Shapley Value | Fair distribution | Computationally expensive |
 
 ### 5. Email Marketing
 
@@ -183,6 +258,15 @@ roi = email.calculate_roi(campaign.email_id, revenue_per_conversion=75)
 print(f"ROI: {roi['roi']:.0f}%")
 ```
 
+**Email Performance Benchmarks:**
+
+| Metric | Good | Average | Poor |
+|--------|------|---------|------|
+| Open Rate | > 25% | 15-25% | < 15% |
+| Click Rate | > 5% | 2-5% | < 2% |
+| Bounce Rate | < 1% | 1-3% | > 3% |
+| Unsubscribe | < 0.5% | 0.5-1% | > 1% |
+
 ### 6. Social Media Management
 
 ```python
@@ -205,8 +289,16 @@ summary = social.get_platform_summary(SocialPlatform.INSTAGRAM)
 top = social.get_top_posts(metric="engagement", limit=5)
 ```
 
-**Supported Platforms**: Facebook, Instagram, Twitter, LinkedIn, TikTok,
-YouTube, Pinterest, Reddit, Snapchat, Threads.
+**Supported Platforms:**
+
+| Platform | Best Content | Engagement |
+|----------|--------------|------------|
+| Facebook | Links, video | Comments, shares |
+| Instagram | Images, reels | Likes, saves |
+| Twitter | Text, threads | Retweets, replies |
+| LinkedIn | Articles, professional | Comments, reactions |
+| TikTok | Short video | Views, shares |
+| YouTube | Long video | Watch time, subs |
 
 ### 7. SEO Management
 
@@ -232,6 +324,15 @@ print(f"Keywords in Top 10: {scorecard['keywords_in_top_10']}")
 audit = seo.run_site_audit("shop.example.com")
 print(f"Overall Score: {audit.overall_score}/100")
 ```
+
+**SEO Audit Dimensions:**
+
+| Dimension | Weight | What It Measures |
+|-----------|--------|------------------|
+| Page Speed | 25% | Load time, Core Web Vitals |
+| Mobile | 20% | Mobile-friendliness, responsive |
+| SEO | 35% | Meta tags, structure, content |
+| Accessibility | 20% | Alt text, contrast, ARIA |
 
 ---
 
@@ -431,6 +532,40 @@ for rec in monthly["recommendations"]:
 
 ---
 
+## Security Considerations
+
+### Data Protection
+
+- PII handling for customer data
+- GDPR compliance for EU audiences
+- Secure API key storage
+- Encrypted data transmission
+
+### Access Control
+
+```
+┌─────────────────┬────────┬────────┬────────┬────────┐
+│  Role           │Campaign│Email   │Social  │SEO     │
+├─────────────────┼────────┼────────┼────────┼────────┤
+│  Viewer         │   ✓    │   ✓    │   ✓    │   ✓    │
+│  Editor         │   ✓    │   ✓    │   ✓    │   ✗    │
+│  Admin          │   ✓    │   ✓    │   ✓    │   ✓    │
+└─────────────────┴────────┴────────┴────────┴────────┘
+```
+
+## Scalability
+
+### Performance Considerations
+
+| Operation | Small (< 1K) | Medium (< 100K) | Large (< 1M) |
+|-----------|---------------|-----------------|--------------|
+| Touchpoint recording | 10ms | 50ms | 200ms |
+| Dashboard generation | 100ms | 1s | 10s |
+| Attribution analysis | 200ms | 2s | 30s |
+| Report generation | 500ms | 5s | 60s |
+
+---
+
 ## Troubleshooting
 
 | Issue | Cause | Resolution |
@@ -441,6 +576,53 @@ for rec in monthly["recommendations"]:
 | Email open rate 0% | Events not recorded | Call `record_event()` for each event type |
 | SEO audit returns random scores | Placeholder implementation | Connect to real SEO API for production use |
 | Duplicate campaigns created | Calling create in a loop | Use `duplicate_campaign()` instead |
+| Dashboard shows no data | Empty analytics | Record touchpoints first |
+
+---
+
+## Design Patterns
+
+### Strategy Pattern for Attribution
+
+```python
+class AttributionStrategy:
+    def compute(self, touchpoints: List[Touchpoint]) -> Dict[str, float]:
+        raise NotImplementedError
+
+class FirstTouchStrategy(AttributionStrategy):
+    def compute(self, touchpoints):
+        # Give all credit to first touchpoint
+        pass
+
+class TimeDecayStrategy(AttributionStrategy):
+    def compute(self, touchpoints):
+        # Weight by recency
+        pass
+```
+
+### Observer Pattern for Campaign Events
+
+```python
+class CampaignObserver:
+    def on_campaign_activated(self, campaign: Campaign):
+        self.notify_stakeholders(campaign)
+    
+    def on_budget_exhausted(self, campaign: Campaign):
+        self.alert_team(campaign)
+```
+
+### Factory Pattern for Channel Creation
+
+```python
+class ChannelFactory:
+    @staticmethod
+    def create(channel_type: ChannelType, config: Dict) -> Channel:
+        if channel_type == ChannelType.PAID_SEARCH:
+            return PaidSearchChannel(config)
+        elif channel_type == ChannelType.EMAIL:
+            return EmailChannel(config)
+        # ... etc
+```
 
 ---
 
@@ -469,3 +651,59 @@ for rec in monthly["recommendations"]:
 - [ ] Monitor email deliverability metrics
 - [ ] Track SEO ranking changes weekly
 - [ ] Generate monthly performance reports
+
+---
+
+## Configuration
+
+```yaml
+digital_marketing_agent:
+  campaign_manager:
+    max_campaigns: 10000
+    audit_log_retention_days: 365
+
+  channel_strategy:
+    default_currency: USD
+    optimization_frequency: daily
+
+  analytics:
+    touchpoint_retention_days: 365
+    alert_thresholds:
+      roas_critical: 1.0
+      cpc_warning: 5.0
+
+  attribution:
+    default_model: linear
+    time_decay_half_life_days: 7
+
+  email:
+    max_send_rate_per_hour: 100000
+
+  seo:
+    max_keywords_tracked: 50000
+```
+
+---
+
+## Best Practices
+
+1. **Always validate before activating** — run `campaign.validate()` to catch issues before they cost money.
+2. **Record every touchpoint** — attribution accuracy depends on complete data.
+3. **Compare attribution models** — no single model tells the full story.
+4. **Monitor alerts daily** — catch ROAS drops and CPC spikes early.
+5. **Re-optimize weekly** — use performance data to reallocate budgets.
+6. **Segment email campaigns** — personalized emails get 2x higher open rates.
+7. **Track SEO weekly** — ranking changes signal algorithm updates.
+8. **Keep creatives fresh** — ad fatigue drops CTR by 50%+ within 2 weeks.
+
+---
+
+## Future Enhancements
+
+- AI-powered creative optimization
+- Predictive budget allocation
+- Automated A/B testing
+- Cross-channel attribution unification
+- Real-time bid optimization
+- Customer lifetime value prediction
+- Automated competitor analysis

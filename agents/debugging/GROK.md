@@ -42,6 +42,37 @@ The Debugging Agent is a systematic debugging platform that helps developers dia
 5. **Document everything** — Build knowledge base from every debugging session
 6. **Prevent recurrence** — Every fix should include monitoring and tests
 
+## Architecture Overview
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                        DebuggingAgent                                      │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Error         │  │  Root Cause    │  │  Profiler                  │  │
+│  │  Analyzer      │  │  Analysis      │  │  ├ CPU                     │  │
+│  │  ├ Classify    │  │  ├ Evidence    │  │  ├ Memory                  │  │
+│  │  ├ Patterns    │  │  ├ Hypothesis  │  │  ├ I/O                     │  │
+│  │  ├ History     │  │  ├ Confirm     │  │  └ Database                │  │
+│  │  └ Severity    │  │  └ Fix Suggest │  │                            │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+│                                                                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────────────┐  │
+│  │  Distributed   │  │  Log           │  │  Session                   │  │
+│  │  Tracer        │  │  Analyzer      │  │  Manager                   │  │
+│  │  ├ Spans       │  │  ├ Patterns    │  │  ├ Create                  │  │
+│  │  ├ Timeline    │  │  ├ Correlation │  │  ├ Track phases            │  │
+│  │  ├ Bottleneck  │  │  ├ Anomalies   │  │  ├ Artifacts               │  │
+│  │  └ Analysis    │  │  └ Strategy    │  │  └ Report                  │  │
+│  └────────────────┘  └────────────────┘  └────────────────────────────┘  │
+│                                                                          │
+│  ┌──────────────────────────────────────────────────────────────────────┐│
+│  │  Fix Suggestion Engine                                               ││
+│  │  ├ Code fixes  │ Config changes  │ Dependency updates  │ Arch changes││
+│  └──────────────────────────────────────────────────────────────────────┘│
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
 ## Capabilities
 
 ### 1. Error Analysis
@@ -66,12 +97,40 @@ for p in patterns:
     print(f"{p['error_type']}: {p['count']} occurrences")
 ```
 
-**Auto-classification covers 20+ error types:**
-- TypeError, NullReference, ValueError, KeyError → TYPE_ERROR, REFERENCE_ERROR, DATA
-- Timeout, ConnectionError → TIMEOUT, NETWORK
-- MemoryError → MEMORY (CRITICAL)
-- ImportError, ModuleNotFoundError → DEPENDENCY
-- PermissionError → PERMISSION
+**Error Classification Matrix:**
+
+| Error Type | Category | Severity | Common Cause |
+|-----------|----------|----------|--------------|
+| TypeError | TYPE_ERROR | Medium | Wrong data type |
+| NullReference | REFERENCE_ERROR | High | Uninitialized variable |
+| ValueError | DATA | Medium | Invalid input |
+| KeyError | DATA | Medium | Missing dictionary key |
+| Timeout | TIMEOUT | High | Slow external service |
+| ConnectionError | NETWORK | High | Network failure |
+| MemoryError | MEMORY | Critical | Resource exhaustion |
+| ImportError | DEPENDENCY | Medium | Missing package |
+| PermissionError | PERMISSION | High | Access denied |
+
+**Error Analysis Flow:**
+
+```
+  ┌──────────────┐
+  │  Error       │
+  │  Input       │
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+  │  Classify    │───►│  Pattern     │───►│  Severity    │
+  │  (20+ types) │    │  Detection   │    │  Assessment  │
+  └──────────────┘    └──────────────┘    └──────┬───────┘
+                                                 │
+                                                 ▼
+                                          ┌──────────────┐
+                                          │  Fix         │
+                                          │  Suggestions │
+                                          └──────────────┘
+```
 
 ### 2. Root Cause Analysis
 
@@ -105,16 +164,49 @@ fixes = agent.generate_fix_suggestions(rca)
 
 **Root Cause Categories:**
 
-| Category | Example |
-|----------|---------|
-| CODE_DEFECT | Null pointer, off-by-one |
-| DESIGN_FLAW | N+1 queries, missing indexes |
-| CONFIGURATION_ERROR | Wrong env var, missing config |
-| DEPENDENCY_FAILURE | Library bug, API change |
-| RESOURCE_LIMIT | OOM, disk full, pool exhaustion |
-| CONCURRENCY_ISSUE | Race condition, deadlock |
-| DATA_CORRUPTION | Invalid data, missing records |
-| SECURITY_VULNERABILITY | SQL injection, XSS |
+| Category | Example | Detection |
+|----------|---------|-----------|
+| CODE_DEFECT | Null pointer, off-by-one | Stack trace, unit test |
+| DESIGN_FLAW | N+1 queries, missing indexes | Profiling, code review |
+| CONFIGURATION_ERROR | Wrong env var, missing config | Config diff, audit |
+| DEPENDENCY_FAILURE | Library bug, API change | Version check, logs |
+| RESOURCE_LIMIT | OOM, disk full, pool exhaustion | Monitoring, metrics |
+| CONCURRENCY_ISSUE | Race condition, deadlock | Profiling, stress test |
+| DATA_CORRUPTION | Invalid data, missing records | Data validation |
+| SECURITY_VULNERABILITY | SQL injection, XSS | Security scan |
+
+**RCA Investigation Flow:**
+
+```
+  ┌──────────────┐
+  │  Issue       │
+  │  Reported    │
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐
+  │  Reproduce   │
+  │  Issue       │
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+  │  Gather      │───►│  Form        │───►│  Test        │
+  │  Evidence    │    │  Hypotheses  │    │  Hypotheses  │
+  └──────────────┘    └──────────────┘    └──────┬───────┘
+                                                 │
+                                                 ▼
+                                          ┌──────────────┐
+                                          │  Confirm     │
+                                          │  Root Cause  │
+                                          └──────┬───────┘
+                                                 │
+                                                 ▼
+                                          ┌──────────────┐
+                                          │  Generate    │
+                                          │  Fixes       │
+                                          └──────────────┘
+```
 
 ### 3. Performance Profiling
 
@@ -153,6 +245,16 @@ db_profile = agent.create_profile(
 # Returns: "12 slow queries detected." and "N+1 query pattern detected."
 ```
 
+**Profiling Types:**
+
+| Type | Focus | Key Metrics | Tools |
+|------|-------|-------------|-------|
+| CPU | Processor usage | Time %, call count | cProfile, py-spy |
+| MEMORY | RAM allocation | Peak, allocations | tracemalloc, memory_profiler |
+| I/O | Disk/network | Read/write ops | iostat, strace |
+| DATABASE | Query performance | Slow queries, N+1 | pg_stat, EXPLAIN |
+| NETWORK | API latency | Response time, throughput | tcpdump, Wireshark |
+
 ### 4. Distributed Tracing
 
 ```python
@@ -172,6 +274,16 @@ print(f"Error spans: {analysis.error_spans}")
 print(f"Recommendations: {analysis.recommendations}")
 ```
 
+**Trace Visualization:**
+
+```
+api-gateway     [████████████████████████████████████████] 350ms
+  auth-service  [███████]                                   45ms
+  user-service  [██████████████████████]                   180ms
+    postgres    [████████████████████]                     140ms ← BOTTLENECK
+  └──────────────────────────────────────────────────────────────┘
+```
+
 ### 5. Log Analysis
 
 ```python
@@ -189,6 +301,20 @@ print(f"By level: {analysis.by_level}")
 print(f"Error patterns: {len(analysis.error_patterns)}")
 print(f"Correlated errors: {len(analysis.correlated_errors)}")
 print(f"Recommendations: {analysis.recommendations}")
+```
+
+**Log Level Guidelines:**
+
+```
+┌──────────┬────────────────────────────────────────────────────────────┐
+│  Level   │  When to Use                                               │
+├──────────┼────────────────────────────────────────────────────────────┤
+│  DEBUG   │  Detailed diagnostic info for developers                   │
+│  INFO    │  General operational events (startup, shutdown)            │
+│  WARN    │  Unexpected but handled situation (retry, fallback)        │
+│  ERROR   │  Operation failed, needs attention                         │
+│  CRITICAL│  System is unusable, immediate action required             │
+└──────────┴────────────────────────────────────────────────────────────┘
 ```
 
 ### 6. Logging Strategy
@@ -237,6 +363,44 @@ Phase 6: VERIFY → Confirm the issue is resolved
 Phase 7: PREVENT → Add monitoring, tests, documentation
 ```
 
+**Methodology Flow:**
+
+```
+  ┌──────────────┐
+  │  1. REPRODUCE│
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐
+  │  2. ISOLATE  │
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐
+  │  3. HYPOTHESIZE│
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐
+  │  4. INVESTIGATE│
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐
+  │  5. FIX      │
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐
+  │  6. VERIFY   │
+  └──────┬───────┘
+         │
+         ▼
+  ┌──────────────┐
+  │  7. PREVENT  │
+  └──────────────┘
+```
+
 ### When to Use Each Capability
 
 | Situation | Use |
@@ -252,7 +416,7 @@ Phase 7: PREVENT → Add monitoring, tests, documentation
 
 | Confidence | Action |
 |------------|--------|
-| ≥ 0.9 | High confidence — apply with standard testing |
+| >= 0.9 | High confidence — apply with standard testing |
 | 0.7 - 0.9 | Medium confidence — apply with careful testing |
 | < 0.7 | Low confidence — investigate more before applying |
 
@@ -311,6 +475,7 @@ class DebuggingAgent:
 ## Data Models
 
 ### ErrorCategory
+
 ```python
 class ErrorCategory(Enum):
     RUNTIME = "runtime"
@@ -333,6 +498,7 @@ class ErrorCategory(Enum):
 ```
 
 ### DebugPhase
+
 ```python
 class DebugPhase(Enum):
     REPRODUCE = "reproduce"
@@ -345,6 +511,7 @@ class DebugPhase(Enum):
 ```
 
 ### RootCauseCategory
+
 ```python
 class RootCauseCategory(Enum):
     CODE_DEFECT = "code_defect"
@@ -360,9 +527,148 @@ class RootCauseCategory(Enum):
     UNKNOWN = "unknown"
 ```
 
+### Key Data Classes
+
+```python
+@dataclass
+class ErrorInfo:
+    error_id: str
+    message: str
+    error_type: str
+    category: ErrorCategory
+    severity: str
+    source_file: str
+    source_line: int
+    stack_trace: str
+    context: Dict[str, Any]
+    first_seen: datetime
+    last_seen: datetime
+    occurrence_count: int
+
+@dataclass
+class RootCauseAnalysis:
+    rca_id: str
+    issue_description: str
+    status: str
+    evidence: List[Dict[str, Any]]
+    hypotheses: List[Dict[str, Any]]
+    root_cause: Optional[str]
+    confidence: float
+    contributing_factors: List[str]
+    recommendations: List[str]
+
+@dataclass
+class FixSuggestion:
+    suggestion_id: str
+    rca_id: str
+    title: str
+    description: str
+    confidence: float
+    fix_type: str  # code, config, dependency, architecture
+    code_changes: Optional[str]
+    testing_notes: str
+```
+
+## Security Considerations
+
+### Sensitive Data in Errors
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│               Security Checklist for Debugging                 │
+├──────────────────────────────────────────────────────────────┤
+│  □ Redact passwords, tokens, API keys from stack traces      │
+│  □ Mask PII in log entries                                   │
+│  □ Sanitize error messages before logging                    │
+│  □ Never include credentials in error context                │
+│  □ Use structured logging with field-level redaction         │
+│  □ Audit debug logs for sensitive data exposure              │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### Logging Best Practices
+
+- Use correlation IDs for request tracing
+- Implement log rotation to prevent disk exhaustion
+- Set appropriate log levels per environment
+- Use structured logging for machine parsing
+- Implement log aggregation for centralized analysis
+
+## Scalability
+
+### Handling High-Volume Errors
+
+| Error Volume | Strategy |
+|-------------|----------|
+| < 100/day | Individual analysis |
+| 100-1000/day | Pattern detection, batch analysis |
+| 1000-10000/day | Sampling, aggregation, alerting |
+| > 10000/day | Deduplication, rate limiting, bulk RCA |
+
+### Performance Considerations
+
+- Profile data retention: 30 days default
+- Log entry limit: 100K entries per analysis
+- Trace span limit: 1000 spans per trace
+- RCA evidence limit: 50 items per investigation
+
+## Design Patterns
+
+### Strategy Pattern for Error Classification
+
+```python
+class ErrorClassifier:
+    def __init__(self):
+        self._strategies = {}
+    
+    def register(self, error_type: str, strategy: ClassificationStrategy):
+        self._strategies[error_type] = strategy
+    
+    def classify(self, error: ErrorInfo) -> ErrorCategory:
+        strategy = self._strategies.get(error.error_type)
+        if strategy:
+            return strategy.classify(error)
+        return ErrorCategory.UNKNOWN
+```
+
+### Chain of Responsibility for Fix Suggestions
+
+```python
+class FixHandler:
+    def __init__(self):
+        self._next_handler = None
+    
+    def set_next(self, handler: 'FixHandler') -> 'FixHandler':
+        self._next_handler = handler
+        return handler
+    
+    def handle(self, rca: RootCauseAnalysis) -> Optional[FixSuggestion]:
+        if self.can_handle(rca):
+            return self.apply_fix(rca)
+        if self._next_handler:
+            return self._next_handler.handle(rca)
+        return None
+```
+
+### Observer Pattern for Debug Events
+
+```python
+class DebugEventBus:
+    def __init__(self):
+        self._subscribers = defaultdict(list)
+    
+    def subscribe(self, event_type: str, callback: Callable):
+        self._subscribers[event_type].append(callback)
+    
+    def publish(self, event_type: str, data: Any):
+        for callback in self._subscribers[event_type]:
+            callback(data)
+```
+
 ## Checklists
 
 ### New Error Investigation
+
 - [ ] Reproduce the error reliably
 - [ ] Classify with `analyze_error`
 - [ ] Check for recurring patterns
@@ -375,6 +681,7 @@ class RootCauseCategory(Enum):
 - [ ] Add monitoring for recurrence
 
 ### Performance Investigation
+
 - [ ] Profile CPU usage
 - [ ] Profile memory allocation
 - [ ] Profile I/O operations
@@ -385,6 +692,7 @@ class RootCauseCategory(Enum):
 - [ ] Re-profile to verify improvement
 
 ### Distributed System Debugging
+
 - [ ] Collect trace spans from all services
 - [ ] Analyze trace for total duration
 - [ ] Identify bottleneck service
@@ -393,29 +701,80 @@ class RootCauseCategory(Enum):
 - [ ] Focus optimization on bottleneck
 - [ ] Add tracing to uninstrumented code
 
+### Logging Strategy Review
+
+- [ ] Verify structured logging enabled
+- [ ] Check correlation ID propagation
+- [ ] Review log level appropriateness
+- [ ] Validate PII redaction
+- [ ] Assess log volume and retention
+- [ ] Test log aggregation pipeline
+
 ## Troubleshooting
 
 ### Error Classification Returns UNKNOWN
+
 - Check that `error_type` matches a known pattern in `config.known_error_patterns`
 - Add custom patterns to the config if needed
 - The message-based fallback may catch it
 
 ### Root Cause Confidence Low
+
 - Add more evidence to the analysis
 - Check if multiple root causes are contributing
 - Consider running profiling or trace analysis for more data
 
 ### Profile Recommendations Empty
+
 - Ensure `summary` contains meaningful metrics
 - Check that hotspots or top_functions are provided
 - Verify profiling_type matches the data collected
 
 ### Trace Analysis Shows No Bottleneck
+
 - Spans may have similar durations — check service_breakdown for the highest total
 - Ensure all relevant services have trace spans
 - Consider adding more granular spans
 
 ### Log Analysis Misses Patterns
+
 - Ensure `error` level is set correctly in LogEntry
 - Check that source field is populated for correlation
 - Verify log entries are within the analysis window
+
+## Integration Points
+
+### With Other Agents
+
+- **debugging**: Core debugging capabilities
+- **devops**: Deployment and infrastructure context
+- **monitoring**: Metric and alert correlation
+- **security**: Vulnerability-related errors
+
+### External Tools
+
+- APM: Datadog, New Relic, Dynatrace
+- Logging: ELK Stack, Splunk, CloudWatch
+- Tracing: Jaeger, Zipkin, OpenTelemetry
+- Profiling: py-spy, cProfile, memory_profiler
+
+## Performance Benchmarks
+
+| Operation | Small (< 1K entries) | Medium (< 100K) | Large (< 1M) |
+|-----------|---------------------|-----------------|--------------|
+| Error analysis | 10ms | 100ms | 1s |
+| Log pattern detection | 50ms | 500ms | 5s |
+| Trace analysis | 20ms | 200ms | 2s |
+| Profile analysis | 100ms | 1s | 10s |
+| RCA generation | 50ms | 500ms | 5s |
+
+## Future Enhancements
+
+- AI-powered root cause prediction
+- Automated fix application with rollback
+- Real-time distributed tracing integration
+- Natural language debugging queries
+- Cross-language stack trace correlation
+- Predictive error detection
+- Automated regression test generation
+- Integration with CI/CD for pre-deploy analysis

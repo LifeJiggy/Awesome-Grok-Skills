@@ -7,16 +7,21 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Features](#features)
-3. [Quick Start](#quick-start)
-4. [Installation](#installation)
-5. [Usage](#usage)
-6. [API Reference](#api-reference)
-7. [Examples](#examples)
-8. [Configuration](#configuration)
-9. [Best Practices](#best-practices)
-10. [Troubleshooting](#troubleshooting)
-11. [License](#license)
+2. [Architecture](#architecture)
+3. [Features](#features)
+4. [Quick Start](#quick-start)
+5. [Installation](#installation)
+6. [Usage](#usage)
+7. [API Reference](#api-reference)
+8. [Data Models](#data-models)
+9. [Examples](#examples)
+10. [Configuration](#configuration)
+11. [Best Practices](#best-practices)
+12. [Security](#security)
+13. [Scalability](#scalability)
+14. [Design Patterns](#design-patterns)
+15. [Troubleshooting](#troubleshooting)
+16. [License](#license)
 
 ---
 
@@ -34,6 +39,81 @@ The Automation Agent provides end-to-end business process automation with a DAG-
 - **Notifications**: Multi-channel alerts (email, Slack, webhook, SMS, console)
 - **Execution History**: Full audit trail with duration and status tracking
 - **Variable Templating**: Pass data between tasks with `{{tasks.TaskName.output}}` syntax
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                       Automation Agent                              │
+├─────────────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │
+│  │   Workflow   │  │  Scheduler   │  │    Email     │             │
+│  │   Engine     │  │   Manager    │  │   Manager    │             │
+│  │              │  │              │  │              │             │
+│  │ • DAG        │  │ • Cron       │  │ • Templates  │             │
+│  │ • Parallel   │  │ • Interval   │  │ • Campaigns  │             │
+│  │ • Retry      │  │ • Recurring  │  │ • Bulk Send  │             │
+│  │ • Compensate │  │ • One-shot   │  │ • Variables  │             │
+│  └──────────────┘  └──────────────┘  └──────────────┘             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐             │
+│  │    File      │  │ Notification │  │   Execution  │             │
+│  │  Operations  │  │   Manager    │  │   History    │             │
+│  │              │  │              │  │              │             │
+│  │ • Watch      │  │ • Email      │  │ • Audit Log  │             │
+│  │ • Copy/Move  │  │ • Slack      │  │ • Duration   │             │
+│  │ • Compress   │  │ • Webhook    │  │ • Status     │             │
+│  │ • Extract    │  │ • SMS        │  │ • Variables  │             │
+│  └──────────────┘  └──────────────┘  └──────────────┘             │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Schedule   │────▶│   Workflow  │────▶│    Task     │
+│  Trigger    │     │   Engine    │     │  Execution  │
+└─────────────┘     └─────────────┘     └──────┬──────┘
+                                               │
+                    ┌──────────────────────────┼──────────────────────────┐
+                    │                          │                          │
+              ┌─────▼──────┐          ┌───────▼───────┐          ┌───────▼──────┐
+              │   Email    │          │    File       │          │  Notification│
+              │   Send     │          │   Operation   │          │   Dispatch   │
+              └────────────┘          └───────────────┘          └──────────────┘
+                                               │
+                                               ▼
+                                        ┌─────────────┐
+                                        │  Execution  │
+                                        │   History   │
+                                        └─────────────┘
+```
+
+### DAG Execution Model
+
+```
+        ┌───────┐
+        │ Start │
+        └───┬───┘
+            │
+    ┌───────┴───────┐
+    │               │
+┌───▼───┐       ┌───▼───┐
+│Task A │       │Task B │    ← Parallel execution
+└───┬───┘       └───┬───┘
+    │               │
+    └───────┬───────┘
+            │
+        ┌───▼───┐
+        │Task C │    ← Waits for A and B
+        └───┬───┘
+            │
+        ┌───▼───┐
+        │ End   │
+        └───────┘
+```
 
 ---
 
@@ -298,6 +378,61 @@ for n in notifications:
 
 ---
 
+## Data Models
+
+### Workflow
+
+```python
+@dataclass
+class Workflow:
+    workflow_id: str              # Unique identifier
+    name: str                     # Human-readable name
+    description: str              # Workflow description
+    tasks: List[Task]             # Ordered task list
+    variables: Dict[str, Any]     # Workflow-level variables
+    tags: List[str]               # Classification tags
+    created_at: datetime          # Creation timestamp
+    updated_at: datetime          # Last modification
+    status: WorkflowStatus        # DRAFT, ACTIVE, COMPLETED, FAILED
+```
+
+### Task
+
+```python
+@dataclass
+class Task:
+    task_id: str                  # Unique identifier
+    name: str                     # Human-readable name
+    action_type: str              # "script", "http_request", "email", "notification", "file"
+    action_config: Dict           # Action-specific configuration
+    depends_on: List[str]         # List of task IDs this depends on
+    timeout_seconds: int          # Execution timeout
+    max_retries: int              # Maximum retry attempts
+    retry_strategy: str           # "fixed", "linear", "exponential"
+    compensation_action: Optional[Dict]  # Rollback action
+    status: TaskStatus            # PENDING, RUNNING, COMPLETED, FAILED, SKIPPED
+    output: Optional[str]         # Task output (set after execution)
+    error: Optional[str]          # Error message (if failed)
+```
+
+### Schedule
+
+```python
+@dataclass
+class Schedule:
+    schedule_id: str              # Unique identifier
+    name: str                     # Human-readable name
+    workflow_id: str              # Associated workflow
+    cron_expression: Optional[str]  # Cron schedule
+    interval_seconds: Optional[int]  # Interval schedule
+    enabled: bool                 # Whether active
+    next_run: datetime            # Next scheduled execution
+    last_run: Optional[datetime]  # Last execution time
+    created_at: datetime          # Creation timestamp
+```
+
+---
+
 ## Examples
 
 ### Parallel Execution
@@ -410,6 +545,133 @@ agent = AutomationAgent(config=config)
 
 ---
 
+## Security
+
+### Credential Management
+
+- SMTP credentials via environment variables, not config files
+- Webhook URLs stored encrypted
+- No secrets in workflow definitions
+- Audit log of all credential access
+
+### Execution Safety
+
+```python
+# Sandboxed execution
+config = Config(
+    enable_compensation=True,      # Always have rollback path
+    default_task_timeout=600,      # Prevent runaway tasks
+    max_parallel_tasks=4,          # Resource limits
+    log_level="INFO",              # Audit trail
+)
+```
+
+### Input Validation
+
+- Task configurations validated before execution
+- File paths sanitized against traversal
+- Webhook URLs validated against SSRF
+- Email recipients validated against injection
+
+---
+
+## Scalability
+
+### Performance Targets
+
+| Operation | Latency | Throughput |
+|-----------|---------|------------|
+| Workflow creation | < 100ms | 1,000/sec |
+| Task execution | Varies | 4 parallel tasks |
+| Schedule check | < 50ms | 10,000/sec |
+| Email send | < 1s | 100/sec |
+| Notification dispatch | < 500ms | 500/sec |
+
+### Scaling Strategies
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Single    │────▶│  Worker     │────▶│  Distributed│
+│   Node      │     │  Pool       │     │  Cluster    │
+└─────────────┘     └─────────────┘     └─────────────┘
+      │                    │                    │
+      ▼                    ▼                    ▼
+  < 100 workflows   100-1K workflows   1K+ workflows
+  4 parallel tasks  16 parallel tasks  64+ parallel tasks
+```
+
+### Resource Management
+
+```python
+config = Config(
+    max_concurrent_workflows=8,     # Limit concurrent workflows
+    max_parallel_tasks=4,           # Limit parallel tasks
+    default_task_timeout=600,       # Prevent resource exhaustion
+    history_retention_days=180,     # Clean up old data
+)
+```
+
+---
+
+## Design Patterns
+
+### DAG Pattern — Workflow Execution
+
+```python
+# Topological sort ensures correct execution order
+def execute_dag(tasks):
+    sorted_tasks = topological_sort(tasks)
+    for task in sorted_tasks:
+        if all_dependencies_met(task):
+            execute_task(task)
+```
+
+### Strategy Pattern — Retry Logic
+
+```python
+class RetryStrategy:
+    def wait_time(self, attempt: int) -> float:
+        raise NotImplementedError
+
+class ExponentialBackoff(RetryStrategy):
+    def wait_time(self, attempt):
+        return min(2 ** attempt * base_delay, max_delay)
+
+class LinearBackoff(RetryStrategy):
+    def wait_time(self, attempt):
+        return attempt * base_delay
+```
+
+### Observer Pattern — Notifications
+
+```python
+class NotificationObserver:
+    def on_workflow_complete(self, workflow):
+        pass
+
+class SlackObserver(NotificationObserver):
+    def on_workflow_complete(self, workflow):
+        send_slack(f"Workflow {workflow.name} completed")
+```
+
+### Command Pattern — Task Actions
+
+```python
+class TaskAction:
+    def execute(self, config):
+        raise NotImplementedError
+
+class ScriptAction(TaskAction):
+    def execute(self, config):
+        return subprocess.run(config["command"], shell=True)
+
+class HttpRequestAction(TaskAction):
+    def execute(self, config):
+        return requests.get(config["url"])
+```
+
+---
+
 ## Troubleshooting
 
 | Problem | Cause | Resolution |
@@ -426,6 +688,208 @@ agent = AutomationAgent(config=config)
 | DAG too deep | Excessive nesting | Flatten workflow; split into sub-workflows |
 
 ---
+
+## Additional Examples
+
+### Example: Database Backup Workflow
+
+```python
+wf = agent.create_workflow("Database Backup", [
+    {
+        "name": "Create Snapshot",
+        "action_type": "script",
+        "action_config": {"command": "pg_dump -Fc mydb > /backups/mydb.dump"},
+        "timeout_seconds": 600,
+    },
+    {
+        "name": "Upload to S3",
+        "action_type": "http_request",
+        "action_config": {
+            "url": "https://s3.amazonaws.com/my-backups",
+            "method": "PUT",
+            "body": "{{tasks.CreateSnapshot.output}}"
+        },
+        "depends_on": ["task-000"],
+        "max_retries": 3,
+        "retry_strategy": "exponential",
+    },
+    {
+        "name": "Verify Upload",
+        "action_type": "script",
+        "action_config": {"command": "aws s3 ls s3://my-backups/mydb.dump"},
+        "depends_on": ["task-001"],
+    },
+    {
+        "name": "Notify Team",
+        "action_type": "notification",
+        "action_config": {
+            "channel": "slack",
+            "recipient": "#ops",
+            "body": "Database backup completed successfully"
+        },
+        "depends_on": ["task-002"],
+    },
+], tags=["backup", "database", "scheduled"])
+
+# Schedule daily at 2 AM
+agent.add_schedule("Daily Backup", wf.workflow_id, cron_expression="0 2 * * *")
+```
+
+### Example: File Processing Pipeline
+
+```python
+wf = agent.create_workflow("CSV Processing", [
+    {
+        "name": "Watch Incoming",
+        "action_type": "file_watch",
+        "action_config": {
+            "path": "/data/incoming",
+            "extensions": [".csv"],
+            "action": "process"
+        },
+    },
+    {
+        "name": "Validate Data",
+        "action_type": "script",
+        "action_config": {"command": "python validate.py --input {{tasks.WatchIncoming.file_path}}"},
+        "depends_on": ["task-000"],
+        "timeout_seconds": 300,
+    },
+    {
+        "name": "Transform",
+        "action_type": "script",
+        "action_config": {"command": "python transform.py --input {{tasks.ValidateData.output}}"},
+        "depends_on": ["task-001"],
+        "timeout_seconds": 600,
+    },
+    {
+        "name": "Load to Database",
+        "action_type": "script",
+        "action_config": {"command": "python load.py --input {{tasks.Transform.output}}"},
+        "depends_on": ["task-002"],
+        "max_retries": 3,
+        "retry_strategy": "exponential",
+        "compensation_action": {
+            "type": "script",
+            "config": {"command": "python rollback.py"}
+        },
+    },
+    {
+        "name": "Archive Processed",
+        "action_type": "file_operation",
+        "action_config": {
+            "operation": "move",
+            "source": "{{tasks.WatchIncoming.file_path}}",
+            "target": "/data/processed/"
+        },
+        "depends_on": ["task-003"],
+    },
+], tags=["etl", "csv", "automated"])
+```
+
+### Example: Multi-Stage Deployment
+
+```python
+wf = agent.create_workflow("Deploy to Production", [
+    {
+        "name": "Run Tests",
+        "action_type": "script",
+        "action_config": {"command": "pytest tests/ -v"},
+        "timeout_seconds": 600,
+    },
+    {
+        "name": "Build Docker Image",
+        "action_type": "script",
+        "action_config": {"command": "docker build -t myapp:${VERSION} ."},
+        "depends_on": ["task-000"],
+        "timeout_seconds": 300,
+    },
+    {
+        "name": "Push to Registry",
+        "action_type": "script",
+        "action_config": {"command": "docker push myapp:${VERSION}"},
+        "depends_on": ["task-001"],
+        "max_retries": 2,
+    },
+    {
+        "name": "Update Staging",
+        "action_type": "script",
+        "action_config": {"command": "kubectl set image deployment/myapp myapp=myapp:${VERSION}"},
+        "depends_on": ["task-002"],
+    },
+    {
+        "name": "Run Smoke Tests",
+        "action_type": "http_request",
+        "action_config": {"url": "https://staging.example.com/health"},
+        "depends_on": ["task-003"],
+        "timeout_seconds": 60,
+    },
+    {
+        "name": "Deploy to Production",
+        "action_type": "script",
+        "action_config": {"command": "kubectl set image deployment/myapp myapp=myapp:${VERSION} -n production"},
+        "depends_on": ["task-004"],
+        "compensation_action": {
+            "type": "script",
+            "config": {"command": "kubectl rollout undo deployment/myapp -n production"}
+        },
+    },
+    {
+        "name": "Notify Deployment",
+        "action_type": "notification",
+        "action_config": {
+            "channel": "slack",
+            "recipient": "#deployments",
+            "body": "Production deployment complete: ${VERSION}"
+        },
+        "depends_on": ["task-005"],
+    },
+], tags=["deployment", "production", "multi-stage"])
+```
+
+### Example: Monitoring and Alerting Workflow
+
+```python
+wf = agent.create_workflow("Health Check Pipeline", [
+    {
+        "name": "Check API Health",
+        "action_type": "http_request",
+        "action_config": {"url": "https://api.example.com/health"},
+        "timeout_seconds": 30,
+    },
+    {
+        "name": "Check Database",
+        "action_type": "script",
+        "action_config": {"command": "pg_isready -h db.example.com"},
+        "timeout_seconds": 10,
+    },
+    {
+        "name": "Check Cache",
+        "action_type": "script",
+        "action_config": {"command": "redis-cli -h cache.example.com ping"},
+        "timeout_seconds": 10,
+    },
+    {
+        "name": "Aggregate Results",
+        "action_type": "script",
+        "action_config": {"command": "python check_results.py"},
+        "depends_on": ["task-000", "task-001", "task-002"],
+    },
+    {
+        "name": "Alert if Down",
+        "action_type": "notification",
+        "action_config": {
+            "channel": "pagerduty",
+            "recipient": "oncall",
+            "body": "Service health check failed"
+        },
+        "depends_on": ["task-003"],
+    },
+], tags=["monitoring", "health-check", "scheduled"])
+
+# Run every 5 minutes
+agent.add_schedule("Health Check", wf.workflow_id, interval_seconds=300)
+```
 
 ## Files
 
