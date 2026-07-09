@@ -702,3 +702,554 @@ MIT License - see [LICENSE](LICENSE)
 
 - **Documentation**: [docs.example.com](https://docs.example.com)
 - **Issues**: [GitHub Issues](https://github.com/awesome-grok-skills/agents/issues)
+
+## Advanced Usage
+
+### Custom Pipeline Components
+
+```python
+# Create custom transformation
+class CustomTransformer(PipelineTransformer):
+    def __init__(self, config):
+        self.config = config
+    
+    def transform(self, data):
+        # Custom transformation logic
+        return data.filter(lambda x: x['value'] > self.config['threshold'])
+
+# Register custom component
+agent.pipeline_manager.register_transformer("custom_filter", CustomTransformer)
+```
+
+### Advanced Stream Processing
+
+```python
+# Complex event processing
+def detect_fraud_pattern(events):
+    """
+    Detect fraudulent patterns using CEP
+    """
+    pattern = (events
+        .key_by(lambda e: e['user_id'])
+        .window(TumblingEventTimeWindows.of(Time.minutes(5)))
+        .process(FraudPatternDetector()))
+
+# Windowed aggregation
+def windowed_aggregation(events):
+    return (events
+        .key_by(lambda e: e['product_id'])
+        .window(SlidingEventTimeWindows.of(Time.minutes(10), Time.minutes(1)))
+        .aggregate(AverageAggregator()))
+```
+
+### Data Lake Management
+
+```python
+# Advanced data lake operations
+def optimize_data_lake(lake_id):
+    """
+    Optimize data lake for performance
+    """
+    # Compaction
+    agent.data_lake_manager.compact_data_lake(
+        lake_id=lake_id,
+        target_file_size_mb=256,
+        strategy="bin_packing"
+    )
+    
+    # Z-ordering
+    agent.data_lake_manager.optimize_z_ordering(
+        lake_id=lake_id,
+        columns=["date", "region", "product_id"]
+    )
+    
+    # Statistics collection
+    agent.data_lake_manager.collect_statistics(
+        lake_id=lake_id,
+        columns=["date", "amount", "quantity"]
+    )
+```
+
+## Performance Tuning
+
+### Cluster Optimization
+
+```python
+# Optimize cluster configuration
+def optimize_cluster(cluster_id):
+    """
+    Optimize cluster for workload
+    """
+    # Analyze workload
+    workload = agent.cluster_manager.analyze_workload(cluster_id)
+    
+    # Right-size workers
+    recommendations = agent.cluster_manager.get_right_sizing_recommendations(
+        cluster_id=cluster_id,
+        workload_type=workload['type']
+    )
+    
+    # Apply recommendations
+    for rec in recommendations:
+        if rec['action'] == 'resize':
+            agent.cluster_manager.resize_worker(
+                cluster_id=cluster_id,
+                worker_type=rec['worker_type'],
+                new_size=rec['recommended_size']
+            )
+```
+
+### Pipeline Optimization
+
+```python
+# Optimize pipeline performance
+def optimize_pipeline(pipeline_id):
+    """
+    Optimize pipeline for throughput
+    """
+    # Analyze bottlenecks
+    analysis = agent.pipeline_manager.analyze_bottlenecks(pipeline_id)
+    
+    # Apply optimizations
+    optimizations = []
+    if analysis['serialization_bottleneck']:
+        optimizations.append("use_kryo")
+    if analysis['shuffle_bottleneck']:
+        optimizations.append("broadcast_join")
+    if analysis['skew_detected']:
+        optimizations.append("salting")
+    
+    agent.pipeline_manager.optimize_pipeline(
+        pipeline_id=pipeline_id,
+        optimizations=optimizations
+    )
+```
+
+### Query Optimization
+
+```python
+# Optimize SQL queries
+def optimize_query(query):
+    """
+    Optimize query for performance
+    """
+    # Analyze query plan
+    plan = agent.spark_optimizer.explain_query(query)
+    
+    # Get optimization suggestions
+    suggestions = agent.spark_optimizer.get_optimization_suggestions(plan)
+    
+    # Apply optimizations
+    optimized_query = query
+    for suggestion in suggestions:
+        if suggestion['type'] == 'broadcast_join':
+            optimized_query = optimized_query.replace(
+                f"JOIN {suggestion['table']}",
+                f"BROADCAST JOIN {suggestion['table']}"
+            )
+    
+    return optimized_query
+```
+
+## Security Considerations
+
+### Data Encryption
+
+```python
+ENCRYPTION_CONFIG = {
+    "at_rest": {
+        "algorithm": "AES-256",
+        "key_management": "AWS KMS",
+        "rotation": "annual",
+        "enforcement": "required"
+    },
+    "in_transit": {
+        "protocol": "TLS 1.3",
+        "certificate_validation": "strict",
+        "mutual_tls": True
+    },
+    "data_masking": {
+        "pii_detection": True,
+        "masking_strategies": {
+            "email": "partial",
+            "phone": "hash",
+            "ssn": "redact"
+        }
+    }
+}
+```
+
+### Access Control
+
+```python
+ACCESS_CONTROL = {
+    "authentication": {
+        "methods": ["oauth2", "saml", "api_key"],
+        "mfa_required": True,
+        "session_timeout": "8h"
+    },
+    "authorization": {
+        "model": "abac",
+        "policies": [
+            {
+                "role": "data_engineer",
+                "permissions": ["read", "write", "execute"],
+                "resources": ["cluster:*", "pipeline:*"]
+            },
+            {
+                "role": "data_analyst",
+                "permissions": ["read"],
+                "resources": ["data_lake:*"]
+            }
+        ]
+    },
+    "audit_logging": {
+        "enabled": True,
+        "events": ["login", "data_access", "schema_change", "pipeline_run"],
+        "retention": "1 year",
+        "storage": "s3://audit-logs"
+    }
+}
+```
+
+### Network Security
+
+```python
+NETWORK_CONFIG = {
+    "vpc": {
+        "cidr": "10.0.0.0/16",
+        "subnets": {
+            "private": ["10.0.1.0/24", "10.0.2.0/24"],
+            "public": ["10.0.101.0/24", "10.0.102.0/24"]
+        }
+    },
+    "security_groups": {
+        "cluster": {
+            "inbound": [
+                {"port": 22, "source": "10.0.0.0/16", "description": "SSH"},
+                {"port": 8080, "source": "10.0.0.0/16", "description": "Spark UI"}
+            ],
+            "outbound": [
+                {"port": 443, "destination": "0.0.0.0/0", "description": "HTTPS"}
+            ]
+        }
+    },
+    "network_policies": {
+        "kubernetes": {
+            "default_deny": True,
+            "allowed_namespaces": ["data-processing", "monitoring"]
+        }
+    }
+}
+```
+
+## Integration Examples
+
+### Kafka Integration
+
+```python
+# Advanced Kafka configuration
+KAFKA_CONFIG = {
+    "producers": {
+        "acks": "all",
+        "retries": 3,
+        "batch_size": 16384,
+        "linger_ms": 10,
+        "compression": "snappy"
+    },
+    "consumers": {
+        "group_id": "big-data-consumer",
+        "auto_offset_reset": "earliest",
+        "enable_auto_commit": False,
+        "max_poll_records": 500
+    },
+    "topics": {
+        "raw_events": {
+            "partitions": 12,
+            "replication_factor": 3,
+            "retention_hours": 168,
+            "cleanup_policy": "delete"
+        }
+    }
+}
+```
+
+### Airflow Integration
+
+```python
+# Airflow DAG configuration
+AIRFLOW_CONFIG = {
+    "dag": {
+        "dag_id": "big_data_pipeline",
+        "schedule_interval": "@daily",
+        "catchup": False,
+        "max_active_runs": 1
+    },
+    "tasks": {
+        "extract": {
+            "operator": "PythonOperator",
+            "python_callable": "extract_data"
+        },
+        "transform": {
+            "operator": "SparkSubmitOperator",
+            "application": "transform.py"
+        },
+        "load": {
+            "operator": "S3ToRedshiftOperator",
+            "schema": "analytics"
+        }
+    }
+}
+```
+
+### Grafana Integration
+
+```python
+# Grafana dashboard configuration
+GRAFANA_CONFIG = {
+    "datasources": {
+        "prometheus": {
+            "type": "prometheus",
+            "url": "http://prometheus:9090",
+            "access": "proxy"
+        },
+        "influxdb": {
+            "type": "influxdb",
+            "url": "http://influxdb:8086",
+            "database": "metrics"
+        }
+    },
+    "dashboards": {
+        "cluster_monitoring": {
+            "title": "Cluster Monitoring",
+            "panels": [
+                {"type": "graph", "title": "CPU Usage", "metric": "cpu_usage"},
+                {"type": "graph", "title": "Memory Usage", "metric": "memory_usage"},
+                {"type": "stat", "title": "Active Jobs", "metric": "active_jobs"}
+            ]
+        }
+    }
+}
+```
+
+## Monitoring & Troubleshooting
+
+### Health Checks
+
+```python
+# Comprehensive health check
+def health_check():
+    """
+    Perform comprehensive health check
+    """
+    checks = {
+        "cluster": agent.cluster_manager.health_check(),
+        "pipelines": agent.pipeline_manager.health_check(),
+        "streams": agent.stream_processor.health_check(),
+        "data_lake": agent.data_lake_manager.health_check()
+    }
+    
+    status = "healthy"
+    for component, result in checks.items():
+        if result['status'] != 'healthy':
+            status = "unhealthy"
+            print(f"{component}: {result['issues']}")
+    
+    return {"status": status, "components": checks}
+```
+
+### Performance Monitoring
+
+```python
+# Monitor performance metrics
+def monitor_performance():
+    """
+    Monitor system performance
+    """
+    metrics = {
+        "cluster": {
+            "cpu_utilization": agent.cluster_manager.get_cpu_utilization(),
+            "memory_utilization": agent.cluster_manager.get_memory_utilization(),
+            "active_tasks": agent.cluster_manager.get_active_tasks()
+        },
+        "pipelines": {
+            "throughput": agent.pipeline_manager.get_throughput(),
+            "error_rate": agent.pipeline_manager.get_error_rate(),
+            "latency": agent.pipeline_manager.get_latency()
+        },
+        "streams": {
+            "consumer_lag": agent.stream_processor.get_consumer_lag(),
+            "throughput": agent.stream_processor.get_throughput(),
+            "checkpoint_status": agent.stream_processor.get_checkpoint_status()
+        }
+    }
+    
+    return metrics
+```
+
+### Debug Mode
+
+```python
+# Enable debug logging
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Enable detailed tracing
+agent.enable_tracing(
+    sample_rate=1.0,
+    export_to="jaeger",
+    tags={
+        "environment": "development",
+        "service": "big-data-agent"
+    }
+)
+```
+
+## Deployment Options
+
+### Docker Compose
+
+```yaml
+version: '3.8'
+services:
+  spark-master:
+    image: bitnami/spark:3.4
+    environment:
+      - SPARK_MODE=master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+
+  spark-worker:
+    image: bitnami/spark:3.4
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    depends_on:
+      - spark-master
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+    ports:
+      - "9092:9092"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+```
+
+### Kubernetes
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: spark-master
+spec:
+  serviceName: spark-master
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-master
+  template:
+    metadata:
+      labels:
+        app: spark-master
+    spec:
+      containers:
+        - name: spark-master
+          image: bitnami/spark:3.4
+          ports:
+            - containerPort: 8080
+            - containerPort: 7077
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1000m"
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
+```
+
+### Terraform
+
+```hcl
+# EMR cluster
+resource "aws_emr_cluster" "big_data" {
+  name          = "big-data-cluster"
+  release_label = "emr-6.10.0"
+  applications  = ["Spark", "Hive", "Hadoop"]
+
+  master_instance_group {
+    instance_type  = "m5.xlarge"
+    instance_count = 1
+  }
+
+  core_instance_group {
+    instance_type  = "m5.2xlarge"
+    instance_count = 3
+  }
+
+  ec2_attributes {
+    subnet_id = aws_subnet.private.id
+  }
+}
+```
+
+## Contributing Guidelines
+
+### Development Workflow
+
+```bash
+# 1. Fork and clone
+git clone https://github.com/your-org/awesome-grok-skills.git
+
+# 2. Create feature branch
+git checkout -b feature/amazing-feature
+
+# 3. Install development dependencies
+pip install -r requirements-dev.txt
+
+# 4. Run tests
+pytest tests/ -v
+
+# 5. Run linter
+ruff check agents/big_data/
+
+# 6. Run type checker
+mypy agents/big_data/
+
+# 7. Commit changes
+git commit -m 'Add amazing feature'
+
+# 8. Push to branch
+git push origin feature/amazing-feature
+
+# 9. Create Pull Request
+```
+
+### Code Standards
+
+```python
+# Code style
+- Follow PEP 8
+- Use type hints
+- Write docstrings for all public functions
+- Keep functions under 50 lines
+- Maximum line length: 88 characters
+
+# Testing
+- Write unit tests for all new features
+- Maintain >90% test coverage
+- Use pytest fixtures
+- Mock external dependencies
+
+# Documentation
+- Update README.md for new features
+- Add API documentation
+- Include usage examples
+```

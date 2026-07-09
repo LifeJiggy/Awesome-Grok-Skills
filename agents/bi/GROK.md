@@ -565,3 +565,491 @@ analysis = agent.self_service.run_ad_hoc_analysis(
 | 2.0.0 | Added self-service analytics, enhanced visualization engine |
 | 1.5.0 | Added alert management, dashboard usage analytics |
 | 1.0.0 | Initial release with report generation, dashboard design, KPI tracking |
+
+## Advanced Analytics
+
+### Predictive Analytics
+
+```python
+# Time series forecasting
+forecast = agent.analytics.forecast_time_series(
+    metric="revenue",
+    periods=12,
+    frequency="monthly",
+    model="prophet",
+    confidence_interval=0.95
+)
+
+print(f"Forecast: {forecast['values']}")
+print(f"Confidence intervals: {forecast['confidence_intervals']}")
+```
+
+### Cohort Analysis
+
+```python
+# User cohort analysis
+cohort = agent.analytics.analyze_cohort(
+    cohort_type="acquisition",
+    cohort_date="2024-01-01",
+    period_type="monthly",
+    metric="retention"
+)
+
+# Visualize cohort retention
+for period, retention in cohort['retention_rates'].items():
+    print(f"Month {period}: {retention:.1f}%")
+```
+
+### Funnel Analysis
+
+```python
+# Conversion funnel
+funnel = agent.analytics.analyze_funnel(
+    steps=["visit", "signup", "activation", "purchase", "retention"],
+    date_range={"start": "2024-01-01", "end": "2024-01-31"}
+)
+
+for step in funnel['steps']:
+    print(f"{step['name']}: {step['count']} ({step['conversion_rate']:.1f}%)")
+```
+
+### A/B Testing
+
+```python
+# Statistical significance test
+result = agent.analytics.ab_test(
+    metric="conversion_rate",
+    control_group=control_data,
+    treatment_group=treatment_data,
+    significance_level=0.05
+)
+
+print(f"Control: {result['control_mean']:.3f}")
+print(f"Treatment: {result['treatment_mean']:.3f}")
+print(f"P-value: {result['p_value']:.4f}")
+print(f"Statistically significant: {result['significant']}")
+```
+
+## Machine Learning Integration
+
+### Anomaly Detection
+
+```python
+# Detect anomalies in metrics
+anomalies = agent.ml.detect_anomalies(
+    metric="daily_revenue",
+    algorithm="isolation_forest",
+    contamination=0.01,
+    date_range={"start": "2024-01-01", "end": "2024-01-31"}
+)
+
+for anomaly in anomalies['detected']:
+    print(f"Anomaly on {anomaly['date']}: {anomaly['value']} (expected: {anomaly['expected']})")
+```
+
+### Clustering
+
+```python
+# Customer segmentation
+segments = agent.ml.cluster_customers(
+    features=["recency", "frequency", "monetary"],
+    algorithm="kmeans",
+    n_clusters=4,
+    normalize=True
+)
+
+for segment in segments['clusters']:
+    print(f"Segment {segment['id']}: {segment['size']} customers")
+    print(f"  Avg RFM: {segment['centroid']}")
+```
+
+### Recommendation Engine
+
+```python
+# Product recommendations
+recommendations = agent.ml.recommend_products(
+    user_id="user_123",
+    algorithm="collaborative_filtering",
+    n_recommendations=5,
+    exclude_purchased=True
+)
+
+for rec in recommendations['products']:
+    print(f"Product {rec['product_id']}: score {rec['score']:.3f}")
+```
+
+## Real-time Processing
+
+### Stream Processing
+
+```python
+# Real-time event processing
+stream_job = agent.stream.create_job(
+    name="real-time-analytics",
+    source="kafka://events",
+    sink="redis://metrics",
+    processing_logic="""
+        SELECT 
+            user_id,
+            COUNT(*) as event_count,
+            SUM(amount) as total_amount
+        FROM events
+        WHERE event_type = 'purchase'
+        GROUP BY user_id, TUMBLE(window_size => INTERVAL '1' MINUTE)
+    """
+)
+
+# Monitor stream
+metrics = agent.stream.get_metrics(stream_job.job_id)
+print(f"Throughput: {metrics['events_per_second']} events/sec")
+print(f"Latency: {metrics['processing_latency_ms']} ms")
+```
+
+### Real-time Dashboards
+
+```python
+# WebSocket configuration for real-time updates
+WEBSOCKET_CONFIG = {
+    "endpoint": "wss://api.example.com/ws",
+    "channels": [
+        "dashboard:{dashboard_id}",
+        "kpi:{kpi_id}",
+        "alert:critical"
+    ],
+    "heartbeat_interval": 30,
+    "reconnect_strategy": "exponential_backoff"
+}
+```
+
+## Data Governance
+
+### Data Quality Rules
+
+```python
+QUALITY_RULES = {
+    "completeness": {
+        "rule": "NOT NULL",
+        "severity": "critical",
+        "action": "reject_record"
+    },
+    "uniqueness": {
+        "rule": "DISTINCT",
+        "severity": "high",
+        "action": "flag_duplicate"
+    },
+    "validity": {
+        "rule": "REGEX",
+        "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        "severity": "medium",
+        "action": "flag_invalid"
+    },
+    "timeliness": {
+        "rule": "FRESHNESS",
+        "max_delay_hours": 24,
+        "severity": "high",
+        "action": "alert_stale_data"
+    }
+}
+```
+
+### Data Catalog
+
+```python
+# Data catalog schema
+DATA_CATALOG = {
+    "databases": [
+        {
+            "name": "analytics",
+            "tables": [
+                {
+                    "name": "fact_orders",
+                    "description": "Daily aggregated order data",
+                    "columns": [
+                        {"name": "date", "type": "DATE", "description": "Order date"},
+                        {"name": "revenue", "type": "DECIMAL(12,2)", "description": "Total revenue"},
+                        {"name": "order_count", "type": "INTEGER", "description": "Number of orders"}
+                    ],
+                    "owner": "data-engineering",
+                    "sla": "daily by 06:00 UTC"
+                }
+            ]
+        }
+    ]
+}
+```
+
+## Performance Optimization
+
+### Query Performance
+
+```python
+# Query optimization techniques
+OPTIMIZATION_TECHNIQUES = {
+    "materialized_views": {
+        "description": "Pre-compute expensive aggregations",
+        "refresh_schedule": "hourly",
+        "examples": ["daily_revenue_summary", "customer_segment_counts"]
+    },
+    "partitioning": {
+        "description": "Partition large tables by date",
+        "strategy": "range partitioning on date column",
+        "benefit": "Reduces scan volume for time-range queries"
+    },
+    "indexing": {
+        "description": "Create indexes for frequent filters",
+        "examples": ["CREATE INDEX idx_orders_date ON fact_orders(date)"]
+    }
+}
+```
+
+### Caching Layers
+
+```python
+# Multi-level caching
+CACHE_HIERARCHY = {
+    "L1": {
+        "type": "in-memory",
+        "size": "100MB",
+        "ttl": 60,
+        "strategy": "LRU"
+    },
+    "L2": {
+        "type": "redis",
+        "size": "1GB",
+        "ttl": 300,
+        "strategy": "write-through"
+    },
+    "L3": {
+        "type": "cdn",
+        "size": "unlimited",
+        "ttl": 3600,
+        "strategy": "cache-aside"
+    }
+}
+```
+
+## Integration Patterns
+
+### Event-Driven Architecture
+
+```python
+# Event bus configuration
+EVENT_CONFIG = {
+    "event_bus": "bi-agent-events",
+    "rules": [
+        {
+            "event_type": "report.generated",
+            "targets": ["slack-notification", "email-delivery"]
+        },
+        {
+            "event_type": "kpi.threshold_breached",
+            "targets": ["pagerduty", "slack-alert"]
+        },
+        {
+            "event_type": "dashboard.updated",
+            "targets": ["websocket-broadcast"]
+        }
+    ]
+}
+```
+
+### API Gateway Configuration
+
+```python
+API_CONFIG = {
+    "rate_limiting": {
+        "requests_per_minute": 1000,
+        "burst_size": 100
+    },
+    "authentication": {
+        "method": "JWT",
+        "issuer": "https://auth.example.com",
+        "audience": "bi-agent-api"
+    },
+    "caching": {
+        "enabled": True,
+        "ttl": 300,
+        "endpoints": ["/api/kpis", "/api/dashboards"]
+    }
+}
+```
+
+## Scalability Patterns
+
+### Horizontal Scaling
+
+```python
+SCALING_CONFIG = {
+    "auto_scaling": {
+        "min_instances": 2,
+        "max_instances": 10,
+        "scale_up_threshold": {
+            "cpu_percent": 70,
+            "memory_percent": 80,
+            "request_latency_p95": 500
+        },
+        "scale_down_threshold": {
+            "cpu_percent": 30,
+            "memory_percent": 40,
+            "request_latency_p95": 100
+        },
+        "cooldown_period": 300
+    }
+}
+```
+
+### Database Scaling
+
+```python
+DATABASE_SCALING = {
+    "read_replicas": {
+        "enabled": True,
+        "count": 3,
+        "strategy": "round_robin"
+    },
+    "connection_pooling": {
+        "min_connections": 5,
+        "max_connections": 20,
+        "idle_timeout": 300
+    },
+    "query_timeout": 30,
+    "slow_query_threshold": 1000
+}
+```
+
+## Monitoring & Alerting
+
+### Alert Rules
+
+```python
+ALERT_RULES = {
+    "high_error_rate": {
+        "metric": "error_rate",
+        "threshold": 0.01,
+        "duration": "5m",
+        "severity": "critical",
+        "channels": ["pagerduty", "slack"]
+    },
+    "slow_queries": {
+        "metric": "query_duration_p95",
+        "threshold": 5000,
+        "duration": "10m",
+        "severity": "warning",
+        "channels": ["slack"]
+    },
+    "low_cache_hit_rate": {
+        "metric": "cache_hit_rate",
+        "threshold": 0.8,
+        "duration": "15m",
+        "severity": "warning",
+        "channels": ["slack"]
+    }
+}
+```
+
+### SLA Monitoring
+
+```python
+SLA_TARGETS = {
+    "availability": {
+        "target": 0.999,
+        "measurement_period": "30d",
+        "error_budget": 43.2  # minutes per month
+    },
+    "performance": {
+        "api_latency_p95": 200,
+        "dashboard_load_time": 2000,
+        "report_generation_time": 30000
+    },
+    "freshness": {
+        "data_delay_max": 3600,
+        "report_generation_max": 300
+    }
+}
+```
+
+## Security Hardening
+
+### API Security
+
+```python
+SECURITY_MEASURES = {
+    "authentication": {
+        "method": "OAuth2 + JWT",
+        "token_expiry": 900,
+        "refresh_token_expiry": 86400
+    },
+    "authorization": {
+        "model": "RBAC",
+        "roles": ["viewer", "analyst", "manager", "admin"],
+        "permissions": {
+            "viewer": ["read"],
+            "analyst": ["read", "write"],
+            "manager": ["read", "write", "execute"],
+            "admin": ["*"]
+        }
+    },
+    "input_validation": {
+        "max_request_size": "10MB",
+        "allowed_content_types": ["application/json"],
+        "sql_injection_protection": True,
+        "xss_protection": True
+    }
+}
+```
+
+### Data Protection
+
+```python
+DATA_PROTECTION = {
+    "encryption": {
+        "at_rest": "AES-256",
+        "in_transit": "TLS 1.3",
+        "key_management": "AWS KMS"
+    },
+    "masking": {
+        "pii_fields": ["email", "phone", "address"],
+        "masking_strategy": "partial_mask",
+        "environments": ["development", "staging"]
+    },
+    "retention": {
+        "raw_data": "90 days",
+        "processed_data": "365 days",
+        "audit_logs": "7 years"
+    }
+}
+```
+
+## Deployment Strategies
+
+### Blue-Green Deployment
+
+```python
+BLUE_GREEN_CONFIG = {
+    "blue_environment": {
+        "name": "production-blue",
+        "traffic_weight": 100,
+        "auto_scaling": {"min": 3, "max": 10}
+    },
+    "green_environment": {
+        "name": "production-green",
+        "traffic_weight": 0,
+        "auto_scaling": {"min": 2, "max": 5}
+    },
+    "switch_strategy": "canary",
+    "canary_percentage": 10,
+    "canary_duration": 300
+}
+```
+
+### Rolling Updates
+
+```python
+ROLLING_UPDATE_CONFIG = {
+    "strategy": "rolling",
+    "max_surge": "25%",
+    "max_unavailable": "0",
+    "progress_deadline": 600,
+    "min_ready_seconds": 30
+}
+```

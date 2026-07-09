@@ -456,3 +456,460 @@ agent = BlockchainAgent()
 | 2.0.0 | Added DAO, multi-chain, advanced analytics |
 | 1.5.0 | Added DeFi positions, NFT collections |
 | 1.0.0 | Initial release with contracts, tokens, wallets |
+
+## Advanced Smart Contract Patterns
+
+### Proxy Pattern (Upgradeable Contracts)
+
+```solidity
+// Proxy contract for upgradeability
+contract Proxy {
+    address public implementation;
+    address public admin;
+    
+    constructor(address _implementation) {
+        implementation = _implementation;
+        admin = msg.sender;
+    }
+    
+    function upgrade(address newImplementation) external {
+        require(msg.sender == admin, "Only admin");
+        implementation = newImplementation;
+    }
+    
+    fallback() external payable {
+        (bool success, ) = implementation.delegatecall(msg.data);
+        require(success, "Delegatecall failed");
+    }
+}
+```
+
+### Access Control Patterns
+
+```solidity
+// Role-based access control
+contract AccessControl {
+    mapping(bytes32 => mapping(address => bool)) private _roles;
+    
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+    
+    modifier onlyRole(bytes32 role) {
+        require(_roles[role][msg.sender], "Invalid role");
+        _;
+    }
+    
+    function grantRole(bytes32 role, address account) public onlyRole(ADMIN_ROLE) {
+        _roles[role][account] = true;
+    }
+}
+```
+
+### Reentrancy Guard
+
+```solidity
+// Reentrancy protection
+abstract contract ReentrancyGuard {
+    uint256 private constant _NOT_ENTERED = 1;
+    uint256 private constant _ENTERED = 2;
+    uint256 private _status;
+    
+    modifier nonReentrant() {
+        require(_status != _ENTERED, "ReentrancyGuard: reentrant call");
+        _status = _ENTERED;
+        _;
+        _status = _NOT_ENTERED;
+    }
+}
+```
+
+## DeFi Advanced Strategies
+
+### Yield Farming Optimization
+
+```python
+# Yield farming strategy
+class YieldFarmingStrategy:
+    def __init__(self, protocols):
+        self.protocols = protocols
+    
+    def optimize_allocation(self, total_capital):
+        """
+        Optimize capital allocation across protocols
+        """
+        allocations = {}
+        for protocol in self.protocols:
+            apy = protocol['apy']
+            risk = protocol['risk_score']
+            
+            # Risk-adjusted return
+            risk_adjusted_return = apy * (1 - risk)
+            allocations[protocol['name']] = {
+                'capital': total_capital * risk_adjusted_return,
+                'expected_apy': apy,
+                'risk_score': risk
+            }
+        
+        return allocations
+```
+
+### Impermanent Loss Calculator
+
+```python
+# Calculate impermanent loss
+def calculate_impermanent_loss(price_ratio):
+    """
+    Calculate impermanent loss for liquidity provision
+    """
+    return 2 * (price_ratio ** 0.5) / (1 + price_ratio) - 1
+
+# Example
+price_change = 2.0  # 100% increase
+il = calculate_impermanent_loss(price_change)
+print(f"Impermanent loss: {il:.2%}")
+```
+
+### Flash Loan Arbitrage
+
+```python
+# Flash loan arbitrage strategy
+def flash_loan_arbitrage(token_a, token_b, amount):
+    """
+    Execute flash loan arbitrage between DEXes
+    """
+    # Step 1: Borrow flash loan
+    flash_loan(token_a, amount)
+    
+    # Step 2: Swap on DEX 1 (lower price)
+    amount_b = swap_dex1(token_a, token_b, amount)
+    
+    # Step 3: Swap on DEX 2 (higher price)
+    amount_a_new = swap_dex2(token_b, token_a, amount_b)
+    
+    # Step 4: Repay flash loan + fee
+    fee = amount * 0.0009  # 0.09% fee
+    repay_flash_loan(token_a, amount + fee)
+    
+    # Step 5: Profit
+    profit = amount_a_new - amount - fee
+    return profit
+```
+
+## NFT Advanced Features
+
+### Dynamic NFTs
+
+```solidity
+// Dynamic NFT with metadata updates
+contract DynamicNFT is ERC721 {
+    struct TokenData {
+        string name;
+        uint256 level;
+        uint256 experience;
+        string imageUrl;
+    }
+    
+    mapping(uint256 => TokenData) private _tokenData;
+    
+    function updateTokenData(
+        uint256 tokenId,
+        uint256 newExperience
+    ) external onlyOwner {
+        TokenData storage data = _tokenData[tokenId];
+        data.experience = newExperience;
+        data.level = newExperience / 1000;
+        
+        // Update metadata URI
+        _setTokenURI(tokenId, _generateMetadata(tokenId));
+    }
+}
+```
+
+### NFT Staking
+
+```python
+# NFT staking rewards
+class NFTStaking:
+    def __init__(self, nft_contract, reward_token):
+        self.nft_contract = nft_contract
+        self.reward_token = reward_token
+        self.staking_rewards = {}
+    
+    def stake(self, user, token_id):
+        """
+        Stake NFT and start earning rewards
+        """
+        # Transfer NFT to staking contract
+        self.nft_contract.transferFrom(user, self.address, token_id)
+        
+        # Record staking start time
+        self.staking_rewards[token_id] = {
+            'staker': user,
+            'start_time': block.timestamp,
+            'reward_rate': self.calculate_reward_rate(token_id)
+        }
+    
+    def claim_rewards(self, token_id):
+        """
+        Claim accumulated rewards
+        """
+        staking_info = self.staking_rewards[token_id]
+        elapsed_time = block.timestamp - staking_info['start_time']
+        rewards = elapsed_time * staking_info['reward_rate']
+        
+        # Transfer rewards
+        self.reward_token.transfer(staking_info['staker'], rewards)
+        return rewards
+```
+
+### NFT Fractionalization
+
+```python
+# Fractionalize NFT into ERC20 tokens
+def fractionalize_nft(nft_contract, token_id, num_shares):
+    """
+    Fractionalize NFT into ERC20 tokens
+    """
+    # Transfer NFT to vault
+    nft_contract.transferFrom(msg.sender, vault_address, token_id)
+    
+    # Mint ERC20 shares
+    total_supply = num_shares
+    erc20_token.mint(msg.sender, total_supply)
+    
+    # Set reserve price for buyout
+    reserve_price = estimate_floor_price(nft_contract) * 1.5
+    
+    return {
+        'vault_address': vault_address,
+        'erc20_token': erc20_token.address,
+        'total_shares': total_supply,
+        'reserve_price': reserve_price
+    }
+```
+
+## Multi-Chain Operations
+
+### Cross-Chain Bridge
+
+```python
+# Cross-chain token bridge
+class CrossChainBridge:
+    def __init__(self, source_chain, target_chain):
+        self.source_chain = source_chain
+        self.target_chain = target_chain
+    
+    def bridge_tokens(self, token, amount, recipient):
+        """
+        Bridge tokens from source to target chain
+        """
+        # Lock tokens on source chain
+        token.lock(amount, recipient)
+        
+        # Generate proof
+        proof = generate_merkle_proof(tx_hash)
+        
+        # Submit to target chain
+        target_chain.redeem(proof, token, amount, recipient)
+        
+        return {
+            'source_tx': tx_hash,
+            'proof': proof,
+            'estimated_arrival': '15 minutes'
+        }
+```
+
+### Multi-Chain Wallet
+
+```python
+# Multi-chain wallet management
+class MultiChainWallet:
+    def __init__(self):
+        self.chains = {
+            'ethereum': EthereumWallet(),
+            'polygon': PolygonWallet(),
+            'arbitrum': ArbitrumWallet(),
+            'solana': SolanaWallet()
+        }
+    
+    def get_balances(self):
+        """
+        Get balances across all chains
+        """
+        balances = {}
+        for chain_name, wallet in self.chains.items():
+            balances[chain_name] = wallet.get_balance()
+        return balances
+    
+    def bridge(self, from_chain, to_chain, token, amount):
+        """
+        Bridge tokens between chains
+        """
+        bridge = self.get_bridge(from_chain, to_chain)
+        return bridge.bridge_tokens(token, amount)
+```
+
+## DAO Advanced Features
+
+### Quadratic Voting
+
+```python
+# Quadratic voting implementation
+class QuadraticVoting:
+    def __init__(self, voting_power_token):
+        self.voting_power_token = voting_power_token
+    
+    def vote(self, voter, proposal_id, vote_amount):
+        """
+        Calculate quadratic voting cost
+        """
+        # Quadratic cost: cost = (votes)^2
+        cost = vote_amount ** 2
+        
+        # Check balance
+        balance = self.voting_power_token.balanceOf(voter)
+        require(balance >= cost, "Insufficient voting power")
+        
+        # Burn voting power
+        self.voting_power_token.burn(voter, cost)
+        
+        # Record vote
+        self.record_vote(voter, proposal_id, vote_amount)
+        
+        return {'cost': cost, 'votes': vote_amount}
+```
+
+### Time-Lock Governance
+
+```solidity
+// Time-lock contract for governance
+contract Timelock {
+    uint256 public constant MIN_DELAY = 1 days;
+    uint256 public constant MAX_DELAY = 30 days;
+    
+    mapping(bytes32 => uint256) public queuedTransactions;
+    
+    function queueTransaction(
+        address target,
+        uint256 value,
+        bytes memory data,
+        uint256 delay
+    ) public returns (bytes32) {
+        require(delay >= MIN_DELAY && delay <= MAX_DELAY, "Invalid delay");
+        
+        bytes32 txHash = keccak256(abi.encode(target, value, data, delay));
+        queuedTransactions[txHash] = block.timestamp + delay;
+        
+        emit TransactionQueued(txHash, target, value, data, delay);
+        return txHash;
+    }
+    
+    function executeTransaction(bytes32 txHash) public {
+        require(queuedTransactions[txHash] != 0, "Transaction not queued");
+        require(block.timestamp >= queuedTransactions[txHash], "Too early");
+        
+        // Execute transaction
+        (bool success, ) = queuedTransactions[txHash].call{value: value}(data);
+        require(success, "Transaction failed");
+        
+        delete queuedTransactions[txHash];
+        emit TransactionExecuted(txHash);
+    }
+}
+```
+
+## Security Advanced Topics
+
+### Formal Verification
+
+```python
+# Formal verification configuration
+FORMAL_VERIFICATION = {
+    "properties": [
+        {
+            "name": "total_supply_conservation",
+            "description": "Total supply never exceeds max supply",
+            "tool": "certora"
+        },
+        {
+            "name": "no_reentrancy",
+            "description": "No reentrancy vulnerabilities",
+            "tool": "mythril"
+        },
+        {
+            "name": "access_control",
+            "description": "Only admin can call admin functions",
+            "tool": "slither"
+        }
+    ],
+    "test_cases": [
+        {"scenario": "normal_operation", "expected": "success"},
+        {"scenario": "edge_case_zero", "expected": "success"},
+        {"scenario": "malicious_input", "expected": "revert"}
+    ]
+}
+```
+
+### Gas Optimization Techniques
+
+```solidity
+// Gas optimization patterns
+contract GasOptimized {
+    // Use uint256 instead of smaller types
+    uint256 public totalSupply;
+    
+    // Pack storage variables
+    struct PackedStruct {
+        uint128 a;  // 16 bytes
+        uint128 b;  // 16 bytes - fits in same slot
+    }
+    
+    // Use events instead of storage for logs
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    
+    // Use calldata instead of memory for read-only parameters
+    function process(uint256[] calldata data) external {
+        // Process data
+    }
+    
+    // Use unchecked for safe arithmetic
+    function unsafeAdd(uint256 a, uint256 b) internal pure returns (uint256) {
+        unchecked {
+            return a + b;
+        }
+    }
+}
+```
+
+### Security Audit Checklist
+
+```python
+SECURITY_AUDIT_CHECKLIST = {
+    "access_control": [
+        "Admin functions are protected",
+        "Role-based access control is implemented",
+        "No single point of failure for admin keys"
+    ],
+    "reentrancy": [
+        "Checks-Effects-Interactions pattern followed",
+        "Reentrancy guards on external calls",
+        "No cross-function reentrancy"
+    ],
+    "integer_overflow": [
+        "SafeMath or Solidity 0.8+ used",
+        "No unchecked arithmetic in critical paths",
+        "Proper bounds checking"
+    ],
+    "front_running": [
+        "Commit-reveal scheme for sensitive operations",
+        "Slippage protection for swaps",
+        "Deadline parameters for transactions"
+    ],
+    "oracle_manipulation": [
+        "Multiple oracle sources",
+        "TWAP (Time-Weighted Average Price) used",
+        "Circuit breakers for extreme price movements"
+    ]
+}
+```

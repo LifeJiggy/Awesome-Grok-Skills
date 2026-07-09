@@ -653,3 +653,298 @@ Internal use: Awesome-Grok-Skills project.
 ---
 
 *AWS Specialist Agent — Part of the Awesome Grok Skills collection.*
+
+## Advanced Features
+
+### Multi-Region Deployment
+
+```python
+# Deploy across multiple regions
+regions = ["us-east-1", "us-west-2", "eu-west-1"]
+for region in regions:
+    agent = AWSSpecialistAgent(Config(region=region))
+    vpc = agent.create_vpc("10.0.0.0/16", f"{region}-vpc")
+    # ... deploy resources
+```
+
+### Disaster Recovery Patterns
+
+```
+Active-Passive:
+  Primary Region: Full production stack
+  DR Region: Warm standby (minimal resources)
+  RPO: < 1 hour
+  RTO: < 4 hours
+
+Active-Active:
+  Multiple regions serving traffic
+  Global load balancing (Route53)
+  RPO: ~0 (synchronous replication)
+  RTO: < 5 minutes
+
+Pilot Light:
+  DR region has core services running
+  Can scale up quickly
+  RPO: < 15 minutes
+  RTO: < 1 hour
+```
+
+### Cost Allocation Tags
+
+```python
+# Mandatory tags for cost tracking
+mandatory_tags = {
+    "Environment": "production",
+    "Team": "platform",
+    "CostCenter": "ENG-123",
+    "Project": "web-app",
+    "Owner": "lead@company.com",
+    "ManagedBy": "aws-specialist-agent",
+    "Expiration": "2025-12-31"
+}
+
+# Apply to all resources
+agent.apply_tags_to_all_resources(mandatory_tags)
+```
+
+### Security Hardening Checklist
+
+- [ ] Enable AWS Config rules for compliance
+- [ ] Configure GuardDuty for threat detection
+- [ ] Set up Security Hub for aggregated findings
+- [ ] Enable CloudTrail in all regions
+- [ ] Configure VPC Flow Logs
+- [ ] Implement AWS WAF for web applications
+- [ ] Enable Shield Advanced for DDoS protection
+- [ ] Set up AWS Secrets Manager for credential rotation
+- [ ] Configure AWS KMS for encryption key management
+- [ ] Implement AWS SSO for centralized access
+
+### Performance Optimization
+
+```python
+# Right-sizing recommendations
+report = agent.optimize_costs()
+for rec in report["recommendations"]:
+    if rec["type"] == "rightsize":
+        print(f"Instance {rec['resource']}: {rec['current_type']} → {rec['suggested_type']}")
+        print(f"  Estimated savings: ${rec['savings_per_hour']}/hour")
+
+# Reserved Instance recommendations
+ri_recs = agent.get_reserved_instance_recommendations()
+for rec in ri_recs:
+    print(f"Purchase {rec['instance_type']} RI: {rec['term']} years")
+    print(f"  Expected savings: ${rec['annual_savings']}/year")
+```
+
+### Monitoring Dashboard
+
+```python
+# Create comprehensive monitoring dashboard
+dashboard = agent.create_cloudwatch_dashboard(
+    name="Infrastructure Overview",
+    widgets=[
+        {"type": "metric", "title": "EC2 CPU Utilization", "metrics": ["AWS/EC2", "CPUUtilization"]},
+        {"type": "metric", "title": "RDS Connections", "metrics": ["AWS/RDS", "DatabaseConnections"]},
+        {"type": "metric", "title": "S3 Bucket Size", "metrics": ["AWS/S3", "BucketSizeBytes"]},
+        {"type": "log", "title": "Application Logs", "log_group": "/app/production"},
+        {"type": "alarm", "title": "Alarms", "alarms": ["high-cpu", "low-memory"]}
+    ]
+)
+```
+
+### Automation Patterns
+
+```python
+# Scheduled maintenance
+agent.create_eventbridge_rule(
+    name="weekly-cleanup",
+    schedule="cron(0 2 ? * SUN *)",
+    targets=[{
+        "arn": "arn:aws:lambda:us-east-1:123456789012:func/cleanup",
+        "input": {"action": "terminate_idle_instances"}
+    }]
+)
+
+# Auto-remediation
+agent.create_eventbridge_rule(
+    name="auto-remediate-security",
+    event_pattern={
+        "source": ["aws.config"],
+        "detail-type": ["Config Rule Compliance Change"],
+        "detail": {
+            "ruleName": ["restricted-ssh"],
+            "complianceType": ["NON_COMPLIANT"]
+        }
+    },
+    targets=[{
+        "arn": "arn:aws:lambda:us-east-1:123456789012:func/remediate",
+        "input": {"action": "remove_public_ssh"}
+    }]
+)
+```
+
+### Integration with CI/CD
+
+```python
+# Terraform output for CI/CD
+tf_output = agent.export_terraform_state()
+# Save to S3 backend
+agent.upload_object_to_s3(
+    bucket_name="terraform-state",
+    key="production/terraform.tfstate",
+    data=tf_output.encode()
+)
+
+# CloudFormation outputs
+cf_output = agent.get_cloudformation_outputs("production-stack")
+# Pass to next pipeline stage
+print(f"VPC ID: {cf_output['VpcId']}")
+print(f"Load Balancer: {cf_output['LoadBalancerDNS']}")
+```
+
+### Backup and Restore
+
+```python
+# Create automated backups
+backup_plan = agent.create_backup_plan(
+    name="production-backup",
+    rules=[
+        {"schedule": "cron(0 12 * * ? *)", "retention_days": 35},
+        {"schedule": "cron(0 14 * * ? *)", "retention_days": 7}
+    ],
+    resources=["arn:aws:ec2:us-east-1:123456789012:volume/*"]
+)
+
+# Restore from backup
+restore_job = agent.restore_from_backup(
+    backup_vault="production",
+    recovery_point="arn:aws:backup:us-east-1:123456789012:recovery-point:..."
+)
+```
+
+### Compliance Reporting
+
+```python
+# Generate compliance report
+report = agent.generate_compliance_report(
+    framework="CIS-AWS-Foundations-Benchmark",
+    controls=["1.1", "1.2", "2.1", "2.2", "3.1", "3.2"]
+)
+
+print(f"Overall compliance: {report['compliance_score']}%")
+for control in report['controls']:
+    status = "✓ PASS" if control['status'] == 'COMPLIANT' else "✗ FAIL"
+    print(f"{control['id']}: {control['name']} - {status}")
+```
+
+### Incident Response
+
+```python
+# Automated incident response
+incident = agent.create_incident_response(
+    name="High CPU Alert",
+    trigger_alarm="high-cpu-utilization",
+    actions=[
+        {"type": "snapshot_volumes", "target": "instance_id"},
+        {"type": "capture_logs", "target": "instance_id"},
+        {"type": "notify_team", "channel": "slack", "team": "ops"},
+        {"type": "scale_out", "asg": "prod-asg", "increment": 2}
+    ]
+)
+```
+
+### Blue-Green Deployment
+
+```python
+# Blue-green deployment setup
+blue_env = agent.create_environment(
+    name="blue",
+    vpc_id="vpc-abc123",
+    subnet_ids=["subnet-1", "subnet-2"],
+    target_group_arn="arn:aws:elasticloadbalancing:..."
+)
+
+green_env = agent.create_environment(
+    name="green",
+    vpc_id="vpc-abc123",
+    subnet_ids=["subnet-3", "subnet-4"],
+    target_group_arn="arn:aws:elasticloadbalancing:..."
+)
+
+# Switch traffic
+agent.switch_traffic(
+    load_balancer_arn="arn:aws:elasticloadbalancing:...",
+    from_target_group="blue-tg",
+    to_target_group="green-tg"
+)
+```
+
+### Multi-Account Strategy
+
+```python
+# Organizational units
+ous = {
+    "production": "ou-abc-def",
+    "staging": "ou-abc-ghi",
+    "development": "ou-abc-jkl",
+    "security": "ou-abc-mno",
+    "log-archive": "ou-abc-pqr"
+}
+
+# Service Control Policies
+scps = {
+    "deny-root-user": {
+        "Statement": [{
+            "Effect": "Deny",
+            "Action": "*",
+            "Resource": "*",
+            "Condition": {
+                "StringLike": {"aws:PrincipalArn": ["arn:aws:iam::*:root"]}
+            }
+        }]
+    }
+}
+```
+
+### Infrastructure Drift Detection
+
+```python
+# Detect configuration drift
+drift = agent.detect_drift(
+    stack_name="production-infrastructure",
+    resource_types=["AWS::EC2::Instance", "AWS::RDS::DBInstance"]
+)
+
+if drift['has_drift']:
+    print("Drift detected:")
+    for resource in drift['drifted_resources']:
+        print(f"  {resource['type']}: {resource['resource_id']}")
+        print(f"    Expected: {resource['expected']}")
+        print(f"    Actual: {resource['actual']}")
+```
+
+### Cost Anomaly Detection
+
+```python
+# Set up cost anomaly detection
+anomaly_detector = agent.create_cost_anomaly_detector(
+    name="monthly-spend-anomaly",
+    monitor_type="DIMENSIONAL",
+    dimension="SERVICE",
+    threshold=1000.00,
+    sensitivity="HIGH"
+)
+
+# Get anomalies
+anomalies = agent.get_cost_anomalies(
+    detector_id="monthly-spend-anomaly",
+    start_date="2025-01-01",
+    end_date="2025-01-31"
+)
+
+for anomaly in anomalies['anomalies']:
+    print(f"Anomaly detected: {anomaly['impact']['total_impact']}")
+    print(f"  Service: {anomaly['dimension_value']}")
+    print(f"  Expected: ${anomaly['impact']['total_impact']:.2f}")
+```

@@ -39,6 +39,40 @@ You are the **Affiliate Marketing Agent**, a specialist in managing affiliate pr
 6. **Transparency**: Clear commission structures and reporting for all partners.
 7. **Sustainable Growth**: Build programs that scale without sacrificing quality.
 
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                  AffiliateMarketingAgent (Orchestrator)              │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                       │
+│  ┌──────────────┐  ┌──────────────────┐  ┌─────────────────────┐    │
+│  │ PartnerMgr    │  │ CommissionCalc   │  │ FraudDetectionEngine│    │
+│  │  - recruit    │  │  - percentage    │  │  - click_flooding   │    │
+│  │  - approve    │  │  - fixed         │  │  - geo_mismatch     │    │
+│  │  - suspend    │  │  - tiered        │  │  - self_referral    │    │
+│  │  - terminate  │  │  - recurring     │  │  - bot_traffic      │    │
+│  └──────────────┘  │  - hybrid        │  │  - cookie_stuffing  │    │
+│                     └──────────────────┘  └─────────────────────┘    │
+│                                                                       │
+│  ┌──────────────┐  ┌──────────────────┐  ┌─────────────────────┐    │
+│  │ TrackingEngine│  │ AttributionEngine │  │ PayoutProcessor     │    │
+│  │  - click      │  │  - last_click    │  │  - paypal           │    │
+│  │  - impression │  │  - first_click   │  │  - bank_transfer    │    │
+│  │  - conversion │  │  - linear        │  │  - wire             │    │
+│  └──────────────┘  │  - time_decay    │  │  - crypto           │    │
+│                     │  - position_based │  └─────────────────────┘    │
+│                     └──────────────────┘                              │
+│                                                                       │
+│  ┌───────────────────────────────────────────────────────────────┐   │
+│  │                    ReportingEngine                              │   │
+│  │  - HTML / JSON / CSV / Markdown reports                        │   │
+│  │  - Dashboard summary with KPIs                                 │   │
+│  │  - Scheduled delivery via webhooks                             │   │
+│  └───────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
 ## Capabilities
 
 ### Partner Management
@@ -90,6 +124,19 @@ PENDING → ACTIVE → (SUSPENDED | INACTIVE | TERMINATED)
   └──► TERMINATED (if application rejected)
 ```
 
+**Tier Progression:**
+```
+┌─────────┬───────────────────┬──────────────────────┐
+│ Tier    │ Monthly Threshold │ Commission Multiplier │
+├─────────┼───────────────────┼──────────────────────┤
+│ BRONZE  │ < $1,000          │ 1.0x                 │
+│ SILVER  │ $1,000 - $5,000   │ 1.1x                 │
+│ GOLD    │ $5,000 - $25,000  │ 1.25x                │
+│ PLATINUM│ $25,000 - $100,000│ 1.5x                 │
+│ DIAMOND │ > $100,000        │ 2.0x                 │
+└─────────┴───────────────────┴──────────────────────┘
+```
+
 ### Commission Rules
 
 ```python
@@ -126,6 +173,16 @@ fixed_rule = CommissionRule(
     name="SaaS Referral $50",
     commission_type=CommissionType.FIXED,
     fixed_amount=50.0,
+    product_categories=["subscription"],
+)
+
+# Create a recurring rule
+recurring_rule = CommissionRule(
+    rule_id="rule-004",
+    name="Subscription Rev Share",
+    commission_type=CommissionType.RECURRING,
+    percentage_rate=0.20,
+    recurrence_months=12,
     product_categories=["subscription"],
 )
 
@@ -182,6 +239,15 @@ agent.track_impression(
 )
 ```
 
+**Tracking Pipeline:**
+```
+Client Click → Fraud Check → Cookie Set → Attribution Record
+                                                        ↓
+Conversion → Rule Match → Commission Calc → Balance Update
+                                                        ↓
+                                            Payout Queue
+```
+
 ### Fraud Detection
 
 ```python
@@ -232,6 +298,22 @@ engine.whitelist_partner(partner.id)
 | COOKIE_STUFFING | Hidden iframes loading tracking | Referrer header analysis |
 | CONVERSION_STUFFING | Fake conversions | Conversion velocity anomaly |
 
+**Fraud Scoring Algorithm:**
+```
+fraud_score = (
+    0.30 * click_velocity_score +
+    0.25 * geo_anomaly_score +
+    0.20 * conversion_ratio_score +
+    0.15 * device_fingerprint_score +
+    0.10 * referrer_quality_score
+)
+
+if fraud_score > 0.80: severity = CRITICAL
+elif fraud_score > 0.60: severity = HIGH
+elif fraud_score > 0.40: severity = WARNING
+else: severity = INFO
+```
+
 ### Performance Reporting
 
 ```python
@@ -252,6 +334,34 @@ print(f"Active Partners: {summary['active_partners']}")
 print(f"Avg Conversion Rate: {summary['avg_conversion_rate']:.2%}")
 print(f"Total Commissions: ${summary['total_commissions']:,.2f}")
 print(f"ROI: {summary['roi']:.1f}x")
+```
+
+**KPI Dashboard:**
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    AFFILIATE PROGRAM DASHBOARD                 │
+├──────────────────────────────────────────────────────────────┤
+│                                                                │
+│  Total Sales:        $125,430.00    ▲ +12.3% vs last month    │
+│  Active Partners:    47              ▲ +3 new this month       │
+│  Conversion Rate:    3.8%           ▼ -0.2% vs last month     │
+│  Total Commissions:  $15,678.75     ▲ +11.8% vs last month    │
+│  ROI:                4.2x           ▲ +0.3x vs last month     │
+│                                                                │
+│  Top 5 Partners:                                               │
+│  ┌─────────────────────┬──────────┬──────────┬───────────┐    │
+│  │ Partner             │ Sales    │ Conv.    │ Comm.     │    │
+│  ├─────────────────────┼──────────┼──────────┼───────────┤    │
+│  │ Tech Review Blog    │ $32,100  │ 5.2%     │ $4,815    │    │
+│  │ Dev Weekly          │ $28,400  │ 4.1%     │ $4,260    │    │
+│  │ Gadget Reviews      │ $21,300  │ 3.9%     │ $3,195    │    │
+│  │ Code Academy        │ $18,200  │ 3.5%     │ $2,730    │    │
+│  │ Security Blog       │ $12,400  │ 2.8%     │ $1,860    │    │
+│  └─────────────────────┴──────────┴──────────┴───────────┘    │
+│                                                                │
+│  Fraud Alerts: 2 pending, 12 resolved this month              │
+│  Payouts: $14,200 processed, $1,478.75 pending                │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ### Payout Processing
@@ -284,6 +394,15 @@ history = agent.get_payout_history(partner.id)
 # ]
 ```
 
+**Payout Methods:**
+| Method | Min Payout | Processing Time | Fees |
+|--------|-----------|-----------------|------|
+| PayPal | $50 | Instant | 2.9% + $0.30 |
+| Bank Transfer | $100 | 2-5 business days | $5 flat |
+| Wire | $500 | 1-3 business days | $25 flat |
+| Crypto (USDC) | $25 | ~10 minutes | Network gas |
+| Check | $200 | 7-14 business days | $2 flat |
+
 ### Attribution
 
 ```python
@@ -305,6 +424,24 @@ result = attribution.attribute("ORD-001")
 #     {"partner_id": "partner_002", "commission": 5.0, "touchpoints": 1}
 #   ]
 # }
+```
+
+**Attribution Models:**
+```
+First Click:     [X]─────────────────────────────────→
+                 100% credit to first touchpoint
+
+Last Click:      ────────────────────────────────[X]─→
+                 100% credit to last touchpoint
+
+Linear:          [X]──────────[X]──────────[X]───────→
+                 Equal credit to all touchpoints
+
+Time Decay:      [X]────────[X]────[X]──────────────→
+                 More credit to recent touchpoints
+
+Position-Based:  [X]────────────────────────────[X]──→
+                 40% first, 40% last, 20% middle
 ```
 
 ## Method Signatures
@@ -521,6 +658,9 @@ class Payout:
 | Conversion not attributed | No touchpoints recorded | Ensure tracking links are used |
 | Click count high, conversions low | Traffic quality issue | Review partner traffic sources |
 | Commission calculation wrong | Rule mismatch | Verify rule conditions match sale attributes |
+| Duplicate conversions | Race condition | Implement idempotency keys on order_id |
+| Missing click data | Cookie blocked | Provide server-side tracking fallback |
+| High fraud score on good partner | Anomalous campaign spike | Whitelist partner temporarily during promotions |
 
 ## Configuration
 
@@ -570,6 +710,20 @@ agent = AffiliateMarketingAgent(config=config)
 - All financial transactions are audit-logged
 - Partner data is isolated by tenant ID
 - Sensitive operations require additional authentication
+
+## Design Patterns
+
+### Observer Pattern for Fraud Detection
+The fraud engine observes all tracking events asynchronously, allowing real-time detection without blocking the tracking pipeline.
+
+### Strategy Pattern for Commission Rules
+Different commission types are implemented as interchangeable strategies, enabling easy addition of new commission models.
+
+### Circuit Breaker for Payout Processing
+Payout processing uses a circuit breaker pattern — if too many payment provider failures occur, payouts are queued rather than retried immediately.
+
+### Chain of Responsibility for Attribution
+Multiple attribution models are chained, allowing fallback from one model to another if insufficient touchpoint data exists.
 
 ---
 

@@ -758,3 +758,231 @@ class QuotaExceededError(AWSSpecialistError):
 - Some AWS resource limits may apply based on account type.
 - Spot instance pricing is volatile; estimates use historical averages.
 - Cross-region features require appropriate IAM permissions.
+
+## Security Best Practices
+
+### IAM Policies
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:Describe*",
+        "ec2:Get*"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Security Group Rules
+
+- Never allow 0.0.0.0/0 on SSH (22) or RDP (3389)
+- Use security group references instead of CIDR blocks where possible
+- Implement separate security groups for each tier (web, app, db)
+- Enable VPC Flow Logs for all VPCs
+
+### Encryption Patterns
+
+```
+Data at Rest:
+  S3     → SSE-S3, SSE-KMS, SSE-C
+  EBS    → AES-256, KMS
+  RDS    → AES-256, KMS
+  EFS    → AES-256, KMS
+  DynamoDB → AWS owned KMS, CMK
+
+Data in Transit:
+  TLS 1.2+ for all API calls
+  TLS for all database connections
+  IPSec for VPN connections
+  PrivateLink for service-to-service
+```
+
+## Scalability Patterns
+
+### Horizontal Scaling
+
+```
+Auto Scaling Group:
+  Min: 2 (high availability)
+  Max: 20 (peak capacity)
+  Desired: 3 (baseline)
+  
+Scaling Policies:
+  Target Tracking: CPU 70%
+  Step Scaling: CloudWatch alarms
+  Scheduled: Known traffic patterns
+  Predictive: ML-based forecasting
+```
+
+### Database Scaling
+
+```
+Read Replicas:
+  Aurora: Up to 15 read replicas
+  RDS: Up to 5 read replicas
+  DynamoDB: Global tables (multi-region)
+
+Sharding:
+  DynamoDB: Partition key design
+  Aurora: ProxySQL read/write splitting
+```
+
+## Cost Optimization Strategies
+
+### Instance Selection
+
+| Workload Type | Recommended Instance | Savings vs On-Demand |
+|---------------|---------------------|----------------------|
+| Burstable | t3/t4g | 30-40% (Reserved) |
+| General Purpose | m6i/m7g | 40-50% (Reserved) |
+| Compute Optimized | c6i/c7g | 50-60% (Spot) |
+| Memory Optimized | r6i/r7g | 40-50% (Reserved) |
+| Storage Optimized | i3/i4i | 50-60% (Spot) |
+
+### Storage Lifecycle
+
+```
+S3 Lifecycle Rules:
+  0-30 days:    Standard (frequent access)
+  30-90 days:   Standard-IA (infrequent access)
+  90-180 days:  Glacier Instant Retrieval
+  180-365 days: Glacier Flexible Retrieval
+  365+ days:    Glacier Deep Archive
+```
+
+## Design Patterns
+
+### Circuit Breaker
+
+```python
+class CircuitBreaker:
+    def __init__(self, failure_threshold=5, recovery_timeout=60):
+        self.failure_count = 0
+        self.failure_threshold = failure_threshold
+        self.recovery_timeout = recovery_timeout
+        self.state = "closed"
+        self.last_failure_time = None
+    
+    def call(self, func, *args, **kwargs):
+        if self.state == "open":
+            if time.time() - self.last_failure_time > self.recovery_timeout:
+                self.state = "half-open"
+            else:
+                raise CircuitBreakerOpenError("Circuit is open")
+        
+        try:
+            result = func(*args, **kwargs)
+            if self.state == "half-open":
+                self.state = "closed"
+                self.failure_count = 0
+            return result
+        except Exception as e:
+            self.failure_count += 1
+            self.last_failure_time = time.time()
+            if self.failure_count >= self.failure_threshold:
+                self.state = "open"
+            raise
+```
+
+### Retry with Exponential Backoff
+
+```python
+def retry_with_backoff(func, max_retries=3, base_delay=1, max_delay=60):
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except Exception as e:
+            if attempt == max_retries - 1:
+                raise
+            delay = min(base_delay * (2 ** attempt), max_delay)
+            jitter = random.uniform(0, delay * 0.1)
+            time.sleep(delay + jitter)
+```
+
+### Resource Tagging Strategy
+
+```
+Mandatory Tags:
+  Environment:  production | staging | development
+  Team:         platform | data | engineering
+  CostCenter:   engineering | marketing | sales
+  Owner:        team-lead@company.com
+  ManagedBy:    aws-specialist-agent
+  Project:      project-name
+  Expiry:       2025-12-31 (for temporary resources)
+```
+
+## Advanced Configurations
+
+### Multi-Region Setup
+
+```python
+# Primary region
+primary_agent = AWSSpecialistAgent(Config(region="us-east-1"))
+
+# DR region
+dr_agent = AWSSpecialistAgent(Config(region="us-west-2"))
+
+# Cross-region replication
+primary_agent.configure_s3_bucket(
+    "primary-bucket",
+    replication_rules=[{
+        "destination_bucket": "dr-bucket",
+        "destination_region": "us-west-2",
+        "storage_class": "STANDARD_IA"
+    }]
+)
+```
+
+### Landing Zone with Control Tower
+
+```python
+# Multi-account strategy
+accounts = {
+    "management": "111111111111",
+    "production": "222222222222",
+    "staging": "333333333333",
+    "development": "444444444444",
+    "security": "555555555555",
+    "log-archive": "666666666666"
+}
+
+# Service Control Policies (SCPs)
+scps = {
+    "deny-root-user": {
+        "Statement": [{
+            "Effect": "Deny",
+            "Action": "*",
+            "Resource": "*",
+            "Condition": {
+                "StringLike": {"aws:PrincipalArn": ["arn:aws:iam::*:root"]}
+            }
+        }]
+    },
+    "deny-region-restriction": {
+        "Statement": [{
+            "Effect": "Deny",
+            "NotAction": [
+                "iam:*", "sts:*", "cloudfront:*", "route53:*"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringNotEquals": {
+                    "aws:RequestedRegion": ["us-east-1", "us-west-2"]
+                }
+            }
+        }]
+    }
+}
+```

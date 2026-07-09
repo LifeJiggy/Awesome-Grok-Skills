@@ -543,3 +543,561 @@ blockchain_agent:
 ## License
 
 MIT License - see [LICENSE](LICENSE)
+
+## Advanced Usage
+
+### Smart Contract Development Workflow
+
+```python
+# Complete development workflow
+def develop_smart_contract(contract_spec):
+    """
+    End-to-end smart contract development
+    """
+    # 1. Generate contract from specification
+    contract_code = agent.contract_manager.generate_contract(contract_spec)
+    
+    # 2. Compile contract
+    compilation = agent.contract_manager.compile_contract(contract_code)
+    
+    # 3. Run tests
+    test_results = agent.contract_manager.run_tests(compilation['abi'])
+    
+    # 4. Static analysis
+    analysis = agent.contract_manager.analyze_security(compilation['bytecode'])
+    
+    # 5. Deploy to testnet
+    deployment = agent.contract_manager.deploy_to_testnet(
+        compilation['bytecode'],
+        network="goerli"
+    )
+    
+    # 6. Verify on block explorer
+    agent.contract_manager.verify_contract(
+        deployment['contract_address'],
+        compilation['source_code'],
+        "solidity"
+    )
+    
+    return deployment
+```
+
+### Advanced Tokenomics
+
+```python
+# Tokenomics simulation
+def simulate_token_economics(token_config):
+    """
+    Simulate token economics over time
+    """
+    simulation = agent.token_manager.simulate(
+        initial_supply=token_config['total_supply'],
+        distribution=token_config['distribution'],
+        vesting_schedules=token_config['vesting'],
+        emission_rate=token_config['emission_rate'],
+        time_period_months=36
+    )
+    
+    # Analyze results
+    print(f"Year 1 circulation: {simulation['year_1_circulation']:,}")
+    print(f"Year 3 circulation: {simulation['year_3_circulation']:,}")
+    print(f"Inflation rate: {simulation['inflation_rate']:.2%}")
+    print(f"Gini coefficient: {simulation['gini_coefficient']:.3f}")
+    
+    return simulation
+```
+
+### DeFi Portfolio Management
+
+```python
+# DeFi portfolio optimization
+class DeFiPortfolio:
+    def __init__(self, risk_tolerance):
+        self.risk_tolerance = risk_tolerance
+        self.positions = []
+    
+    def optimize_allocation(self, total_value):
+        """
+        Optimize portfolio allocation across DeFi protocols
+        """
+        protocols = self.get_available_protocols()
+        
+        # Risk-adjusted returns
+        optimized = {}
+        for protocol in protocols:
+            risk_score = self.calculate_risk(protocol)
+            expected_return = protocol['apy']
+            
+            # Sharpe ratio-like metric
+            risk_adjusted = expected_return / risk_score if risk_score > 0 else 0
+            
+            if risk_adjusted > self.risk_tolerance:
+                optimized[protocol['name']] = {
+                    'allocation': total_value * (risk_adjusted / 100),
+                    'expected_apy': expected_return,
+                    'risk_score': risk_score
+                }
+        
+        return optimized
+    
+    def calculate_risk(self, protocol):
+        """
+        Calculate protocol risk score
+        """
+        factors = {
+            'tvl': protocol['tvl'] / 1_000_000_000,  # Normalize
+            'audit_score': protocol['audit_score'] / 100,
+            'time_in_market': protocol['months_active'] / 12,
+            'team_reputation': protocol['team_score'] / 100
+        }
+        
+        return sum(factors.values()) / len(factors)
+```
+
+### NFT Minting dApp
+
+```python
+# NFT minting dApp integration
+def create_nft_minting_dapp(collection_config):
+    """
+    Create a complete NFT minting dApp
+    """
+    # 1. Deploy NFT contract
+    nft_contract = agent.nft_manager.create_collection(
+        name=collection_config['name'],
+        symbol=collection_config['symbol'],
+        blockchain=collection_config['blockchain'],
+        metadata={
+            "max_supply": collection_config['max_supply'],
+            "price": collection_config['price'],
+            "royalty": collection_config['royalty'],
+            "base_uri": collection_config['base_uri']
+        }
+    )
+    
+    # 2. Create minting website
+    website = agent.nft_manager.create_minting_website(
+        contract_address=nft_contract['contract_address'],
+        theme=collection_config['theme'],
+        features=['whitelist', 'presale', 'reveal']
+    )
+    
+    # 3. Set up payment processing
+    payment = agent.nft_manager.setup_payment_processing(
+        accepted_tokens=['ETH', 'USDC'],
+        wallet_address=collection_config['wallet_address']
+    )
+    
+    return {
+        'contract': nft_contract,
+        'website': website,
+        'payment': payment
+    }
+```
+
+## Security Best Practices
+
+### Smart Contract Security
+
+```python
+SECURITY_CHECKLIST = {
+    "pre_deployment": [
+        "Code reviewed by 2+ senior developers",
+        "100% unit test coverage",
+        "Integration tests passing",
+        "Gas optimization completed",
+        "Access control validated",
+        "Emergency procedures documented"
+    ],
+    "audit_requirements": [
+        "Independent security audit by reputable firm",
+        "Formal verification for critical functions",
+        "Bug bounty program established",
+        "Time-lock on admin functions",
+        "Upgrade mechanism documented"
+    ],
+    "monitoring": [
+        "Transaction monitoring alerts",
+        "Unusual activity detection",
+        "Gas price monitoring",
+        "Contract balance alerts",
+        "Admin action notifications"
+    ]
+}
+```
+
+### Wallet Security
+
+```python
+WALLET_SECURITY = {
+    "hot_wallet": {
+        "usage": "Daily operations, small amounts",
+        "security": [
+            "Hardware wallet for key storage",
+            "Multi-factor authentication",
+            "Transaction signing on separate device",
+            "Regular key rotation"
+        ],
+        "limits": {
+            "daily_transaction_limit": "1 ETH",
+            "single_transaction_limit": "0.5 ETH"
+        }
+    },
+    "cold_wallet": {
+        "usage": "Long-term storage, large amounts",
+        "security": [
+            "Air-gapped device",
+            "Multi-signature requirement",
+            "Geographic distribution of keys",
+            "Regular backup verification"
+        ],
+        "limits": {
+            "daily_transaction_limit": "100 ETH",
+            "single_transaction_limit": "50 ETH"
+        }
+    }
+}
+```
+
+### DeFi Risk Management
+
+```python
+DEFI_RISK_MANAGEMENT = {
+    "protocol_risk": {
+        "due_diligence": [
+            "Audit report review",
+            "Team background check",
+            "TVL trend analysis",
+            "Community sentiment",
+            "Code maturity assessment"
+        ],
+        "limits": {
+            "max_allocation_per_protocol": "20% of portfolio",
+            "min_tvl": "$10M",
+            "min_audit_score": "80/100"
+        }
+    },
+    "smart_contract_risk": {
+        "mitigation": [
+            "Use established protocols",
+            "Diversify across protocols",
+            "Set stop-loss levels",
+            "Regular position monitoring"
+        ]
+    },
+    "liquidity_risk": {
+        "monitoring": [
+            "Pool depth analysis",
+            "Slippage estimation",
+            "Exit strategy planning"
+        ]
+    }
+}
+```
+
+## Integration Examples
+
+### Web3.py Integration
+
+```python
+# Web3.py integration
+from web3 import Web3
+
+def integrate_web3():
+    """
+    Integrate with Web3.py for Ethereum interactions
+    """
+    # Connect to Ethereum
+    w3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/YOUR_PROJECT_ID'))
+    
+    # Get account
+    account = w3.eth.account.from_key(PRIVATE_KEY)
+    
+    # Send transaction
+    tx = {
+        'from': account.address,
+        'to': '0xRecipientAddress',
+        'value': w3.to_wei(0.1, 'ether'),
+        'gas': 21000,
+        'gasPrice': w3.eth.gas_price,
+        'nonce': w3.eth.get_transaction_count(account.address),
+        'chainId': 1  # Mainnet
+    }
+    
+    signed_tx = w3.eth.account.sign_transaction(tx, PRIVATE_KEY)
+    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+    
+    return tx_hash.hex()
+```
+
+### Alchemy Integration
+
+```python
+# Alchemy integration for enhanced features
+def integrate_alchemy():
+    """
+    Integrate with Alchemy for enhanced blockchain data
+    """
+    from alchemy import Alchemy, Network
+    
+    alchemy = Alchemy(api_key="YOUR_API_KEY")
+    
+    # Get NFTs for address
+    nfts = alchemy.nft.get_nfts_for_owner("0x1234...abcd")
+    
+    # Get token balances
+    balances = alchemy.core.get_token_balances("0x1234...abcd")
+    
+    # Get transaction history
+    history = alchemy.core.get_asset_transfers(
+        from_address="0x1234...abcd",
+        category=["external", "erc20", "erc721"]
+    )
+    
+    return {
+        'nfts': nfts,
+        'balances': balances,
+        'history': history
+    }
+```
+
+### IPFS Integration
+
+```python
+# IPFS integration for NFT metadata
+def integrate_ipfs():
+    """
+    Integrate with IPFS for decentralized storage
+    """
+    import ipfshttpclient
+    
+    client = ipfshttpclient.connect('/ip4/127.0.0.1/tcp/5001')
+    
+    # Upload metadata to IPFS
+    metadata = {
+        "name": "My NFT",
+        "description": "A unique digital collectible",
+        "image": "ipfs://QmHash.../image.png",
+        "attributes": [
+            {"trait_type": "Color", "value": "Blue"},
+            {"trait_type": "Rarity", "value": "Legendary"}
+        ]
+    }
+    
+    result = client.add_json(metadata)
+    return f"ipfs://{result}"
+```
+
+### The Graph Integration
+
+```python
+# The Graph integration for indexed blockchain data
+def integrate_thegraph():
+    """
+    Integrate with The Graph for querying blockchain data
+    """
+    import requests
+    
+    query = """
+    {
+      pairs(first: 10, orderBy: volumeUSD, orderDirection: desc) {
+        id
+        token0 { symbol }
+        token1 { symbol }
+        volumeUSD
+        reserveUSD
+      }
+    }
+    """
+    
+    response = requests.post(
+        'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
+        json={'query': query}
+    )
+    
+    return response.json()
+```
+
+## Performance Optimization
+
+### Gas Optimization
+
+```python
+GAS_OPTIMIZATION = {
+    "techniques": [
+        "Use uint256 instead of smaller types",
+        "Pack storage variables",
+        "Use events instead of storage for logs",
+        "Batch operations when possible",
+        "Use view and pure functions"
+    ],
+    "tools": [
+        "Solidity Optimizer (200+ runs)",
+        "Gas Reporter for testing",
+        "Tenderly for simulation",
+        "Etherscan Gas Tracker"
+    ],
+    "best_practices": [
+        "Cache storage variables in memory",
+        "Use short-circuit evaluation",
+        "Avoid unnecessary SSTORE operations",
+        "Use calldata instead of memory for read-only parameters"
+    ]
+}
+```
+
+### Transaction Optimization
+
+```python
+TX_OPTIMIZATION = {
+    "nonce_management": {
+        "strategy": "sequential",
+        "replacement": "speed_up",
+        "timeout": "20 minutes"
+    },
+    "gas_strategy": {
+        "low": {"maxFeePerGas": "auto", "maxPriorityFeePerGas": "1 gwei"},
+        "medium": {"maxFeePerGas": "auto", "maxPriorityFeePerGas": "2 gwei"},
+        "high": {"maxFeePerGas": "auto", "maxPriorityFeePerGas": "5 gwei"}
+    },
+    "batching": {
+        "enabled": True,
+        "max_batch_size": 100,
+        "timeout": "5 minutes"
+    }
+}
+```
+
+## Monitoring & Alerting
+
+### On-Chain Monitoring
+
+```python
+ON_CHAIN_MONITORING = {
+    "contracts": {
+        "balance_changes": True,
+        "large_transactions": {"threshold": "100 ETH"},
+        "unusual_activity": True
+    },
+    "wallets": {
+        "outgoing_transfers": True,
+        "token_approvals": True,
+        "smart_contract_interactions": True
+    },
+    "market_data": {
+        "price_alerts": {"threshold": "5% change"},
+        "volume_alerts": {"threshold": "100% increase"},
+        "liquidity_alerts": {"threshold": "50% decrease"}
+    }
+}
+```
+
+### Alert Configuration
+
+```python
+ALERT_CONFIGURATION = {
+    "channels": {
+        "email": {"enabled": True, "recipients": ["team@company.com"]},
+        "slack": {"enabled": True, "webhook": "https://hooks.slack.com/..."},
+        "telegram": {"enabled": True, "chat_id": "123456789"}
+    },
+    "severity_levels": {
+        "critical": {"response_time": "5 minutes", "escalation": "immediate"},
+        "high": {"response_time": "15 minutes", "escalation": "1 hour"},
+        "medium": {"response_time": "1 hour", "escalation": "4 hours"},
+        "low": {"response_time": "4 hours", "escalation": "24 hours"}
+    }
+}
+```
+
+## Troubleshooting Advanced
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Transaction stuck | Low gas price | Speed up with higher gas |
+| Nonce too high | Pending transaction | Reset nonce or wait |
+| Contract interaction failed | Insufficient gas | Increase gas limit |
+| Front-running detected | Predictable transaction | Use commit-reveal scheme |
+| Oracle manipulation | Single price source | Use multiple oracles |
+| Flash loan attack | Insufficient validation | Add time-lock and checks |
+
+### Debug Tools
+
+```python
+DEBUG_TOOLS = {
+    "tenderly": {
+        "usage": "Transaction simulation and debugging",
+        "features": ["stack trace", "state diff", "gas profiling"]
+    },
+    "hardhat": {
+        "usage": "Local development and testing",
+        "features": ["console.log", "stack traces", "forking"]
+    },
+    "foundry": {
+        "usage": "Fast testing and fuzzing",
+        "features": ["fuzz testing", "invariant testing", "gas snapshots"]
+    },
+    "etherscan": {
+        "usage": "Contract verification and interaction",
+        "features": ["read/write contract", "event logs", "bytecode"]
+    }
+}
+```
+
+## Contributing Guidelines
+
+### Development Workflow
+
+```bash
+# 1. Fork and clone
+git clone https://github.com/your-org/awesome-grok-skills.git
+
+# 2. Create feature branch
+git checkout -b feature/amazing-feature
+
+# 3. Install development dependencies
+pip install -r requirements-dev.txt
+
+# 4. Run tests
+pytest tests/ -v
+
+# 5. Run linter
+ruff check agents/blockchain/
+
+# 6. Run type checker
+mypy agents/blockchain/
+
+# 7. Commit changes
+git commit -m 'Add amazing feature'
+
+# 8. Push to branch
+git push origin feature/amazing-feature
+
+# 9. Create Pull Request
+```
+
+### Code Standards
+
+```python
+# Code style
+- Follow PEP 8
+- Use type hints
+- Write docstrings for all public functions
+- Keep functions under 50 lines
+- Maximum line length: 88 characters
+
+# Smart Contract Standards
+- Follow Solidity style guide
+- Use NatSpec documentation
+- Write comprehensive tests
+- Perform security audit
+- Verify on block explorer
+
+# Testing
+- Write unit tests for all new features
+- Maintain >90% test coverage
+- Use pytest fixtures
+- Mock external dependencies
+```

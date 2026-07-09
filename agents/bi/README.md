@@ -659,3 +659,428 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: [docs.example.com](https://docs.example.com)
 - **Issues**: [GitHub Issues](https://github.com/awesome-grok-skills/agents/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/awesome-grok-skills/agents/discussions)
+
+## Advanced Usage
+
+### Custom Visualization Components
+
+```python
+# Create custom visualization
+class HeatmapWidget(VisualizationWidget):
+    def __init__(self, data, color_scale="viridis"):
+        self.data = data
+        self.color_scale = color_scale
+    
+    def render(self):
+        return {
+            "type": "heatmap",
+            "data": self.data,
+            "color_scale": self.color_scale,
+            "interactive": True
+        }
+
+# Register custom widget
+agent.visualization.register_widget("heatmap", HeatmapWidget)
+```
+
+### Advanced Query Builder
+
+```python
+# Complex query construction
+query = (agent.query_builder
+    .select("date", "revenue", "orders")
+    .from_table("fact_orders")
+    .where("date >= '2024-01-01'")
+    .where("region = 'US'")
+    .group_by("date")
+    .having("SUM(revenue) > 10000")
+    .order_by("revenue", descending=True)
+    .limit(100)
+    .build())
+
+result = agent.query_executor.execute(query)
+```
+
+### Dashboard Templates
+
+```python
+# Create reusable dashboard template
+template = agent.dashboard_designer.create_template(
+    name="E-commerce Executive",
+    description="Executive dashboard for e-commerce metrics",
+    widgets=[
+        {"type": "kpi_card", "title": "Daily Revenue", "metric": "daily_revenue"},
+        {"type": "kpi_card", "title": "Conversion Rate", "metric": "conversion_rate"},
+        {"type": "line_chart", "title": "Revenue Trend", "metric": "revenue_trend"},
+        {"type": "bar_chart", "title": "Top Products", "metric": "product_performance"},
+        {"type": "pie_chart", "title": "Traffic Sources", "metric": "traffic_sources"},
+        {"type": "table", "title": "Recent Orders", "columns": ["Order ID", "Amount", "Status"]}
+    ],
+    layout="grid",
+    theme="corporate"
+)
+
+# Apply template
+dashboard_id = agent.dashboard_designer.create_from_template(
+    template_id=template['template_id'],
+    name="Q1 2024 Executive Dashboard",
+    owner="CFO"
+)
+```
+
+### Automated Insights
+
+```python
+# Generate automated insights
+insights = agent.analytics.generate_insights(
+    metrics=["revenue", "conversion_rate", "customer_acquisition_cost"],
+    date_range={"start": "2024-01-01", "end": "2024-01-31"},
+    insight_types=["trend", "anomaly", "correlation"]
+)
+
+for insight in insights['insights']:
+    print(f"Insight: {insight['description']}")
+    print(f"Confidence: {insight['confidence']:.2f}")
+    print(f"Action: {insight['recommended_action']}")
+```
+
+## Performance Tuning
+
+### Query Optimization
+
+```python
+# Analyze query performance
+analysis = agent.performance.analyze_query(
+    query="SELECT date, SUM(revenue) FROM fact_orders GROUP BY date",
+    explain_plan=True
+)
+
+print(f"Execution time: {analysis['execution_time_ms']} ms")
+print(f"Rows scanned: {analysis['rows_scanned']}")
+print(f"Indexes used: {analysis['indexes_used']}")
+print(f"Optimization suggestions: {analysis['suggestions']}")
+```
+
+### Caching Strategies
+
+```python
+# Configure caching
+agent.performance.configure_cache(
+    cache_type="redis",
+    ttl=300,
+    strategy="write-through",
+    invalidation_rules=[
+        {"event": "data_update", "pattern": "orders:*"},
+        {"event": "schema_change", "pattern": "*"}
+    ]
+)
+
+# Warm cache
+agent.performance.warm_cache(
+    queries=[
+        "SELECT * FROM daily_revenue WHERE date = CURRENT_DATE",
+        "SELECT * FROM top_products LIMIT 10"
+    ]
+)
+```
+
+### Connection Pooling
+
+```python
+# Configure connection pooling
+agent.database.configure_pool(
+    min_connections=5,
+    max_connections=20,
+    idle_timeout=300,
+    connection_timeout=10,
+    retry_attempts=3
+)
+```
+
+## Security Considerations
+
+### Role-Based Access Control
+
+```python
+# Define roles and permissions
+roles = {
+    "viewer": {
+        "permissions": ["read:dashboards", "read:reports", "read:kpis"],
+        "data_access": "own_department"
+    },
+    "analyst": {
+        "permissions": ["read:*", "write:reports", "write:dashboards"],
+        "data_access": "all_departments"
+    },
+    "manager": {
+        "permissions": ["read:*", "write:*", "execute:*"],
+        "data_access": "all_departments",
+        "admin": ["manage_users", "configure_alerts"]
+    }
+}
+
+# Apply role to user
+agent.auth.assign_role(user_id="user_123", role="analyst")
+```
+
+### Data Masking
+
+```python
+# Configure data masking
+agent.security.configure_masking(
+    rules=[
+        {"column": "email", "strategy": "partial", "pattern": "***@***.com"},
+        {"column": "phone", "strategy": "hash", "algorithm": "sha256"},
+        {"column": "ssn", "strategy": "redact", "replacement": "XXX-XX-XXXX"}
+    ],
+    environments=["development", "staging"]
+)
+```
+
+### Audit Logging
+
+```python
+# Enable audit logging
+agent.security.enable_audit_logging(
+    events=[
+        "user.login",
+        "user.logout",
+        "data.access",
+        "data.modification",
+        "report.generation",
+        "dashboard.creation"
+    ],
+    retention_days=365,
+    storage="s3://audit-logs-bucket"
+)
+```
+
+## Integration Examples
+
+### Slack Integration
+
+```python
+# Send report to Slack
+agent.integration.slack.send_report(
+    webhook_url="https://hooks.slack.com/services/xxx",
+    report_id="report_123",
+    channel="#analytics",
+    message="Daily sales report ready"
+)
+
+# Send alert
+agent.integration.slack.send_alert(
+    webhook_url="https://hooks.slack.com/services/xxx",
+    channel="#alerts",
+    severity="critical",
+    message="KPI threshold breached: Conversion rate dropped below 2%"
+)
+```
+
+### Email Integration
+
+```python
+# Send report via email
+agent.integration.email.send_report(
+    to=["cfo@company.com", "analytics@company.com"],
+    report_id="report_123",
+    subject="Monthly Financial Report",
+    body="Please find attached the monthly financial report.",
+    attachments=["report.pdf", "data.xlsx"]
+)
+```
+
+### Webhook Integration
+
+```python
+# Configure webhooks
+agent.integration.webhooks.register(
+    endpoint="https://api.company.com/webhooks/bi",
+    events=["report.generated", "kpi.alert", "dashboard.updated"],
+    secret="webhook_secret_key",
+    retry_policy={"max_retries": 3, "backoff": "exponential"}
+)
+```
+
+## Monitoring & Troubleshooting
+
+### Health Check
+
+```python
+# Check system health
+health = agent.monitoring.health_check()
+print(f"Status: {health['status']}")
+print(f"Components: {health['components']}")
+print(f"Uptime: {health['uptime']}")
+
+# Check specific component
+db_health = agent.monitoring.check_component("database")
+print(f"Database status: {db_health['status']}")
+print(f"Connection pool: {db_health['connection_pool']}")
+```
+
+### Performance Monitoring
+
+```python
+# Monitor performance metrics
+metrics = agent.monitoring.get_metrics(
+    time_range="last_hour",
+    metrics=["api_latency", "error_rate", "throughput", "cache_hit_rate"]
+)
+
+for metric, value in metrics.items():
+    print(f"{metric}: {value}")
+```
+
+### Debug Mode
+
+```python
+# Enable debug logging
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Enable detailed tracing
+agent.monitoring.enable_tracing(
+    sample_rate=1.0,
+    export_to="jaeger"
+)
+```
+
+## Deployment Options
+
+### Docker Deployment
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+### Kubernetes Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bi-agent
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bi-agent
+  template:
+    metadata:
+      labels:
+        app: bi-agent
+    spec:
+      containers:
+        - name: bi-agent
+          image: bi-agent:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: bi-secrets
+                  key: database-url
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+```
+
+### Terraform Deployment
+
+```hcl
+resource "aws_ecs_service" "bi_agent" {
+  name            = "bi-agent"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.bi_agent.arn
+  desired_count   = 3
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets         = aws_subnet.private[*].id
+    security_groups = [aws_security_group.bi_agent.id]
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.bi_agent.arn
+    container_name   = "bi-agent"
+    container_port   = 8000
+  }
+}
+```
+
+## Contributing Guidelines
+
+### Development Workflow
+
+```bash
+# 1. Fork and clone
+git clone https://github.com/your-org/awesome-grok-skills.git
+
+# 2. Create feature branch
+git checkout -b feature/amazing-feature
+
+# 3. Install development dependencies
+pip install -r requirements-dev.txt
+
+# 4. Run tests
+pytest tests/ -v
+
+# 5. Run linter
+ruff check agents/bi/
+
+# 6. Run type checker
+mypy agents/bi/
+
+# 7. Commit changes
+git commit -m 'Add amazing feature'
+
+# 8. Push to branch
+git push origin feature/amazing-feature
+
+# 9. Create Pull Request
+```
+
+### Code Standards
+
+```python
+# Code style
+- Follow PEP 8
+- Use type hints
+- Write docstrings for all public functions
+- Keep functions under 50 lines
+- Maximum line length: 88 characters
+
+# Testing
+- Write unit tests for all new features
+- Maintain >90% test coverage
+- Use pytest fixtures
+- Mock external dependencies
+
+# Documentation
+- Update README.md for new features
+- Add API documentation
+- Include usage examples
+```
