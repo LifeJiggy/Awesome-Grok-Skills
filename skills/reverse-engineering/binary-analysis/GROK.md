@@ -1,44 +1,44 @@
----
-name: "Binary Analysis"
-version: "1.0.0"
-description: "Binary analysis and reverse engineering tools"
-author: "Awesome Grok Skills"
-license: "MIT"
-tags: ["binary-analysis", "reverse-engineering", "disassembly", "packing-detection"]
+﻿---
+name: "binary-analysis"
 category: "reverse-engineering"
-personality: "binary-analyst"
-use_cases: ["binary-inspection", "protection-analysis", "function-identification"]
+version: "1.0.0"
+tags: ["reverse-engineering", "binary-analysis"]
 ---
 
-# Binary Analysis 🔬
-
-> Analyze binaries with Grok's detailed structural understanding
+# Binary Analysis
 
 ## Overview
 
-Comprehensive binary analysis tools for reverse engineering and security research.
+Comprehensive binary-analysis capabilities within the reverse-engineering domain. This module provides tools, frameworks, and best practices for binary-analysis operations.
 
-## Resources
+## Core Capabilities
 
-| Resource | Type | Description |
-|----------|------|-------------|
-| `binary_analysis.py` | Module | Binary analysis tools |
-| `signatures.yaml` | Data | Packing and protection signatures |
-| `archs.json` | Data | Architecture specifications |
+- Configuration and setup
+- Data processing and analysis
+- Integration with related systems
+- Monitoring and observability
+- Best practices and patterns
 
-## Quick Start
+## Usage
 
 ```python
-from binary_analysis import BinaryAnalyzer
+from binary-analysis import _module
 
-analyzer = BinaryAnalyzer()
-
-# Analyze binary
-info = analyzer.analyze("/path/to/binary")
-
-# Get protections
-protections = analyzer.get_protections(info)
-
-# Extract strings
-strings = analyzer.extract_strings("/path/to/binary")
+engine = _module.Engine()
+engine.configure()
+results = engine.run()
+print(results)
 ```
+
+## Best Practices
+
+- Follow security guidelines
+- Implement proper error handling
+- Use configuration management
+- Monitor performance metrics
+- Document API interfaces
+
+## Related Modules
+
+- Other modules in reverse-engineering domain
+- Integration points with external systems

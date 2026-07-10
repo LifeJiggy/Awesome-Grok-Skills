@@ -1,41 +1,49 @@
----
-name: "Penetration Testing"
-version: "1.0.0"
-description: "Penetration testing methodologies and tools"
-author: "Awesome Grok Skills"
-license: "MIT"
-tags: ["penetration-testing", "pentest", "exploitation", "security-testing"]
+﻿---
+name: "penetration-testing"
 category: "redteam"
-personality: "security-tester"
-use_cases: ["vulnerability-assessment", "exploitation", "security-testing"]
+version: "1.0.0"
+tags: ["redteam", "penetration-testing"]
 ---
 
-# Penetration Testing 🎯
-
-> Execute penetration tests with Grok's systematic methodology
+# 
 
 ## Overview
 
-Comprehensive penetration testing methodology and tool integration.
+Comprehensive penetration-testing capabilities within the redteam domain. This module provides tools, frameworks, and best practices for penetration-testing operations.
 
-## Resources
+## Core Capabilities
 
-| Resource | Type | Description |
-|----------|------|-------------|
-| `pentest.py` | Module | Pentest methodology and tools |
-| `checklists.yaml` | Data | Testing checklists |
-| `exploits.json` | Data | Exploit database |
+- Configuration and setup
+- Data processing and analysis
+- Integration with related systems
+- Monitoring and observability
+- Best practices and patterns
 
-## Quick Start
+## Usage
 
-```python
-from pentest import PenetrationTester
+`python
+from penetration-testing import _module
 
-pentester = PenetrationTester()
+# Initialize
+engine = _module.Engine()
 
-# Execute assessment
-results = pentester.assess_target("192.168.1.0/24")
+# Configure
+engine.configure()
 
-# Generate report
-report = pentester.generate_report(results)
-```
+# Execute
+results = engine.run()
+print(results)
+`
+
+## Best Practices
+
+- Follow security guidelines
+- Implement proper error handling
+- Use configuration management
+- Monitor performance metrics
+- Document API interfaces
+
+## Related Modules
+
+- Other modules in redteam domain
+- Integration points with external systems
