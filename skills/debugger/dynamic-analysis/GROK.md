@@ -1,44 +1,44 @@
----
-name: "Dynamic Analysis"
-version: "1.0.0"
-description: "Dynamic program analysis and debugging tools"
-author: "Awesome Grok Skills"
-license: "MIT"
-tags: ["dynamic-analysis", "debugging", "instrumentation", "tracing"]
+﻿---
+name: "dynamic-analysis"
 category: "debugger"
-personality: "dynamic-analyst"
-use_cases: ["execution-tracing", "instrumentation", "taint-tracking"]
+version: "1.0.0"
+tags: ["debugger", "dynamic-analysis"]
 ---
 
-# Dynamic Analysis 🔧
-
-> Analyze programs dynamically with Grok's detailed tracing
+# Dynamic Analysis
 
 ## Overview
 
-Dynamic analysis tools for execution tracing and program behavior analysis.
+Comprehensive dynamic-analysis capabilities within the debugger domain. This module provides tools, frameworks, and best practices for dynamic-analysis operations.
 
-## Resources
+## Core Capabilities
 
-| Resource | Type | Description |
-|----------|------|-------------|
-| `debugging.py` | Module | Dynamic analysis and debugging tools |
-| `hooks.yaml` | Data | Function hook definitions |
-| `tracers.py` | Module | Execution tracing utilities |
+- Configuration and setup
+- Data processing and analysis
+- Integration with related systems
+- Monitoring and observability
+- Best practices and patterns
 
-## Quick Start
+## Usage
 
 ```python
-from dynamic_analysis import DynamicAnalyzer
+from dynamic-analysis import _module
 
-analyzer = DynamicAnalyzer()
-
-# Instrument binary
-instrumented = analyzer.instrument("/path/to/binary")
-
-# Trace execution
-trace = analyzer.trace_execution(instrumented, input_data)
-
-# Analyze results
-analysis = analyzer.analyze_trace(trace)
+engine = _module.Engine()
+engine.configure()
+results = engine.run()
+print(results)
 ```
+
+## Best Practices
+
+- Follow security guidelines
+- Implement proper error handling
+- Use configuration management
+- Monitor performance metrics
+- Document API interfaces
+
+## Related Modules
+
+- Other modules in debugger domain
+- Integration points with external systems

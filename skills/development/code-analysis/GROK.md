@@ -1,44 +1,49 @@
----
-name: "Code Analysis"
-version: "1.0.0"
-description: "Static code analysis and quality assurance"
-author: "Awesome Grok Skills"
-license: "MIT"
-tags: ["code-analysis", "static-analysis", "quality", "refactoring"]
+﻿---
+name: "code-analysis"
 category: "development"
-personality: "code-analyst"
-use_cases: ["code-quality", "security-scanning", "refactoring"]
+version: "1.0.0"
+tags: ["development", "code-analysis"]
 ---
 
-# Code Analysis 📊
-
-> Analyze code quality with Grok's systematic precision
+# 
 
 ## Overview
 
-Static code analysis tools for quality assurance and security scanning.
+Comprehensive code-analysis capabilities within the development domain. This module provides tools, frameworks, and best practices for code-analysis operations.
 
-## Resources
+## Core Capabilities
 
-| Resource | Type | Description |
-|----------|------|-------------|
-| `code_analysis.py` | Module | Static analysis engine |
-| `rules.yaml` | Data | Analysis rule definitions |
-| `patterns.json` | Data | Code pattern database |
+- Configuration and setup
+- Data processing and analysis
+- Integration with related systems
+- Monitoring and observability
+- Best practices and patterns
 
-## Quick Start
+## Usage
 
-```python
-from code_analysis import CodeAnalyzer
+`python
+from code-analysis import _module
 
-analyzer = CodeAnalyzer()
+# Initialize
+engine = _module.Engine()
 
-# Analyze source file
-results = analyzer.analyze("/path/to/source.py")
+# Configure
+engine.configure()
 
-# Get quality metrics
-metrics = analyzer.get_metrics(results)
+# Execute
+results = engine.run()
+print(results)
+`
 
-# Generate refactoring suggestions
-suggestions = analyzer.suggest_refactoring(results)
-```
+## Best Practices
+
+- Follow security guidelines
+- Implement proper error handling
+- Use configuration management
+- Monitor performance metrics
+- Document API interfaces
+
+## Related Modules
+
+- Other modules in development domain
+- Integration points with external systems

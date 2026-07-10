@@ -1,44 +1,44 @@
----
-name: "Threat Intelligence"
-version: "1.0.0"
-description: "Advanced threat intelligence collection and analysis"
-author: "Awesome Grok Skills"
-license: "MIT"
-tags: ["threat-intelligence", "ioc", "apt", "adversary"]
+﻿---
+name: "threat-intelligence"
 category: "hunting"
-personality: "intel-analyst"
-use_cases: ["ioc-collection", "threat-mapping", "adversary-tracking"]
+version: "1.0.0"
+tags: ["hunting", "threat-intelligence"]
 ---
 
-# Threat Intelligence 🔍
-
-> Collect and analyze threat intelligence with Grok's analytical precision
+# Threat Intelligence
 
 ## Overview
 
-This skill provides comprehensive threat intelligence capabilities for hunting and analysis.
+Comprehensive threat-intelligence capabilities within the hunting domain. This module provides tools, frameworks, and best practices for threat-intelligence operations.
 
-## Resources
+## Core Capabilities
 
-| Resource | Type | Description |
-|----------|------|-------------|
-| `threat_intel.py` | Module | Threat intelligence collection and analysis |
-| `indicators.yaml` | Data | IOC database and mappings |
-| `ttps.json` | Data | MITRE ATT&CK TTPs mapping |
+- Configuration and setup
+- Data processing and analysis
+- Integration with related systems
+- Monitoring and observability
+- Best practices and patterns
 
-## Quick Start
+## Usage
 
 ```python
-from threat_intel import ThreatIntelligence
+from threat-intelligence import _module
 
-intel = ThreatIntelligence()
-
-# Collect IOCs
-indicators = intel.collect_from_feed("https://feed.example.com/iocs")
-
-# Enrich with context
-enriched = intel.enrich_indicators(indicators)
-
-# Map to TTPs
-ttps_mapped = intel.map_to_attack(enriched)
+engine = _module.Engine()
+engine.configure()
+results = engine.run()
+print(results)
 ```
+
+## Best Practices
+
+- Follow security guidelines
+- Implement proper error handling
+- Use configuration management
+- Monitor performance metrics
+- Document API interfaces
+
+## Related Modules
+
+- Other modules in hunting domain
+- Integration points with external systems
