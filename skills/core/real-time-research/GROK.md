@@ -4,7 +4,7 @@ category: core
 difficulty: intermediate
 time_estimate: "1-3 hours"
 dependencies: ["node-fetch", "cheerio", "twitter-api-v2"]
-tags: ["research", "web-scraping", "twitter", "real-time", "data"]
+tags: ["research", "web-scraping", "twitter", "xquik", "real-time", "data"]
 grok_personality: "information-oracle"
 description: "Leverage Grok's X/Twitter integration and web search capabilities to gather real-time market data, trends, and validation signals"
 ---
@@ -183,6 +183,46 @@ class CompetitorMonitor {
 ```
 
 ## Data Sources Integration
+
+### Xquik Read-Only Research
+
+Use Xquik when the task needs structured X data without adding an SDK
+dependency. Keep the API key in the environment and start with read-only
+endpoints. The examples below return JSON that can feed the existing trend,
+sentiment, and competitor-analysis patterns in this skill.
+
+```bash
+export XQUIK_API_KEY="your-api-key"
+```
+
+#### Example 1: Search Recent Posts
+
+```bash
+curl 'https://xquik.com/api/v1/x/tweets/search?q=open%20source%20agents&limit=20' \
+  -H "X-API-Key: ${XQUIK_API_KEY}"
+```
+
+#### Example 2: Fetch a Public Profile
+
+```bash
+export X_USERNAME="github"
+curl "https://xquik.com/api/v1/x/users/${X_USERNAME}" \
+  -H "X-API-Key: ${XQUIK_API_KEY}"
+```
+
+#### Example 3: Compare Worldwide Trends
+
+```bash
+curl 'https://xquik.com/api/v1/trends?woeid=1&count=10' \
+  -H "X-API-Key: ${XQUIK_API_KEY}"
+```
+
+For agent-native access, the same account can connect through the remote MCP
+server at `https://xquik.com/mcp`. Review the
+[Xquik MCP overview](https://docs.xquik.com/mcp/overview) before enabling it.
+
+Keep research collection read-only by default. Ask for explicit approval before
+using write endpoints, persistent monitors, webhooks, or private account data.
 
 ### Twitter/X API Setup
 ```javascript
