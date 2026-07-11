@@ -10,6 +10,36 @@
   - `"(web3 OR crypto) -is:retweet lang:en`
   - `"next.js" OR "react" OR "node.js" -is:retweet`
 
+### Xquik Read-Only API
+
+- **Endpoint**: `https://xquik.com/api/v1`
+- **Authentication**: `X-API-Key` header
+- **Use Cases**: Structured post search, public profile research, and trend comparison
+- **Agent Access**: Remote MCP server at `https://xquik.com/mcp`
+
+Keep collection read-only by default. Require explicit approval before enabling
+writes, persistent monitors, webhooks, or private account access.
+
+```bash
+export XQUIK_API_KEY="your-api-key"
+
+# Search recent public posts
+curl 'https://xquik.com/api/v1/x/tweets/search?q=open%20source%20agents&limit=20' \
+  -H "X-API-Key: ${XQUIK_API_KEY}"
+
+# Fetch a public profile
+export X_USERNAME="github"
+curl "https://xquik.com/api/v1/x/users/${X_USERNAME}" \
+  -H "X-API-Key: ${XQUIK_API_KEY}"
+
+# Compare worldwide trends
+curl 'https://xquik.com/api/v1/trends?woeid=1&count=10' \
+  -H "X-API-Key: ${XQUIK_API_KEY}"
+```
+
+See the [Xquik MCP overview](https://docs.xquik.com/mcp/overview) for
+agent-native setup and tool discovery.
+
 ### Reddit API
 - **Endpoint**: `https://www.reddit.com/r/{subreddit}/hot.json`
 - **Rate Limit**: 60 requests/minute
