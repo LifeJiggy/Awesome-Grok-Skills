@@ -215,6 +215,10 @@ celerybeat.pid
 # mkdocs documentation
 /site
 
+.mimocode/
+old
+
+
 # mypy
 .mypy_cache/
 .dmypy.json

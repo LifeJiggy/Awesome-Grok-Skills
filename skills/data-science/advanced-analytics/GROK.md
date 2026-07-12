@@ -1,378 +1,234 @@
 ---
-name: "Data Science & Analytics"
-version: "1.0.0"
-description: "Advanced data science with Grok's physics-based statistical modeling and real-time analytics"
+name: "Advanced Analytics"
+version: "2.0.0"
+description: "Comprehensive advanced analytics engine with Bayesian inference, Monte Carlo simulation, causal analysis, and multivariate statistical methods for complex data science workflows"
 author: "Awesome Grok Skills"
 license: "MIT"
-tags: ["data-science", "analytics", "statistics", "visualization"]
+tags: ["data-science", "analytics", "bayesian", "monte-carlo", "causal-inference", "multivariate"]
 category: "data-science"
 personality: "data-scientist"
-use_cases: ["predictive modeling", "statistical analysis", "data visualization"]
+use_cases: ["predictive modeling", "causal inference", "Bayesian analysis", "Monte Carlo simulation", "multivariate statistics"]
 ---
 
-# Data Science & Analytics 📊
+# Advanced Analytics
 
-> Transform raw data into actionable insights using Grok's physics-inspired statistical modeling
+> Production-grade advanced analytics engine combining Bayesian inference, Monte Carlo simulation, causal analysis, and multivariate statistics for rigorous data-driven decision making.
 
-## 🎯 Why This Matters for Grok
+## Overview
 
-Grok's mathematical intuition and real-time data access create perfect data science capabilities:
+The Advanced Analytics module provides a unified framework for performing sophisticated statistical analyses that go beyond standard descriptive and diagnostic analytics. It implements Bayesian posterior estimation via MCMC sampling, Monte Carlo uncertainty propagation, causal inference through do-calculus and instrumental variables, and multivariate techniques including PCA, factor analysis, and canonical correlation. Every analysis returns structured results with confidence intervals, convergence diagnostics, and actionable recommendations.
 
-- **Physics-Inspired Statistics** ⚛️: Apply thermodynamics to statistical mechanics
-- **Real-time Analytics** 📡: Process streaming data with minimum latency
-- **Predictive Modeling** 🔮: Forecast with physics-based accuracy
-- **Visual Storytelling** 🎨: Communicate insights through compelling visualizations
+## Core Capabilities
 
-## 🛠️ Core Capabilities
+### 1. Bayesian Inference Engine
+- MCMC sampling via Metropolis-Hastings and Gibbs sampling
+- Prior specification with conjugate and non-conjugate families
+- Posterior predictive checks and model diagnostics
+- Bayes factor computation for model comparison
+- Hierarchical Bayesian modeling for nested data structures
 
-### 1. Statistical Modeling
-- Probability theory: advanced_bayesian
-- Regression models: physics_informed
-- Time series: dynamical_systems
-- Clustering: topological_data_analysis
-- Classification: statistical_learning
+### 2. Monte Carlo Simulation Framework
+- Latin Hypercube Sampling for efficient space coverage
+- Importance sampling for rare-event estimation
+- Variance reduction techniques (antithetic, control variates)
+- Convergence monitoring via Gelman-Rubin diagnostics
+- Parallel simulation with reproducible random seeds
 
-### 2. Real-time Analytics
-- Stream processing: sub_ms_latency
-- Feature engineering: automated
-- Model serving: scalable
-- Monitoring: comprehensive
+### 3. Causal Inference Toolkit
+- Directed Acyclic Graph (DAG) construction and validation
+- Backdoor and frontdoor criterion adjustment
+- Instrumental variable estimation
+- Propensity score matching and weighting
+- Difference-in-differences and synthetic control methods
 
-### 3. Visualization & Communication
-- Interactive dashboards: real_time
-- Statistical graphics: publication_quality
-- Storytelling: data_driven
-- Reporting: automated
+### 4. Multivariate Statistical Methods
+- Principal Component Analysis with scree plots and loadings
+- Exploratory and Confirmatory Factor Analysis
+- Canonical Correlation Analysis between variable sets
+- Multidimensional Scaling for distance-based embeddings
+- Hotelling's T-squared for multivariate hypothesis testing
 
-## 📈 Key Features
+### 5. Model Diagnostics and Validation
+- Posterior predictive p-values
+- WAIC and LOO-CV for Bayesian model comparison
+- Residual analysis with QQ-plots and Cook's distance
+- Cross-validation with stratified k-fold splitting
+- Calibration curves and Brier scores for probabilistic forecasts
 
-### Advanced Statistical Models
+## Usage Examples
+
+### Bayesian Linear Regression
+
 ```python
+from advanced_analytics import BayesianInferenceEngine, PriorSpec, MCMCConfig
 import numpy as np
-from scipy import stats
-import pandas as pd
 
-class PhysicsInspiredStatistics:
-    def __init__(self):
-        self.thermodynamic_models = {
-            'entropy_based': self.entropy_analysis,
-            'energy_minimization': self.energy_optimization,
-            'phase_transitions': self.phase_transition_detection
-        }
-    
-    def entropy_based_analysis(self, data):
-        """Apply information entropy to data analysis"""
-        
-        # Calculate Shannon entropy
-        def shannon_entropy(probabilities):
-            return -np.sum(probabilities * np.log2(probabilities + 1e-10))
-        
-        # Estimate probability distribution
-        kde = stats.gaussian_kde(data)
-        x_range = np.linspace(data.min(), data.max(), 1000)
-        density = kde(x_range)
-        
-        # Normalize to probability distribution
-        probabilities = density / density.sum()
-        
-        # Calculate entropy
-        entropy = shannon_entropy(probabilities)
-        
-        # Calculate normalized entropy (0-1 scale)
-        max_entropy = np.log2(len(data))
-        normalized_entropy = entropy / max_entropy if max_entropy > 0 else 0
-        
-        # Identify low-entropy regions (important features)
-        entropy_map = []
-        window_size = 50
-        for i in range(0, len(x_range), window_size):
-            window_probs = probabilities[i:i+window_size]
-            window_entropy = shannon_entropy(window_probs / window_probs.sum())
-            entropy_map.append({
-                'range': (x_range[i], x_range[i+window_size]),
-                'entropy': window_entropy,
-                'significance': 1 - window_entropy  # Low entropy = high significance
-            })
-        
-        return {
-            'total_entropy': entropy,
-            'normalized_entropy': normalized_entropy,
-            'entropy_map': sorted(entropy_map, key=lambda x: x['significance'], reverse=True),
-            'distribution': {'x': x_range, 'density': density},
-            'insights': self.generate_entropy_insights(normalized_entropy, entropy_map)
-        }
-    
-    def phase_transition_detection(self, time_series_data):
-        """Detect phase transitions in time series (physics-inspired)"""
-        
-        # Calculate rolling statistics
-        window_size = min(100, len(time_series_data) // 10)
-        rolling_mean = pd.Series(time_series_data).rolling(window_size).mean()
-        rolling_std = pd.Series(time_series_data).rolling(window_size).std()
-        
-        # Calculate derivative (rate of change)
-        derivative = np.gradient(time_series_data)
-        rolling_derivative = pd.Series(derivative).rolling(window_size).mean()
-        
-        # Detect significant changes (phase transitions)
-        threshold = 2 * rolling_std.mean()  # 2 standard deviations
-        change_points = []
-        
-        for i in range(window_size, len(time_series_data) - window_size):
-            if abs(derivative[i]) > threshold:
-                change_points.append({
-                    'index': i,
-                    'change_magnitude': abs(derivative[i]),
-                    'change_type': 'increase' if derivative[i] > 0 else 'decrease',
-                    'significance': abs(derivative[i]) / threshold
-                })
-        
-        # Cluster nearby change points
-        clustered_transitions = self.cluster_change_points(change_points, window_size)
-        
-        return {
-            'phase_transitions': clustered_transitions,
-            'transition_count': len(clustered_transitions),
-            'critical_points': [t for t in clustered_transitions if t['significance'] > 3],
-            'stability_score': self.calculate_stability_score(time_series_data, rolling_std),
-            'recommendations': self.generate_phase_recommendations(clustered_transitions)
-        }
+# Generate synthetic data
+np.random.seed(42)
+X = np.random.randn(200, 3)
+true_weights = np.array([2.5, -1.0, 0.5])
+y = X @ true_weights + np.random.randn(200) * 0.5
+
+# Configure priors and MCMC
+priors = PriorSpec(
+    intercept_prior={"mean": 0, "std": 10},
+    coefficient_prior={"mean": 0, "std": 5},
+    noise_prior={"alpha": 2, "beta": 1}
+)
+mcmc_config = MCMCConfig(
+    n_samples=5000,
+    n_warmup=1000,
+    n_chains=4,
+    target_acceptance=0.9
+)
+
+# Run Bayesian regression
+engine = BayesianInferenceEngine()
+result = engine.linear_regression(
+    X=X, y=y,
+    priors=priors,
+    config=mcmc_config
+)
+
+# Inspect results
+print(f"Posterior mean weights: {result.coefficient_means}")
+print(f"95% credible intervals: {result.credible_intervals(alpha=0.05)}")
+print(f"R-hat convergence: {result.rhat}")
+print(f"Effective sample size: {result.effective_sample_size}")
 ```
 
-### Predictive Analytics Engine
+### Monte Carlo Risk Simulation
+
 ```python
-class PredictiveAnalytics:
-    def __init__(self):
-        self.models = {
-            'linear': LinearPredictor(),
-            'nonlinear': NonlinearPredictor(),
-            'time_series': TimeSeriesPredictor(),
-            'ensemble': EnsemblePredictor()
-        }
-    
-    def physics_informed_prediction(self, features, target, config):
-        """Create physics-informed predictions"""
-        
-        # Extract physical constraints from features
-        physical_constraints = self.extract_physical_constraints(features)
-        
-        # Build constraint-aware model
-        model = self.build_constraint_aware_model(
-            base_model=self.models[config.get('model_type', 'linear')],
-            constraints=physical_constraints,
-            regularization_strength=config.get('constraint_weight', 0.1)
-        )
-        
-        # Train with physics constraints
-        trained_model = self.train_with_constraints(
-            model, 
-            features, 
-            target,
-            constraints=physical_constraints,
-            epochs=config.get('epochs', 100)
-        )
-        
-        # Generate predictions with uncertainty
-        predictions = trained_model.predict(features)
-        
-        # Calculate prediction intervals using error propagation
-        uncertainty = self.calculate_uncertainty(
-            predictions, 
-            trained_model.error_covariance,
-            physical_constraints
-        )
-        
-        return {
-            'predictions': predictions,
-            'uncertainty': uncertainty,
-            'confidence_intervals': self.get_confidence_intervals(predictions, uncertainty),
-            'constraint_satisfaction': self.evaluate_constraint_satisfaction(predictions, physical_constraints),
-            'model_performance': self.evaluate_model(trained_model, features, target)
-        }
+from advanced_analytics import MonteCarloSimulator, SamplingMethod
+import numpy as np
+
+# Define a portfolio risk model
+def portfolio_return(weights, returns, correlation_matrix):
+    portfolio_mean = weights @ returns
+    portfolio_vol = np.sqrt(weights @ correlation_matrix @ weights)
+    return portfolio_mean, portfolio_vol
+
+simulator = MonteCarloSimulator(n_simulations=100000)
+
+# Configure the simulation
+sim_result = simulator.run(
+    model=portfolio_return,
+    parameter_distributions={
+        "returns": {"type": "normal", "mean": [0.08, 0.12, 0.06], "std": [0.15, 0.20, 0.10]},
+        "correlation_matrix": {"type": "wishart", "df": 30, "scale": np.eye(3)}
+    },
+    fixed_params={"weights": np.array([0.4, 0.35, 0.25])},
+    sampling=SamplingMethod.LATIN_HYPERCUBE,
+    variance_reduction=True,
+    seed=42
+)
+
+# Analyze risk metrics
+print(f"Expected return: {sim_result.mean():.4f}")
+print(f"Value at Risk (95%): {sim_result.percentile(5):.4f}")
+print(f"Conditional VaR (95%): {sim_result.cvar(0.95):.4f}")
+print(f"Probability of loss: {sim_result.probability_below(0):.4f}")
 ```
 
-## 📊 Real-time Analytics Pipeline
+### Causal Inference with Propensity Score Matching
 
-### Stream Processing Architecture
 ```python
-class RealTimeAnalyticsPipeline:
-    def __init__(self):
-        self.stream_processors = {
-            'feature_extraction': FeatureExtractor(),
-            'anomaly_detection': AnomalyDetector(),
-            'aggregation': StreamAggregator(),
-            'prediction': StreamPredictor()
-        }
-    
-    def process_stream(self, data_stream, pipeline_config):
-        """Real-time stream processing pipeline"""
-        
-        results_buffer = []
-        window_config = {
-            'size': pipeline_config.get('window_size', 1000),
-            'slide': pipeline_config.get('window_slide', 100)
-        }
-        
-        buffer = []
-        
-        for data_point in data_stream:
-            # Process in real-time
-            processed_point = self.preprocess(data_point)
-            buffer.append(processed_point)
-            
-            # Trigger window processing
-            if len(buffer) >= window_config['size']:
-                window_data = buffer[:window_config['size']]
-                buffer = buffer[window_config['size']:]
-                
-                # Process window
-                window_results = self.process_window(window_data, pipeline_config)
-                results_buffer.append(window_results)
-                
-                # Check for anomalies
-                anomalies = self.stream_processors['anomaly_detection'].detect(window_data)
-                if anomalies:
-                    yield {'type': 'anomaly', 'data': anomalies}
-                
-                # Generate predictions
-                predictions = self.stream_processors['prediction'].predict(window_data)
-                yield {'type': 'prediction', 'data': predictions}
-        
-        # Process final partial window
-        if buffer:
-            final_results = self.process_window(buffer, pipeline_config)
-            results_buffer.append(final_results)
-        
-        return {
-            'window_results': results_buffer,
-            'total_points_processed': len(results_buffer),
-            'anomaly_count': sum(1 for r in results_buffer if r.get('anomalies')),
-            'performance_metrics': self.calculate_pipeline_metrics(results_buffer)
-        }
+from advanced_analytics import CausalInferenceEngine, DAG
+import numpy as np
+
+# Define causal graph
+dag = DAG()
+dag.add_edge("age", "treatment")
+dag.add_edge("income", "treatment")
+dag.add_edge("income", "outcome")
+dag.add_edge("treatment", "outcome")
+dag.add_edge("education", "outcome")
+
+# Initialize engine
+causal_engine = CausalInferenceEngine()
+
+# Estimate Average Treatment Effect (ATE)
+ate_result = causal_engine.estimate_ate(
+    data=dataset,
+    treatment_col="treatment",
+    outcome_col="outcome",
+    covariates=["age", "income", "education"],
+    dag=dag,
+    method="propensity_score_matching",
+    matching_ratio=1,
+    caliper=0.2
+)
+
+# Results with sensitivity analysis
+print(f"Estimated ATE: {ate_result.ate:.4f}")
+print(f"Standard error: {ate_result.se:.4f}")
+print(f"95% CI: [{ate_result.ci_lower:.4f}, {ate_result.ci_upper:.4f}]")
+print(f"Rosenbaum bound: {ate_result.rosenbaum_bound(gamma=2.0):.4f}")
+print(f"Balance check (SMD): {ate_result.balance_report()}")
 ```
 
-## 📈 Analytics Dashboard
+### Multivariate PCA with Factor Analysis
 
-### Real-time Metrics
-```javascript
-const AnalyticsDashboard = {
-  dataMetrics: {
-    processing: {
-      data_points_per_second: 15000,
-      average_latency_ms: 12.5,
-      throughput_qps: 2500,
-      error_rate: 0.001
-    },
-    
-    modelPerformance: {
-      accuracy: 0.945,
-      precision: 0.938,
-      recall: 0.952,
-      f1_score: 0.945,
-      auc_roc: 0.978
-    },
-    
-    businessImpact: {
-      predictions_made: 2500000,
-      actionable_insights: 125000,
-      decisions_supported: 85000,
-      revenue_impact: 12500000
-    }
-  },
-  
-  generateAnalyticsInsights: function() {
-    const insights = [];
-    
-    // Processing efficiency
-    if (this.dataMetrics.processing.average_latency_ms > 50) {
-      insights.push({
-        type: 'performance',
-        level: 'warning',
-        message: 'Processing latency above threshold',
-        recommendation: 'Consider stream parallelization'
-      });
-    }
-    
-    // Model accuracy
-    if (this.dataMetrics.modelPerformance.accuracy < 0.9) {
-      insights.push({
-        type: 'model',
-        level: 'attention',
-        message: 'Model accuracy below target',
-        recommendation: 'Consider feature engineering or model update'
-      });
-    }
-    
-    // Business impact
-    const insightsPerDecision = this.dataMetrics.businessImpact.actionable_insights / 
-                               this.dataMetrics.businessImpact.decisions_supported;
-    if (insightsPerDecision < 1.5) {
-      insights.push({
-        type: 'business',
-        level: 'info',
-        message: 'Actionable insights per decision could be improved',
-        recommendation: 'Enhance insight generation algorithms'
-      });
-    }
-    
-    return insights;
-  },
-  
-  predictDataGrowth: function() {
-    const growthRate = 0.15; // 15% monthly growth
-    
-    return {
-      projected_points_per_second: this.dataMetrics.processing.data_points_per_second * (1 + growthRate),
-      projected_storage_monthly: this.dataMetrics.processing.data_points_per_second * 86400 * 30 * 0.001 * (1 + growthRate),
-      scaling_recommendations: this.generateScalingRecommendations(growthRate)
-    };
-  }
-};
+```python
+from advanced_analytics import MultivariateAnalysis, RotationMethod
+import numpy as np
+
+# Run PCA + Factor Analysis on high-dimensional data
+mv = MultivariateAnalysis()
+
+pca_result = mv.principal_component_analysis(
+    data=high_dim_data,
+    n_components=None,  # auto-select via Kaiser criterion
+    scree_plot=True,
+    loadings_threshold=0.3
+)
+
+# Promax rotation for interpretability
+fa_result = mv.factor_analysis(
+    data=high_dim_data,
+    n_factors=pca_result.n_significant_components,
+    rotation=RotationMethod.PROMAX,
+    method="ml",
+    fit_indices=True
+)
+
+print(f"Variance explained by factors: {fa_result.variance_explained}")
+print(f"RMSEA: {fa_result.rmsea:.4f}")
+print(f"CFI: {fa_result.cfi:.4f}")
+print(f"Factor loadings:\n{fa_result.loadings_table()}")
 ```
 
-## 🎯 Implementation Roadmap
+## Best Practices
 
-### Phase 1: Foundation (Week 1-2)
-- [ ] Statistical framework setup
-- [ ] Data pipeline architecture
-- [ ] Basic visualization dashboard
-- [ ] Initial model training
+### MCMC Convergence
+- Always run at least 4 chains and check R-hat < 1.05 for all parameters
+- Use trace plots and autocorrelation plots to diagnose mixing
+- Set warmup to at least 20% of total samples, minimum 1000 iterations
+- Monitor effective sample size (ESS) — aim for ESS > 400 per chain
 
-### Phase 2: Intelligence (Week 3-4)
-- [ ] Physics-informed models
-- [ ] Real-time stream processing
-- [ ] Advanced feature engineering
-- [ ] Automated insight generation
+### Monte Carlo Accuracy
+- Use Latin Hypercube Sampling over naive random sampling for 2-3x variance reduction
+- Start with 10,000 simulations and increase by 10x until CIs stabilize
+- Always report confidence intervals alongside point estimates
+- Set random seeds for reproducibility in production pipelines
 
-### Phase 3: Production (Week 5-6)
-- [ ] Production MLOps
-- [ ] Real-time monitoring
-- [ ] Advanced analytics automation
-- [ ] Enterprise deployment
+### Causal Inference Rigor
+- Always draw the DAG before estimating effects — hidden confounders invalidate results
+- Check covariate balance (standardized mean differences < 0.1) after matching
+- Perform sensitivity analysis (Rosenbaum bounds, E-value) for unmeasured confounding
+- Prefer instrumental variables when randomization is impossible
 
-## 📊 Success Metrics
+### Multivariate Analysis
+- Standardize variables before PCA unless units are directly comparable
+- Use parallel analysis (not Kaiser criterion alone) for component retention
+- Report both unrotated and rotated solutions for transparency
+- Validate factor structures with confirmatory analysis on held-out data
 
-### Analytics Excellence
-```yaml
-processing_performance:
-  latency: "< 20ms"
-  throughput: "> 10K events/sec"
-  accuracy: "> 95%"
-  uptime: "> 99.9%"
-  
-business_impact:
-  actionable_insights: "> 5% of data"
-  decision_support: "> 30% automated"
-  roi: "> 300%"
-  time_to_insight: "< 1 hour"
-  
-operational_efficiency:
-  automation_level: "> 80%"
-  maintenance_overhead: "< 10 hours/week"
-  scaling_efficiency: "> 90%"
-  cost_per_insight: "< $0.10"
-```
+## Related Modules
 
----
-
-*Transform data into insights with physics-inspired precision and real-time processing capabilities.* 📊✨
+- **statistical-analysis**: Foundational descriptive and inferential statistics
+- **feature-engineering**: Data transformation and feature construction for analytics pipelines
+- **time-series**: Temporal data analysis with autoregressive and state-space models
+- **data-visualization**: Publication-quality plots for analytics results
+- **model-optimization**: Hyperparameter tuning and model selection utilities

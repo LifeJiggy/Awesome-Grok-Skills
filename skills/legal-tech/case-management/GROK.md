@@ -1,49 +1,129 @@
-﻿---
+---
 name: "case-management"
 category: "legal-tech"
-version: "1.0.0"
-tags: ["legal-tech", "case-management"]
+version: "2.0.0"
+tags: ["legal", "case", "management", "litigation", "tracking"]
+description: "Legal case management, tracking, and workflow automation"
 ---
 
-# 
+# Case Management
 
 ## Overview
 
-Comprehensive case-management capabilities within the legal-tech domain. This module provides tools, frameworks, and best practices for case-management operations.
+The Case Management module provides comprehensive tools for managing legal cases, tracking deadlines, organizing documents, and automating legal workflows. It supports matter management, deadline tracking, task assignment, billing integration, and reporting for law firms and legal departments.
 
 ## Core Capabilities
 
-- Configuration and setup
-- Data processing and analysis
-- Integration with related systems
-- Monitoring and observability
-- Best practices and patterns
+- **Matter Management**: Track all aspects of legal matters
+- **Deadline Management**: Track court deadlines and statute of limitations
+- **Task Management**: Assign and track legal tasks
+- **Document Organization**: Organize case documents and exhibits
+- **Time Tracking**: Track billable hours and expenses
+- **Billing Integration**: Generate invoices from time entries
+- **Calendar Integration**: Sync with calendar systems
+- **Reporting**: Generate case and matter reports
 
-## Usage
+## Usage Examples
 
-`python
-from case-management import _module
+### Matter Management
 
-# Initialize
-engine = _module.Engine()
+```python
+from case_management import CaseManager, Matter
 
-# Configure
-engine.configure()
+manager = CaseManager()
 
-# Execute
-results = engine.run()
-print(results)
-`
+# Create matter
+matter = Matter(
+    matter_id="MATTER-2024-001",
+    client="Acme Corporation",
+    matter_type="litigation",
+    description="Contract dispute with vendor",
+    responsible_attorney="jsmith@lawfirm.com",
+    status="active",
+    opened_date="2024-01-15",
+)
+
+matter_id = manager.create_matter(matter)
+print(f"Matter Created: {matter_id}")
+print(f"  Client: {matter.client}")
+print(f"  Type: {matter.matter_type}")
+```
+
+### Deadline Tracking
+
+```python
+from case_management import DeadlineTracker, Deadline
+
+tracker = DeadlineTracker(matter_id="MATTER-2024-001")
+
+# Add deadline
+deadline = Deadline(
+    description="Response to Motion to Dismiss",
+    due_date="2024-02-15",
+    deadline_type="court_filing",
+    responsible_attorney="jsmith@lawfirm.com",
+    alert_days_before=14,
+)
+
+deadline_id = tracker.add_deadline(deadline)
+print(f"Deadline Added: {deadline_id}")
+print(f"  Due: {deadline.due_date}")
+```
+
+### Task Management
+
+```python
+from case_management import TaskManager, LegalTask
+
+task_mgr = TaskManager(matter_id="MATTER-2024-001")
+
+# Create task
+task = LegalTask(
+    title="Review contract for discovery",
+    assignee="paralegal-001",
+    priority="high",
+    due_date="2024-02-01",
+    estimated_hours=8,
+)
+
+task_id = task_mgr.create_task(task)
+print(f"Task Created: {task_id}")
+```
+
+### Time Tracking
+
+```python
+from case_management import TimeTracker, TimeEntry
+
+tracker = TimeTracker(matter_id="MATTER-2024-001")
+
+# Log time
+entry = TimeEntry(
+    attorney="jsmith@lawfirm.com",
+    date="2024-01-15",
+    hours=2.5,
+    description="Review and analysis of contract",
+    activity_type="research",
+    billable=True,
+)
+
+entry_id = tracker.log_time(entry)
+print(f"Time Logged: {entry.hours}h ({entry.activity_type})")
+```
 
 ## Best Practices
 
-- Follow security guidelines
-- Implement proper error handling
-- Use configuration management
-- Monitor performance metrics
-- Document API interfaces
+- **Systematic Organization**: Organize matters consistently
+- **Deadline Management**: Never miss court deadlines
+- **Time Capture**: Capture time contemporaneously
+- **Document Management**: Maintain organized document repositories
+- **Communication Logging**: Log all client communications
+- **Conflict Checks**: Conduct conflict checks before opening matters
+- **Client Updates**: Provide regular client updates
+- **Matter Closing**: Properly close and archive completed matters
 
 ## Related Modules
 
-- Other modules in legal-tech domain
-- Integration points with external systems
+- **e-discovery**: Document discovery management
+- **legal-research**: Research for case matters
+- **compliance-tools**: Compliance tracking for matters

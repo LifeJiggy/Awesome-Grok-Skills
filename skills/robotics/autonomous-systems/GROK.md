@@ -1,438 +1,229 @@
 ---
-name: "Autonomous Robotics Systems"
-version: "1.0.0"
-description: "Advanced autonomous robotics with Grok's physics-based control systems and AI"
-author: "Awesome Grok Skills"
-license: "MIT"
-tags: ["robotics", "autonomous", "control-systems", "ros"]
+name: "autonomous-systems"
 category: "robotics"
-personality: "roboticist"
-use_cases: ["motion-planning", "sensor-fusion", "navigation", "manipulation"]
+version: "2.0.0"
+tags: ["robotics", "autonomous-systems", "planning", "decision-making", "self-driving", "fault-recovery", "multi-vehicle"]
 ---
 
-# Autonomous Robotics Systems 🤖
+# Autonomous Systems
 
-> Build intelligent autonomous robots with Grok's physics-inspired control systems
+## Overview
 
-## 🎯 Why This Matters for Grok
+The Autonomous Systems module provides a comprehensive framework for building self-governing robotic agents capable of perceiving their environment, making decisions, and executing actions without direct human intervention. This module covers deliberative, reactive, and hybrid architectures, mission planning, fault detection and recovery, and multi-vehicle coordination. It is designed for applications ranging from autonomous ground vehicles and UAVs to underwater robots and planetary rovers. Whether you are prototyping a small indoor rover or deploying a fleet of delivery drones, this module supplies the building blocks for end-to-end autonomy.
 
-Grok's physics expertise and optimization mindset create perfect robotics systems:
+Autonomous systems must solve the full sense-plan-act loop: acquiring sensor data, building world models, planning trajectories, executing motion, and adapting to failures in real time. This module provides reusable infrastructure for each stage, along with production-grade error handling, telemetry, and safety interlocks. The architecture is intentionally modular so that individual subsystems (planner, world model, safety layer) can be swapped, upgraded, or tested in isolation without affecting the rest of the pipeline.
 
-- **Physics-Based Control** ⚛️: Apply classical mechanics to motion
-- **Sensor Fusion** 🎯: Combine multiple sensor modalities
-- **Real-time Processing** ⚡: Microsecond-level control loops
-- **Adaptive Learning** 🧠: Self-improving robot behavior
+The design philosophy prioritizes safety, determinism, and observability. Every decision is logged, every fault is caught, and the system always has a path to a safe state. This makes the module suitable not only for research and prototyping but also for safety-critical deployments where regulatory compliance and auditability are required.
 
-## 🛠️ Core Capabilities
+## Core Capabilities
 
-### 1. Motion Planning
-```yaml
-planning:
-  algorithms: ["rrt", "prm", "a*", "d*"]
-  optimization: ["minimum-time", "minimum-energy", "smooth"]
-  constraints: ["kinematic", "dynamic", "collision"]
-  learning: ["imitation", "reinforcement", "adaptive"]
-```
+- **Deliberative Planning** — Hierarchical Task Network (HTN) and PDDL-based planners for mission-level goal decomposition. Supports temporal constraints, resource allocation, and multi-step plan generation.
+- **Reactive Behaviors** — Subsumption-style behavior layers for reflexive obstacle avoidance and emergency stops. Behaviors are evaluated in priority order and the highest-priority non-null command wins.
+- **Hybrid Architecture** — Three-layer architecture combining planning, sequencing, and reactive safety layers. The deliberative layer handles long-term goals, the sequencing layer manages discrete actions, and the reactive layer enforces safety invariants.
+- **World Modeling** — Probabilistic occupancy grids, semantic maps, and object tracking with Kalman filters. The world model fuses data from LiDAR, cameras, and range sensors into a unified representation.
+- **Fault Detection, Isolation, and Recovery (FDIR)** — watchdog timers, sensor sanity checks, graceful degradation modes. Each sensor and actuator has a health status that drives automatic recovery actions.
+- **Mission Management** — waypoint missions with abort conditions, re-planning triggers, and completion callbacks. Missions can be paused, resumed, and reconfigured on the fly.
+- **Multi-Vehicle Coordination** — leader-follower formation control and cooperative task allocation. Supports heterogeneous fleets with different capabilities.
+- **Telemetry and Logging** — structured event logging, flight data recording, and post-mission analysis. All data is timestamped and indexed for efficient retrieval.
+- **Safety Interlocks** — hardware and software safety layers that enforce velocity limits, geofencing, and emergency stops independent of the planner.
+- **Simulation Integration** — built-in support for Gazebo, AirSim, and custom simulators with deterministic replay for regression testing.
 
-### 2. Control Systems
-```yaml
-control:
-  low_level: ["pid", "lqr", "mpc", "sliding-mode"]
-  high_level: ["behavior-trees", "state-machines", "task-planners"]
-  adaptive: ["gain-scheduling", "model-reference", "reinforcement"]
-  distributed: ["multi-agent", "formation", "swarm"]
-```
+## Usage Examples
 
-### 3. Perception
-```yaml
-perception:
-  sensors: ["lidar", "camera", "radar", "imu", "gps"]
-  algorithms: ["slam", "object-detection", "segmentation"]
-  fusion: ["kalman", "bayesian", "deep-learning"]
-  real_time: ["voxel", "point-cloud", "semantic"]
-```
+### Defining an Autonomous Mission
 
-## 🧠 Advanced Robotics Systems
-
-### Physics-Inspired Motion Planning
 ```python
-import numpy as np
-from dataclasses import dataclass
-from typing import List, Tuple
+from autonomous_systems import AutonomousEngine, Mission, Waypoint, AbortCondition
 
-@dataclass
-class RobotState:
-    position: np.ndarray  # [x, y, z]
-    orientation: np.ndarray  # Quaternion [w, x, y, z]
-    velocity: np.ndarray  # Linear velocity
-    angular_velocity: np.ndarray  # Angular velocity
+engine = AutonomousEngine(name="rover-alpha")
+engine.configure(
+    control_frequency_hz=50,
+    safety_enabled=True,
+    max_velocity_ms=2.0,
+)
 
-@dataclass
-class Obstacle:
-    position: np.ndarray
-    shape: str  # 'sphere', 'box', 'cylinder'
-    dimensions: List[float]
-    velocity: np.ndarray  # For moving obstacles
+mission = Mission(name="survey-field", waypoints=[
+    Waypoint(x=0.0, y=0.0, z=0.0, label="home"),
+    Waypoint(x=10.0, y=5.0, z=0.0, label="scan-point-1"),
+    Waypoint(x=10.0, y=15.0, z=0.0, label="scan-point-2"),
+    Waypoint(x=0.0, y=15.0, z=0.0, label="scan-point-3"),
+], abort_conditions=[
+    AbortCondition(type="battery_below", threshold=15.0),
+    AbortCondition(type="obstacle_proximity", threshold=0.3),
+])
 
-class PhysicsInspiredMotionPlanner:
-    def __init__(self, robot_config):
-        self.robot_config = robot_config
-        self.dynamics_model = RobotDynamicsModel(robot_config)
-        
-    def rrt_star_planning(self, start: RobotState, goal: RobotState,
-                          obstacles: List[Obstacle],
-                          max_iterations: int = 1000,
-                          step_size: float = 0.1) -> List[RobotState]:
-        """RRT* algorithm with physics-based optimization"""
-        
-        # Tree structure: node -> (state, parent, cost)
-        tree = {start: (None, 0)}
-        
-        for _ in range(max_iterations):
-            # Sample random state
-            if np.random.random() < 0.1:
-                random_state = self.sample_goal_region(goal)
-            else:
-                random_state = self.sample_free_space(obstacles)
-            
-            # Find nearest neighbor
-            nearest_state = self.find_nearest(tree, random_state)
-            
-            # Extend towards random state
-            new_state = self.extend_towards(nearest_state, random_state, step_size)
-            
-            # Check collision with physics constraints
-            if not self.check_collision(new_state, obstacles):
-                # Find nearby states for rewiring
-                nearby_states = self.find_nearby(tree, new_state, radius=0.5)
-                
-                # Connect to best parent
-                best_parent, cost_to_parent = self.find_best_parent(
-                    nearby_states, new_state, obstacles
-                )
-                
-                if best_parent is not None:
-                    tree[new_state] = (best_parent, cost_to_parent)
-                    
-                    # Rewire nearby states
-                    for nearby in nearby_states:
-                        if nearby == best_parent:
-                            continue
-                        
-                        new_cost = cost_to_parent + self.calculate_cost(
-                            new_state, nearby
-                        )
-                        
-                        if new_cost < tree[nearby][1]:
-                            # Rewire with new parent
-                            tree[nearby] = (new_state, new_cost)
-            
-            # Check if goal reached
-            if self.distance_to_goal(new_state, goal) < 0.1:
-                return self.reconstruct_path(tree, start, new_state)
-        
-        return None  # No path found
-    
-    def calculate_smooth_trajectory(self, path: List[RobotState]) -> List[RobotState]:
-        """Apply physics-based trajectory smoothing"""
-        
-        if len(path) < 3:
-            return path
-        
-        smoothed_path = [path[0]]
-        
-        for i in range(1, len(path) - 1):
-            # B-spline smoothing with physics constraints
-            prev = smoothed_path[-1]
-            curr = path[i]
-            next_p = path[i + 1]
-            
-            # Calculate smoothed point
-            alpha = 0.3  # Smoothing factor
-            smoothed = RobotState(
-                position=prev.position + alpha * (curr.position - prev.position),
-                orientation=self.slerp_smoothing(prev.orientation, curr.orientation, next_p.orientation),
-                velocity=self.smooth_velocity(prev.velocity, curr.velocity, next_p.velocity),
-                angular_velocity=self.smooth_angular(prev.angular_velocity, curr.angular_velocity, next_p.angular_velocity)
-            )
-            
-            # Check dynamic constraints
-            if self.dynamics_model.check_constraints(smoothed):
-                smoothed_path.append(smoothed)
-        
-        smoothed_path.append(path[-1])
-        return smoothed_path
-    
-    def optimize_for_minimum_time(self, path: List[RobotState],
-                                   max_velocity: float,
-                                   max_acceleration: float) -> Tuple[List[RobotState], float]:
-        """Time-optimal trajectory optimization using bang-bang control"""
-        
-        # Parameterize path by arc length
-        arc_lengths = self.calculate_arc_lengths(path)
-        total_length = arc_lengths[-1]
-        
-        # Time optimization using Pontryagin's maximum principle
-        time_grid = np.linspace(0, total_length, 1000)
-        velocities = np.zeros_like(time_grid)
-        
-        for i in range(len(time_grid)):
-            # Calculate maximum feasible velocity at each point
-            curvature = self.calculate_curvature(path, time_grid[i])
-            
-            # Velocity limit from curvature
-            v_curvature = np.sqrt(max_acceleration * curvature) if curvature > 0 else max_velocity
-            
-            # Take minimum of limits
-            velocities[i] = min(v_curvature, max_velocity)
-        
-        # Integrate to get times
-        times = np.zeros_like(time_grid)
-        for i in range(1, len(time_grid)):
-            ds = arc_lengths[i] - arc_lengths[i-1]
-            v_avg = (velocities[i] + velocities[i-1]) / 2
-            times[i] = times[i-1] + ds / (v_avg + 1e-6)
-        
-        return self.parameterize_by_time(path, times), times[-1]
+result = engine.run(mission)
+print(f"Mission status: {result.status}")
 ```
 
-### Robot Dynamics and Control
+### Implementing a Custom Behavior Layer
+
 ```python
-class RobotDynamicsModel:
-    def __init__(self, config):
-        # Mass properties
-        self.mass = config.get('mass', 10.0)  # kg
-        self.inertia = np.diag(config.get('inertia', [1, 1, 1]))  # kg·m²
-        
-        # Dynamic limits
-        self.max_force = config.get('max_force', 100.0)  # N
-        self.max_torque = config.get('max_torque', 50.0)  # N·m
-        
-        # Friction coefficients
-        self.friction = config.get('friction', {'static': 0.5, 'dynamic': 0.3})
-        
-    def forward_dynamics(self, state: RobotState, 
-                         force: np.ndarray, 
-                         torque: np.ndarray) -> RobotState:
-        """Calculate accelerations from forces and torques"""
-        
-        # Linear acceleration (F = ma)
-        linear_acc = force / self.mass
-        
-        # Angular acceleration (τ = Iα)
-        angular_acc = np.linalg.solve(self.inertia, torque)
-        
-        # Apply friction
-        linear_acc -= self.friction['dynamic'] * state.velocity / (np.linalg.norm(state.velocity) + 1e-6)
-        
-        # Return new state
-        return RobotState(
-            position=state.position,
-            orientation=state.orientation,
-            velocity=state.velocity + linear_acc * 0.01,  # dt = 0.01
-            angular_velocity=state.angular_velocity + angular_acc * 0.01
-        )
-    
-    def inverse_dynamics(self, desired_acc: np.ndarray,
-                         desired_angular_acc: np.ndarray,
-                         state: RobotState) -> Tuple[np.ndarray, np.ndarray]:
-        """Calculate required force and torque for desired acceleration"""
-        
-        # Calculate required force (F = ma)
-        force = self.mass * desired_acc
-        
-        # Add compensation for gravity and friction
-        gravity_force = np.array([0, 0, -self.mass * 9.81])
-        friction_force = self.friction['dynamic'] * state.velocity
-        
-        force += gravity_force + friction_force
-        
-        # Calculate required torque (τ = Iα)
-        torque = self.inertia @ desired_angular_acc
-        
-        # Clamp to limits
-        force = np.clip(force, -self.max_force, self.max_force)
-        torque = np.clip(torque, -self.max_torque, self.max_torque)
-        
-        return force, torque
-    
-    def compute_jacobian(self, state: RobotState, 
-                         joint_positions: List[float]) -> np.ndarray:
-        """Compute Jacobian matrix for velocity transformation"""
-        
-        # Simplified 2-link planar arm Jacobian
-        l1, l2 = 0.5, 0.4  # Link lengths
-        
-        # Position of end effector
-        x = l1 * np.cos(joint_positions[0]) + l2 * np.cos(joint_positions[0] + joint_positions[1])
-        y = l1 * np.sin(joint_positions[0]) + l2 * np.sin(joint_positions[0] + joint_positions[1])
-        
-        # Jacobian
-        J = np.array([
-            [-l1 * np.sin(joint_positions[0]) - l2 * np.sin(joint_positions[0] + joint_positions[1]),
-             -l2 * np.sin(joint_positions[0] + joint_positions[1])],
-            [l1 * np.cos(joint_positions[0]) + l2 * np.cos(joint_positions[0] + joint_positions[1]),
-             l2 * np.cos(joint_positions[0] + joint_positions[1])]
-        ])
-        
-        return J
+from autonomous_systems import BehaviorLayer, SensorInput, ActuatorCommand
+
+class EmergencyStopLayer(BehaviorLayer):
+    priority = 0  # highest priority — overrides everything
+
+    def evaluate(self, sensor: SensorInput) -> ActuatorCommand | None:
+        if sensor.lidar_min_distance_m < 0.2:
+            return ActuatorCommand(linear=0.0, angular=0.0, emergency=True)
+        return None  # pass through to next layer
 ```
 
-## 📊 Robotics Dashboard
+### Fault Detection and Recovery
 
-### Robot Performance
-```javascript
-const RoboticsDashboard = {
-  robots: {
-    total: 25,
-    active: 23,
-    idle: 2,
-    charging: 3,
-    maintenance: 0
-  },
-  
-  motion: {
-    avg_velocity_ms: 1.2,
-    max_velocity_ms: 2.5,
-    acceleration_ms2: 0.8,
-    success_rate: 0.98,
-    collision_count: 2
-  },
-  
-  navigation: {
-    localization_accuracy_cm: 5,
-    mapping_quality: 0.92,
-    path_planning_time_ms: 45,
-    path_length_efficiency: 0.95,
-    replanning_rate: 0.08
-  },
-  
-  perception: {
-    detection_accuracy: 0.96,
-    processing_fps: 30,
-    sensor_fusion_latency_ms: 12,
-    false_positive_rate: 0.02,
-    tracking_stability: 0.94
-  },
-  
-  energy: {
-    avg_battery_level: 72,
-    avg_operation_hours: 6.5,
-    charging_cycles: 450,
-    energy_efficiency_km_per_kwh: 8.5,
-    battery_health: 0.92
-  },
-  
-  generateRoboticsInsights: function() {
-    const insights = [];
-    
-    // Motion safety
-    if (this.motion.collision_count > 5) {
-      insights.push({
-        type: 'safety',
-        level: 'warning',
-        message: `${this.motion.collision_count} collisions this week`,
-        recommendation: 'Review obstacle detection and emergency stopping'
-      });
-    }
-    
-    // Navigation efficiency
-    if (this.navigation.path_length_efficiency < 0.9) {
-      insights.push({
-        type: 'navigation',
-        level: 'info',
-        message: `Path efficiency below target: ${(this.navigation.path_length_efficiency * 100).toFixed(1)}%`,
-        recommendation: 'Optimize path planning algorithm parameters'
-      });
-    }
-    
-    // Battery health
-    if (this.energy.battery_health < 0.85) {
-      insights.push({
-        type: 'maintenance',
-        level: 'medium',
-        message: `Battery health degrading: ${(this.energy.battery_health * 100).toFixed(1)}%`,
-        recommendation: 'Schedule battery replacement for oldest units'
-      });
-    }
-    
-    return insights;
-  },
-  
-  predictMaintenanceNeeds: function() {
-    const maintenancePredictions = [];
-    
-    for (const robot of this.robots.active_list) {
-      const batteryDegradation = (1 - this.energy.battery_health) * robot.battery_cycles;
-      const wearScore = (robot.operation_hours / 1000) * 0.3 + batteryDegradation * 0.7;
-      
-      maintenancePredictions.push({
-        robot_id: robot.id,
-        wear_score: wearScore,
-        predicted_failure: wearScore > 0.7 ? 'battery' : wearScore > 0.5 ? 'motors' : null,
-        recommended_service: wearScore > 0.6 ? 'inspect_and_service' : 'scheduled_check',
-        days_until_maintenance: Math.max(7, 30 - wearScore * 30)
-      });
-    }
-    
-    return {
-      predictions: maintenancePredictions,
-      total_robots_needing_service: maintenancePredictions.filter(p => p.wearScore > 0.5).length,
-      estimated_parts_needed: this.calculatePartsNeeded(maintenancePredictions)
-    };
-  }
-};
+```python
+from autonomous_systems import FDIRManager, SensorHealth, RecoveryAction
+
+fdir = FDIRManager()
+fdir.register_watchdog("imu", timeout_ms=100)
+fdir.register_watchdog("gps", timeout_ms=500)
+
+@fdir.on_fault
+def handle_fault(sensor_id: str, health: SensorHealth) -> RecoveryAction:
+    if sensor_id == "gps" and health.status == "timeout":
+        return RecoveryAction.SWITCH_TO_ODOMETRY
+    if sensor_id == "imu" and health.status == "stale":
+        return RecoveryAction.RESTART_SENSOR
+    return RecoveryAction.ABORT_MISSION
 ```
 
-## 🎯 Implementation Roadmap
+### World Model and Path Planning
 
-### Phase 1: Foundation (Week 1-2)
-- [ ] Robot hardware setup
-- [ ] Basic motion control
-- [ ] Sensor integration
-- [ ] Safety systems
+```python
+from autonomous_systems import OccupancyGrid, AStarPlanner, WorldModel
 
-### Phase 2: Intelligence (Week 3-4)
-- [ ] Advanced motion planning
-- [ ] SLAM implementation
-- [ ] Machine learning integration
-- [ ] Adaptive control
+world = WorldModel(resolution=0.1)  # 10 cm grid cells
+world.update_occupancy(lidar_scan)
+world.update_objects(detected_objects)
 
-### Phase 3: Production (Week 5-6)
-- [ ] Multi-robot coordination
-- [ ] Fleet management
-- [ ] Cloud integration
-- [ ] Performance optimization
-
-## 📊 Success Metrics
-
-### Robotics Excellence
-```yaml
-motion_control:
-  position_accuracy: "< 1cm"
-  velocity_tracking_error: "< 5%"
-  settling_time: "< 100ms"
-  collision_rate: "< 0.1%"
-  
-navigation:
-  localization_accuracy: "< 5cm"
-  path_planning_time: "< 50ms"
-  success_rate: "> 99%"
-  replanning_frequency: "< 10%"
-  
-perception:
-  detection_accuracy: "> 95%"
-  processing_latency: "< 20ms"
-  tracking_stability: "> 95%"
-  sensor_fusion_accuracy: "> 98%"
-  
-operational:
-  uptime: "> 99%"
-  battery_efficiency: "> 8 km/kWh"
-  maintenance_interval: "> 2 weeks"
-  fleet_utilization: "> 85%"
+planner = AStarPlanner(world.occupancy_grid, inflation_radius=0.5)
+path = planner.plan(
+    start=(0.0, 0.0),
+    goal=(10.0, 15.0),
+    cost_function="euclidean",
+)
 ```
 
----
+### Multi-Vehicle Fleet Coordination
 
-*Build intelligent autonomous robots with physics-inspired control and adaptive learning.* 🤖✨
+```python
+from autonomous_systems import FleetManager, Vehicle, TaskAllocation
+
+fleet = FleetManager()
+fleet.register_vehicle(Vehicle(id="uav-1", capabilities=["survey", "photo"]))
+fleet.register_vehicle(Vehicle(id="uav-2", capabilities=["transport", "survey"]))
+fleet.register_vehicle(Vehicle(id="ugv-1", capabilities=["transport", "heavy-lift"]))
+
+tasks = [
+    TaskAllocation(task="survey-north", required_cap="survey"),
+    TaskAllocation(task="deliver-package", required_cap="transport"),
+    TaskAllocation(task="aerial-photo", required_cap="photo"),
+]
+
+assignments = fleet.allocate(tasks)
+for vehicle_id, assigned_tasks in assignments.items():
+    print(f"{vehicle_id} assigned: {[t.task for t in assigned_tasks]}")
+```
+
+### Telemetry Recording and Replay
+
+```python
+from autonomous_systems import TelemetryRecorder, ReplayPlayer
+
+recorder = TelemetryRecorder(bag_path="/data/mission-001.bag")
+recorder.record_topic("sensors/lidar", lidar_data)
+recorder.record_topic("planner/path", planned_path)
+recorder.record_topic("actuator/cmd", motor_commands)
+recorder.finalize()
+
+# Later: replay for debugging
+player = ReplayPlayer(bag_path="/data/mission-001.bag")
+for timestamp, message in player.play(topics=["sensors/lidar", "planner/path"]):
+    print(f"[{timestamp:.3f}] {message.topic}: {message.data}")
+```
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Mission Manager                       │
+│  (waypoints, abort conditions, completion callbacks)     │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────┐
+│                  Deliberative Planner                    │
+│  (HTN / PDDL goal decomposition, re-planning)           │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────┐
+│                  Sequencing Layer                        │
+│  (discrete action selection, state transitions)          │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────┐
+│                  Reactive Safety Layer                   │
+│  (obstacle avoidance, emergency stop, geofence)         │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────┐
+│              World Model  ◄──  FDIR Manager             │
+│  (occupancy grid, object tracking, semantic map)         │
+└──────────────────────┬──────────────────────────────────┘
+                       │
+         ┌─────────────▼─────────────┐
+         │     Actuator Interface     │
+         │  (motor cmds, servo cmds)  │
+         └───────────────────────────┘
+```
+
+The three-layer hybrid architecture separates concerns cleanly. The deliberative layer operates at 1-10 Hz for long-horizon planning. The sequencing layer runs at 10-50 Hz for action selection. The reactive safety layer runs at 50-200 Hz to guarantee hard real-time response to hazards. The world model is shared across all layers and updated at sensor rate.
+
+## Best Practices
+
+1. **Always enable safety interlocks in production.** The reactive safety layer must run at the highest frequency and override all deliberative decisions. Never allow the planner to bypass safety constraints.
+2. **Use watchdog timers on every critical sensor.** A stale IMU or GPS reading can cause catastrophic drift. Set timeouts based on the sensor's rated update rate plus a generous margin (typically 2-3x).
+3. **Log everything.** Autonomous systems are difficult to debug post-facto. Record sensor data, planner outputs, actuator commands, and state transitions at full control frequency. Use a structured bag format for efficient storage.
+4. **Test fault injection regularly.** Simulate sensor dropouts, actuator saturations, and communication failures in simulation before deploying to hardware. A fault that has never been tested will occur in the field.
+5. **Use hierarchical mission abort conditions.** Set both soft aborts (slow down, re-plan) and hard aborts (stop immediately, enter safe mode) depending on severity. Always define a terminal safe state.
+6. **Validate world models against ground truth.** Periodically compare occupancy grid predictions against known maps to detect calibration drift. Use map alignment metrics to quantify accuracy.
+7. **Keep the reactive layer simple.** Complex logic in the safety layer is a liability. It should be fast, deterministic, and formally verifiable. Move complex reasoning to the deliberative layer.
+8. **Implement graceful degradation.** When a sensor fails, the system should continue operating with reduced capability rather than halting entirely, unless safety is compromised.
+9. **Design for deterministic replay.** Every run should be reproducible from logged inputs. This is essential for debugging, regression testing, and regulatory compliance.
+10. **Separate configuration from code.** Mission parameters, safety thresholds, and tuning constants should live in configuration files, not hardcoded in source. This enables field tuning without redeployment.
+
+## Performance Considerations
+
+- **Control loop frequency**: The reactive safety layer must run at 50-200 Hz. Profile the critical path and ensure the worst-case execution time fits within the deadline. Use C extensions or pre-allocated buffers for hot loops.
+- **World model update rate**: Occupancy grid updates from LiDAR scans can be expensive at high resolution. Use 10-20 cm resolution for global planning and 2-5 cm for local planning.
+- **Planner latency**: PDDL planners can take seconds for complex missions. Run the planner in a background thread and cache plans. If the planner exceeds its time budget, use the cached plan with a re-plan trigger.
+- **Memory usage**: Occupancy grids for large environments consume significant memory. A 500x500 grid at 10 cm resolution requires 250K cells. Use quadtree or sparse representations for large areas.
+- **Telemetry bandwidth**: Recording at full sensor rate can produce gigabytes per hour. Use compression and selective recording to stay within storage budgets. Prioritize critical topics for high-rate recording.
+- **Fleet communication**: Multi-vehicle coordination requires reliable communication. Use mesh networking with gossip protocols for scalability. Design for intermittent connectivity.
+
+## Security Considerations
+
+- **Command authentication**: All actuator commands should be authenticated to prevent unauthorized control. Use message authentication codes (HMAC) on critical command channels.
+- **Geofencing enforcement**: Geofence boundaries must be enforced at the hardware level, not just in software. A compromised planner should not be able to command motion outside the geofence.
+- **Sensor spoofing defense**: GPS and LiDAR spoofing can cause catastrophic failures. Cross-validate sensor inputs and detect anomalies. Use redundant sensors for critical measurements.
+- **Secure telemetry storage**: Mission logs may contain sensitive location data. Encrypt stored telemetry and implement access controls on replay systems.
+- **Firmware integrity**: Verify actuator firmware signatures before enabling autonomous operation. A compromised motor controller can bypass all software safety layers.
+- **Network segmentation**: Separate the autonomous control network from external networks. Use firewalls and intrusion detection on any bridge between segments.
+
+## Related Modules
+
+- **navigation** — Trajectory following, SLAM, and path smoothing algorithms
+- **robotics-vision** — Camera-based perception, object detection, and visual odometry
+- **manipulation** — Arm control and grasping for autonomous manipulation tasks
+- **swarm-robotics** — Multi-agent coordination and distributed task allocation
+
+## References
+
+- Thrun, S., Burgard, W., & Fox, D. (2005). *Probabilistic Robotics*. MIT Press.
+- Siegwart, R., Nourbakhsh, I. R., & Scaramuzza, D. (2011). *Introduction to Autonomous Mobile Robots*. MIT Press.
+- Russell, S. & Norvig, P. (2020). *Artificial Intelligence: A Modern Approach*, 4th Edition. Pearson.
+- Ferguson, D. & Kalra, N. (2006). Replanning for RRT* in dynamic environments. *IEEE International Conference on Robotics and Automation*.
+- Brooks, R. A. (1986). A robust layered control system for a mobile robot. *IEEE Journal on Robotics and Automation*, 2(1), 14-23.
+- Kavraki, L. E., Svestka, P., Latombe, J.-C., & Overmars, M. H. (1996). Probabilistic roadmaps for path planning in high-dimensional configuration spaces. *IEEE Transactions on Robotics and Automation*, 12(4), 566-580.
+- ROS 2 Navigation Documentation: https://docs.ros.org/en/humble/Tutorials/Navigation.html
+- PX4 Autopilot Developer Guide: https://docs.px4.io/main/en/dev_guide/
