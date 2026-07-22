@@ -11,22 +11,22 @@ tags: ["web-dev", "tailwind", "shadcn", "css", "ui-components"]
 
 Tailwind CSS is a utility-first CSS framework that provides atomic classes for rapid UI development without leaving your HTML or JSX. Instead of writing custom CSS, you compose utility classes directly on elements: `flex items-center justify-between p-4 rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow`. This approach eliminates naming debates, reduces CSS bundle size through tree-shaking (unused utilities are purged), and creates a consistent visual language enforced by design tokens.
 
-shadcn/ui is not a traditional component library — it's a collection of re-usable, accessible components built on Radix UI primitives and styled with Tailwind CSS. Unlike packages you install via npm, shadcn/ui components are copied into your project as source code, giving you full ownership and customization control. Each component is built with `class-variance-authority` (CVA) for variant management, `clsx` and `tailwind-merge` for conditional class composition, and follows a consistent pattern of `className` props, `asChild` composition, and forwardRef patterns.
+shadcn/ui is not a traditional component library Ã¢â‚¬â€ it's a collection of re-usable, accessible components built on Radix UI primitives and styled with Tailwind CSS. Unlike packages you install via npm, shadcn/ui components are copied into your project as source code, giving you full ownership and customization control. Each component is built with `class-variance-authority` (CVA) for variant management, `clsx` and `tailwind-merge` for conditional class composition, and follows a consistent pattern of `className` props, `asChild` composition, and forwardRef patterns.
 
-The design system approach combines Tailwind's utility layer with shadcn/ui's component conventions: CSS custom properties for theming (colors, radius, spacing), Tailwind's `@layer` directives for component styles, and a `components.json` configuration that defines the component directory, alias paths, and styling preferences. Dark mode is handled through CSS class toggling (`.dark` class on `<html>`), with each component providing dark variants. The result is a fully typed, accessible, and deeply customizable UI system where every component is source code you own — not a black box dependency.
+The design system approach combines Tailwind's utility layer with shadcn/ui's component conventions: CSS custom properties for theming (colors, radius, spacing), Tailwind's `@layer` directives for component styles, and a `components.json` configuration that defines the component directory, alias paths, and styling preferences. Dark mode is handled through CSS class toggling (`.dark` class on `<html>`), with each component providing dark variants. The result is a fully typed, accessible, and deeply customizable UI system where every component is source code you own Ã¢â‚¬â€ not a black box dependency.
 
 The theming system uses CSS custom properties defined in `globals.css` under `:root` and `.dark` selectors, with Tailwind's `theme.extend.colors` mapping these variables to utility classes. This creates a two-layer design token system: CSS variables for runtime theme switching and Tailwind's config for build-time optimization. Components reference these tokens through standard Tailwind classes, ensuring consistency while allowing per-component customization.
 
 ## Core Capabilities
 
-- **Utility-first CSS composition** — Atomic classes for layout, spacing, typography, colors, and effects without custom CSS
-- **Copy-paste component ownership** — shadcn/ui components as source code, not package dependencies
-- **Variant management with CVA** — Class Variance Authority for type-safe component variants (size, color, intent)
-- **Design token theming** — CSS custom properties for colors, radius, and spacing with dark mode support
-- **Responsive design system** — Mobile-first breakpoints with Tailwind's responsive prefixes
-- **Dark mode implementation** — Class-based dark mode with automatic variant application
-- **Component composition patterns** — Radix UI primitives, `asChild` prop, compound components
-- **Accessible form components** — Built-in label, error, and description patterns with ARIA compliance
+- **Utility-first CSS composition** Ã¢â‚¬â€ Atomic classes for layout, spacing, typography, colors, and effects without custom CSS
+- **Copy-paste component ownership** Ã¢â‚¬â€ shadcn/ui components as source code, not package dependencies
+- **Variant management with CVA** Ã¢â‚¬â€ Class Variance Authority for type-safe component variants (size, color, intent)
+- **Design token theming** Ã¢â‚¬â€ CSS custom properties for colors, radius, and spacing with dark mode support
+- **Responsive design system** Ã¢â‚¬â€ Mobile-first breakpoints with Tailwind's responsive prefixes
+- **Dark mode implementation** Ã¢â‚¬â€ Class-based dark mode with automatic variant application
+- **Component composition patterns** Ã¢â‚¬â€ Radix UI primitives, `asChild` prop, compound components
+- **Accessible form components** Ã¢â‚¬â€ Built-in label, error, and description patterns with ARIA compliance
 
 ## Usage Examples
 
@@ -235,28 +235,28 @@ docs = index.generate_docs()
 
 ## Best Practices
 
-1. **Use `cn()` for class composition** — Always use the `cn()` helper (which wraps `clsx` + `tailwind-merge`) for conditional classes. This prevents conflicts and deduplicates utilities: `cn("p-4", isActive && "bg-blue-500", className)`.
+1. **Use `cn()` for class composition** Ã¢â‚¬â€ Always use the `cn()` helper (which wraps `clsx` + `tailwind-merge`) for conditional classes. This prevents conflicts and deduplicates utilities: `cn("p-4", isActive && "bg-blue-500", className)`.
 
-2. **Customize at the theme level, not the component level** — Use CSS custom properties in `globals.css` for theme-wide changes. Override component-specific styles with Tailwind's `@apply` or className props, not by modifying the component source.
+2. **Customize at the theme level, not the component level** Ã¢â‚¬â€ Use CSS custom properties in `globals.css` for theme-wide changes. Override component-specific styles with Tailwind's `@apply` or className props, not by modifying the component source.
 
-3. **Follow the variant pattern** — Use `class-variance-authority` for component variants instead of conditional strings. This keeps variants type-safe, discoverable, and composable.
+3. **Follow the variant pattern** Ã¢â‚¬â€ Use `class-variance-authority` for component variants instead of conditional strings. This keeps variants type-safe, discoverable, and composable.
 
-4. **Keep components focused** — Each shadcn/ui component does one thing well. Compose them in your pages rather than creating mega-components. A Card is a Card; your page composes Card.Header, Card.Content, and Card.Footer.
+4. **Keep components focused** Ã¢â‚¬â€ Each shadcn/ui component does one thing well. Compose them in your pages rather than creating mega-components. A Card is a Card; your page composes Card.Header, Card.Content, and Card.Footer.
 
-5. **Use semantic color tokens** — Reference `bg-primary`, `text-muted-foreground`, `border-border` instead of raw colors like `bg-blue-500`. Semantic tokens automatically adapt to dark mode and theme changes.
+5. **Use semantic color tokens** Ã¢â‚¬â€ Reference `bg-primary`, `text-muted-foreground`, `border-border` instead of raw colors like `bg-blue-500`. Semantic tokens automatically adapt to dark mode and theme changes.
 
-6. **Mobile-first responsive design** — Always start with base styles for mobile and add `sm:`, `md:`, `lg:` prefixes for larger screens. This ensures your layout works on all devices by default.
+6. **Mobile-first responsive design** Ã¢â‚¬â€ Always start with base styles for mobile and add `sm:`, `md:`, `lg:` prefixes for larger screens. This ensures your layout works on all devices by default.
 
-7. **Accessibility is built-in** — shadcn/ui components include ARIA attributes, keyboard navigation, and focus management. Don't strip these when customizing. Test with screen readers.
+7. **Accessibility is built-in** Ã¢â‚¬â€ shadcn/ui components include ARIA attributes, keyboard navigation, and focus management. Don't strip these when customizing. Test with screen readers.
 
-8. **Tree-shake aggressively** — Tailwind purges unused utilities. Only include classes you actually use. For dynamic classes, safelist them in `tailwind.config.js` or use complete class names in templates.
+8. **Tree-shake aggressively** Ã¢â‚¬â€ Tailwind purges unused utilities. Only include classes you actually use. For dynamic classes, safelist them in `tailwind.config.js` or use complete class names in templates.
 
 ## Related Modules
 
-- **nextjs-fullstack** — Integrating Tailwind and shadcn/ui in Next.js App Router
-- **server-components** — Using shadcn/ui components in React Server Components
-- **edge-runtime** — CSS-in-JS considerations at the edge
-- **supabase-auth** — Auth form UI patterns with shadcn/ui components
+- **nextjs-fullstack** Ã¢â‚¬â€ Integrating Tailwind and shadcn/ui in Next.js App Router
+- **server-components** Ã¢â‚¬â€ Using shadcn/ui components in React Server Components
+- **edge-runtime** Ã¢â‚¬â€ CSS-in-JS considerations at the edge
+- **supabase-auth** Ã¢â‚¬â€ Auth form UI patterns with shadcn/ui components
 
 ---
 
@@ -299,29 +299,29 @@ plugin = TailwindPlugin(
 
 ```
 Radix UI Primitives
-        │
-        ▼
-┌──────────────┐
-│ shadcn/ui    │── Accessible, styled components
-│ Component    │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ CVA Variants │── Type-safe variant system
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Tailwind     │── Utility-first styling
-│ Classes      │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ CSS Custom   │── Theme tokens for runtime switching
-│ Properties   │
-└──────────────┘
+        Ã¢â€â€š
+        Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š shadcn/ui    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Accessible, styled components
+Ã¢â€â€š Component    Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š CVA Variants Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Type-safe variant system
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Tailwind     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Utility-first styling
+Ã¢â€â€š Classes      Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š CSS Custom   Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Theme tokens for runtime switching
+Ã¢â€â€š Properties   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Integration Guide
@@ -448,7 +448,7 @@ def test_class_merging():
 
 | Term | Definition |
 |------|-----------|
-| **CVA** | Class Variance Authority — variant system |
+| **CVA** | Class Variance Authority Ã¢â‚¬â€ variant system |
 | **cn()** | clsx + tailwind-merge helper |
 | **Radix UI** | Headless accessible component primitives |
 | **Design Token** | CSS custom property for theming |
@@ -614,8 +614,8 @@ Copyright (c) 2024 Awesome Grok Skills
 
 | Component | Description | Radix Primitive |
 |-----------|-------------|-----------------|
-| Button | Clickable button | — |
-| Card | Content container | — |
+| Button | Clickable button | Ã¢â‚¬â€ |
+| Card | Content container | Ã¢â‚¬â€ |
 | Dialog | Modal dialog | Dialog |
 | Dropdown Menu | Context menu | DropdownMenu |
 | Select | Dropdown select | Select |
@@ -623,8 +623,8 @@ Copyright (c) 2024 Awesome Grok Skills
 | Accordion | Collapsible sections | Collapsible |
 | Toast | Notification | Toast |
 | Tooltip | Hover info | Tooltip |
-| Form | Form with validation | — |
-| Table | Data table | — |
+| Form | Form with validation | Ã¢â‚¬â€ |
+| Table | Data table | Ã¢â‚¬â€ |
 | Sheet | Side panel | Dialog |
 | Popover | Floating content | Popover |
 | Command | Command palette | Cmdk |
@@ -708,3 +708,171 @@ cn("p-2 sm:p-4 md:p-6 lg:p-8")
 | Border | rounded-lg, border | Visual borders |
 | Shadow | shadow-sm, shadow-lg | Elevation |
 | Motion | transition, duration-200 | Animations |
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

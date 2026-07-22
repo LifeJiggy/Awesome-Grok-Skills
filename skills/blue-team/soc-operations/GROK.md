@@ -100,9 +100,9 @@ tickets.resolve(t.ticket_id, "False positive - legitimate scan")
 
 ## Best Practices
 
-- Follow the NIST SOC Capability Model: Monitor → Detect → Analyze → Respond → Recover
+- Follow the NIST SOC Capability Model: Monitor Ã¢â€ â€™ Detect Ã¢â€ â€™ Analyze Ã¢â€ â€™ Respond Ã¢â€ â€™ Recover
 - Maintain a maximum 15-minute triage SLA for critical alerts, 1 hour for high, 4 hours for medium
-- Document every investigation step — if it isn't documented, it didn't happen
+- Document every investigation step Ã¢â‚¬â€ if it isn't documented, it didn't happen
 - Conduct weekly calibration sessions to align analyst severity scoring
 - Use MITRE ATT&CK mapping for every alert to ensure technique coverage
 - Implement automated enrichment (GeoIP, WHOIS, threat intel) to reduce triage time
@@ -202,64 +202,64 @@ shifts:
 ### SOC Operating Model
 
 ```
-Tier 1 — Alert Triage:
-├── Monitor alert queue
-├── Perform initial triage
-├── Escalate true positives
-├── Close false positives
-├── Document investigation steps
-└── Time SLA: 15min critical, 1hr high
+Tier 1 Ã¢â‚¬â€ Alert Triage:
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Monitor alert queue
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Perform initial triage
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Escalate true positives
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Close false positives
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Document investigation steps
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Time SLA: 15min critical, 1hr high
 
-Tier 2 — Investigation:
-├── Deep-dive investigation
-├── Threat hunting (ad-hoc)
-├── Malware analysis basics
-├── Network forensics basics
-├── Containment actions
-└── Time SLA: 1hr critical, 4hr high
+Tier 2 Ã¢â‚¬â€ Investigation:
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Deep-dive investigation
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Threat hunting (ad-hoc)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Malware analysis basics
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network forensics basics
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Containment actions
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Time SLA: 1hr critical, 4hr high
 
-Tier 3 — Advanced Analysis:
-├── Complex incident handling
-├── Reverse engineering
-├── Advanced forensics
-├── Threat intelligence
-├── Root cause analysis
-└── Time SLA: Immediate critical, 24hr high
+Tier 3 Ã¢â‚¬â€ Advanced Analysis:
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Complex incident handling
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reverse engineering
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Advanced forensics
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Threat intelligence
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Root cause analysis
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Time SLA: Immediate critical, 24hr high
 
 Management:
-├── Shift leads
-├── SOC manager
-├── Security director
-└── CISO
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Shift leads
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SOC manager
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Security director
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ CISO
 ```
 
 ### Playbook Architecture
 
 ```
 Playbook Types:
-├── Alert-Based Playbooks
-│   ├── SSH Brute Force
-│   ├── Malware Detected
-│   ├── Phishing Report
-│   └── Data Exfiltration
-├── Incident-Based Playbooks
-│   ├── Ransomware Response
-│   ├── Account Compromise
-│   ├── Data Breach
-│   └── Insider Threat
-└── Procedural Playbooks
-    ├── Shift Handover
-    ├── Escalation
-    ├── Communication
-    └── Reporting
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Alert-Based Playbooks
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SSH Brute Force
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Malware Detected
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Phishing Report
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Data Exfiltration
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Incident-Based Playbooks
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Ransomware Response
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Account Compromise
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data Breach
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Insider Threat
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Procedural Playbooks
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Shift Handover
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Escalation
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Communication
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Reporting
 ```
 
 ### Ticket Lifecycle
 
 ```
-Created → Assigned → In Progress → Investigating → Resolved → Closed
-  │          │           │              │              │          │
-  └── Auto   └── Manual  └── Analyst    └── Deep dive  └── Fix    └── Verified
+Created Ã¢â€ â€™ Assigned Ã¢â€ â€™ In Progress Ã¢â€ â€™ Investigating Ã¢â€ â€™ Resolved Ã¢â€ â€™ Closed
+  Ã¢â€â€š          Ã¢â€â€š           Ã¢â€â€š              Ã¢â€â€š              Ã¢â€â€š          Ã¢â€â€š
+  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Auto   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Manual  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Analyst    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Deep dive  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Fix    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Verified
       or          or         working         or verify       applied     confirmed
       triage      auto-
                   assign
@@ -405,22 +405,22 @@ print(f"Reason: {assignment.reason}")
 
 ```
 Required logging for all SOC actions:
-├── Ticket updates and status changes
-├── Evidence access and collection
-├── Containment actions (IP blocks, account locks)
-├── Tool usage (forensic tools, SIEM queries)
-├── Escalation decisions
-└── Communication with stakeholders
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Ticket updates and status changes
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Evidence access and collection
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Containment actions (IP blocks, account locks)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tool usage (forensic tools, SIEM queries)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Escalation decisions
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Communication with stakeholders
 ```
 
 ### Sensitive Data Handling
 
 ```
 Data Classification:
-├── Public: Alert summaries, non-sensitive metrics
-├── Internal: Investigation details, IOCs
-├── Confidential: Evidence, PII, credentials
-└── Restricted: Legal hold, executive communications
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Public: Alert summaries, non-sensitive metrics
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Internal: Investigation details, IOCs
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Confidential: Evidence, PII, credentials
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Restricted: Legal hold, executive communications
 ```
 
 ## Troubleshooting Guide
@@ -614,34 +614,34 @@ ShiftReport:
 
 ```
 1. Planning
-   ├── Define operating hours (24/7, business hours)
-   ├── Staff requirements (T1/T2/T3 ratios)
-   ├── Tool selection and procurement
-   └── Communication channels
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Define operating hours (24/7, business hours)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Staff requirements (T1/T2/T3 ratios)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tool selection and procurement
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Communication channels
 
 2. Infrastructure
-   ├── Deploy SIEM platform
-   ├── Set up ticketing system
-   ├── Configure chat/communication tools
-   └── Set up forensic workstation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Deploy SIEM platform
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Set up ticketing system
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Configure chat/communication tools
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Set up forensic workstation
 
 3. Process
-   ├── Define escalation procedures
-   ├── Create playbooks for top alert types
-   ├── Document SLA requirements
-   └── Establish shift handover process
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Define escalation procedures
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Create playbooks for top alert types
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Document SLA requirements
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Establish shift handover process
 
 4. Training
-   ├── Analyst onboarding
-   ├── Playbook walkthroughs
-   ├── Tool training
-   └── Tabletop exercises
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Analyst onboarding
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Playbook walkthroughs
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tool training
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Tabletop exercises
 
 5. Go-Live
-   ├── Start with business hours coverage
-   ├── Expand to 24/7 as team matures
-   ├── Continuously tune and improve
-   └── Regular performance reviews
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Start with business hours coverage
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Expand to 24/7 as team matures
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Continuously tune and improve
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Regular performance reviews
 ```
 
 ## Monitoring & Observability
@@ -661,13 +661,13 @@ ShiftReport:
 
 ```
 SOC Performance Dashboard:
-├── Alert volume trend (daily, weekly)
-├── Mean time to detect/respond
-├── Tickets by severity and status
-├── Analyst workload distribution
-├── Playbook execution metrics
-├── SLA compliance rate
-└── False positive rate trend
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Alert volume trend (daily, weekly)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Mean time to detect/respond
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tickets by severity and status
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Analyst workload distribution
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Playbook execution metrics
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SLA compliance rate
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ False positive rate trend
 ```
 
 ## Testing Strategy
@@ -676,22 +676,22 @@ SOC Performance Dashboard:
 
 ```
 1. Playbook Testing
-   ├── Tabletop exercises (quarterly)
-   ├── Simulated incidents (monthly)
-   ├── Red team coordination (quarterly)
-   └── Communication drills (monthly)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tabletop exercises (quarterly)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Simulated incidents (monthly)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Red team coordination (quarterly)
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Communication drills (monthly)
 
 2. Process Testing
-   ├── Shift handover drills
-   ├── Escalation path verification
-   ├── SLA compliance testing
-   └── Tool integration testing
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Shift handover drills
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Escalation path verification
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SLA compliance testing
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Tool integration testing
 
 3. Performance Testing
-   ├── Alert volume stress testing
-   ├── Peak load simulation
-   ├── After-hours coverage testing
-   └── Incident response timing
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Alert volume stress testing
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Peak load simulation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ After-hours coverage testing
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Incident response timing
 ```
 
 ## Versioning & Migration
@@ -700,19 +700,19 @@ SOC Performance Dashboard:
 
 ```
 v2.0: Major process overhaul
-├── New escalation paths
-├── New tool integrations
-└── New SLA targets
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New escalation paths
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New tool integrations
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ New SLA targets
 
 v1.x: Process improvements
-├── Playbook updates
-├── Rule tuning
-└── Training updates
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Playbook updates
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Rule tuning
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Training updates
 
 v1.0.x: Bug fixes
-├── Documentation corrections
-├── Tool configuration fixes
-└── Minor process adjustments
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Documentation corrections
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tool configuration fixes
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Minor process adjustments
 ```
 
 ## Glossary
@@ -794,3 +794,171 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

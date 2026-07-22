@@ -11,7 +11,7 @@ tags: [devops, caching, redis, memcached, cdn]
 
 The Caching module provides a comprehensive toolkit for implementing multi-layer caching strategies across distributed systems. It supports in-memory caching (LRU, LFU, TTL-based), distributed caching (Redis, Memcached), CDN edge caching, and application-level caching with cache invalidation patterns. The module abstracts cache backend differences behind a unified API, enabling consistent caching behavior across development, staging, and production environments.
 
-Caching is critical for system performance — a well-designed cache reduces database load by 90%+ and improves response times from seconds to milliseconds. This module implements the most common and battle-tested caching patterns: cache-aside, read-through, write-through, write-behind, and cache warming. Each pattern includes automatic cache invalidation strategies, stale-while-revalidate support, and cache stampede prevention.
+Caching is critical for system performance Ã¢â‚¬â€ a well-designed cache reduces database load by 90%+ and improves response times from seconds to milliseconds. This module implements the most common and battle-tested caching patterns: cache-aside, read-through, write-through, write-behind, and cache warming. Each pattern includes automatic cache invalidation strategies, stale-while-revalidate support, and cache stampede prevention.
 
 The module provides cache analytics including hit rate monitoring, memory usage tracking, eviction rate analysis, and cache warming recommendations. Integration with monitoring systems (Prometheus, Datadog) enables real-time cache performance visibility. The module also supports cache coherency in distributed systems through pub/sub invalidation and consistent hashing.
 
@@ -168,29 +168,29 @@ print(f"Key routes to: {node}")
 
 ```
 Application
-    │
-    ▼
-┌──────────────┐
-│ L1: In-Memory│── LRU/LFU, <1ms access
-└──────┬───────┘
-    │ MISS
-    ▼
-┌──────────────┐
-│ L2: Redis    │── Distributed, <5ms access
-└──────┬───────┘
-    │ MISS
-    ▼
-┌──────────────┐
-│ L3: Database │── Source of truth
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š L1: In-MemoryÃ¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ LRU/LFU, <1ms access
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š MISS
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š L2: Redis    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Distributed, <5ms access
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š MISS
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š L3: Database Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Source of truth
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ### Cache Invalidation Patterns
 
 ```
-Write → Invalidate Cache → Next Read Populates
-Write → Update Cache (write-through)
-Write → Buffer Writes (write-behind) → Async Flush
+Write Ã¢â€ â€™ Invalidate Cache Ã¢â€ â€™ Next Read Populates
+Write Ã¢â€ â€™ Update Cache (write-through)
+Write Ã¢â€ â€™ Buffer Writes (write-behind) Ã¢â€ â€™ Async Flush
 ```
 
 ## Integration Guide
@@ -360,11 +360,11 @@ def test_cache_expiry():
 
 | Term | Definition |
 |------|-----------|
-| **LRU** | Least Recently Used — eviction policy |
+| **LRU** | Least Recently Used Ã¢â‚¬â€ eviction policy |
 | **Cache-Aside** | App manages cache reads/writes explicitly |
 | **Write-Behind** | Buffer writes, flush asynchronously |
 | **Stampede** | Thundering herd on cache miss |
-| **TTL** | Time-To-Live — cache entry expiration |
+| **TTL** | Time-To-Live Ã¢â‚¬â€ cache entry expiration |
 
 ## Changelog
 
@@ -488,19 +488,19 @@ config = cache.get("config:feature_flags")
 ```python
 from caching import MemoryCache, EvictionPolicy
 
-# LRU (default) — evicts least recently accessed
+# LRU (default) Ã¢â‚¬â€ evicts least recently accessed
 cache_lru = MemoryCache(max_size=10000, eviction=EvictionPolicy.LRU)
 
-# LFU — evicts least frequently accessed
+# LFU Ã¢â‚¬â€ evicts least frequently accessed
 cache_lfu = MemoryCache(max_size=10000, eviction=EvictionPolicy.LFU)
 
-# FIFO — evicts oldest entries
+# FIFO Ã¢â‚¬â€ evicts oldest entries
 cache_fifo = MemoryCache(max_size=10000, eviction=EvictionPolicy.FIFO)
 
-# Random — random eviction
+# Random Ã¢â‚¬â€ random eviction
 cache_random = MemoryCache(max_size=10000, eviction=EvictionPolicy.RANDOM)
 
-# ARC — adaptive replacement cache
+# ARC Ã¢â‚¬â€ adaptive replacement cache
 cache_arc = MemoryCache(max_size=10000, eviction=EvictionPolicy.ARC)
 ```
 
@@ -656,7 +656,7 @@ cache = CircuitBreakerCache(
 try:
     data = cache.get("key")
 except CacheUnavailable:
-    # Circuit is open — Redis is down
+    # Circuit is open Ã¢â‚¬â€ Redis is down
     data = db.get("key")
     cache.set("key", data, ttl=60)  # Cache to local fallback
 ```
@@ -783,7 +783,7 @@ cache = CircuitBreakerCache(
 try:
     data = cache.get("key")
 except CacheUnavailable:
-    # Circuit is open — Redis is down
+    # Circuit is open Ã¢â‚¬â€ Redis is down
     data = db.get("key")
     cache.set("key", data, ttl=60)  # Cache to local fallback
 ```
@@ -819,3 +819,171 @@ data = cache.get("dataset:full")
 MIT License
 
 Copyright (c) 2024 Awesome Grok Skills
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

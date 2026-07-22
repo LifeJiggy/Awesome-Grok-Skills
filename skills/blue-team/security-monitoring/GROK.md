@@ -104,7 +104,7 @@ print(f"Dashboard panels: {len(dashboard.panels)}")
 - Ensure log retention meets compliance requirements (PCI-DSS: 1 year, HIPAA: 6 years)
 - Use correlation windows of 5-15 minutes for brute force detection
 - Implement automated playbooks for high-confidence alerts to reduce response time
-- Monitor for log gaps — a missing log source is a detection blind spot
+- Monitor for log gaps Ã¢â‚¬â€ a missing log source is a detection blind spot
 - Regularly test detection rules against MITRE ATT&CK techniques
 
 ## Related Modules
@@ -188,68 +188,68 @@ alert_tuning:
 
 ```
 Data Sources:
-├── Network
-│   ├── Firewall logs
-│   ├── IDS/IPS alerts
-│   ├── NetFlow data
-│   ├── DNS logs
-│   └── Proxy logs
-├── Endpoint
-│   ├── EDR telemetry
-│   ├── Windows Event Logs
-│   ├── Sysmon logs
-│   └── File integrity monitoring
-├── Application
-│   ├── Web server logs
-│   ├── Application logs
-│   ├── Database audit logs
-│   └── API access logs
-├── Identity
-│   ├── Active Directory logs
-│   ├── SSO/IAM logs
-│   └── VPN logs
-└── Cloud
-    ├── CloudTrail/Activity Log
-    ├── VPC Flow Logs
-    └── S3 access logs
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Firewall logs
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ IDS/IPS alerts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ NetFlow data
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ DNS logs
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Proxy logs
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Endpoint
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ EDR telemetry
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Windows Event Logs
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Sysmon logs
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ File integrity monitoring
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Application
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Web server logs
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Application logs
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Database audit logs
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ API access logs
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Identity
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Active Directory logs
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SSO/IAM logs
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ VPN logs
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Cloud
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ CloudTrail/Activity Log
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ VPC Flow Logs
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ S3 access logs
 
 Collection Layer:
-├── Log Collectors (Fluentd, Logstash)
-├── API Pollers
-├── Agent-based (OSSEC, Wazuh)
-└── Network TAPs
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Log Collectors (Fluentd, Logstash)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ API Pollers
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Agent-based (OSSEC, Wazuh)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Network TAPs
 
 Processing Layer:
-├── Normalization
-├── Enrichment (GeoIP, Threat Intel)
-├── Deduplication
-└── Correlation Engine
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Normalization
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Enrichment (GeoIP, Threat Intel)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Deduplication
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Correlation Engine
 
 Storage Layer:
-├── Hot (7 days, SSD)
-├── Warm (30 days, HDD)
-├── Cold (1 year, Archive)
-└── Frozen (7+ years, Glacier)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Hot (7 days, SSD)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Warm (30 days, HDD)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cold (1 year, Archive)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Frozen (7+ years, Glacier)
 
 Analysis Layer:
-├── Real-time correlation
-├── Historical queries
-├── ML anomaly detection
-└── Threat hunting
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Real-time correlation
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Historical queries
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ML anomaly detection
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Threat hunting
 
 Visualization Layer:
-├── Dashboards
-├── Alerts
-├── Reports
-└── Executive views
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Dashboards
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Alerts
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reports
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Executive views
 ```
 
 ### Alert Processing Pipeline
 
 ```
-Raw Events → Normalization → Enrichment → Correlation → Alert → Triage → Response
-    │              │              │              │          │         │         │
-    └── Parse      └── Standardize └── Add context └── Pattern └── Create └── Analyst └── Action
+Raw Events Ã¢â€ â€™ Normalization Ã¢â€ â€™ Enrichment Ã¢â€ â€™ Correlation Ã¢â€ â€™ Alert Ã¢â€ â€™ Triage Ã¢â€ â€™ Response
+    Ã¢â€â€š              Ã¢â€â€š              Ã¢â€â€š              Ã¢â€â€š          Ã¢â€â€š         Ã¢â€â€š         Ã¢â€â€š
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Parse      Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Standardize Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Add context Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Pattern Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Create Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Analyst Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Action
 ```
 
 ## Integration Guide
@@ -338,19 +338,19 @@ deployer.deploy_rules(
 
 ```
 Strategy:
-├── Filtering at source (reduce noise)
-│   ├── Drop verbose debug logs
-│   ├── Sample high-volume events
-│   └── Aggregate similar events
-├── Tiered storage
-│   ├── Hot: 7 days SSD
-│   ├── Warm: 30 days HDD
-│   ├── Cold: 1 year archive
-│   └── Frozen: 7+ years compliance
-└── Compression
-    ├── Zstandard for hot/warm
-    ├── gzip for cold
-    └── Raw for frozen
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Filtering at source (reduce noise)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Drop verbose debug logs
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Sample high-volume events
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Aggregate similar events
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tiered storage
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Hot: 7 days SSD
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Warm: 30 days HDD
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cold: 1 year archive
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Frozen: 7+ years compliance
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Compression
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Zstandard for hot/warm
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ gzip for cold
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Raw for frozen
 ```
 
 ### Dashboard Performance
@@ -368,7 +368,7 @@ optimizer.optimize(
         "precompute_summaries",
     ],
 )
-print(f"Load time: {optimizer.original_load_time}s → {optimizer.optimized_load_time}s")
+print(f"Load time: {optimizer.original_load_time}s Ã¢â€ â€™ {optimizer.optimized_load_time}s")
 ```
 
 ## Security Considerations
@@ -387,11 +387,11 @@ print(f"Load time: {optimizer.original_load_time}s → {optimizer.optimized_load
 
 ```
 Sensitive Data Handling:
-├── PII in logs → Mask/hash before storage
-├── Credentials → Never log; use vault references
-├── Financial data → Encrypt at rest and in transit
-├── Health data → HIPAA compliance requirements
-└── Card data → PCI-DSS masking requirements
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ PII in logs Ã¢â€ â€™ Mask/hash before storage
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Credentials Ã¢â€ â€™ Never log; use vault references
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Financial data Ã¢â€ â€™ Encrypt at rest and in transit
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Health data Ã¢â€ â€™ HIPAA compliance requirements
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Card data Ã¢â€ â€™ PCI-DSS masking requirements
 ```
 
 ### Access Control Matrix
@@ -581,34 +581,34 @@ LogSource:
 
 ```
 1. Planning
-   ├── Define log sources and retention
-   ├── Size infrastructure (CPU, RAM, storage)
-   ├── Plan network architecture
-   └── Define access controls
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Define log sources and retention
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Size infrastructure (CPU, RAM, storage)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Plan network architecture
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Define access controls
 
 2. Installation
-   ├── Deploy SIEM platform
-   ├── Configure storage tiers
-   ├── Set up collectors
-   └── Enable SSL/TLS
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Deploy SIEM platform
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Configure storage tiers
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Set up collectors
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Enable SSL/TLS
 
 3. Configuration
-   ├── Import log sources
-   ├── Create normalization rules
-   ├── Deploy detection rules
-   └── Set up dashboards
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Import log sources
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Create normalization rules
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Deploy detection rules
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Set up dashboards
 
 4. Validation
-   ├── Test log ingestion
-   ├── Verify correlation rules
-   ├── Validate alert routing
-   └── Confirm dashboard data
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Test log ingestion
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify correlation rules
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Validate alert routing
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Confirm dashboard data
 
 5. Go-Live
-   ├── Enable monitoring
-   ├── Train analysts
-   ├── Document procedures
-   └── Schedule reviews
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Enable monitoring
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Train analysts
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Document procedures
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Schedule reviews
 ```
 
 ## Monitoring & Observability
@@ -628,20 +628,20 @@ LogSource:
 
 ```
 SOC Overview Dashboard:
-├── Alert volume by severity
-├── Mean time to detect (MTTD)
-├── Mean time to respond (MTTR)
-├── Top alert types
-├── Analyst workload
-└── Trend lines (7d, 30d)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Alert volume by severity
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Mean time to detect (MTTD)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Mean time to respond (MTTR)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Top alert types
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Analyst workload
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Trend lines (7d, 30d)
 
 Infrastructure Dashboard:
-├── Log ingestion rates
-├── Storage utilization
-├── Query performance
-├── Collector health
-├── Error rates
-└── Capacity forecasting
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Log ingestion rates
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Storage utilization
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Query performance
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Collector health
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Error rates
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Capacity forecasting
 ```
 
 ## Testing Strategy
@@ -650,22 +650,22 @@ Infrastructure Dashboard:
 
 ```
 1. Rule Validation
-   ├── Test against known-good data (FP check)
-   ├── Test against known-bad data (TP check)
-   ├── Performance testing (latency)
-   └── Volume testing (scale)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Test against known-good data (FP check)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Test against known-bad data (TP check)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Performance testing (latency)
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Volume testing (scale)
 
 2. Red Team Validation
-   ├── Execute MITRE ATT&CK techniques
-   ├── Verify detection triggers
-   ├── Measure detection time
-   └── Document coverage gaps
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Execute MITRE ATT&CK techniques
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify detection triggers
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Measure detection time
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Document coverage gaps
 
 3. Regression Testing
-   ├── Run rules against historical data
-   ├── Compare alert volumes
-   ├── Identify new false positives
-   └── Verify no false negatives
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Run rules against historical data
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Compare alert volumes
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Identify new false positives
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Verify no false negatives
 ```
 
 ## Versioning & Migration
@@ -692,7 +692,7 @@ v1.0.x: Rule tuning and false positive fixes
 
 | Term | Definition |
 |------|-----------|
-| EPS | Events Per Second — log ingestion rate |
+| EPS | Events Per Second Ã¢â‚¬â€ log ingestion rate |
 | SIEM | Security Information and Event Management |
 | SOC | Security Operations Center |
 | Sigma | Vendor-agnostic detection rule format |
@@ -768,3 +768,171 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

@@ -103,7 +103,7 @@ reporter.export_pdf(report, "forensic_report.pdf")
 
 ## Best Practices
 
-- Always work with forensic copies, never original evidence — maintain write blockers
+- Always work with forensic copies, never original evidence Ã¢â‚¬â€ maintain write blockers
 - Document every step of the examination with timestamps and examiner identity
 - Calculate and verify cryptographic hashes before and after every evidence handling step
 - Use validated forensic tools with published validation results (NIST CFTT)
@@ -187,42 +187,42 @@ timeline:
 
 ```
 Case Initiation
-├── Document case details
-├── Define scope and objectives
-├── Assign examiner
-└── Establish chain of custody
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Document case details
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Define scope and objectives
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Assign examiner
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Establish chain of custody
 
 Evidence Collection
-├── Volatile data (memory, network, processes)
-├── Live acquisition (if system running)
-├── Dead acquisition (disk imaging)
-└── Network captures
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Volatile data (memory, network, processes)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Live acquisition (if system running)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Dead acquisition (disk imaging)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Network captures
 
 Analysis
-├── Disk analysis
-│   ├── Partition analysis
-│   ├── File system recovery
-│   ├── Deleted file carving
-│   └── Metadata extraction
-├── Memory analysis
-│   ├── Process extraction
-│   ├── Network connections
-│   ├── Malware detection
-│   └── Registry extraction
-├── Network analysis
-│   ├── Session reconstruction
-│   ├── Protocol analysis
-│   └── Data extraction
-└── Timeline analysis
-    ├── Super timeline creation
-    ├── Event correlation
-    └── Activity reconstruction
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Disk analysis
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Partition analysis
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ File system recovery
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Deleted file carving
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Metadata extraction
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Memory analysis
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Process extraction
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network connections
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Malware detection
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Registry extraction
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network analysis
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Session reconstruction
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Protocol analysis
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Data extraction
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Timeline analysis
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Super timeline creation
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Event correlation
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Activity reconstruction
 
 Reporting
-├── Findings documentation
-├── Evidence catalog
-├── Timeline visualization
-└── Court-admissible report
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Findings documentation
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Evidence catalog
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Timeline visualization
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Court-admissible report
 ```
 
 ### Forensic Evidence Types
@@ -241,28 +241,28 @@ Reporting
 
 ```
 Timeline Sources:
-├── System Logs
-│   ├── Windows Event Logs
-│   ├── Syslog
-│   └── Application logs
-├── File System
-│   ├── $MFT (NTFS)
-│   ├── $LogFile (NTFS)
-│   ├── USN Journal
-│   └── Inode timestamps
-├── Registry
-│   ├── Last write times
-│   ├── UserAssist
-│   ├── AppCompatCache
-│   └── ShellBags
-├── Browser
-│   ├── History databases
-│   ├── Cache files
-│   └── Cookies
-└── Network
-    ├── Connection logs
-    ├── DNS cache
-    └── ARP cache
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ System Logs
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Windows Event Logs
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Syslog
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Application logs
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ File System
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ $MFT (NTFS)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ $LogFile (NTFS)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ USN Journal
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Inode timestamps
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Registry
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Last write times
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ UserAssist
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AppCompatCache
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ShellBags
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Browser
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ History databases
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cache files
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Cookies
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Network
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Connection logs
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ DNS cache
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ARP cache
 ```
 
 ## Integration Guide
@@ -401,25 +401,25 @@ print(f"Total time: {result.total_time_seconds:.1f}s")
 
 ```
 Tool Validation Requirements:
-├── NIST CFTT (Computer Forensics Tool Testing)
-│   ├── Disk imaging tools
-│   ├── Write blockers
-│   └── Analysis tools
-├── Tool version documentation
-├── Validation test results
-├── Peer review of methodology
-└── Court admissibility assessment
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ NIST CFTT (Computer Forensics Tool Testing)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Disk imaging tools
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Write blockers
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Analysis tools
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tool version documentation
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Validation test results
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Peer review of methodology
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Court admissibility assessment
 ```
 
 ### Legal Requirements
 
 ```
 Court Admissibility (Daubert Standard):
-├── Methodology is testable
-├── Methodology has been peer reviewed
-├── Known error rate is documented
-├── Methodology is generally accepted
-└── Examiner is qualified
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Methodology is testable
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Methodology has been peer reviewed
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Known error rate is documented
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Methodology is generally accepted
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Examiner is qualified
 ```
 
 ## Troubleshooting Guide
@@ -613,29 +613,29 @@ TimelineEvent:
 
 ```
 1. Hardware
-   ├── Forensic workstation (16+ cores, 64GB RAM, 4TB NVMe)
-   ├── Write blockers (hardware)
-   ├── Forensic storage array (encrypted)
-   ├── Network tap (for live analysis)
-   └── Evidence storage (climate-controlled)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Forensic workstation (16+ cores, 64GB RAM, 4TB NVMe)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Write blockers (hardware)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Forensic storage array (encrypted)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network tap (for live analysis)
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Evidence storage (climate-controlled)
 
 2. Software
-   ├── Volatility3 (memory analysis)
-   ├── Autopsy/Sleuth Kit (disk analysis)
-   ├── Plaso (timeline)
-   ├── Wireshark (network)
-   ├── YARA (malware detection)
-   └── FTK Imager (imaging)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Volatility3 (memory analysis)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Autopsy/Sleuth Kit (disk analysis)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Plaso (timeline)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Wireshark (network)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ YARA (malware detection)
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ FTK Imager (imaging)
 
 3. Infrastructure
-   ├── Isolated forensic network
-   ├── Evidence management system
-   ├── Case management system
-   └── Report generation templates
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Isolated forensic network
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Evidence management system
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Case management system
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Report generation templates
 
 4. Validation
-   ├── NIST CFTT tool validation
-   ├── Procedure validation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ NIST CFTT tool validation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Procedure validation
     examiner qualification
     documentation
 ```
@@ -656,13 +656,13 @@ TimelineEvent:
 
 ```
 Forensic Case Dashboard:
-├── Active cases by priority
-├── Evidence collection status
-├── Analysis progress
-├── Case aging (days open)
-├── Tool utilization
-├── Examiner workload
-└── Storage utilization
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Active cases by priority
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Evidence collection status
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Analysis progress
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Case aging (days open)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tool utilization
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Examiner workload
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Storage utilization
 ```
 
 ## Testing Strategy
@@ -671,15 +671,15 @@ Forensic Case Dashboard:
 
 ```
 1. Tool Validation
-   ├── NIST CFTT test cases
-   ├── Known-answer tests
-   ├── Error rate documentation
-   └── Peer review of results
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ NIST CFTT test cases
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Known-answer tests
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Error rate documentation
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Peer review of results
 
 2. Procedure Testing
-   ├── Mock case exercises
-   ├── Chain of custody verification
-   ├── Timeline reconstruction accuracy
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Mock case exercises
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Chain of custody verification
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Timeline reconstruction accuracy
     admissibility review
 ```
 
@@ -689,19 +689,19 @@ Forensic Case Dashboard:
 
 ```
 Major: New analysis capability
-├── Example: New memory format support
-├── Requires: Re-validation
-└── Risk: Analysis methodology change
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: New memory format support
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Re-validation
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Analysis methodology change
 
 Minor: New plugins/features
-├── Example: New YARA rules
-├── Requires: Update documentation
-└── Risk: Low
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: New YARA rules
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Update documentation
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Low
 
 Patch: Bug fixes
-├── Example: Hash calculation fix
-├── Requires: Re-run affected cases
-└── Risk: Low
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Hash calculation fix
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Re-run affected cases
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Low
 ```
 
 ## Glossary
@@ -711,7 +711,7 @@ Patch: Bug fixes
 | Chain of Custody | Documented evidence handling history |
 | Dead Forensics | Analysis of powered-off system |
 | DFIR | Digital Forensics and Incident Response |
-| E01 | Expert Witness Format — forensic image format |
+| E01 | Expert Witness Format Ã¢â‚¬â€ forensic image format |
 | File Carving | Recovering files from raw disk data |
 | Hash Verification | Confirming evidence integrity |
 | Live Forensics | Analysis of running system |
@@ -783,3 +783,171 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

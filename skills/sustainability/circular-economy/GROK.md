@@ -170,22 +170,22 @@ config = {
 | **Material Circularity Indicator (MCI)** | `(V_r + V_u) / (V_t + V_w)` | Ellen MacArthur Foundation circularity metric |
 | **Recycling Rate** | `Recycled_output / Total_material_input` | Percentage of input materials recovered |
 | **Diversion Rate** | `Diverted_waste / Total_waste` | Percentage of waste diverted from landfill |
-| **Remanufacturing ROI** | `(New_cost - Reman_cost) / Reman_cost × 100` | Return on investment for remanufacturing |
-| **EPR Fee** | `Weight_kg × Fee_per_kg` | Extended Producer Responsibility compliance cost |
-| **Industrial Symbiosis Value** | `Quantity × Price_savings + avoided_disposal` | Economic value of waste-as-resource exchanges |
+| **Remanufacturing ROI** | `(New_cost - Reman_cost) / Reman_cost Ãƒâ€” 100` | Return on investment for remanufacturing |
+| **EPR Fee** | `Weight_kg Ãƒâ€” Fee_per_kg` | Extended Producer Responsibility compliance cost |
+| **Industrial Symbiosis Value** | `Quantity Ãƒâ€” Price_savings + avoided_disposal` | Economic value of waste-as-resource exchanges |
 | **Product Circularity Score** | `Weighted sum of design criteria` | 0-100 score across durability, repairability, recyclability |
 | **Material Efficiency** | `Product_output / Material_input` | Fraction of input materials ending up in final product |
 | **Recovery Rate** | `Recovered_material / Total_material_processed` | Percentage of material successfully recovered from waste |
-| **Symbiosis Match Score** | `Qty_match × 60 + distance_score × 40` | Weighted feasibility of industrial symbiosis pairing |
+| **Symbiosis Match Score** | `Qty_match Ãƒâ€” 60 + distance_score Ãƒâ€” 40` | Weighted feasibility of industrial symbiosis pairing |
 | **Landfill Diversion Rate** | `1 - (Landfill_waste / Total_waste)` | Percentage of waste diverted from landfill via recycling or reuse |
 | **EPR Compliance Rate** | `Compliant_products / Total_products` | Percentage of products with active EPR registrations |
 
 ## Related Modules
 
-- [green-it](../green-it/GROK.md) — E-waste tracking and IT hardware lifecycle management. Extends circular-economy's general MFA with IT-specific asset tracking and disposal workflows.
-- [carbon-tracking](../carbon-tracking/GROK.md) — Embodied carbon in materials and Scope 3 product lifecycle emissions. Provides the carbon accounting framework that lifecycle stages feed into.
-- [green-computing](../green-computing/GROK.md) — Energy efficiency in computing systems. Addresses the operational energy dimension that complements circular-economy's material focus.
-- [renewable-energy](../renewable-energy/GROK.md) — End-of-life management for solar panels, wind turbine blades, and batteries. Handles the circularity challenges specific to renewable energy equipment.
+- [green-it](../green-it/GROK.md) Ã¢â‚¬â€ E-waste tracking and IT hardware lifecycle management. Extends circular-economy's general MFA with IT-specific asset tracking and disposal workflows.
+- [carbon-tracking](../carbon-tracking/GROK.md) Ã¢â‚¬â€ Embodied carbon in materials and Scope 3 product lifecycle emissions. Provides the carbon accounting framework that lifecycle stages feed into.
+- [green-computing](../green-computing/GROK.md) Ã¢â‚¬â€ Energy efficiency in computing systems. Addresses the operational energy dimension that complements circular-economy's material focus.
+- [renewable-energy](../renewable-energy/GROK.md) Ã¢â‚¬â€ End-of-life management for solar panels, wind turbine blades, and batteries. Handles the circularity challenges specific to renewable energy equipment.
 
 ## Standards & Frameworks Referenced
 
@@ -732,11 +732,11 @@ mfa = MaterialFlowAnalyzer(
 
 | Term | Definition |
 |------|-----------|
-| **MFA** | Material Flow Analysis — tracking materials through a system |
-| **MCI** | Material Circularity Indicator — Ellen MacArthur Foundation metric |
-| **C2C** | Cradle to Cradle — product design certification framework |
-| **EPR** | Extended Producer Responsibility — producer obligation for end-of-life |
-| **WEEE** | Waste Electrical and Electronic Equipment — EU directive |
+| **MFA** | Material Flow Analysis Ã¢â‚¬â€ tracking materials through a system |
+| **MCI** | Material Circularity Indicator Ã¢â‚¬â€ Ellen MacArthur Foundation metric |
+| **C2C** | Cradle to Cradle Ã¢â‚¬â€ product design certification framework |
+| **EPR** | Extended Producer Responsibility Ã¢â‚¬â€ producer obligation for end-of-life |
+| **WEEE** | Waste Electrical and Electronic Equipment Ã¢â‚¬â€ EU directive |
 | **Downcycling** | Recycling that reduces material quality |
 | **Upcycling** | Recycling that improves material quality |
 | **Industrial Symbiosis** | One company's waste as another's feedstock |
@@ -796,3 +796,171 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

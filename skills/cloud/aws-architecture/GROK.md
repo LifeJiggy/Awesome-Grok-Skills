@@ -15,7 +15,7 @@ This skill is essential for cloud architects, DevOps engineers, and solutions ar
 
 ## Core Capabilities
 
-- **Well-Architected Review**: Assessment across 6 pillars — operational excellence, security, reliability, performance efficiency, cost optimization, sustainability
+- **Well-Architected Review**: Assessment across 6 pillars Ã¢â‚¬â€ operational excellence, security, reliability, performance efficiency, cost optimization, sustainability
 - **Compute Patterns**: EC2, Lambda, ECS/EKS, Fargate selection criteria and deployment architectures
 - **Storage Patterns**: S3, EBS, EFS, and storage class optimization for different access patterns
 - **Networking**: VPC design, Transit Gateway, Direct Connect, and hybrid connectivity patterns
@@ -107,14 +107,14 @@ for rec in report.recommendations:
 
 ## Best Practices
 
-- Design for failure — every component should be treated as replaceable
+- Design for failure Ã¢â‚¬â€ every component should be treated as replaceable
 - Use Auto Scaling for all stateless workloads to handle traffic variability
 - Implement multi-AZ by default; use multi-region only for DR or global latency
 - Apply defense-in-depth: WAF, Shield, Security Groups, NACLs, IAM policies
 - Use S3 Intelligent-Tiering for unpredictable access patterns
 - Enable CloudTrail in all regions and guardrails via AWS Organizations SCPs
 - Tag all resources for cost allocation: environment, team, project, cost-center
-- Use SSM Parameter Store or Secrets Manager — never hardcode secrets
+- Use SSM Parameter Store or Secrets Manager Ã¢â‚¬â€ never hardcode secrets
 - Implement health checks at every layer with proper thresholds
 - Review AWS Well-Architected Framework bi-annually for every production workload
 
@@ -198,21 +198,21 @@ well_architected:
 
 ```
 Multi-AZ Deployment:
-├── Application Tier
-│   ├── ALB (Application Load Balancer)
-│   ├── Auto Scaling Group
-│   ├── EC2 instances (2+ AZs)
-│   └── Target Groups
-├── Database Tier
-│   ├── RDS Multi-AZ
-│   ├── Read Replicas
-│   └── ElastiCache
-├── Storage Tier
-│   ├── S3 (Cross-Region Replication)
-│   └── EBS (Multi-Attach)
-└── DNS
-    ├── Route 53 (health checks)
-    └── Latency-based routing
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Application Tier
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ALB (Application Load Balancer)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Auto Scaling Group
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ EC2 instances (2+ AZs)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Target Groups
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Database Tier
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ RDS Multi-AZ
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Read Replicas
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ElastiCache
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Storage Tier
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ S3 (Cross-Region Replication)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ EBS (Multi-Attach)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ DNS
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Route 53 (health checks)
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Latency-based routing
 ```
 
 ### Disaster Recovery Strategies
@@ -228,34 +228,34 @@ Multi-AZ Deployment:
 
 ```
 Event-Driven Architecture:
-├── API Gateway → Lambda → DynamoDB
-├── S3 Events → Lambda → SQS
-├── DynamoDB Streams → Lambda → Elasticsearch
-├── SNS → Lambda → Multiple targets
-├── EventBridge → Step Functions → Multiple services
-└── Kinesis → Lambda → S3/Redshift
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ API Gateway Ã¢â€ â€™ Lambda Ã¢â€ â€™ DynamoDB
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ S3 Events Ã¢â€ â€™ Lambda Ã¢â€ â€™ SQS
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ DynamoDB Streams Ã¢â€ â€™ Lambda Ã¢â€ â€™ Elasticsearch
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SNS Ã¢â€ â€™ Lambda Ã¢â€ â€™ Multiple targets
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ EventBridge Ã¢â€ â€™ Step Functions Ã¢â€ â€™ Multiple services
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Kinesis Ã¢â€ â€™ Lambda Ã¢â€ â€™ S3/Redshift
 ```
 
 ### Data Lake Architecture
 
 ```
 Data Lake Layers:
-├── Raw Zone (S3)
-│   ├── Original format
-│   └── Immutable
-├── Cleansed Zone (S3)
-│   ├── Validated
-│   └── Schema applied
-├── Processed Zone (S3)
-│   ├── Transformed
-│   └── Enriched
-├── Consumption Zone (S3)
-│   ├── Analytics-ready
-│   └── ML-ready
-└── Governance
-    ├── AWS Glue Catalog
-    ├── Lake Formation
-    └── Data Lineage
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Raw Zone (S3)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Original format
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Immutable
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cleansed Zone (S3)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Validated
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Schema applied
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Processed Zone (S3)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Transformed
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Enriched
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Consumption Zone (S3)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Analytics-ready
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ML-ready
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Governance
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AWS Glue Catalog
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Lake Formation
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Data Lineage
 ```
 
 ## Integration Guide
@@ -349,30 +349,30 @@ Resources:
 
 ```
 S3 Storage Classes:
-├── S3 Standard — Frequent access
-├── S3 Intelligent-Tiering — Unknown patterns
-├── S3 Standard-IA — Infrequent access (30d min)
-├── S3 One Zone-IA — Non-critical, re-creatable
-├── S3 Glacier Instant Retrieval — Archive (ms access)
-├── S3 Glacier Flexible Retrieval — Archive (min-hours)
-└── S3 Glacier Deep Archive — Long-term archive (12h)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ S3 Standard Ã¢â‚¬â€ Frequent access
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ S3 Intelligent-Tiering Ã¢â‚¬â€ Unknown patterns
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ S3 Standard-IA Ã¢â‚¬â€ Infrequent access (30d min)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ S3 One Zone-IA Ã¢â‚¬â€ Non-critical, re-creatable
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ S3 Glacier Instant Retrieval Ã¢â‚¬â€ Archive (ms access)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ S3 Glacier Flexible Retrieval Ã¢â‚¬â€ Archive (min-hours)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ S3 Glacier Deep Archive Ã¢â‚¬â€ Long-term archive (12h)
 
 EBS Volume Types:
-├── gp3 — General SSD (3000 IOPS baseline)
-├── io2 — High-performance SSD (64K IOPS)
-├── st1 — Throughput-optimized HDD
-└── sc1 — Cold HDD (infrequent access)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ gp3 Ã¢â‚¬â€ General SSD (3000 IOPS baseline)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ io2 Ã¢â‚¬â€ High-performance SSD (64K IOPS)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ st1 Ã¢â‚¬â€ Throughput-optimized HDD
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ sc1 Ã¢â‚¬â€ Cold HDD (infrequent access)
 ```
 
 ### Network Optimization
 
 ```
 Performance Techniques:
-├── CloudFront caching (edge locations)
-├── Global Accelerator (anycast IP)
-├── VPC endpoints (S3, DynamoDB)
-├── Direct Connect (dedicated bandwidth)
-└── Enhanced networking (ENA)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ CloudFront caching (edge locations)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Global Accelerator (anycast IP)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ VPC endpoints (S3, DynamoDB)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Direct Connect (dedicated bandwidth)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Enhanced networking (ENA)
 ```
 
 ## Security Considerations
@@ -415,12 +415,12 @@ Performance Techniques:
 
 ```
 Security Layers:
-├── Security Groups (stateful, instance-level)
-├── NACLs (stateless, subnet-level)
-├── VPC Endpoints (private connectivity)
-├── Flow Logs (traffic monitoring)
-├── Network Firewall (traffic inspection)
-└── WAF (application layer protection)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Security Groups (stateful, instance-level)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ NACLs (stateless, subnet-level)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ VPC Endpoints (private connectivity)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Flow Logs (traffic monitoring)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network Firewall (traffic inspection)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ WAF (application layer protection)
 ```
 
 ## Troubleshooting Guide
@@ -579,23 +579,23 @@ LambdaFunction:
 
 ```
 1. Prerequisites
-   ├── AWS account with admin access
-   ├── AWS CLI configured
-   ├── Terraform/CDK installed
-   └── State backend configured
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AWS account with admin access
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AWS CLI configured
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Terraform/CDK installed
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ State backend configured
 
 2. Deployment Steps
-   ├── Initialize Terraform/CDK
-   ├── Plan infrastructure changes
-   ├── Apply infrastructure
-   ├── Verify deployment
-   └── Update documentation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Initialize Terraform/CDK
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Plan infrastructure changes
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Apply infrastructure
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify deployment
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Update documentation
 
 3. Post-Deployment
-   ├── Configure monitoring
-   ├── Set up alerts
-   ├── Enable backup
-   └── Document procedures
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Configure monitoring
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Set up alerts
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Enable backup
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Document procedures
 ```
 
 ### CI/CD Pipeline
@@ -661,24 +661,24 @@ cloudwatch.put_metric_data(
 
 ```
 1. Unit Tests
-   ├── Lambda function logic
-   ├── Data transformation
-   └── API integration
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Lambda function logic
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data transformation
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ API integration
 
 2. Integration Tests
-   ├── End-to-end workflows
-   ├── Service interactions
-   └── Error handling
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ End-to-end workflows
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Service interactions
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Error handling
 
 3. Performance Tests
-   ├── Load testing (Locust)
-   ├── Stress testing
-   └── Endurance testing
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Load testing (Locust)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Stress testing
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Endurance testing
 
 4. Security Tests
-   ├── Penetration testing
-   ├── IAM policy review
-   └── Vulnerability scanning
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Penetration testing
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ IAM policy review
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Vulnerability scanning
 ```
 
 ## Versioning & Migration
@@ -687,19 +687,19 @@ cloudwatch.put_metric_data(
 
 ```
 Major: New architecture pattern
-├── Example: Migrate from EC2 to Lambda
-├── Requires: Full testing, rollback plan
-└── Risk: High
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Migrate from EC2 to Lambda
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Full testing, rollback plan
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: High
 
 Minor: Service additions
-├── Example: Add ElastiCache cluster
-├── Requires: Testing, documentation
-└── Risk: Low
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Add ElastiCache cluster
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Testing, documentation
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Low
 
 Patch: Configuration changes
-├── Example: Update instance type
-├── Requires: Basic testing
-└── Risk: Very low
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Update instance type
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Basic testing
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Very low
 ```
 
 ## Glossary
@@ -782,3 +782,171 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

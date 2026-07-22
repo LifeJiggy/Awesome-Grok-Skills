@@ -91,14 +91,14 @@ print(f"Technologies: {arch.technologies}")
 
 - Use Kubernetes as the compute abstraction layer for maximum portability across clouds
 - Prefer managed services with open standards (PostgreSQL, Redis, Kafka) over proprietary alternatives
-- Implement identity federation — one identity across all clouds, not separate accounts
+- Implement identity federation Ã¢â‚¬â€ one identity across all clouds, not separate accounts
 - Use Terraform with multi-provider modules for consistent infrastructure-as-code
 - Deploy service mesh (Istio/Linkerd) for consistent networking and observability across clouds
 - Centralize secrets management with a cloud-agnostic tool (HashiCorp Vault)
 - Implement unified logging and monitoring across all cloud providers
 - Use CDN providers with multi-cloud origins (Cloudflare, Fastly) for edge consistency
 - Maintain cloud-agnostic data formats (Parquet, Avro) for portability
-- Design for graceful degradation — what happens when one cloud provider has an outage?
+- Design for graceful degradation Ã¢â‚¬â€ what happens when one cloud provider has an outage?
 
 ## Related Modules
 
@@ -196,72 +196,72 @@ spec:
 
 ```
 Multi-Cloud Strategy:
-├── Workload Placement
-│   ├── AWS — Compute-heavy, ML workloads
-│   ├── Azure — Enterprise integration, .NET
-│   ├── GCP — Data analytics, AI/ML
-│   └── On-prem — Compliance, legacy
-├── Networking
-│   ├── Cloud Interconnect (dedicated)
-│   ├── VPN (encrypted tunnels)
-│   ├── SD-WAN (software-defined)
-│   └── Service Mesh (Istio/Linkerd)
-├── Identity
-│   ├── Federated identity (OIDC)
-│   ├── Workload identity federation
-│   └── Cross-cloud SSO
-├── Data
-│   ├── Multi-cloud replication
-│   ├── Conflict resolution
-│   └── Consistency models
-└── Management
-    ├── Unified control plane
-    ├── Cost management
-    └── Compliance monitoring
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Workload Placement
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AWS Ã¢â‚¬â€ Compute-heavy, ML workloads
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Azure Ã¢â‚¬â€ Enterprise integration, .NET
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ GCP Ã¢â‚¬â€ Data analytics, AI/ML
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ On-prem Ã¢â‚¬â€ Compliance, legacy
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Networking
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cloud Interconnect (dedicated)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ VPN (encrypted tunnels)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SD-WAN (software-defined)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Service Mesh (Istio/Linkerd)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Identity
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Federated identity (OIDC)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Workload identity federation
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Cross-cloud SSO
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Multi-cloud replication
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Conflict resolution
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Consistency models
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Management
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Unified control plane
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cost management
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Compliance monitoring
 ```
 
 ### Identity Federation Architecture
 
 ```
 Identity Federation:
-├── Primary Identity Provider
-│   ├── Azure AD/Entra ID
-│   ├── Okta
-│   └── Auth0
-├── Federation
-│   ├── OIDC tokens
-│   ├── SAML assertions
-│   └── Workload identity
-├── Cross-Cloud Access
-│   ├── AWS AssumeRole
-│   ├── Azure Managed Identity
-│   └── GCP Workload Identity
-└── Audit
-    ├── Centralized logging
-    ├── Compliance tracking
-    └── Access reviews
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Primary Identity Provider
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Azure AD/Entra ID
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Okta
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Auth0
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Federation
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ OIDC tokens
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SAML assertions
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Workload identity
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cross-Cloud Access
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AWS AssumeRole
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Azure Managed Identity
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ GCP Workload Identity
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Audit
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Centralized logging
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Compliance tracking
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Access reviews
 ```
 
 ### Data Synchronization Architecture
 
 ```
 Data Sync Patterns:
-├── Active-Active
-│   ├── Multi-master replication
-│   ├── Conflict resolution (last-write-wins)
-│   └── High availability
-├── Active-Passive
-│   ├── Primary-replica
-│   ├── Failover capability
-│   └── Cost efficient
-├── Event-Driven
-│   ├── Event sourcing
-│   ├── CQRS pattern
-│   └── Eventually consistent
-└── Batch Sync
-    ├── Scheduled replication
-    ├── ETL pipelines
-    └── Data lake integration
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Active-Active
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Multi-master replication
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Conflict resolution (last-write-wins)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ High availability
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Active-Passive
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Primary-replica
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Failover capability
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Cost efficient
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Event-Driven
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Event sourcing
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ CQRS pattern
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Eventually consistent
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Batch Sync
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scheduled replication
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ETL pipelines
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Data lake integration
 ```
 
 ## Integration Guide
@@ -360,24 +360,24 @@ print(f"GCP Key: {secret['data']['data']['gcp_key'][:8]}...")
 
 ```
 Multi-Cloud Cost Strategies:
-├── Spot/Preemptible instances (60-90% savings)
-├── Reserved/Committed use (30-60% savings)
-├── Right-sizing across providers
-├── Cross-cloud arbitrage
-├── Shared services consolidation
-└── Unified cost management
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Spot/Preemptible instances (60-90% savings)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reserved/Committed use (30-60% savings)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Right-sizing across providers
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cross-cloud arbitrage
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Shared services consolidation
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Unified cost management
 ```
 
 ### Data Transfer Optimization
 
 ```
 Data Transfer Strategies:
-├── Minimize cross-cloud transfers
-├── Use compression
-├── Batch transfers during off-peak
-├── Cache frequently accessed data
-├── Use CDN for static content
-└── Optimize serialization format
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Minimize cross-cloud transfers
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Use compression
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Batch transfers during off-peak
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cache frequently accessed data
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Use CDN for static content
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Optimize serialization format
 ```
 
 ## Security Considerations
@@ -396,23 +396,23 @@ Data Transfer Strategies:
 
 ```
 Zero Trust Principles:
-├── Verify explicitly
-├── Use least privilege access
-├── Assume breach
-├── Micro-segmentation
-├── Encrypt everything
-└── Continuous monitoring
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify explicitly
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Use least privilege access
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Assume breach
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Micro-segmentation
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Encrypt everything
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Continuous monitoring
 ```
 
 ### Secret Management
 
 ```
 Cross-Cloud Secrets:
-├── HashiCorp Vault (centralized)
-├── AWS Secrets Manager
-├── Azure Key Vault
-├── GCP Secret Manager
-└── Synchronization between providers
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ HashiCorp Vault (centralized)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AWS Secrets Manager
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Azure Key Vault
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ GCP Secret Manager
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Synchronization between providers
 ```
 
 ## Troubleshooting Guide
@@ -542,28 +542,28 @@ CrossCloudMetric:
 
 ```
 1. Planning
-   ├── Define workload placement strategy
-   ├── Select providers
-   ├── Design networking
-   └── Plan identity federation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Define workload placement strategy
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Select providers
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Design networking
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Plan identity federation
 
 2. Infrastructure
-   ├── Deploy networking (interconnects)
-   ├── Set up identity federation
-   ├── Configure secret management
-   └── Deploy monitoring
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Deploy networking (interconnects)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Set up identity federation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Configure secret management
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Deploy monitoring
 
 3. Deployment
-   ├── Deploy workloads to each cloud
-   ├── Configure cross-cloud communication
-   ├── Set up data replication
-   └── Enable failover
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Deploy workloads to each cloud
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Configure cross-cloud communication
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Set up data replication
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Enable failover
 
 4. Operations
-   ├── Unified monitoring
-   ├── Cost management
-   ├── Compliance monitoring
-   └── Incident response
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Unified monitoring
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cost management
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Compliance monitoring
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Incident response
 ```
 
 ## Monitoring & Observability
@@ -582,13 +582,13 @@ CrossCloudMetric:
 
 ```
 Multi-Cloud Dashboard:
-├── Cost summary by provider
-├── Performance comparison
-├── Security posture
-├── Compliance status
-├── Resource utilization
-├── Cross-cloud connectivity
-└── Alert summary
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cost summary by provider
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Performance comparison
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Security posture
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Compliance status
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Resource utilization
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cross-cloud connectivity
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Alert summary
 ```
 
 ## Testing Strategy
@@ -597,22 +597,22 @@ Multi-Cloud Dashboard:
 
 ```
 1. Connectivity Tests
-   ├── Cross-cloud latency
-   ├── Bandwidth testing
-   ├── Failover testing
-   └── VPN stability
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cross-cloud latency
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Bandwidth testing
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Failover testing
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ VPN stability
 
 2. Identity Tests
-   ├── Federation validation
-   ├── Cross-cloud access
-   ├── Role propagation
-   └── Token exchange
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Federation validation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cross-cloud access
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Role propagation
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Token exchange
 
 3. Data Tests
-   ├── Replication accuracy
-   ├── Conflict resolution
-   ├── Consistency checks
-   └── Backup/restore
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Replication accuracy
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Conflict resolution
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Consistency checks
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Backup/restore
 ```
 
 ## Versioning & Migration
@@ -621,19 +621,19 @@ Multi-Cloud Dashboard:
 
 ```
 Major: Provider change
-├── Example: Migrate from AWS to GCP
-├── Requires: Full testing, rollback plan
-└── Risk: High
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Migrate from AWS to GCP
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Full testing, rollback plan
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: High
 
 Minor: Service additions
-├── Example: Add Azure for specific workload
-├── Requires: Testing, documentation
-└── Risk: Medium
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Add Azure for specific workload
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Testing, documentation
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Medium
 
 Patch: Configuration changes
-├── Example: Update instance types
-├── Requires: Basic testing
-└── Risk: Low
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Update instance types
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Basic testing
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Low
 ```
 
 ## Glossary
@@ -707,3 +707,171 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

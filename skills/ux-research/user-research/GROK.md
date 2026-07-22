@@ -9,11 +9,11 @@ tags: ["ux-research", "user-research", "interviews", "surveys", "personas"]
 
 ## Overview
 
-User research is the foundation of evidence-based product design. This module provides a comprehensive toolkit for conducting, analyzing, and synthesizing user research across multiple methodologies—from in-depth interviews and surveys to diary studies and card sorting. It enables researchers to move from raw qualitative and quantitative data to actionable personas, journey maps, and jobs-to-be-done frameworks that inform design decisions across product teams.
+User research is the foundation of evidence-based product design. This module provides a comprehensive toolkit for conducting, analyzing, and synthesizing user research across multiple methodologiesÃ¢â‚¬â€from in-depth interviews and surveys to diary studies and card sorting. It enables researchers to move from raw qualitative and quantitative data to actionable personas, journey maps, and jobs-to-be-done frameworks that inform design decisions across product teams.
 
 The toolkit supports the full research lifecycle: recruitment screener design, interview script creation with probing frameworks, survey methodology with statistical rigor, participant management, research repository organization, and multi-method synthesis. It handles both continuous discovery practices (weekly interview cadences, rolling diary studies) and discrete research sprints (generative explorations, evaluative usability rounds, concept testing).
 
-Built for practitioners who need to produce defensible research artifacts at speed, the module enforces methodological best practices—triangulation across methods, saturation tracking, bias mitigation in persona development, and proper statistical treatment of MaxDiff and discrete choice data. All outputs are structured for stakeholder consumption, with severity-weighted findings, prioritized insights, and research-to-action translation.
+Built for practitioners who need to produce defensible research artifacts at speed, the module enforces methodological best practicesÃ¢â‚¬â€triangulation across methods, saturation tracking, bias mitigation in persona development, and proper statistical treatment of MaxDiff and discrete choice data. All outputs are structured for stakeholder consumption, with severity-weighted findings, prioritized insights, and research-to-action translation.
 
 ## Core Capabilities
 
@@ -261,10 +261,10 @@ print(f"Minimum responses needed: {sample}")
 
 ## Related Modules
 
-- [usability-testing](../usability-testing/GROK.md) — Task success measurement, think-aloud analysis, and severity rating
-- [information-architecture](../information-architecture/GROK.md) — Card sort and tree test analysis for IA decisions
-- [interaction-design](../interaction-design/GROK.md) — Micro-interaction patterns informed by user research findings
-- [accessibility](../accessibility/GROK.md) — Inclusive research methods and accessibility-specific participant recruitment
+- [usability-testing](../usability-testing/GROK.md) Ã¢â‚¬â€ Task success measurement, think-aloud analysis, and severity rating
+- [information-architecture](../information-architecture/GROK.md) Ã¢â‚¬â€ Card sort and tree test analysis for IA decisions
+- [interaction-design](../interaction-design/GROK.md) Ã¢â‚¬â€ Micro-interaction patterns informed by user research findings
+- [accessibility](../accessibility/GROK.md) Ã¢â‚¬â€ Inclusive research methods and accessibility-specific participant recruitment
 
 ---
 
@@ -302,38 +302,38 @@ print(f"Significant: {significance.is_significant}, p={significance.p_value:.4f}
 
 ```
 Research Question
-    │
-    ▼
-┌──────────────┐
-│ Method       │── Interview, Survey, Diary, Card Sort
-│ Selection    │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Recruitment  │── Screener, demographics, behavioral criteria
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Data         │── Transcripts, responses, observations
-│ Collection   │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Analysis     │── Thematic coding, affinity diagramming, stats
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Synthesis    │── Personas, journey maps, JTBD
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Delivery     │── Stakeholder report, action items
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Method       Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Interview, Survey, Diary, Card Sort
+Ã¢â€â€š Selection    Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Recruitment  Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Screener, demographics, behavioral criteria
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Data         Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Transcripts, responses, observations
+Ã¢â€â€š Collection   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Analysis     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Thematic coding, affinity diagramming, stats
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Synthesis    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Personas, journey maps, JTBD
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Delivery     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Stakeholder report, action items
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Integration Guide
@@ -555,7 +555,7 @@ Copyright (c) 2024 Awesome Grok Skills
 
 ### Sample Size Calculator
 
-| Population | 95% CI, ±5% | 95% CI, ±3% | 99% CI, ±5% |
+| Population | 95% CI, Ã‚Â±5% | 95% CI, Ã‚Â±3% | 99% CI, Ã‚Â±5% |
 |-----------|-------------|-------------|-------------|
 | 100 | 80 | 92 | 87 |
 | 500 | 217 | 341 | 278 |
@@ -607,7 +607,7 @@ Copyright (c) 2024 Awesome Grok Skills
 | Survey | Monthly | 15 min | 200+ | Quantitative data |
 | Diary study | Quarterly | 21 days | 15-20 | Behavioral patterns |
 | Card sort | Quarterly | 30 min | 20-30 | IA recommendations |
-| A/B test analysis | Weekly | 30 min | — | Statistical results |
+| A/B test analysis | Weekly | 30 min | Ã¢â‚¬â€ | Statistical results |
 
 ### Common Research Biases
 
@@ -624,40 +624,40 @@ Copyright (c) 2024 Awesome Grok Skills
 
 ```
 research-repo/
-├── studies/
-│   ├── 2024-q1-onboarding-interviews/
-│   │   ├── protocol.md
-│   │   ├── transcripts/
-│   │   ├── analysis/
-│   │   └── findings.md
-│   ├── 2024-q1-usability-testing/
-│   └── 2024-q2-diary-study/
-├── personas/
-│   ├── power-collaborator.md
-│   └── occasional-checker.md
-├── journey-maps/
-│   └── onboarding-journey.md
-├── insights/
-│   ├── onboarding.md
-│   └── engagement.md
-└── reports/
-    └── q1-research-report.md
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ studies/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 2024-q1-onboarding-interviews/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ protocol.md
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ transcripts/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ analysis/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ findings.md
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 2024-q1-usability-testing/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ 2024-q2-diary-study/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ personas/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ power-collaborator.md
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ occasional-checker.md
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ journey-maps/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ onboarding-journey.md
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ insights/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ onboarding.md
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ engagement.md
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ reports/
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ q1-research-report.md
 ```
 
 ### Research Ethics Checklist
 
 ```
 ETHICS REVIEW
-    □ Informed consent obtained
-    □ Right to withdraw explained
-    □ Data anonymization plan in place
-    □ Recording consent obtained
-    □ Incentive amount appropriate (not coercive)
-    □ PII storage and retention defined
-    □ Data sharing restrictions documented
-    □ Vulnerable populations considerations
-    □ Accessibility accommodations planned
-    □ IRB approval (if required)
+    Ã¢â€“Â¡ Informed consent obtained
+    Ã¢â€“Â¡ Right to withdraw explained
+    Ã¢â€“Â¡ Data anonymization plan in place
+    Ã¢â€“Â¡ Recording consent obtained
+    Ã¢â€“Â¡ Incentive amount appropriate (not coercive)
+    Ã¢â€“Â¡ PII storage and retention defined
+    Ã¢â€“Â¡ Data sharing restrictions documented
+    Ã¢â€“Â¡ Vulnerable populations considerations
+    Ã¢â€“Â¡ Accessibility accommodations planned
+    Ã¢â€“Â¡ IRB approval (if required)
 ```
 
 ### Complete Interview Script Template
@@ -797,3 +797,171 @@ Thank you for completing this survey! Your feedback helps us improve.
 - [Persona 1]
 - [Persona 2]
 ```
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

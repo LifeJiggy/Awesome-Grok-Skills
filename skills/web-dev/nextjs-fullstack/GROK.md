@@ -9,29 +9,29 @@ tags: ["web-dev", "nextjs", "fullstack", "app-router", "react"]
 
 ## Overview
 
-Next.js App Router represents the evolution of React full-stack development, introducing a file-system based routing convention that unifies server and client rendering strategies under a single mental model. The App Router (introduced in Next.js 13, stable in 14+) replaces the legacy Pages Router with a layout-first architecture where `layout.js`, `page.js`, `loading.js`, and `error.js` compose a nested routing tree. Each segment in the file system maps to a URL path, and the component hierarchy is derived from the folder nesting — eliminating manual route configuration entirely.
+Next.js App Router represents the evolution of React full-stack development, introducing a file-system based routing convention that unifies server and client rendering strategies under a single mental model. The App Router (introduced in Next.js 13, stable in 14+) replaces the legacy Pages Router with a layout-first architecture where `layout.js`, `page.js`, `loading.js`, and `error.js` compose a nested routing tree. Each segment in the file system maps to a URL path, and the component hierarchy is derived from the folder nesting Ã¢â‚¬â€ eliminating manual route configuration entirely.
 
-Server Components are the default rendering strategy in the App Router. Every component in `app/` runs on the server unless explicitly marked with `'use client'`. This means data fetching happens at the component level without `useEffect`, `getServerSideProps`, or client-side state management. The server can directly query databases, call internal APIs, read the filesystem, and stream HTML to the browser while the client hydrates progressively. Client Components handle interactivity — event handlers, browser APIs, state, and effects — and are serialized across the server-client boundary as React Server Component payloads.
+Server Components are the default rendering strategy in the App Router. Every component in `app/` runs on the server unless explicitly marked with `'use client'`. This means data fetching happens at the component level without `useEffect`, `getServerSideProps`, or client-side state management. The server can directly query databases, call internal APIs, read the filesystem, and stream HTML to the browser while the client hydrates progressively. Client Components handle interactivity Ã¢â‚¬â€ event handlers, browser APIs, state, and effects Ã¢â‚¬â€ and are serialized across the server-client boundary as React Server Component payloads.
 
 The full-stack capability extends to API routes colocated with pages, middleware that runs at the edge before routing, image optimization via the `next/image` component, font optimization with `next/font`, and metadata generation through the Metadata API. Server Actions (available since Next.js 14) enable form submissions and mutations directly from Server Components without creating separate API endpoints, completing the full-stack loop where the same codebase handles rendering, data, and mutations.
 
 ## Core Capabilities
 
-- **File-system routing with layouts** — Nested folders define URL segments; shared layouts persist across navigations without remounting
-- **Server/Client Component boundaries** — Default server rendering with explicit `'use client'` for interactive islands
-- **Multi-strategy data fetching** — SSR (request-time), SSG (build-time), ISR (revalidated), and Streaming (chunked HTML)
-- **Server Actions** — Form mutations directly from Server Components without API route boilerplate
-- **Middleware** — Edge-compatible request/response interception for auth, redirects, rewrites, and geo-routing
-- **Image and font optimization** — Automatic WebP/AVIF conversion, lazy loading, layout shift prevention, and font self-hosting
-- **Metadata API** — SEO, Open Graph, JSON-LD, and sitemap generation through structured exports
-- **Parallel and intercepting routes** — Modal overlays, shared layouts across route groups, and route interception for UX patterns
+- **File-system routing with layouts** Ã¢â‚¬â€ Nested folders define URL segments; shared layouts persist across navigations without remounting
+- **Server/Client Component boundaries** Ã¢â‚¬â€ Default server rendering with explicit `'use client'` for interactive islands
+- **Multi-strategy data fetching** Ã¢â‚¬â€ SSR (request-time), SSG (build-time), ISR (revalidated), and Streaming (chunked HTML)
+- **Server Actions** Ã¢â‚¬â€ Form mutations directly from Server Components without API route boilerplate
+- **Middleware** Ã¢â‚¬â€ Edge-compatible request/response interception for auth, redirects, rewrites, and geo-routing
+- **Image and font optimization** Ã¢â‚¬â€ Automatic WebP/AVIF conversion, lazy loading, layout shift prevention, and font self-hosting
+- **Metadata API** Ã¢â‚¬â€ SEO, Open Graph, JSON-LD, and sitemap generation through structured exports
+- **Parallel and intercepting routes** Ã¢â‚¬â€ Modal overlays, shared layouts across route groups, and route interception for UX patterns
 
 ## Usage Examples
 
 ### Basic App Router Page with Server Component Data Fetching
 
 ```python
-# nextjs_fullstack.py — conceptual example of App Router page structure
+# nextjs_fullstack.py Ã¢â‚¬â€ conceptual example of App Router page structure
 from nextjs_fullstack import AppRouter, PageConfig, ServerComponent
 
 router = AppRouter()
@@ -39,7 +39,7 @@ router = AppRouter()
 # Define a page that fetches data server-side at request time
 @router.page("/dashboard")
 class DashboardPage(ServerComponent):
-    """Server Component — runs on the server, no client JS shipped."""
+    """Server Component Ã¢â‚¬â€ runs on the server, no client JS shipped."""
 
     config = PageConfig(
         dynamic="force-dynamic",  # SSR on every request
@@ -47,7 +47,7 @@ class DashboardPage(ServerComponent):
     )
 
     async def render(self, params: dict) -> str:
-        # Direct database query — no API layer needed
+        # Direct database query Ã¢â‚¬â€ no API layer needed
         user = await self.db.users.find_unique(where={"id": params["userId"]})
         metrics = await self.fetch_metrics(user.org_id)
 
@@ -120,7 +120,7 @@ class AuthMiddleware(Middleware):
 from nextjs_fullstack import ServerAction, useFormStatus, useTransition
 
 class CreatePostAction(ServerAction):
-    """Server Action — called from a form in a Server Component."""
+    """Server Action Ã¢â‚¬â€ called from a form in a Server Component."""
 
     async def execute(self, form_data: dict, user: AuthenticatedUser):
         title = form_data["title"]
@@ -149,7 +149,7 @@ from nextjs_fullstack import ParallelRoute, InterceptingRoute
 # app/dashboard/@modal/(..)photo/[id]/page.tsx pattern
 @router.parallel_route("modal")
 class ModalSlot(InterceptingRoute):
-    """Intercepting route — renders as modal over parent layout."""
+    """Intercepting route Ã¢â‚¬â€ renders as modal over parent layout."""
 
     async def render(self, params: dict) -> str:
         photo = await self.db.photos.find_unique(where={"id": params["id"]})
@@ -161,21 +161,21 @@ class ModalSlot(InterceptingRoute):
 
 ## Best Practices
 
-1. **Default to Server Components** — Only add `'use client'` when the component needs event handlers, browser APIs, or React hooks like `useState`/`useEffect`. Every client component adds JavaScript to the bundle.
+1. **Default to Server Components** Ã¢â‚¬â€ Only add `'use client'` when the component needs event handlers, browser APIs, or React hooks like `useState`/`useEffect`. Every client component adds JavaScript to the bundle.
 
-2. **Colocate data fetching with components** — Fetch data in the component that renders it, not in a parent. This enables independent loading states via `loading.js` and streaming.
+2. **Colocate data fetching with components** Ã¢â‚¬â€ Fetch data in the component that renders it, not in a parent. This enables independent loading states via `loading.js` and streaming.
 
-3. **Use `loading.js` for streaming** — Create a `loading.js` file in any route segment to show instant loading UI while the server component streams data.
+3. **Use `loading.js` for streaming** Ã¢â‚¬â€ Create a `loading.js` file in any route segment to show instant loading UI while the server component streams data.
 
-4. **Cache aggressively, revalidate intentionally** — Default fetch requests in Server Components are cached. Use `cache: 'no-store'` for truly dynamic data and `revalidate` for time-based staleness.
+4. **Cache aggressively, revalidate intentionally** Ã¢â‚¬â€ Default fetch requests in Server Components are cached. Use `cache: 'no-store'` for truly dynamic data and `revalidate` for time-based staleness.
 
-5. **Keep Server Actions near their usage** — Define Server Actions in the same file or adjacent to the form that calls them. This keeps the mutation logic co-located with the UI.
+5. **Keep Server Actions near their usage** Ã¢â‚¬â€ Define Server Actions in the same file or adjacent to the form that calls them. This keeps the mutation logic co-located with the UI.
 
-6. **Use parallel routes for modals** — Avoid query-parameter-based modal state. Parallel routes (`@slot`) let the URL reflect modal content while preserving the underlying page.
+6. **Use parallel routes for modals** Ã¢â‚¬â€ Avoid query-parameter-based modal state. Parallel routes (`@slot`) let the URL reflect modal content while preserving the underlying page.
 
-7. **Optimize images with `next/image`** — Always use the Image component for external images. It handles lazy loading, responsive sizing, and format optimization automatically.
+7. **Optimize images with `next/image`** Ã¢â‚¬â€ Always use the Image component for external images. It handles lazy loading, responsive sizing, and format optimization automatically.
 
-8. **Leverage metadata exports** — Export a `metadata` object or `generateMetadata` function from each page for SEO. Avoid duplicating metadata across layouts; let children merge via the Metadata API.
+8. **Leverage metadata exports** Ã¢â‚¬â€ Export a `metadata` object or `generateMetadata` function from each page for SEO. Avoid duplicating metadata across layouts; let children merge via the Metadata API.
 
 ## Rendering Strategies Explained
 
@@ -185,11 +185,11 @@ SSR generates HTML on every request. Use this when the page content depends on r
 
 ### Static Site Generation (SSG)
 
-SSG generates HTML at build time. Pages with no dynamic data are automatically static. For pages with known dynamic segments, export a `generateStaticParams()` function that returns all possible parameter combinations. The HTML is generated once and served from CDN — fastest possible TTFB. Use SSG for marketing pages, documentation, and blog posts.
+SSG generates HTML at build time. Pages with no dynamic data are automatically static. For pages with known dynamic segments, export a `generateStaticParams()` function that returns all possible parameter combinations. The HTML is generated once and served from CDN Ã¢â‚¬â€ fastest possible TTFB. Use SSG for marketing pages, documentation, and blog posts.
 
 ### Incremental Static Regeneration (ISR)
 
-ISR extends SSG by revalidating static pages after a time interval or on-demand. Set `revalidate: 3600` to revalidate every hour, or use `revalidateTag('posts')` to trigger on-demand revalidation from Server Actions or API routes. ISR combines SSG performance with SSR freshness — the stale page serves immediately while a background regeneration creates the updated version.
+ISR extends SSG by revalidating static pages after a time interval or on-demand. Set `revalidate: 3600` to revalidate every hour, or use `revalidateTag('posts')` to trigger on-demand revalidation from Server Actions or API routes. ISR combines SSG performance with SSR freshness Ã¢â‚¬â€ the stale page serves immediately while a background regeneration creates the updated version.
 
 ### Streaming SSR
 
@@ -224,10 +224,10 @@ app/
 
 ## Related Modules
 
-- **server-components** — Deep dive into React Server Components architecture and streaming
-- **tailwind-shadcn** — UI component patterns for Next.js applications
-- **supabase-auth** — Authentication integration with Next.js middleware and server actions
-- **edge-runtime** — Edge function deployment for Next.js middleware and API routes
+- **server-components** Ã¢â‚¬â€ Deep dive into React Server Components architecture and streaming
+- **tailwind-shadcn** Ã¢â‚¬â€ UI component patterns for Next.js applications
+- **supabase-auth** Ã¢â‚¬â€ Authentication integration with Next.js middleware and server actions
+- **edge-runtime** Ã¢â‚¬â€ Edge function deployment for Next.js middleware and API routes
 
 ---
 
@@ -271,64 +271,64 @@ next_config = NextConfig(
 
 ```
 Browser Request
-    │
-    ▼
-┌──────────────┐
-│ Edge         │── Middleware (auth, geo, redirects)
-│ Middleware   │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Route        │── Layout + Page + Loading + Error
-│ Resolution   │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Server       │── Data fetching, rendering
-│ Components   │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Streaming    │── Progressive HTML delivery
-│ SSR          │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Client       │── Hydration, interactivity
-│ Hydration    │
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Edge         Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Middleware (auth, geo, redirects)
+Ã¢â€â€š Middleware   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Route        Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Layout + Page + Loading + Error
+Ã¢â€â€š Resolution   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Server       Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Data fetching, rendering
+Ã¢â€â€š Components   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Streaming    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Progressive HTML delivery
+Ã¢â€â€š SSR          Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Client       Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Hydration, interactivity
+Ã¢â€â€š Hydration    Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ### Server Action Flow
 
 ```
 Form Submit (Client)
-    │
-    ▼
-┌──────────────┐
-│ Server Action │── Validates input, executes mutation
-│ (RPC)        │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Database     │── Direct query or ORM
-│ Mutation     │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Revalidation │── Revalidate tags or paths
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ UI Update    │── Server sends updated HTML
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Server Action Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Validates input, executes mutation
+Ã¢â€â€š (RPC)        Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Database     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Direct query or ORM
+Ã¢â€â€š Mutation     Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Revalidation Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Revalidate tags or paths
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š UI Update    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Server sends updated HTML
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Integration Guide
@@ -700,32 +700,32 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 
 ```
 app/
-├── layout.js              # Root layout
-├── page.js                # Home page
-├── loading.js             # Root loading
-├── error.js               # Root error
-├── not-found.js           # 404 page
-├── globals.css            # Global styles
-├── dashboard/
-│   ├── layout.js          # Dashboard layout
-│   ├── page.js            # /dashboard
-│   ├── loading.js         # Dashboard loading
-│   ├── error.js           # Dashboard error
-│   └── settings/
-│       └── page.js        # /dashboard/settings
-├── api/
-│   └── users/
-│       ├── route.js       # GET/POST /api/users
-│       └── [id]/
-│           └── route.js   # GET/PUT/DELETE /api/users/:id
-├── @modal/
-│   └── (..)photo/
-│       └── [id]/
-│           └── page.js    # Intercepting route
-└── (marketing)/
-    ├── layout.js          # Marketing layout group
-    └── about/
-        └── page.js        # /about
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ layout.js              # Root layout
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ page.js                # Home page
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ loading.js             # Root loading
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ error.js               # Root error
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ not-found.js           # 404 page
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ globals.css            # Global styles
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ dashboard/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ layout.js          # Dashboard layout
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ page.js            # /dashboard
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ loading.js         # Dashboard loading
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ error.js           # Dashboard error
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ settings/
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ page.js        # /dashboard/settings
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ users/
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ route.js       # GET/POST /api/users
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ [id]/
+Ã¢â€â€š           Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ route.js   # GET/PUT/DELETE /api/users/:id
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ @modal/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ (..)photo/
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ [id]/
+Ã¢â€â€š           Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ page.js    # Intercepting route
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ (marketing)/
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ layout.js          # Marketing layout group
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ about/
+        Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ page.js        # /about
 ```
 
 ### Common Patterns Reference
@@ -739,3 +739,171 @@ app/
 | Catch-all routes | `[...slug]` | CMS pages |
 | Optional catch-all | `[[...slug]]` | Marketing + docs |
 | Intercepting catch-all | `(..)[...slug]` | Modal + direct URL |
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

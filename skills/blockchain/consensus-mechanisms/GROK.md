@@ -118,10 +118,10 @@ print(f"Minimum profitable stake: ${economics.min_profitable_stake:,.0f}")
 
 - PoW: Adjust difficulty every 2016 blocks (Bitcoin) or use ASERT (Bitcoin Cash) for smoother adjustment
 - PoS: Require minimum 32 ETH stake for Ethereum consensus validators; set slashing at 1/32 for safety
-- BFT: Never run with f >= n/3 Byzantine nodes — safety guarantees break
+- BFT: Never run with f >= n/3 Byzantine nodes Ã¢â‚¬â€ safety guarantees break
 - DPoS: Limit delegate set to 21-100 nodes for manageable communication complexity
 - Finality: Require 2/3+1 validator attestations for absolute finality in BFT systems
-- Always model economic security — protocol security is only as strong as attack cost vs profit
+- Always model economic security Ã¢â‚¬â€ protocol security is only as strong as attack cost vs profit
 - Monitor for nothing-at-stake in PoS: require validators to attest to exactly one chain
 - Use checkpointing to bound long-range attack recovery depth in PoS systems
 - Consider hybrid consensus (PoW + BFT finality) for maximum security guarantees
@@ -202,59 +202,59 @@ bft_config = BFTConfig(
 
 ```
 Beacon Chain:
-├── Epochs (32 slots each)
-│   ├── Slot: Single block proposal
-│   ├── Committees: Attestation groups
-│   └── Finality: 2/3+ attestations
-├── Validator Management
-│   ├── Activation queue
-│   ├── Active set
-│   ├── Exit queue
-│   └── Withdrawal
-├── Fork Choice
-│   ├── LMD-GHOST (latest message driven)
-│   └── FFG (Friendly Finality Gadget)
-└── Slashing Conditions
-    ├── Double voting
-    ├── Surround voting
-    └── Inactivity leak
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Epochs (32 slots each)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Slot: Single block proposal
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Committees: Attestation groups
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Finality: 2/3+ attestations
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Validator Management
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Activation queue
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Active set
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Exit queue
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Withdrawal
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Fork Choice
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ LMD-GHOST (latest message driven)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ FFG (Friendly Finality Gadget)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Slashing Conditions
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Double voting
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Surround voting
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Inactivity leak
 ```
 
 ### Tendermint BFT Architecture
 
 ```
 Round Lifecycle:
-├── Propose
-│   └── Round-robin proposer selection
-├── Prevote
-│   └── Validators vote on proposal
-├── Precommit
-│   └── 2/3+ prevotes → precommit
-└── Commit
-    └── 2/3+ precommits → block committed
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Propose
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Round-robin proposer selection
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Prevote
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Validators vote on proposal
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Precommit
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ 2/3+ prevotes Ã¢â€ â€™ precommit
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Commit
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ 2/3+ precommits Ã¢â€ â€™ block committed
 
 View Change:
-├── Timeout triggers
-├── New proposer election
-└── State recovery
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Timeout triggers
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New proposer election
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ State recovery
 ```
 
 ### Economic Security Model
 
 ```
 Attack Cost vs Profit:
-├── 51% Attack (PoW)
-│   ├── Hardware cost: $X billion
-│   ├── Electricity: $X million/hour
-│   └── Profit from double spend: $Y
-├── Nothing-at-Stake (PoS)
-│   ├── Slashing penalty: 1/32 stake
-│   ├── Attestation delay: 2 epochs
-│   └── Cost exceeds profit
-└── Long-Range Attack (PoS)
-    ├── Checkpoint finality
-    ├── Social consensus recovery
-    └── Economic bond requirements
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 51% Attack (PoW)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Hardware cost: $X billion
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Electricity: $X million/hour
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Profit from double spend: $Y
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Nothing-at-Stake (PoS)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Slashing penalty: 1/32 stake
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Attestation delay: 2 epochs
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Cost exceeds profit
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Long-Range Attack (PoS)
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Checkpoint finality
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Social consensus recovery
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Economic bond requirements
 ```
 
 ## Integration Guide
@@ -337,16 +337,16 @@ monitor.start()
 
 ```
 Block Propagation:
-├── Compact block relay (EIP-2976)
-├── Block propagation networks (FIBRE)
-├── Sub-second gossip protocols
-└── Parallel attestations
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Compact block relay (EIP-2976)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Block propagation networks (FIBRE)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Sub-second gossip protocols
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Parallel attestations
 
 Finality Optimization:
-├── Single-slot finality (SSF)
-├── Faster finality gadgets
-├── Aggregated attestations
-└── Reduced committee sizes
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Single-slot finality (SSF)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Faster finality gadgets
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Aggregated attestations
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Reduced committee sizes
 ```
 
 ### Validator Performance
@@ -384,32 +384,32 @@ print(f"Missed attestations/month: {config.missed_attestations}")
 
 ```
 PoW Security:
-├── Hash rate required: >50% for attack
-├── Confirmation depth: 6 blocks (~72s) for high-value
-├── Reorg depth: typically <3 blocks
-└── Attack cost: billions USD
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Hash rate required: >50% for attack
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Confirmation depth: 6 blocks (~72s) for high-value
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reorg depth: typically <3 blocks
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Attack cost: billions USD
 
 PoS Security:
-├── Stake required: >33% for safety halt
-├── Stake required: >66% for finality manipulation
-├── Finality delay: 2 epochs (~12.8 minutes)
-└── Slashing penalty: 1/32 of stake
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Stake required: >33% for safety halt
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Stake required: >66% for finality manipulation
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Finality delay: 2 epochs (~12.8 minutes)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Slashing penalty: 1/32 of stake
 ```
 
 ### Incentive Compatibility
 
 ```
 Honest Behavior Rewards:
-├── Block proposal: block_reward + tx_fees
-├── Attestation: attestation_reward
-├── Sync committee: sync_reward
-└── Total: proportional to stake
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Block proposal: block_reward + tx_fees
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Attestation: attestation_reward
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Sync committee: sync_reward
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Total: proportional to stake
 
 Dishonest Behavior Penalties:
-├── Double voting: full stake slash
-├── Surround voting: full stake slash
-├── Inactivity: gradual balance leak
-└── Downtime: missed rewards only
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Double voting: full stake slash
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Surround voting: full stake slash
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Inactivity: gradual balance leak
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Downtime: missed rewards only
 ```
 
 ## Troubleshooting Guide
@@ -658,22 +658,22 @@ beaconchain_finality_delay        # Finality delay in epochs
 
 ```
 1. Unit Tests
-   ├── Block production logic
-   ├── Attestation aggregation
-   ├── Finality calculation
-   └── Slashing condition detection
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Block production logic
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Attestation aggregation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Finality calculation
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Slashing condition detection
 
 2. Integration Tests
-   ├── Multi-validator coordination
-   ├── Network partition recovery
-   ├── View change handling
-   └── Cross-shard communication
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Multi-validator coordination
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network partition recovery
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ View change handling
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Cross-shard communication
 
 3. Stress Tests
-   ├── High validator count (1M+)
-   ├── Network latency simulation
-   ├── Fault injection (Byzantine nodes)
-   └── Long-running stability (72h+)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ High validator count (1M+)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network latency simulation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Fault injection (Byzantine nodes)
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Long-running stability (72h+)
 ```
 
 ## Versioning & Migration
@@ -682,19 +682,19 @@ beaconchain_finality_delay        # Finality delay in epochs
 
 ```
 Major: Consensus algorithm change
-├── Example: PoW → PoS (The Merge)
-├── Requires: All nodes upgrade simultaneously
-└── Risk: Chain split if not coordinated
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: PoW Ã¢â€ â€™ PoS (The Merge)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: All nodes upgrade simultaneously
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Chain split if not coordinated
 
 Minor: Parameter change
-├── Example: Slot time reduction
-├── Requires: Validator upgrade
-└── Risk: Fork if not unanimous
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Slot time reduction
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Validator upgrade
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Fork if not unanimous
 
 Patch: Bug fixes
-├── Example: Attestation aggregation fix
-├── Requires: Client update
-└── Risk: Low if backward compatible
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Attestation aggregation fix
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Client update
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Low if backward compatible
 ```
 
 ## Glossary
@@ -777,3 +777,171 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

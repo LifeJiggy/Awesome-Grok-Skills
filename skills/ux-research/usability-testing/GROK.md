@@ -9,11 +9,11 @@ tags: ["ux-research", "usability-testing", "SUS", "task-analysis", "A-B-testing"
 
 ## Overview
 
-Usability testing is the empirical backbone of user-centered design—systematically observing real users attempting real tasks to identify where interfaces fail. This module provides a comprehensive toolkit for planning, executing, analyzing, and reporting on usability studies across moderated, unmoderated, remote, and in-person methodologies. It covers the full measurement spectrum: task success rates, time-on-task, error rates, satisfaction scores (SUS, NPS, UMUX-Lite), think-aloud protocol analysis, clickstream and heatmap interpretation, A/B test design and statistical analysis, funnel conversion analysis, rage click detection, and severity rating frameworks.
+Usability testing is the empirical backbone of user-centered designÃ¢â‚¬â€systematically observing real users attempting real tasks to identify where interfaces fail. This module provides a comprehensive toolkit for planning, executing, analyzing, and reporting on usability studies across moderated, unmoderated, remote, and in-person methodologies. It covers the full measurement spectrum: task success rates, time-on-task, error rates, satisfaction scores (SUS, NPS, UMUX-Lite), think-aloud protocol analysis, clickstream and heatmap interpretation, A/B test design and statistical analysis, funnel conversion analysis, rage click detection, and severity rating frameworks.
 
 The toolkit bridges raw usability data into actionable severity-ranked findings. It handles both quantitative metrics (completion rates, binary success/failure, time distributions) and qualitative insights (think-aloud transcripts, observer notes, satisfaction free-text). Severity ratings follow established frameworks (Nielsen's severity scale adapted for modern contexts) and link findings directly to design recommendations with confidence levels and effort estimates.
 
-Built for UX researchers and product teams running continuous usability validation—from formative studies during early design through summative benchmark studies against competitor baselines—this module automates the tedious statistical work (confidence intervals, significance testing, effect sizes) while preserving researcher judgment for interpretive synthesis. All outputs are structured for both research-readers (detailed methodology) and stakeholder-readers (executive summary with priority actions).
+Built for UX researchers and product teams running continuous usability validationÃ¢â‚¬â€from formative studies during early design through summative benchmark studies against competitor baselinesÃ¢â‚¬â€this module automates the tedious statistical work (confidence intervals, significance testing, effect sizes) while preserving researcher judgment for interpretive synthesis. All outputs are structured for both research-readers (detailed methodology) and stakeholder-readers (executive summary with priority actions).
 
 ## Core Capabilities
 
@@ -23,8 +23,8 @@ Built for UX researchers and product teams running continuous usability validati
 - **Heatmap and Clickstream Analysis**: Aggregated click density interpretation, scroll depth analysis, navigation path identification, and dead-click/zero-click zone detection
 - **A/B Test Design**: Sample size calculation, randomization validation, multi-variant test planning, and statistical significance evaluation with Bayes and frequentist approaches
 - **Funnel Conversion Analysis**: Step-by-step funnel metrics, drop-off calculation, statistical comparison across funnel variants, and cohort-based funnel analysis
-- **Rage Click Detection**: Automated identification of frustration patterns—rapid repeated clicks, dead-clicks, scroll-rage, and form abandonment signals
-- **Severity Rating Framework**: Multi-factor severity scoring combining frequency × impact × persistence, mapped to prioritized design recommendations
+- **Rage Click Detection**: Automated identification of frustration patternsÃ¢â‚¬â€rapid repeated clicks, dead-clicks, scroll-rage, and form abandonment signals
+- **Severity Rating Framework**: Multi-factor severity scoring combining frequency Ãƒâ€” impact Ãƒâ€” persistence, mapped to prioritized design recommendations
 
 ## Usage Examples
 
@@ -184,13 +184,13 @@ print(f"Recommendation: {finding.recommendation()}")
 
 1. **Plan before you test**: Define clear success criteria for each task before running the study. Pre-register your hypotheses and sample size rationale. Post-hoc rationalization erodes credibility and invites skepticism from stakeholders.
 
-2. **Separate formative from summative**: Formative studies (during design) are exploratory and small-n (5-8 participants). Summative studies (after design) are statistical and require larger samples. Don't mix methodologies—a think-aloud protocol contaminates a benchmark metric.
+2. **Separate formative from summative**: Formative studies (during design) are exploratory and small-n (5-8 participants). Summative studies (after design) are statistical and require larger samples. Don't mix methodologiesÃ¢â‚¬â€a think-aloud protocol contaminates a benchmark metric.
 
-3. **Use the severity framework consistently**: Apply the same severity rating rubric to every finding. Frequency × Impact × Persistence prevents the loudest stakeholder from overriding the most critical finding. Track severity across studies to spot regressions.
+3. **Use the severity framework consistently**: Apply the same severity rating rubric to every finding. Frequency Ãƒâ€” Impact Ãƒâ€” Persistence prevents the loudest stakeholder from overriding the most critical finding. Track severity across studies to spot regressions.
 
-4. **Report confidence intervals, not just means**: A task success rate of 78% with a 95% CI of [65%, 88%] tells a very different story than [75%, 81%]. Small samples produce wide intervals—acknowledge uncertainty rather than hiding it behind averages.
+4. **Report confidence intervals, not just means**: A task success rate of 78% with a 95% CI of [65%, 88%] tells a very different story than [75%, 81%]. Small samples produce wide intervalsÃ¢â‚¬â€acknowledge uncertainty rather than hiding it behind averages.
 
-5. **Distinguish frustration from confusion**: Rage clicks indicate frustration (user knows what they want but the interface blocks them). Long pauses indicate confusion (user doesn't know what to do). The interventions are different—remove friction vs. add guidance.
+5. **Distinguish frustration from confusion**: Rage clicks indicate frustration (user knows what they want but the interface blocks them). Long pauses indicate confusion (user doesn't know what to do). The interventions are differentÃ¢â‚¬â€remove friction vs. add guidance.
 
 6. **Test with representative users**: Recruiting convenience participants (colleagues, friends) produces biased findings. Screen for task-relevant experience, not just demographics. A usability finding from the wrong user population is worse than no finding.
 
@@ -200,10 +200,10 @@ print(f"Recommendation: {finding.recommendation()}")
 
 ## Related Modules
 
-- [user-research](../user-research/GROK.md) — Pre-test recruitment, persona validation, and think-aloud script design
-- [information-architecture](../information-architecture/GROK.md) — Findability metrics and card sort inputs for IA-related usability issues
-- [interaction-design](../interaction-design/GROK.md) — Micro-interaction and animation patterns that reduce usability friction
-- [accessibility](../accessibility/GROK.md) — Accessibility-specific usability testing with assistive technologies
+- [user-research](../user-research/GROK.md) Ã¢â‚¬â€ Pre-test recruitment, persona validation, and think-aloud script design
+- [information-architecture](../information-architecture/GROK.md) Ã¢â‚¬â€ Findability metrics and card sort inputs for IA-related usability issues
+- [interaction-design](../interaction-design/GROK.md) Ã¢â‚¬â€ Micro-interaction and animation patterns that reduce usability friction
+- [accessibility](../accessibility/GROK.md) Ã¢â‚¬â€ Accessibility-specific usability testing with assistive technologies
 
 ---
 
@@ -244,31 +244,31 @@ print(f"Required: {sample} per variant")
 
 ```
 Study Design
-    │
-    ▼
-┌──────────────┐
-│ Recruitment  │── Screener, scheduling, incentives
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Moderation   │── Think-aloud, task observation
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Data Capture │── Screen recording, clickstream, notes
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Analysis     │── Task metrics, behavioral coding, SUS
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Reporting    │── Severity ranking, recommendations
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Recruitment  Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Screener, scheduling, incentives
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Moderation   Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Think-aloud, task observation
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Data Capture Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Screen recording, clickstream, notes
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Analysis     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Task metrics, behavioral coding, SUS
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Reporting    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Severity ranking, recommendations
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Integration Guide
@@ -427,9 +427,9 @@ def test_task_success_rate():
 
 | Term | Definition |
 |------|-----------|
-| **SUS** | System Usability Scale — 10-question standard survey |
+| **SUS** | System Usability Scale Ã¢â‚¬â€ 10-question standard survey |
 | **Think-Aloud** | Verbal protocol where users narrate their actions |
-| **NPS** | Net Promoter Score — likelihood to recommend |
+| **NPS** | Net Promoter Score Ã¢â‚¬â€ likelihood to recommend |
 | **Rage Click** | Rapid repeated clicks indicating frustration |
 | **Task Success** | Whether the user completed the intended task |
 
@@ -465,8 +465,8 @@ Copyright (c) 2024 Awesome Grok Skills
 |--------|------------|-------|----------|
 | Binary success | 1 if completed, 0 if not | 0-1 | Simple tasks |
 | Composite success | Weighted combination | 0-1 | Complex tasks |
-| Time-on-task | Seconds to complete | 0-∞ | Efficiency |
-| Error count | Number of errors | 0-∞ | Accuracy |
+| Time-on-task | Seconds to complete | 0-Ã¢Ë†Å¾ | Efficiency |
+| Error count | Number of errors | 0-Ã¢Ë†Å¾ | Accuracy |
 | Recovery rate | Recovered errors / total errors | 0-1 | Resilience |
 | Help usage | Used help / total attempts | 0-1 | Learnability |
 
@@ -493,12 +493,12 @@ Copyright (c) 2024 Awesome Grok Skills
 
 ```
 Result is statistically significant?
-├── YES → Is the effect size meaningful?
-│   ├── YES → Implement the winning variant
-│   └── NO → Consider cost vs. benefit
-└── NO → Is the sample size sufficient?
-    ├── YES → Result is inconclusive, move on
-    └── NO → Continue test until sufficient sample
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ YES Ã¢â€ â€™ Is the effect size meaningful?
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ YES Ã¢â€ â€™ Implement the winning variant
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ NO Ã¢â€ â€™ Consider cost vs. benefit
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ NO Ã¢â€ â€™ Is the sample size sufficient?
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ YES Ã¢â€ â€™ Result is inconclusive, move on
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ NO Ã¢â€ â€™ Continue test until sufficient sample
 ```
 
 ### Think-Aloud Coding Taxonomy
@@ -586,10 +586,10 @@ Result is statistically significant?
 
 | Funnel Stage | Good Conversion | Average | Poor |
 |-------------|----------------|---------|------|
-| Visit → View | > 60% | 40-60% | < 40% |
-| View → Add to Cart | > 30% | 15-30% | < 15% |
-| Add to Cart → Checkout | > 70% | 50-70% | < 50% |
-| Checkout → Purchase | > 80% | 60-80% | < 60% |
+| Visit Ã¢â€ â€™ View | > 60% | 40-60% | < 40% |
+| View Ã¢â€ â€™ Add to Cart | > 30% | 15-30% | < 15% |
+| Add to Cart Ã¢â€ â€™ Checkout | > 70% | 50-70% | < 50% |
+| Checkout Ã¢â€ â€™ Purchase | > 80% | 60-80% | < 60% |
 | Overall conversion | > 3% | 1-3% | < 1% |
 
 ### Complete Severity Rating Examples
@@ -631,11 +631,11 @@ Result is statistically significant?
 ## Opening Script (3 min)
 "Thank you for joining us today. My name is [Name], and I'm a 
 researcher at [Company]. We're testing [product/feature], NOT you. 
-There are no right or wrong answers—we want to learn from your 
+There are no right or wrong answersÃ¢â‚¬â€we want to learn from your 
 experience.
 
 This session will take about [X] minutes. I'll ask you to complete 
-a few tasks while thinking aloud—just telling me what you're 
+a few tasks while thinking aloudÃ¢â‚¬â€just telling me what you're 
 thinking as you go.
 
 Do you have any questions before we begin?"
@@ -648,7 +648,7 @@ be shared publicly. Do you consent to being recorded?"
 ## Think-Aloud Prompt
 - "What are you thinking right now?"
 - "Tell me what you're looking for."
-- "I noticed you paused—what went through your mind?"
+- "I noticed you pausedÃ¢â‚¬â€what went through your mind?"
 - "Can you describe what you expected to happen?"
 
 ## Closing Script (3 min)
@@ -697,29 +697,29 @@ Do you have any final thoughts or questions?"
 
 ```
 PRE-TEST TECHNICAL SETUP
-    □ Test internet connection (upload/download speed)
-    □ Verify screen sharing works
-    □ Test recording software (audio + video)
-    □ Confirm backup platform (Zoom backup link)
-    □ Check participant can join from their device
-    □ Verify consent form is accessible
-    □ Test think-aloud prompts are visible
-    □ Ensure notes template is open
+    Ã¢â€“Â¡ Test internet connection (upload/download speed)
+    Ã¢â€“Â¡ Verify screen sharing works
+    Ã¢â€“Â¡ Test recording software (audio + video)
+    Ã¢â€“Â¡ Confirm backup platform (Zoom backup link)
+    Ã¢â€“Â¡ Check participant can join from their device
+    Ã¢â€“Â¡ Verify consent form is accessible
+    Ã¢â€“Â¡ Test think-aloud prompts are visible
+    Ã¢â€“Â¡ Ensure notes template is open
 
 DURING TEST
-    □ Confirm participant can see screen
-    □ Verify audio quality (no echo, clear voice)
-    □ Monitor for lag or connection issues
-    □ Keep backup platform ready to switch
-    □ Take timestamped notes
+    Ã¢â€“Â¡ Confirm participant can see screen
+    Ã¢â€“Â¡ Verify audio quality (no echo, clear voice)
+    Ã¢â€“Â¡ Monitor for lag or connection issues
+    Ã¢â€“Â¡ Keep backup platform ready to switch
+    Ã¢â€“Â¡ Take timestamped notes
 
 POST-TEST
-    □ Save recording immediately
-    □ Export clickstream data
-    □ Complete session notes within 1 hour
-    □ Tag key moments in recording
-    □ Send incentive within 24 hours
-    □ Schedule debrief with team
+    Ã¢â€“Â¡ Save recording immediately
+    Ã¢â€“Â¡ Export clickstream data
+    Ã¢â€“Â¡ Complete session notes within 1 hour
+    Ã¢â€“Â¡ Tag key moments in recording
+    Ã¢â€“Â¡ Send incentive within 24 hours
+    Ã¢â€“Â¡ Schedule debrief with team
 ```
 
 ### Usability Finding Prioritization Matrix
@@ -752,7 +752,7 @@ because [rationale].
 ## Results Summary
 | Variant | Visitors | Conversions | Rate | Lift | p-value |
 |---------|----------|-------------|------|------|---------|
-| Control | [N] | [N] | [%] | — | — |
+| Control | [N] | [N] | [%] | Ã¢â‚¬â€ | Ã¢â‚¬â€ |
 | Treatment | [N] | [N] | [%] | [%] | [X] |
 
 ## Statistical Analysis
@@ -770,3 +770,171 @@ because [rationale].
 - [Action item 1]
 - [Action item 2]
 ```
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

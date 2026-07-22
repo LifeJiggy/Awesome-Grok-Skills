@@ -110,12 +110,12 @@ print(f"Recommendations: {len(report.recommendations)}")
 
 ## Best Practices
 
-- Activate the incident response plan BEFORE an incident occurs — don't build the plane while flying it
+- Activate the incident response plan BEFORE an incident occurs Ã¢â‚¬â€ don't build the plane while flying it
 - Establish clear severity levels with defined response time SLAs (Critical: 15min, High: 1hr)
 - Collect volatile evidence first (memory, network connections) before disk imaging
 - Always calculate and record cryptographic hashes (SHA-256) for all collected evidence
 - Maintain chain of custody documentation from the moment evidence is collected
-- Separate containment from eradication — contain first, then plan eradication carefully
+- Separate containment from eradication Ã¢â‚¬â€ contain first, then plan eradication carefully
 - Test recovery procedures before you need them; untested backups are not backups
 - Conduct lessons-learned meetings within 1 week of incident closure
 - Update detection rules and playbooks based on lessons learned from every incident
@@ -204,32 +204,32 @@ templates:
 
 ```
 1. Preparation
-   ├── IR plan documentation
-   ├── Team roles and responsibilities
-   ├── Tool deployment and testing
-   ├── Communication channels
-   └── Training and exercises
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ IR plan documentation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Team roles and responsibilities
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tool deployment and testing
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Communication channels
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Training and exercises
 
 2. Detection & Analysis
-   ├── Alert triage
-   ├── Initial assessment
-   ├── Scope determination
-   ├── Evidence collection
-   └── Documentation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Alert triage
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Initial assessment
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scope determination
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Evidence collection
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Documentation
 
 3. Containment, Eradication, Recovery
-   ├── Short-term containment
-   ├── Long-term containment
-   ├── Evidence preservation
-   ├── Eradication
-   └── Recovery
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Short-term containment
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Long-term containment
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Evidence preservation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Eradication
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Recovery
 
 4. Post-Incident Activity
-   ├── Lessons learned
-   ├── Playbook updates
-   ├── Detection improvements
-   ├── Control gap analysis
-   └── Report generation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Lessons learned
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Playbook updates
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Detection improvements
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Control gap analysis
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Report generation
 ```
 
 ### Incident Classification
@@ -245,25 +245,25 @@ templates:
 
 ```
 Evidence Collection
-├── Document collector identity
-├── Record collection timestamp
-├── Calculate hash (SHA-256)
-├── Label evidence bag
-└── Store in secure location
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Document collector identity
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Record collection timestamp
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Calculate hash (SHA-256)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Label evidence bag
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Store in secure location
 
 Evidence Transfer
-├── Record transfer date/time
-├── Record receiver identity
-├── Verify hash integrity
-├── Update chain of custody log
-└── Store transfer receipt
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Record transfer date/time
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Record receiver identity
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify hash integrity
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Update chain of custody log
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Store transfer receipt
 
 Evidence Storage
-├── Climate-controlled environment
-├── Tamper-evident packaging
-├── Access logging
-├── Periodic integrity checks
-└── Retention policy compliance
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Climate-controlled environment
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tamper-evident packaging
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Access logging
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Periodic integrity checks
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Retention policy compliance
 ```
 
 ## Integration Guide
@@ -347,11 +347,11 @@ print(f"Related events: {len(events)}")
 
 ```
 Optimization Strategy:
-├── Prioritize volatile evidence (memory, network)
-├── Use streaming collection (not stop-the-world)
-├── Parallel collection of independent evidence
-├── Pre-configured collection scripts
-└── Automated hash calculation and logging
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Prioritize volatile evidence (memory, network)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Use streaming collection (not stop-the-world)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Parallel collection of independent evidence
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Pre-configured collection scripts
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Automated hash calculation and logging
 ```
 
 ### Recovery Acceleration
@@ -386,24 +386,24 @@ print(f"Parallel restores: {plan.parallel_count}")
 
 ```
 Evidence Admissibility Requirements:
-├── Chain of custody documentation
-├── Hash verification at collection and transfer
-├── Proper handling procedures
-├── Qualified examiner credentials
-├── Methodology documentation
-└── Tool validation records
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Chain of custody documentation
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Hash verification at collection and transfer
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Proper handling procedures
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Qualified examiner credentials
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Methodology documentation
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Tool validation records
 ```
 
 ### Privacy Compliance
 
 ```
 Data Protection During IR:
-├── Minimize collection of PII
-├── Redact unnecessary personal data
-├── Secure storage of collected data
-├── Retention limits aligned with policy
-├── Right to deletion considerations
-└── Cross-border data transfer rules
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Minimize collection of PII
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Redact unnecessary personal data
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Secure storage of collected data
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Retention limits aligned with policy
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Right to deletion considerations
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Cross-border data transfer rules
 ```
 
 ## Troubleshooting Guide
@@ -617,44 +617,44 @@ ChainOfCustodyEntry:
 
 ```
 1. Team Structure
-   ├── IR Lead
-   ├── Technical Lead
-   ├── Forensic Analysts
-   ├── Communication Lead
-   ├── Legal Liaison
-   └── Management Sponsor
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ IR Lead
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Technical Lead
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Forensic Analysts
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Communication Lead
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Legal Liaison
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Management Sponsor
 
 2. Tool Deployment
-   ├── Forensic workstation setup
-   ├── Evidence storage infrastructure
-   ├── Communication platform
-   ├── Ticketing system
-   └── SIEM access
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Forensic workstation setup
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Evidence storage infrastructure
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Communication platform
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Ticketing system
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ SIEM access
 
 3. Documentation
-   ├── IR plan
-   ├── Playbooks for common incidents
-   ├── Contact lists
-   ├── Legal requirements
-   └── Vendor contacts
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ IR plan
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Playbooks for common incidents
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Contact lists
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Legal requirements
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Vendor contacts
 
 4. Training
-   ├── Tabletop exercises (quarterly)
-   ├── Technical training
-   ├── Legal and compliance training
-   └── Communication training
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tabletop exercises (quarterly)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Technical training
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Legal and compliance training
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Communication training
 ```
 
 ### Evidence Infrastructure
 
 ```
 Requirements:
-├── Forensic workstation (isolated network)
-├── Evidence storage (encrypted, RAID)
-├── Write blockers (hardware)
-├── Network tap (for live capture)
-├── Secure transfer mechanism
-└── Backup and redundancy
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Forensic workstation (isolated network)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Evidence storage (encrypted, RAID)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Write blockers (hardware)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network tap (for live capture)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Secure transfer mechanism
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Backup and redundancy
 ```
 
 ## Monitoring & Observability
@@ -674,13 +674,13 @@ Requirements:
 
 ```
 Incident Dashboard:
-├── Active incidents by severity
-├── Incidents by category
-├── Mean time to detect/respond
-├── Evidence collection status
-├── Communication timeline
-├── Recovery progress
-└── Trend analysis (30d, 90d)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Active incidents by severity
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Incidents by category
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Mean time to detect/respond
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Evidence collection status
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Communication timeline
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Recovery progress
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Trend analysis (30d, 90d)
 ```
 
 ## Testing Strategy
@@ -689,22 +689,22 @@ Incident Dashboard:
 
 ```
 1. Tabletop Exercises
-   ├── Scenario walkthrough (quarterly)
-   ├── Decision point analysis
-   ├── Communication drill
-   └── Documentation review
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scenario walkthrough (quarterly)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Decision point analysis
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Communication drill
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Documentation review
 
 2. Technical Exercises
-   ├── Evidence collection drill
-   ├── Forensic analysis exercise
-   ├── Recovery procedure test
-   └── Tool proficiency test
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Evidence collection drill
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Forensic analysis exercise
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Recovery procedure test
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Tool proficiency test
 
 3. Full-Scale Exercises
-   ├── Simulated incident (annual)
-   ├── Red team coordination
-   ├── Legal involvement
-   └── Executive notification
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Simulated incident (annual)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Red team coordination
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Legal involvement
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Executive notification
 ```
 
 ## Versioning & Migration
@@ -713,19 +713,19 @@ Incident Dashboard:
 
 ```
 v3.0: Major plan overhaul
-├── New incident categories
-├── Updated escalation paths
-├── New tool integrations
-└── Regulatory changes
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New incident categories
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Updated escalation paths
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New tool integrations
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Regulatory changes
 
 v2.x: Plan updates
-├── Playbook additions
-├── Contact list updates
-└── Tool configuration changes
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Playbook additions
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Contact list updates
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Tool configuration changes
 
 v2.0.x: Minor updates
-├── Documentation corrections
-└── Template updates
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Documentation corrections
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Template updates
 ```
 
 ## Glossary
@@ -807,3 +807,171 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

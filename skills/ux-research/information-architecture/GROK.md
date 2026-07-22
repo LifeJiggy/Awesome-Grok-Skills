@@ -9,7 +9,7 @@ tags: ["ux-research", "information-architecture", "taxonomy", "navigation", "fin
 
 ## Overview
 
-Information architecture (IA) is the structural design of shared information environments—the invisible scaffolding that determines whether users can find what they need, understand where they are, and predict where they can go. This module provides a comprehensive toolkit for designing, evaluating, and optimizing information architectures across digital products, from content-heavy editorial sites to complex enterprise applications.
+Information architecture (IA) is the structural design of shared information environmentsÃ¢â‚¬â€the invisible scaffolding that determines whether users can find what they need, understand where they are, and predict where they can go. This module provides a comprehensive toolkit for designing, evaluating, and optimizing information architectures across digital products, from content-heavy editorial sites to complex enterprise applications.
 
 The toolkit covers the full IA lifecycle: content taxonomy design with hierarchical and faceted classification, navigation structure optimization across primary/secondary/tertiary systems, site map generation with parent-child relationship modeling, labeling system design and A/B testing, mental model alignment through tree testing and reverse card sorting, findability metrics (direct vs. exploratory search, success rate, time-to-find), search analytics with zero-result analysis, and IA benchmarking against industry standards.
 
@@ -183,7 +183,7 @@ for cat, items in results['dendrogram'].items():
 
 4. **Label with user language, not internal jargon**: Your product team calls it "Configuration" but users call it "Settings." Your taxonomy labels should use the vocabulary your users actually use. Validate labels through first-click testing and search log analysis, not stakeholder meetings.
 
-5. **Monitor findability continuously**: IA doesn't fail in a single dramatic moment—it degrades as content accumulates. Track zero-result search queries weekly, monitor content avoidance patterns, and run annual tree tests against your navigation. IA regression is a slow crisis.
+5. **Monitor findability continuously**: IA doesn't fail in a single dramatic momentÃ¢â‚¬â€it degrades as content accumulates. Track zero-result search queries weekly, monitor content avoidance patterns, and run annual tree tests against your navigation. IA regression is a slow crisis.
 
 6. **Treat search as an IA failure signal**: When users search, navigation has already failed them. Track the search-to-navigate ratio. High search usage on specific topics suggests those topics are poorly surfaced in navigation. Fix the structure, not the search engine.
 
@@ -193,10 +193,10 @@ for cat, items in results['dendrogram'].items():
 
 ## Related Modules
 
-- [user-research](../user-research/GROK.md) — Card sort and tree test participant recruitment and persona alignment
-- [usability-testing](../usability-testing/GROK.md) — Task success measurement for IA-related tasks
-- [interaction-design](../interaction-design/GROK.md) — Navigation interaction patterns and micro-interactions
-- [accessibility](../accessibility/GROK.md) — Accessible navigation patterns and screen reader IA
+- [user-research](../user-research/GROK.md) Ã¢â‚¬â€ Card sort and tree test participant recruitment and persona alignment
+- [usability-testing](../usability-testing/GROK.md) Ã¢â‚¬â€ Task success measurement for IA-related tasks
+- [interaction-design](../interaction-design/GROK.md) Ã¢â‚¬â€ Navigation interaction patterns and micro-interactions
+- [accessibility](../accessibility/GROK.md) Ã¢â‚¬â€ Accessible navigation patterns and screen reader IA
 
 ## When to Use This Module
 
@@ -242,33 +242,33 @@ pipeline.run_daily_analysis()
 
 ```
 Content Audit
-    │
-    ▼
-┌──────────────┐
-│ Taxonomy     │── Card sort, controlled vocabulary
-│ Design       │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Navigation   │── Tree test, first-click test
-│ Validation   │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Implementation│── Breadcrumbs, sitemap, labels
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Monitoring   │── Findability metrics, search analytics
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Iteration    │── Regression testing, optimization
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Taxonomy     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Card sort, controlled vocabulary
+Ã¢â€â€š Design       Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Navigation   Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Tree test, first-click test
+Ã¢â€â€š Validation   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š ImplementationÃ¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Breadcrumbs, sitemap, labels
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Monitoring   Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Findability metrics, search analytics
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Iteration    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Regression testing, optimization
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Integration Guide
@@ -472,8 +472,8 @@ Copyright (c) 2024 Awesome Grok Skills
 | Metric | Description | Target |
 |--------|-------------|--------|
 | Agreement score | How much participants agree | > 60% |
-| Similarity matrix | Pairwise card grouping frequency | — |
-| Dendrogram clusters | Natural groupings found | — |
+| Similarity matrix | Pairwise card grouping frequency | Ã¢â‚¬â€ |
+| Dendrogram clusters | Natural groupings found | Ã¢â‚¬â€ |
 | Variability score | How much agreement varies | < 0.3 |
 | Recommended categories | Optimal number of categories | 5-8 |
 
@@ -481,10 +481,10 @@ Copyright (c) 2024 Awesome Grok Skills
 
 | Depth | User Expectation | Example |
 |-------|-----------------|---------|
-| 1 click | Most important tasks | Home → Dashboard |
-| 2 clicks | Common tasks | Home → Products → Laptops |
-| 3 clicks | Secondary tasks | Home → Support → Warranty → Status |
-| 4+ clicks | Deep content | Home → Resources → Technical → Specs → Model X |
+| 1 click | Most important tasks | Home Ã¢â€ â€™ Dashboard |
+| 2 clicks | Common tasks | Home Ã¢â€ â€™ Products Ã¢â€ â€™ Laptops |
+| 3 clicks | Secondary tasks | Home Ã¢â€ â€™ Support Ã¢â€ â€™ Warranty Ã¢â€ â€™ Status |
+| 4+ clicks | Deep content | Home Ã¢â€ â€™ Resources Ã¢â€ â€™ Technical Ã¢â€ â€™ Specs Ã¢â€ â€™ Model X |
 
 ### Label Quality Criteria
 
@@ -510,23 +510,23 @@ Copyright (c) 2024 Awesome Grok Skills
 
 ```
 QUARTERLY IA REVIEW
-    □ Run tree test on current navigation
-    □ Analyze search logs for zero-result queries
-    □ Review content inventory for orphans
-    □ Check taxonomy for new content
-    □ Validate label consistency
-    □ Test new navigation concepts
-    □ Update sitemap
-    □ Document changes
+    Ã¢â€“Â¡ Run tree test on current navigation
+    Ã¢â€“Â¡ Analyze search logs for zero-result queries
+    Ã¢â€“Â¡ Review content inventory for orphans
+    Ã¢â€“Â¡ Check taxonomy for new content
+    Ã¢â€“Â¡ Validate label consistency
+    Ã¢â€“Â¡ Test new navigation concepts
+    Ã¢â€“Â¡ Update sitemap
+    Ã¢â€“Â¡ Document changes
 
 CONTENT MIGRATION CHECKLIST
-    □ Audit all existing content
-    □ Map content to new taxonomy
-    □ Set up redirects for moved content
-    □ Test all internal links
-    □ Update search index
-    □ Train content editors
-    □ Monitor 404 errors post-launch
+    Ã¢â€“Â¡ Audit all existing content
+    Ã¢â€“Â¡ Map content to new taxonomy
+    Ã¢â€“Â¡ Set up redirects for moved content
+    Ã¢â€“Â¡ Test all internal links
+    Ã¢â€“Â¡ Update search index
+    Ã¢â€“Â¡ Train content editors
+    Ã¢â€“Â¡ Monitor 404 errors post-launch
 ```
 
 ### IA Documentation Template
@@ -536,13 +536,13 @@ CONTENT MIGRATION CHECKLIST
 
 ## Navigation Structure
 ### Primary Navigation
-- [Item 1] → [URL]
-- [Item 2] → [URL]
-  - [Sub-item 2.1] → [URL]
-  - [Sub-item 2.2] → [URL]
+- [Item 1] Ã¢â€ â€™ [URL]
+- [Item 2] Ã¢â€ â€™ [URL]
+  - [Sub-item 2.1] Ã¢â€ â€™ [URL]
+  - [Sub-item 2.2] Ã¢â€ â€™ [URL]
 
 ### Secondary Navigation
-- [Item] → [URL]
+- [Item] Ã¢â€ â€™ [URL]
 
 ## Taxonomy
 ### Categories
@@ -566,9 +566,9 @@ CONTENT MIGRATION CHECKLIST
 | Query Type | Example | Action |
 |-----------|---------|--------|
 | Zero-result | "xyz123" | Add content or synonyms |
-| High refinement | "pricing cost" → "plans" | Improve labels |
-| High exit | "contact" → leave | Make contact easier |
-| Low CTR | "help" → no clicks | Improve result snippets |
+| High refinement | "pricing cost" Ã¢â€ â€™ "plans" | Improve labels |
+| High exit | "contact" Ã¢â€ â€™ leave | Make contact easier |
+| Low CTR | "help" Ã¢â€ â€™ no clicks | Improve result snippets |
 | Brand + feature | "Acme pricing" | Ensure brand pages rank |
 
 ### Complete Content Inventory Template
@@ -578,7 +578,7 @@ CONTENT MIGRATION CHECKLIST
 | / | Home | Page | Live | Marketing | 2024-01 | 10,000 | 30% |
 | /products | Products | Page | Live | Product | 2024-01 | 5,000 | 25% |
 | /blog/post-1 | Blog Post | Article | Live | Content | 2024-01 | 2,000 | 45% |
-| /old-page | Old Page | Page | Redirect | — | 2023-06 | 100 | 90% |
+| /old-page | Old Page | Page | Redirect | Ã¢â‚¬â€ | 2023-06 | 100 | 90% |
 
 ### Complete URL Structure Reference
 
@@ -686,7 +686,7 @@ CONTENT MIGRATION CHECKLIST
 - Status: Pass/Fail
 
 ## Navigation Depth
-- Target: ≤ 3 clicks to any page
+- Target: Ã¢â€°Â¤ 3 clicks to any page
 - Actual: [X] clicks average
 - Status: Pass/Fail
 
@@ -741,3 +741,171 @@ BAD:  "Navigate to the software section."
 - Discrete: Single correct answer
 - Ambiguous: Multiple valid paths
 ```
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

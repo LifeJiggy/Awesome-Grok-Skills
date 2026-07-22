@@ -9,7 +9,7 @@ tags: ["ux-research", "interaction-design", "micro-interactions", "accessibility
 
 ## Overview
 
-Interaction design (IxD) defines how users engage with digital products through behaviors, responses, and feedback loops. It governs the grammar of user interfaces—what happens when a user taps, swipes, types, or waits—and determines whether an experience feels intuitive, delightful, or frustrating. This module provides a comprehensive toolkit for designing, modeling, and evaluating interaction patterns across web, mobile, and cross-platform applications.
+Interaction design (IxD) defines how users engage with digital products through behaviors, responses, and feedback loops. It governs the grammar of user interfacesÃ¢â‚¬â€what happens when a user taps, swipes, types, or waitsÃ¢â‚¬â€and determines whether an experience feels intuitive, delightful, or frustrating. This module provides a comprehensive toolkit for designing, modeling, and evaluating interaction patterns across web, mobile, and cross-platform applications.
 
 The module implements state machine modeling for complex UI flows (multi-step forms, onboarding wizards, drag-and-drop interfaces), micro-interaction design patterns with trigger-feedback-loop structures, animation timing function selection and customization, gesture interaction libraries for touch-first interfaces, haptic feedback design for mobile devices, progressive disclosure pattern generators, dark pattern detection and classification, and accessibility-first interaction design with WCAG-compliant alternatives for every interaction pattern.
 
@@ -17,7 +17,7 @@ Whether you are designing a single button animation, architecting a multi-step c
 
 ## Core Capabilities
 
-- **Micro-Interaction Design Patterns**: Design trigger → rules → feedback → loops patterns for every UI element, with automatic state transition documentation and feedback timing specifications
+- **Micro-Interaction Design Patterns**: Design trigger Ã¢â€ â€™ rules Ã¢â€ â€™ feedback Ã¢â€ â€™ loops patterns for every UI element, with automatic state transition documentation and feedback timing specifications
 - **State Machine Modeling**: Build deterministic finite automata for UI flows with states, transitions, guards, actions, and error states; validate for completeness, dead-ends, and unreachable states
 - **Gesture Interaction Libraries**: Catalog and specify touch gestures (tap, double-tap, long-press, swipe, pinch, rotate, multi-touch) with interaction dictionaries, platform conventions, and discoverability scoring
 - **Animation Timing Functions**: Select and customize cubic-bezier timing curves for different motion purposes (ease-in for exits, ease-out for entrances, spring for playful interactions), with performance budgets
@@ -173,7 +173,7 @@ lib.register(
     platform=Platform.IOS,
     action="Delete item from list",
     discoverability_score=0.8,
-    accessibility_alternative="Edit button → Delete",
+    accessibility_alternative="Edit button Ã¢â€ â€™ Delete",
 )
 lib.register(
     gesture=GestureType.LONG_PRESS,
@@ -196,24 +196,24 @@ print(f"Low discoverability gestures: {coverage['low_discoverability']}")
 
 2. **Model Complex Flows as State Machines**: If an interaction has more than 3 states or conditional transitions, model it formally as a state machine. This prevents dead-ends, unreachable states, and impossible transitions that plague complex UIs.
 
-3. **Follow Platform Gesture Conventions**: Swipe-left-to-delete is iOS convention. Long-press-to-menu is Android convention. Deviating from platform norms increases cognitive load and error rates—only break conventions when you have a compelling user-research-backed reason.
+3. **Follow Platform Gesture Conventions**: Swipe-left-to-delete is iOS convention. Long-press-to-menu is Android convention. Deviating from platform norms increases cognitive load and error ratesÃ¢â‚¬â€only break conventions when you have a compelling user-research-backed reason.
 
 4. **Duration Follows Purpose**: Enter animations (200-300ms), exit animations (150-200ms), attention-grabbing animations (400-800ms). Faster is better for actions; slower is better for spatial context.
 
 5. **Spring Physics > Cubic Bezier for Natural Motion**: Spring-based animations (damping ratio, stiffness, mass) feel more natural than fixed cubic-bezier curves because they adapt to the element's distance. Use springs for playful or organic interactions; use bezier for precise timing control.
 
-6. **Haptic Feedback is Not Decoration**: Every haptic event should communicate meaningful information—success, error, selection change, or warning. Random haptics train users to ignore them, just like gratuitous sound effects.
+6. **Haptic Feedback is Not Decoration**: Every haptic event should communicate meaningful informationÃ¢â‚¬â€success, error, selection change, or warning. Random haptics train users to ignore them, just like gratuitous sound effects.
 
 7. **Progressive Disclosure Reduces Cognitive Load**: Show only what's needed at each step. A form with 20 fields should be split into 4 steps of 5 fields each. Complexity should be revealed progressively as the user demonstrates readiness.
 
-8. **Dark Patterns Erode Trust, Not Just Ethics**: Beyond being unethical, dark patterns have measurable costs—increased support tickets, higher churn, brand damage, and legal risk (GDPR fines for manipulative consent flows). Every dark pattern is also a bad long-term business decision.
+8. **Dark Patterns Erode Trust, Not Just Ethics**: Beyond being unethical, dark patterns have measurable costsÃ¢â‚¬â€increased support tickets, higher churn, brand damage, and legal risk (GDPR fines for manipulative consent flows). Every dark pattern is also a bad long-term business decision.
 
 ## Related Modules
 
-- [user-research](../user-research/GROK.md) — Research methods that inform interaction design decisions
-- [usability-testing](../usability-testing/GROK.md) — Testing interaction patterns with real users
-- [information-architecture](../information-architecture/GROK.md) — Navigation interaction patterns and information hierarchy
-- [accessibility](../accessibility/GROK.md) — Accessible interaction alternatives and WCAG compliance
+- [user-research](../user-research/GROK.md) Ã¢â‚¬â€ Research methods that inform interaction design decisions
+- [usability-testing](../usability-testing/GROK.md) Ã¢â‚¬â€ Testing interaction patterns with real users
+- [information-architecture](../information-architecture/GROK.md) Ã¢â‚¬â€ Navigation interaction patterns and information hierarchy
+- [accessibility](../accessibility/GROK.md) Ã¢â‚¬â€ Accessible interaction alternatives and WCAG compliance
 
 ---
 
@@ -255,32 +255,32 @@ issues = machine.validate_with_rules(rules)
 
 ```
 Trigger
-    │
-    ▼
-┌──────────────┐
-│ Rules        │── Preconditions, state checks
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Feedback     │── Visual, haptic, auditory
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Loops        │── Repeat, reversal, success state
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Rules        Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Preconditions, state checks
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Feedback     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Visual, haptic, auditory
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Loops        Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Repeat, reversal, success state
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ### State Machine Pattern
 
 ```
-IDLE ──trigger──> ACTIVE ──complete──> SUCCESS
-  │                 │                    │
-  │                 ▼                    │
-  │              ERROR ──retry──> ACTIVE │
-  │                                    │
-  └────────reset───────────────────────┘
+IDLE Ã¢â€â‚¬Ã¢â€â‚¬triggerÃ¢â€â‚¬Ã¢â€â‚¬> ACTIVE Ã¢â€â‚¬Ã¢â€â‚¬completeÃ¢â€â‚¬Ã¢â€â‚¬> SUCCESS
+  Ã¢â€â€š                 Ã¢â€â€š                    Ã¢â€â€š
+  Ã¢â€â€š                 Ã¢â€“Â¼                    Ã¢â€â€š
+  Ã¢â€â€š              ERROR Ã¢â€â‚¬Ã¢â€â‚¬retryÃ¢â€â‚¬Ã¢â€â‚¬> ACTIVE Ã¢â€â€š
+  Ã¢â€â€š                                    Ã¢â€â€š
+  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬resetÃ¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Integration Guide
@@ -419,7 +419,7 @@ from interaction_design import MetricsCollector
 
 collector = MetricsCollector()
 collector.counter("interaction.dark_patterns_found", count, tags={"type": ptype})
-collector.gauge("interaction.accessibility.alternatives覆盖率", coverage)
+collector.gauge("interaction.accessibility.alternativesÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡", coverage)
 collector.histogram("interaction.animation.duration_ms", duration)
 ```
 
@@ -498,12 +498,12 @@ Copyright (c) 2024 Awesome Grok Skills
 
 | Pattern | States | Use Case |
 |---------|--------|----------|
-| Simple Toggle | OFF → ON → OFF | Light switch, mute |
-| Three-State | OFF → LOADING → ON → OFF | Async toggle |
-| Wizard | STEP1 → STEP2 → STEP3 → COMPLETE | Multi-step forms |
-| Modal | CLOSED → OPEN → CLOSED | Dialogs, overlays |
-| Loading | IDLE → LOADING → SUCCESS/ERROR | Async operations |
-| Undo | NORMAL → UNDOABLE → RESTORED | Delete with undo |
+| Simple Toggle | OFF Ã¢â€ â€™ ON Ã¢â€ â€™ OFF | Light switch, mute |
+| Three-State | OFF Ã¢â€ â€™ LOADING Ã¢â€ â€™ ON Ã¢â€ â€™ OFF | Async toggle |
+| Wizard | STEP1 Ã¢â€ â€™ STEP2 Ã¢â€ â€™ STEP3 Ã¢â€ â€™ COMPLETE | Multi-step forms |
+| Modal | CLOSED Ã¢â€ â€™ OPEN Ã¢â€ â€™ CLOSED | Dialogs, overlays |
+| Loading | IDLE Ã¢â€ â€™ LOADING Ã¢â€ â€™ SUCCESS/ERROR | Async operations |
+| Undo | NORMAL Ã¢â€ â€™ UNDOABLE Ã¢â€ â€™ RESTORED | Delete with undo |
 
 ### Animation Timing Reference
 
@@ -551,23 +551,23 @@ Copyright (c) 2024 Awesome Grok Skills
 
 ```
 KEYBOARD ACCESSIBILITY
-    □ All interactive elements reachable via Tab
-    □ Tab order follows visual reading order
-    □ Focus indicator visible on all elements
-    □ Enter/Space activates buttons and links
-    □ Escape closes modals and menus
-    □ Arrow keys navigate within components
-    □ Focus trapped in modals
-    □ Focus restored after modal close
+    Ã¢â€“Â¡ All interactive elements reachable via Tab
+    Ã¢â€“Â¡ Tab order follows visual reading order
+    Ã¢â€“Â¡ Focus indicator visible on all elements
+    Ã¢â€“Â¡ Enter/Space activates buttons and links
+    Ã¢â€“Â¡ Escape closes modals and menus
+    Ã¢â€“Â¡ Arrow keys navigate within components
+    Ã¢â€“Â¡ Focus trapped in modals
+    Ã¢â€“Â¡ Focus restored after modal close
 
 SCREEN READER ACCESSIBILITY
-    □ All images have alt text
-    □ Form inputs have labels
-    □ Headings are properly nested
-    □ Landmarks are properly defined
-    □ Dynamic content announced via aria-live
-    □ Interactive elements have accessible names
-    □ Custom widgets have ARIA roles
+    Ã¢â€“Â¡ All images have alt text
+    Ã¢â€“Â¡ Form inputs have labels
+    Ã¢â€“Â¡ Headings are properly nested
+    Ã¢â€“Â¡ Landmarks are properly defined
+    Ã¢â€“Â¡ Dynamic content announced via aria-live
+    Ã¢â€“Â¡ Interactive elements have accessible names
+    Ã¢â€“Â¡ Custom widgets have ARIA roles
 ```
 
 ### Design Token Reference
@@ -620,17 +620,17 @@ SCREEN READER ACCESSIBILITY
 |-------|-------------|-------------|-------------|
 | IDLE | Waiting for input | Show placeholder | Hide placeholder |
 | LOADING | Processing request | Show spinner | Hide spinner |
-| SUCCESS | Operation complete | Show checkmark | — |
+| SUCCESS | Operation complete | Show checkmark | Ã¢â‚¬â€ |
 | ERROR | Operation failed | Show error message | Clear error |
 
 ## Transitions
 | From | To | Trigger | Guard | Action |
 |------|----|---------|-------|--------|
 | IDLE | LOADING | User submits | Form valid | Submit data |
-| LOADING | SUCCESS | Data received | — | Update UI |
-| LOADING | ERROR | Request fails | — | Show error |
-| ERROR | IDLE | User dismisses | — | Reset form |
-| SUCCESS | IDLE | Timeout | — | Reset form |
+| LOADING | SUCCESS | Data received | Ã¢â‚¬â€ | Update UI |
+| LOADING | ERROR | Request fails | Ã¢â‚¬â€ | Show error |
+| ERROR | IDLE | User dismisses | Ã¢â‚¬â€ | Reset form |
+| SUCCESS | IDLE | Timeout | Ã¢â‚¬â€ | Reset form |
 
 ## Initial State: IDLE
 ## Final State: SUCCESS
@@ -669,35 +669,35 @@ SCREEN READER ACCESSIBILITY
 DARK PATTERN AUDIT
 
 MISDIRECTION
-    □ Check for visual hierarchy manipulation
-    □ Verify equal prominence for all options
-    □ Look for pre-checked opt-in boxes
-    □ Check for hidden costs at checkout
-    □ Verify cancellation is as easy as signup
+    Ã¢â€“Â¡ Check for visual hierarchy manipulation
+    Ã¢â€“Â¡ Verify equal prominence for all options
+    Ã¢â€“Â¡ Look for pre-checked opt-in boxes
+    Ã¢â€“Â¡ Check for hidden costs at checkout
+    Ã¢â€“Â¡ Verify cancellation is as easy as signup
 
 ROACH MOTEL
-    □ Test signup flow (easy?)
-    □ Test cancellation flow (also easy?)
-    □ Check for hidden unsubscribe links
-    □ Verify account deletion process
+    Ã¢â€“Â¡ Test signup flow (easy?)
+    Ã¢â€“Â¡ Test cancellation flow (also easy?)
+    Ã¢â€“Â¡ Check for hidden unsubscribe links
+    Ã¢â€“Â¡ Verify account deletion process
 
 FORCE
-    □ Check for forced account creation
-    □ Verify social login alternatives
-    □ Check for forced continuity
-    □ Verify free trial conversion process
+    Ã¢â€“Â¡ Check for forced account creation
+    Ã¢â€“Â¡ Verify social login alternatives
+    Ã¢â€“Â¡ Check for forced continuity
+    Ã¢â€“Â¡ Verify free trial conversion process
 
 CONFIRM SHAMING
-    □ Check opt-out language for guilt-tripping
-    □ Verify neutral language for all options
-    □ Look for "No, I don't want to save money"
-    □ Check unsubscribe confirmation text
+    Ã¢â€“Â¡ Check opt-out language for guilt-tripping
+    Ã¢â€“Â¡ Verify neutral language for all options
+    Ã¢â€“Â¡ Look for "No, I don't want to save money"
+    Ã¢â€“Â¡ Check unsubscribe confirmation text
 
 URGENCY/MANIPULATION
-    □ Check for fake scarcity ("Only 2 left!")
-    □ Verify countdown timers are real
-    □ Look for social proof manipulation
-    □ Check for hidden sponsorship/ads
+    Ã¢â€“Â¡ Check for fake scarcity ("Only 2 left!")
+    Ã¢â€“Â¡ Verify countdown timers are real
+    Ã¢â€“Â¡ Look for social proof manipulation
+    Ã¢â€“Â¡ Check for hidden sponsorship/ads
 ```
 
 ### Complete Accessibility Interaction Patterns
@@ -712,5 +712,173 @@ URGENCY/MANIPULATION
 | Tab | tab | Arrow keys | "tab, [label], selected/unselected" |
 | Modal | dialog | Escape to close | "dialog, [title]" |
 | Menu | menu | Arrow keys | "menu, [item]" |
-| Tooltip | tooltip | — | "tooltip, [text]" |
+| Tooltip | tooltip | Ã¢â‚¬â€ | "tooltip, [text]" |
 | Accordion | button + region | Enter/Space | "button, [label], expanded/collapsed" |
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

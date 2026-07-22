@@ -174,80 +174,80 @@ hunt_scope:
 
 ```
 1. Scoping
-   ├── Define objectives
-   ├── Identify data sources
-   ├── Set timeline
-   └── Assign resources
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Define objectives
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Identify data sources
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Set timeline
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Assign resources
 
 2. Hypothesis Development
-   ├── Threat intelligence analysis
-   ├── MITRE ATT&CK mapping
-   ├── IOB development
-   └── Hypothesis documentation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Threat intelligence analysis
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ MITRE ATT&CK mapping
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ IOB development
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Hypothesis documentation
 
 3. Data Collection
-   ├── Source identification
-   ├── Data aggregation
-   ├── Data normalization
-   └── Data validation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Source identification
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data aggregation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data normalization
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Data validation
 
 4. Analysis
-   ├── Query execution
-   ├── Pattern recognition
-   ├── Anomaly detection
-   └── Hypothesis testing
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Query execution
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Pattern recognition
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Anomaly detection
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Hypothesis testing
 
 5. Reporting
-   ├── Findings documentation
-   ├── True/false positive classification
-   ├── Detection gap analysis
-   └── Recommendations
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Findings documentation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ True/false positive classification
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Detection gap analysis
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Recommendations
 ```
 
 ### IOB (Indicators of Behavior) Framework
 
 ```
 Behavior Categories:
-├── Execution
-│   ├── Command and scripting interpreters
-│   ├── Exploitation for execution
-│   └── Shared modules
-├── Persistence
-│   ├── Boot autostart
-│   ├── Scheduled tasks
-│   └── Registry modification
-├── Privilege Escalation
-│   ├── Process injection
-│   ├── Access token manipulation
-│   └── Domain policy modification
-├── Defense Evasion
-│   ├── Obfuscated files
-│   ├── Indicator removal
-│   └── Masquerading
-├── Credential Access
-│   ├── OS credential dumping
-│   ├── Brute forcing
-│   └── Steal session cookies
-├── Discovery
-│   ├── System information
-│   ├── Network discovery
-│   └── Account discovery
-├── Lateral Movement
-│   ├── Remote services
-│   ├── Use alternate authentication
-│   └── Remote access tools
-├── Collection
-│   ├── Data from local system
-│   ├── Data from network shared drive
-│   └── Screen capture
-├── Exfiltration
-│   ├── Exfil over C2 channel
-│   ├── Exfil over web service
-│   └── Automated exfil
-└── Command and Control
-    ├── Application layer protocol
-    ├── Encrypted channel
-    └── Proxy
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Execution
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Command and scripting interpreters
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Exploitation for execution
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Shared modules
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Persistence
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Boot autostart
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scheduled tasks
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Registry modification
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Privilege Escalation
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Process injection
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Access token manipulation
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Domain policy modification
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Defense Evasion
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Obfuscated files
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Indicator removal
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Masquerading
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Credential Access
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ OS credential dumping
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Brute forcing
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Steal session cookies
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Discovery
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ System information
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network discovery
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Account discovery
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Lateral Movement
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Remote services
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Use alternate authentication
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Remote access tools
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Collection
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data from local system
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data from network shared drive
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Screen capture
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Exfiltration
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Exfil over C2 channel
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Exfil over web service
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Automated exfil
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Command and Control
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Application layer protocol
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Encrypted channel
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Proxy
 ```
 
 ### Data Source Coverage Model
@@ -386,23 +386,23 @@ print(f"Time remaining: {progress.estimated_remaining_hours:.1f}h")
 
 ```
 Hunt OPSEC:
-├── Use non-attributable infrastructure
-├── Rotate hunt personas
-├── Monitor for hunt detection by adversary
-├── Use passive collection where possible
-├── Avoid tipping off active adversaries
-└── Document all actions for accountability
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Use non-attributable infrastructure
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Rotate hunt personas
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Monitor for hunt detection by adversary
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Use passive collection where possible
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Avoid tipping off active adversaries
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Document all actions for accountability
 ```
 
 ### Data Protection
 
 ```
 Sensitive Data in Hunts:
-├── PII in endpoint telemetry → Mask before analysis
-├── Credentials in logs → Never expose in reports
-├── Network captures → Encrypt at rest
-├── Hunt results → Classify appropriately
-└── Adversary tools → Secure storage
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ PII in endpoint telemetry Ã¢â€ â€™ Mask before analysis
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Credentials in logs Ã¢â€ â€™ Never expose in reports
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network captures Ã¢â€ â€™ Encrypt at rest
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Hunt results Ã¢â€ â€™ Classify appropriately
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Adversary tools Ã¢â€ â€™ Secure storage
 ```
 
 ## Troubleshooting Guide
@@ -589,40 +589,40 @@ Query:
 
 ```
 1. Foundation
-   ├── Define hunt objectives
-   ├── Identify data sources
-   ├── Select tools and platforms
-   └── Train hunt team
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Define hunt objectives
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Identify data sources
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Select tools and platforms
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Train hunt team
 
 2. Process
-   ├── Develop hunt lifecycle
-   ├── Create hypothesis templates
-   ├── Establish reporting format
-   └── Define success criteria
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Develop hunt lifecycle
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Create hypothesis templates
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Establish reporting format
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Define success criteria
 
 3. Execution
-   ├── Start with simple hunts
-   ├── Progress to complex scenarios
-   ├── Build query library
-   └── Track coverage
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Start with simple hunts
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Progress to complex scenarios
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Build query library
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Track coverage
 
 4. Maturity
-   ├── Automate recurring hunts
-   ├── Integrate with detection engineering
-   ├── Share findings across teams
-   └── Measure program effectiveness
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Automate recurring hunts
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Integrate with detection engineering
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Share findings across teams
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Measure program effectiveness
 ```
 
 ### Data Source Requirements
 
 ```
 Minimum data sources for comprehensive hunting:
-├── EDR (endpoint telemetry)
-├── Network flows (NetFlow, Zeek)
-├── DNS logs (passive DNS)
-├── Authentication logs (AD, SSO)
-├── Cloud audit logs (CloudTrail, Activity Log)
-└── Web proxy logs
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ EDR (endpoint telemetry)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Network flows (NetFlow, Zeek)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ DNS logs (passive DNS)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Authentication logs (AD, SSO)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cloud audit logs (CloudTrail, Activity Log)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Web proxy logs
 ```
 
 ## Monitoring & Observability
@@ -641,13 +641,13 @@ Minimum data sources for comprehensive hunting:
 
 ```
 Hunt Program Dashboard:
-├── Active hunts status
-├── Coverage heatmap (ATT&CK)
-├── Findings by severity
-├── Rule creation rate
-├── Data source coverage
-├── Hunt completion rate
-└── Trend analysis (quarterly)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Active hunts status
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Coverage heatmap (ATT&CK)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Findings by severity
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Rule creation rate
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data source coverage
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Hunt completion rate
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Trend analysis (quarterly)
 ```
 
 ## Testing Strategy
@@ -656,22 +656,22 @@ Hunt Program Dashboard:
 
 ```
 1. Hypothesis Validation
-   ├── Red team simulation
-   ├── Known-good baseline
-   ├── Historical data replay
-   └── Adversary emulation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Red team simulation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Known-good baseline
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Historical data replay
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Adversary emulation
 
 2. Query Validation
-   ├── True positive test cases
-   ├── False positive test cases
-   ├── Performance benchmarks
-   └── Cross-platform consistency
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ True positive test cases
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ False positive test cases
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Performance benchmarks
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Cross-platform consistency
 
 3. Coverage Validation
-   ├── MITRE ATT&CK coverage assessment
-   ├── Data source gap analysis
-   ├── Rule effectiveness testing
-   └── Detection gap remediation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ MITRE ATT&CK coverage assessment
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data source gap analysis
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Rule effectiveness testing
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Detection gap remediation
 ```
 
 ## Versioning & Migration
@@ -680,19 +680,19 @@ Hunt Program Dashboard:
 
 ```
 v3.0: New hunt methodologies
-├── ML-based anomaly hunts
-├── Cloud-native hunt techniques
-└── Supply chain hunt scenarios
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ML-based anomaly hunts
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cloud-native hunt techniques
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Supply chain hunt scenarios
 
 v2.x: Hunt additions
-├── New MITRE technique coverage
-├── New data source integration
-└── Query library expansion
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New MITRE technique coverage
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New data source integration
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Query library expansion
 
 v1.0.x: Hunt refinements
-├── Query optimization
-├── Documentation updates
-└── False positive reduction
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Query optimization
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Documentation updates
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ False positive reduction
 ```
 
 ## Glossary
@@ -701,8 +701,8 @@ v1.0.x: Hunt refinements
 |------|-----------|
 | ATT&CK | Adversarial Tactics, Techniques, and Common Knowledge |
 | Hypothesis | Testable assumption about adversary behavior |
-| IOB | Indicator of Behavior — behavioral pattern of adversary |
-| IOC | Indicator of Compromise — artifact of intrusion |
+| IOB | Indicator of Behavior Ã¢â‚¬â€ behavioral pattern of adversary |
+| IOC | Indicator of Compromise Ã¢â‚¬â€ artifact of intrusion |
 | Tactic | Adversary goal (e.g., persistence, lateral movement) |
 | Technique | Method used to achieve tactic |
 | Procedure | Specific implementation of technique |
@@ -773,3 +773,171 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

@@ -5,15 +5,15 @@ version: "1.0.0"
 tags: ["voice-technology", "speech-processing", "audio", "signal-processing", "vad", "diarization"]
 ---
 
-# Speech Processing — Audio Preprocessing, Feature Extraction & Enhancement
+# Speech Processing Ã¢â‚¬â€ Audio Preprocessing, Feature Extraction & Enhancement
 
 ## Overview
 
-Speech processing is the foundational layer of any voice technology stack. Before audio can be recognized, synthesized, or analyzed, it must be cleaned, normalized, and converted into meaningful feature representations. This module provides a comprehensive toolkit for raw audio preprocessing — including noise reduction via spectral gating, automatic gain normalization, voice activity detection (VAD), and silence removal — along with feature extraction pipelines that produce the MFCCs, spectrograms, and pitch contours consumed by downstream ASR and speaker ID systems.
+Speech processing is the foundational layer of any voice technology stack. Before audio can be recognized, synthesized, or analyzed, it must be cleaned, normalized, and converted into meaningful feature representations. This module provides a comprehensive toolkit for raw audio preprocessing Ã¢â‚¬â€ including noise reduction via spectral gating, automatic gain normalization, voice activity detection (VAD), and silence removal Ã¢â‚¬â€ along with feature extraction pipelines that produce the MFCCs, spectrograms, and pitch contours consumed by downstream ASR and speaker ID systems.
 
 Modern speech processing extends well beyond simple filtering. Contemporary systems must handle far-field microphone arrays, multi-speaker overlap, background music contamination, and heterogeneous audio formats sampled anywhere from 8 kHz (telephony) to 48 kHz (broadcast). The algorithms in this module are designed to operate robustly across these conditions, leveraging both classical DSP techniques (Wiener filtering, adaptive noise estimation) and modern neural-enhanced approaches (DNN-based dereverberation, perceptual loss functions).
 
-Additionally, this module covers speaker diarization — the process of determining "who spoke when" — which is essential for meeting transcription, call center analytics, and multi-party conversational AI. Audio quality metrics such as PESQ, STOI, and SNR estimation provide objective feedback on processing effectiveness, enabling automated pipeline tuning and quality gating before downstream consumption.
+Additionally, this module covers speaker diarization Ã¢â‚¬â€ the process of determining "who spoke when" Ã¢â‚¬â€ which is essential for meeting transcription, call center analytics, and multi-party conversational AI. Audio quality metrics such as PESQ, STOI, and SNR estimation provide objective feedback on processing effectiveness, enabling automated pipeline tuning and quality gating before downstream consumption.
 
 The processing pipeline is designed to be modular: each stage (noise reduction, normalization, feature extraction) operates independently and can be composed into custom workflows. State is maintained through dataclass containers that carry audio signals, metadata, and quality metrics through the pipeline without requiring external storage.
 
@@ -259,10 +259,10 @@ except AudioProcessingError as e:
 
 ## Related Modules
 
-- [voice-assistants](../voice-assistants/) — Intent recognition and dialogue management built on extracted features
-- [speech-recognition](../speech-recognition/) — ASR pipelines that consume MFCCs and spectrograms
-- [text-to-speech](../text-to-speech/) — Synthesis output that feeds back into quality assessment
-- [voice-analytics](../voice-analytics/) — Emotion detection and biometric analysis from processed audio
+- [voice-assistants](../voice-assistants/) Ã¢â‚¬â€ Intent recognition and dialogue management built on extracted features
+- [speech-recognition](../speech-recognition/) Ã¢â‚¬â€ ASR pipelines that consume MFCCs and spectrograms
+- [text-to-speech](../text-to-speech/) Ã¢â‚¬â€ Synthesis output that feeds back into quality assessment
+- [voice-analytics](../voice-analytics/) Ã¢â‚¬â€ Emotion detection and biometric analysis from processed audio
 
 ---
 
@@ -306,35 +306,35 @@ vad_config = VADConfig(
 
 ```
 Raw Audio Input
-    │
-    ▼
-┌──────────────┐
-│ Format       │── Resample, channel downmix, bit depth
-│ Conversion   │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Noise        │── Spectral gating, Wiener filter
-│ Reduction    │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Normalization│── Peak, loudness (EBU R128)
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ VAD /        │── Speech segment detection
-│ Silence Trim │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Feature      │── MFCC, mel-spectrogram, pitch
-│ Extraction   │
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Format       Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Resample, channel downmix, bit depth
+Ã¢â€â€š Conversion   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Noise        Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Spectral gating, Wiener filter
+Ã¢â€â€š Reduction    Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š NormalizationÃ¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Peak, loudness (EBU R128)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š VAD /        Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Speech segment detection
+Ã¢â€â€š Silence Trim Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Feature      Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ MFCC, mel-spectrogram, pitch
+Ã¢â€â€š Extraction   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Integration Guide
@@ -591,8 +591,8 @@ Copyright (c) 2024 Awesome Grok Skills
 |--------|-------|------|-----|----------|
 | PESQ | -0.5 to 4.5 | > 3.5 | < 2.0 | Speech quality |
 | STOI | 0 to 1.0 | > 0.9 | < 0.5 | Intelligibility |
-| SNR | -∞ to +∞ dB | > 20 dB | < 5 dB | Noise level |
-| SI-SNR | -∞ to +∞ dB | > 15 dB | < 5 dB | Source separation |
+| SNR | -Ã¢Ë†Å¾ to +Ã¢Ë†Å¾ dB | > 20 dB | < 5 dB | Noise level |
+| SI-SNR | -Ã¢Ë†Å¾ to +Ã¢Ë†Å¾ dB | > 15 dB | < 5 dB | Source separation |
 
 ### Common Audio Issues and Fixes
 
@@ -608,16 +608,16 @@ Copyright (c) 2024 Awesome Grok Skills
 
 ```
 ASR Pipeline:
-Input → Resample(16k) → Mono → Normalize(-23 LUFS) → VAD → MFCC → ASR
+Input Ã¢â€ â€™ Resample(16k) Ã¢â€ â€™ Mono Ã¢â€ â€™ Normalize(-23 LUFS) Ã¢â€ â€™ VAD Ã¢â€ â€™ MFCC Ã¢â€ â€™ ASR
 
 Speaker ID Pipeline:
-Input → Resample(16k) → Mono → Normalize → VAD → ECAPA-TDNN → Gallery Match
+Input Ã¢â€ â€™ Resample(16k) Ã¢â€ â€™ Mono Ã¢â€ â€™ Normalize Ã¢â€ â€™ VAD Ã¢â€ â€™ ECAPA-TDNN Ã¢â€ â€™ Gallery Match
 
 Emotion Detection Pipeline:
-Input → Resample(16k) → Mono → Normalize → Segmentation → CNN/Transformer → Emotion Labels
+Input Ã¢â€ â€™ Resample(16k) Ã¢â€ â€™ Mono Ã¢â€ â€™ Normalize Ã¢â€ â€™ Segmentation Ã¢â€ â€™ CNN/Transformer Ã¢â€ â€™ Emotion Labels
 
 TTS Quality Pipeline:
-Input Text → Normalize → G2P → Acoustic Model → Vocoder → Normalize → Output
+Input Text Ã¢â€ â€™ Normalize Ã¢â€ â€™ G2P Ã¢â€ â€™ Acoustic Model Ã¢â€ â€™ Vocoder Ã¢â€ â€™ Normalize Ã¢â€ â€™ Output
 ```
 
 ## Signal Analysis & Advanced DSP
@@ -633,17 +633,17 @@ analyzer = SpectralAnalyzer(sample_rate=16000)
 # Compute power spectral density
 psd = analyzer.compute_psd(signal, method="welch", nperseg=512)
 
-# Spectral centroid — center of mass of spectrum
+# Spectral centroid Ã¢â‚¬â€ center of mass of spectrum
 centroid = analyzer.spectral_centroid(signal)
 print(f"Centroid: {centroid:.0f} Hz")  # Higher = brighter sound
 
-# Spectral rolloff — frequency below which 85% of energy lies
+# Spectral rolloff Ã¢â‚¬â€ frequency below which 85% of energy lies
 rolloff = analyzer.spectral_rolloff(signal, roll=0.85)
 
-# Spectral bandwidth — spread of the spectrum
+# Spectral bandwidth Ã¢â‚¬â€ spread of the spectrum
 bandwidth = analyzer.spectral_bandwidth(signal)
 
-# Spectral flatness — how tone-like vs noise-like (0=tonal, 1=noisy)
+# Spectral flatness Ã¢â‚¬â€ how tone-like vs noise-like (0=tonal, 1=noisy)
 flatness = analyzer.spectral_flatness(signal)
 print(f"Flatness: {flatness:.3f}")
 
@@ -739,10 +739,10 @@ from speech_processing import MultiBandProcessor
 multi_band = MultiBandProcessor(
     sample_rate=16000,
     bands=[
-        (0, 500),       # Low frequencies — rumble, hum
-        (500, 2000),    # Mid-low — speech fundamentals
-        (2000, 4000),   # Mid — speech formants
-        (4000, 8000),   # High — fricatives, sibilance
+        (0, 500),       # Low frequencies Ã¢â‚¬â€ rumble, hum
+        (500, 2000),    # Mid-low Ã¢â‚¬â€ speech fundamentals
+        (2000, 4000),   # Mid Ã¢â‚¬â€ speech formants
+        (4000, 8000),   # High Ã¢â‚¬â€ fricatives, sibilance
     ],
     crossover_filter_order=4
 )
@@ -873,3 +873,171 @@ server = WebSocketServer(
 server.start()
 print("Real-time processing server running on ws://0.0.0.0:8765")
 ```
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

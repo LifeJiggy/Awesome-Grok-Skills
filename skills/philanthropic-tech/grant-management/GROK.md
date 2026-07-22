@@ -143,33 +143,33 @@ print(f"Upcoming deadlines: {status.upcoming_deadlines}")
 ### Grant Management Workflow
 
 ```
-┌─────────────────────────────────────────┐
-│           Prospect Research             │
-│   (Funder Database, Opportunity Search) │
-└────────────────┬────────────────────────┘
-                 │
-┌────────────────▼────────────────────────┐
-│          Proposal Development           │
-│   (Narrative, Budget, Attachments)      │
-└────────────────┬────────────────────────┘
-                 │
-┌────────────────▼────────────────────────┐
-│          Award Management               │
-│   (Setup, Tracking, Compliance)         │
-└────────────────┬────────────────────────┘
-                 │
-┌────────────────▼────────────────────────┐
-│          Reporting & Closeout           │
-│   (Progress Reports, Final Reports)     │
-└─────────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚           Prospect Research             â”‚
+â”‚   (Funder Database, Opportunity Search) â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                 â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚          Proposal Development           â”‚
+â”‚   (Narrative, Budget, Attachments)      â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                 â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚          Award Management               â”‚
+â”‚   (Setup, Tracking, Compliance)         â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                 â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚          Reporting & Closeout           â”‚
+â”‚   (Progress Reports, Final Reports)     â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### Document Management
 
 ```
-Document Upload → Categorization → Approval → Storage → Retrieval
-       │              │              │          │         │
-       ▼              ▼              ▼          ▼         ▼
+Document Upload â†’ Categorization â†’ Approval â†’ Storage â†’ Retrieval
+       â”‚              â”‚              â”‚          â”‚         â”‚
+       â–¼              â–¼              â–¼          â–¼         â–¼
    File/Folder    Auto-tag      Workflow    Version    Search
    Organization  Classification Manager    Control    & Access
 ```
@@ -177,9 +177,9 @@ Document Upload → Categorization → Approval → Storage → Retrieval
 ### Budget Tracking Flow
 
 ```
-Budget Entry → Approval → Allocation → Expenditure → Reporting
-     │            │          │              │            │
-     ▼            ▼          ▼              ▼            ▼
+Budget Entry â†’ Approval â†’ Allocation â†’ Expenditure â†’ Reporting
+     â”‚            â”‚          â”‚              â”‚            â”‚
+     â–¼            â–¼          â–¼              â–¼            â–¼
   Create      Review     Distribute    Track Costs   Generate
   Line Items  & Approve  to Projects   Against Budget Reports
 ```
@@ -187,17 +187,17 @@ Budget Entry → Approval → Allocation → Expenditure → Reporting
 ### Grant Calendar Integration
 
 ```
-┌─────────────────────────────────────────┐
-│           Grant Calendar                │
-│   (Deadlines, Reports, Milestones)      │
-└────────────────┬────────────────────────┘
-                 │
-    ┌────────────┼────────────┐
-    │            │            │
-┌───▼───┐  ┌────▼────┐  ┌───▼───┐
-│Funder │  │Internal │  │Board  │
-│Deadlines│ │Deadlines│  │Reporting│
-└───────┘  └─────────┘  └───────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚           Grant Calendar                â”‚
+â”‚   (Deadlines, Reports, Milestones)      â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                 â”‚
+    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+    â”‚            â”‚            â”‚
+â”Œâ”€â”€â”€â–¼â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â–¼â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â–¼â”€â”€â”€â”
+â”‚Funder â”‚  â”‚Internal â”‚  â”‚Board  â”‚
+â”‚Deadlinesâ”‚ â”‚Deadlinesâ”‚  â”‚Reportingâ”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ## Integration Guide
@@ -404,11 +404,11 @@ spec:
 
 ### Self-Monitoring Metrics
 
-- `grants_active_total` — active grants count.
-- `grants_applications_submitted_total` — applications submitted.
-- `grants_awards_received_total` — awards received.
-- `grants_deadlines_upcoming` — upcoming deadlines.
-- `grant_budget_utilization` — budget utilization rate.
+- `grants_active_total` â€” active grants count.
+- `grants_applications_submitted_total` â€” applications submitted.
+- `grants_awards_received_total` â€” awards received.
+- `grants_deadlines_upcoming` â€” upcoming deadlines.
+- `grant_budget_utilization` â€” budget utilization rate.
 
 ## Testing Strategy
 
@@ -705,7 +705,7 @@ compliance_status = monitor.check_compliance(
 )
 
 for item in compliance_status.items:
-    status_icon = "✓" if item.status == "compliant" else "⚠" if item.status == "warning" else "✗"
+    status_icon = "âœ“" if item.status == "compliant" else "âš " if item.status == "warning" else "âœ—"
     print(f"{status_icon} {item.rule_name}: {item.status}")
     if item.status != "compliant":
         print(f"  Issue: {item.issue_description}")
@@ -832,3 +832,30 @@ for indicator in progress.indicator_summaries:
 ## License
 
 MIT License. See the root LICENSE file for full terms.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills

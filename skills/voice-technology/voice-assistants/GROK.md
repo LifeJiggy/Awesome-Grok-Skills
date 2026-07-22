@@ -5,17 +5,17 @@ version: "1.0.0"
 tags: ["voice-technology", "voice-assistants", "nlu", "dialogue-management", "wake-word", "intent-recognition"]
 ---
 
-# Voice Assistants — Intent Recognition, Dialogue Management & Skill Routing
+# Voice Assistants Ã¢â‚¬â€ Intent Recognition, Dialogue Management & Skill Routing
 
 ## Overview
 
-Voice assistants sit at the intersection of speech recognition, natural language understanding, and action execution. This module provides the full stack beyond raw transcription — from wake word detection that activates the system, through intent classification and slot filling that extracts structured commands, to multi-turn dialogue management that maintains conversational context across interactions. The goal is to transform free-form spoken language into reliable, actionable function calls with sub-second latency.
+Voice assistants sit at the intersection of speech recognition, natural language understanding, and action execution. This module provides the full stack beyond raw transcription Ã¢â‚¬â€ from wake word detection that activates the system, through intent classification and slot filling that extracts structured commands, to multi-turn dialogue management that maintains conversational context across interactions. The goal is to transform free-form spoken language into reliable, actionable function calls with sub-second latency.
 
 A production voice assistant must handle far more than simple command-response pairs. Users expect the system to disambiguate vague requests ("play that song" requires context), handle interruptions mid-sentence, gracefully recover from misrecognitions, and orchestrate multiple backend skills simultaneously (setting a timer while playing music while adjusting lights). This module's dialogue manager implements a finite-state-machine with slot-carrying context, supporting both deterministic intent flows and probabilistic dialogue policies trained via reinforcement learning.
 
-Privacy is a first-class concern. Modern voice assistants process sensitive personal data — location, contacts, health queries, financial requests. This module includes privacy-preserving patterns: on-device wake word detection, ephemeral audio buffers, opt-in processing for sensitive domains, and configurable data retention policies. The architecture separates the always-on keyword detector (runs locally, never transmits) from the cloud-connected understanding pipeline (activated only after wake word confirmation).
+Privacy is a first-class concern. Modern voice assistants process sensitive personal data Ã¢â‚¬â€ location, contacts, health queries, financial requests. This module includes privacy-preserving patterns: on-device wake word detection, ephemeral audio buffers, opt-in processing for sensitive domains, and configurable data retention policies. The architecture separates the always-on keyword detector (runs locally, never transmits) from the cloud-connected understanding pipeline (activated only after wake word confirmation).
 
-The voice user interface (VUI) patterns in this module define how the assistant communicates with users — when to confirm, when to ask clarifying questions, and how to present progressive disclosure without overwhelming the conversational flow. These patterns are informed by research in human-computer interaction and are designed to feel natural across diverse user populations.
+The voice user interface (VUI) patterns in this module define how the assistant communicates with users Ã¢â‚¬â€ when to confirm, when to ask clarifying questions, and how to present progressive disclosure without overwhelming the conversational flow. These patterns are informed by research in human-computer interaction and are designed to feel natural across diverse user populations.
 
 This module also supports multi-modal interaction where voice commands are combined with visual context (screen content, camera input) and gesture recognition, enabling richer interaction paradigms for smart displays, automotive systems, and augmented reality interfaces.
 
@@ -212,7 +212,7 @@ print(f"Routing to: {target.device_id}")
 
 7. **Log interaction telemetry for pipeline improvement**: Record intent accuracy, slot fill rates, abandonment points, and correction frequency. These metrics drive continuous improvement of the NLU models and dialogue policies. Set up dashboards to track weekly trends.
 
-8. **Design voice UI templates for all states**: Pre-script responses for every dialogue state — confirmation, error, disambiguation, timeout, and success. Inconsistent phrasing confuses users and degrades trust. Use a consistent voice persona across all templates.
+8. **Design voice UI templates for all states**: Pre-script responses for every dialogue state Ã¢â‚¬â€ confirmation, error, disambiguation, timeout, and success. Inconsistent phrasing confuses users and degrades trust. Use a consistent voice persona across all templates.
 
 ## Architecture Notes
 
@@ -226,10 +226,10 @@ The privacy architecture enforces a strict boundary between on-device and cloud 
 
 ## Related Modules
 
-- [speech-recognition](../speech-recognition/) — ASR engine that provides transcripts to the intent classifier
-- [speech-processing](../speech-processing/) — Audio preprocessing before wake word and ASR
-- [text-to-speech](../text-to-speech/) — Response synthesis for spoken output
-- [voice-analytics](../voice-analytics/) — Emotion detection for context-aware response tone
+- [speech-recognition](../speech-recognition/) Ã¢â‚¬â€ ASR engine that provides transcripts to the intent classifier
+- [speech-processing](../speech-processing/) Ã¢â‚¬â€ Audio preprocessing before wake word and ASR
+- [text-to-speech](../text-to-speech/) Ã¢â‚¬â€ Response synthesis for spoken output
+- [voice-analytics](../voice-analytics/) Ã¢â‚¬â€ Emotion detection for context-aware response tone
 
 ---
 
@@ -274,51 +274,51 @@ intent_config = IntentConfig(
 
 ```
 Audio Stream
-    │
-    ▼
-┌──────────────┐
-│ Wake Word    │── On-device keyword spotting
-│ Detection    │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ ASR          │── Speech-to-text transcription
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ NLU          │── Intent classification + slot filling
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Dialogue     │── Context management, disambiguation
-│ Manager      │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Skill Router │── Dispatch to appropriate skill
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ TTS          │── Text-to-speech response
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Wake Word    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ On-device keyword spotting
+Ã¢â€â€š Detection    Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š ASR          Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Speech-to-text transcription
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š NLU          Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Intent classification + slot filling
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Dialogue     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Context management, disambiguation
+Ã¢â€â€š Manager      Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Skill Router Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Dispatch to appropriate skill
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š TTS          Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Text-to-speech response
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ### Dialogue State Machine
 
 ```
-IDLE → LISTENING → PROCESSING → AWAITING_SLOT → EXECUTING → RESPONDING → IDLE
-  ↑                                                                    │
-  └────────────────────────────────────────────────────────────────────┘
+IDLE Ã¢â€ â€™ LISTENING Ã¢â€ â€™ PROCESSING Ã¢â€ â€™ AWAITING_SLOT Ã¢â€ â€™ EXECUTING Ã¢â€ â€™ RESPONDING Ã¢â€ â€™ IDLE
+  Ã¢â€ â€˜                                                                    Ã¢â€â€š
+  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 
 Additional transitions:
-- PROCESSING → AWAITING_CONFIRMATION (destructive actions)
-- AWAITING_SLOT → LISTENING (user provides slot)
-- RESPONDING → LISTENING (follow-up question)
+- PROCESSING Ã¢â€ â€™ AWAITING_CONFIRMATION (destructive actions)
+- AWAITING_SLOT Ã¢â€ â€™ LISTENING (user provides slot)
+- RESPONDING Ã¢â€ â€™ LISTENING (follow-up question)
 ```
 
 ## Integration Guide
@@ -700,7 +700,7 @@ result1 = filler.fill(
 print(f"Missing required slots: {result1.missing_slots}")
 # Missing required: ['genre']
 
-# Turn 2 — context carries over
+# Turn 2 Ã¢â‚¬â€ context carries over
 result2 = filler.fill(
     utterance="jazz please",
     intent="play_music",
@@ -720,7 +720,7 @@ templates = {
     "confirmation": ResponseTemplate(
         templates=[
             "I'll {action} for you. Should I proceed?",
-            "Got it — {action}. Confirm?",
+            "Got it Ã¢â‚¬â€ {action}. Confirm?",
             "You want me to {action}. Is that right?"
         ],
         variables=["action"],
@@ -738,7 +738,7 @@ templates = {
     "success": ResponseTemplate(
         templates=[
             "Done. {action_description}.",
-            "{action_description} — all set!",
+            "{action_description} Ã¢â‚¬â€ all set!",
             "OK, I've {action_description}."
         ],
         variables=["action_description"],
@@ -784,3 +784,171 @@ print(f"Detection rate: {metrics.detection_rate:.2%}")
 print(f"False positive rate: {metrics.false_positive_rate:.4%}")
 print(f"Average latency: {metrics.latency_ms:.0f}ms")
 ```
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

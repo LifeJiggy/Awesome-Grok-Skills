@@ -9,24 +9,24 @@ tags: ["web-dev", "supabase", "auth", "authentication", "rls"]
 
 ## Overview
 
-Supabase Auth provides a complete authentication and authorization layer built on PostgreSQL's Row-Level Security (RLS), offering a unified identity system that works across client and server environments. Unlike standalone auth services that store sessions in external databases, Supabase Auth integrates directly with PostgreSQL, meaning your authorization policies are enforced at the database level — every query is automatically scoped to the authenticated user's permissions without application-level checks.
+Supabase Auth provides a complete authentication and authorization layer built on PostgreSQL's Row-Level Security (RLS), offering a unified identity system that works across client and server environments. Unlike standalone auth services that store sessions in external databases, Supabase Auth integrates directly with PostgreSQL, meaning your authorization policies are enforced at the database level Ã¢â‚¬â€ every query is automatically scoped to the authenticated user's permissions without application-level checks.
 
 The authentication system supports multiple identity providers: email/password, magic links, social OAuth (Google, GitHub, Discord, Twitter, etc.), phone/SMS OTP, and passkeys (WebAuthn). Sessions are managed via JWTs containing the user's ID, role, and app metadata, which Supabase's PostgREST layer uses to set the `auth.uid()` and `auth.role()` PostgreSQL functions on every request. This means RLS policies can reference the authenticated user directly: `CREATE POLICY "Users can read own data" ON items USING (auth.uid() = user_id)`.
 
 Row-Level Security is the cornerstone of Supabase's authorization model. When RLS is enabled on a table, every SELECT, INSERT, UPDATE, and DELETE operation is filtered through policy expressions. Policies can be additive (multiple policies are OR'd) or require specific conditions. Combined with Supabase's `service_role` key (which bypasses RLS) for server-side operations, this creates a clean security boundary: client-side queries are always user-scoped, while server-side operations can access the full dataset when needed.
 
-Real-time subscriptions in Supabase are also governed by RLS — a user can only subscribe to changes on rows they can read. Edge Functions (Deno-based) can verify JWTs, call Supabase's admin API, and interact with the database using service-role or user-scoped clients. The entire stack — from the JavaScript client to the PostgREST API to the PostgreSQL database — enforces a single, consistent authorization model.
+Real-time subscriptions in Supabase are also governed by RLS Ã¢â‚¬â€ a user can only subscribe to changes on rows they can read. Edge Functions (Deno-based) can verify JWTs, call Supabase's admin API, and interact with the database using service-role or user-scoped clients. The entire stack Ã¢â‚¬â€ from the JavaScript client to the PostgREST API to the PostgreSQL database Ã¢â‚¬â€ enforces a single, consistent authorization model.
 
 ## Core Capabilities
 
-- **Multi-provider authentication** — Email/password, magic links, OAuth (40+ providers), phone OTP, and passkeys
-- **Row-Level Security policies** — Database-level authorization enforced on every query without application code
-- **JWT-based session management** — Stateless tokens with automatic refresh, configurable expiry, and role-based claims
-- **Multi-factor authentication (MFA)** — TOTP authenticator apps, SMS backup codes, and enforced MFA per user
-- **Role-based access control (RBAC)** — Custom claims in JWT, PostgreSQL roles, and policy-based role switching
-- **Real-time auth state** — Client-side auth state listener with `onAuthStateChange` for reactive UI updates
-- **Edge Function auth middleware** — JWT verification and user context injection in Deno Edge Functions
-- **Server-side session handling** — Cookie-based sessions with SSR frameworks (Next.js, Nuxt, etc.)
+- **Multi-provider authentication** Ã¢â‚¬â€ Email/password, magic links, OAuth (40+ providers), phone OTP, and passkeys
+- **Row-Level Security policies** Ã¢â‚¬â€ Database-level authorization enforced on every query without application code
+- **JWT-based session management** Ã¢â‚¬â€ Stateless tokens with automatic refresh, configurable expiry, and role-based claims
+- **Multi-factor authentication (MFA)** Ã¢â‚¬â€ TOTP authenticator apps, SMS backup codes, and enforced MFA per user
+- **Role-based access control (RBAC)** Ã¢â‚¬â€ Custom claims in JWT, PostgreSQL roles, and policy-based role switching
+- **Real-time auth state** Ã¢â‚¬â€ Client-side auth state listener with `onAuthStateChange` for reactive UI updates
+- **Edge Function auth middleware** Ã¢â‚¬â€ JWT verification and user context injection in Deno Edge Functions
+- **Server-side session handling** Ã¢â‚¬â€ Cookie-based sessions with SSR frameworks (Next.js, Nuxt, etc.)
 
 ## Usage Examples
 
@@ -230,28 +230,28 @@ async def get_server_session(request_cookies: dict) -> dict | None:
 
 ## Best Practices
 
-1. **Always use RLS** — Never rely solely on application-level checks. Enable RLS on every table and write policies for all operations. The `service_role` key should only be used in trusted server environments.
+1. **Always use RLS** Ã¢â‚¬â€ Never rely solely on application-level checks. Enable RLS on every table and write policies for all operations. The `service_role` key should only be used in trusted server environments.
 
-2. **Never expose service_role key client-side** — The service_role key bypasses RLS. Only use it in server-side code, Edge Functions with verified JWTs, or database migrations.
+2. **Never expose service_role key client-side** Ã¢â‚¬â€ The service_role key bypasses RLS. Only use it in server-side code, Edge Functions with verified JWTs, or database migrations.
 
-3. **Use short-lived JWTs with refresh tokens** — Set access token expiry to 1 hour (default) and refresh token expiry to 7 days. Use cookie-based sessions for SSR frameworks to avoid token exposure in client JavaScript.
+3. **Use short-lived JWTs with refresh tokens** Ã¢â‚¬â€ Set access token expiry to 1 hour (default) and refresh token expiry to 7 days. Use cookie-based sessions for SSR frameworks to avoid token exposure in client JavaScript.
 
-4. **Implement MFA for sensitive accounts** — Enforce TOTP-based MFA for admin users and offer it for all users. Use `amr` (Authentication Methods References) claims to check if MFA was used in the current session.
+4. **Implement MFA for sensitive accounts** Ã¢â‚¬â€ Enforce TOTP-based MFA for admin users and offer it for all users. Use `amr` (Authentication Methods References) claims to check if MFA was used in the current session.
 
-5. **Scope policies with `auth.uid()`** — Reference the authenticated user in RLS policies using `auth.uid() = user_id` rather than passing user IDs from the client. This prevents horizontal privilege escalation.
+5. **Scope policies with `auth.uid()`** Ã¢â‚¬â€ Reference the authenticated user in RLS policies using `auth.uid() = user_id` rather than passing user IDs from the client. This prevents horizontal privilege escalation.
 
-6. **Use server-side auth for SSR frameworks** — In Next.js, always verify the session server-side in `getServerSideProps` or middleware. Don't rely on client-side `getUser()` for protected pages.
+6. **Use server-side auth for SSR frameworks** Ã¢â‚¬â€ In Next.js, always verify the session server-side in `getServerSideProps` or middleware. Don't rely on client-side `getUser()` for protected pages.
 
-7. **Audit auth events** — Log sign-in attempts, sign-ups, MFA challenges, and password resets. Supabase provides `auth.admin.list_users()` and `auth.admin.get_user()` for user management.
+7. **Audit auth events** Ã¢â‚¬â€ Log sign-in attempts, sign-ups, MFA challenges, and password resets. Supabase provides `auth.admin.list_users()` and `auth.admin.get_user()` for user management.
 
-8. **Rotate secrets regularly** — Rotate JWT signing keys, API keys, and OAuth client secrets on a schedule. Supabase supports multiple active JWT secrets during rotation.
+8. **Rotate secrets regularly** Ã¢â‚¬â€ Rotate JWT signing keys, API keys, and OAuth client secrets on a schedule. Supabase supports multiple active JWT secrets during rotation.
 
 ## Related Modules
 
-- **nextjs-fullstack** — Integrating Supabase Auth with Next.js middleware and server actions
-- **edge-runtime** — Deploying Supabase Edge Functions with auth middleware
-- **server-components** — Using Supabase auth state in React Server Components
-- **tailwind-shadcn** — UI patterns for auth forms and login pages
+- **nextjs-fullstack** Ã¢â‚¬â€ Integrating Supabase Auth with Next.js middleware and server actions
+- **edge-runtime** Ã¢â‚¬â€ Deploying Supabase Edge Functions with auth middleware
+- **server-components** Ã¢â‚¬â€ Using Supabase auth state in React Server Components
+- **tailwind-shadcn** Ã¢â‚¬â€ UI patterns for auth forms and login pages
 
 ---
 
@@ -292,34 +292,34 @@ templates = RLSTemplate(
 
 ```
 Client Request
-    │
-    ▼
-┌──────────────┐
-│ Middleware    │── JWT verification, session refresh
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Server       │── Session validation, user context
-│ Component    │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ PostgREST    │── Sets auth.uid() from JWT
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ RLS Policy   │── Filters rows based on auth.uid()
-│ Evaluation   │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Database     │── Returns only authorized rows
-│ Query        │
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Middleware    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ JWT verification, session refresh
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Server       Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Session validation, user context
+Ã¢â€â€š Component    Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š PostgREST    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Sets auth.uid() from JWT
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š RLS Policy   Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Filters rows based on auth.uid()
+Ã¢â€â€š Evaluation   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Database     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Returns only authorized rows
+Ã¢â€â€š Query        Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Integration Guide
@@ -505,7 +505,7 @@ async function signInWithMFA(email: string, password: string) {
   // Check if MFA is enrolled
   const { data: factors } = await supabase.auth.mfa.listFactors()
   if (factors?.totp.length === 0) {
-    // No MFA enrolled — redirect to setup
+    // No MFA enrolled Ã¢â‚¬â€ redirect to setup
     return { requiresSetup: true }
   }
 
@@ -580,7 +580,7 @@ async function maintainSession() {
   if (timeUntilExpiry < 5 * 60 * 1000) {
     const { error } = await supabase.auth.refreshSession()
     if (error) {
-      // Session refresh failed — user needs to re-authenticate
+      // Session refresh failed Ã¢â‚¬â€ user needs to re-authenticate
       await supabase.auth.signOut()
       window.location.href = '/login'
     }
@@ -730,7 +730,7 @@ CREATE POLICY "Admins full access" ON items
 | Access token expiry | 3600s | 1800-3600s | Short-lived token |
 | Refresh token expiry | 604800s | 604800s | 7 days |
 | Token refresh interval | 300s | 300-600s | Auto-refresh |
-| Session timeout | — | 86400s | Inactivity timeout |
+| Session timeout | Ã¢â‚¬â€ | 86400s | Inactivity timeout |
 
 ### JWT Claims Reference
 
@@ -753,7 +753,7 @@ Email/Password Sign-Up:
 1. User submits email + password
 2. Supabase creates user in auth.users
 3. Confirmation email sent
-4. User clicks link → email confirmed
+4. User clicks link Ã¢â€ â€™ email confirmed
 5. Session created with JWT
 
 OAuth Sign-In:
@@ -772,3 +772,171 @@ Magic Link:
 4. Session created with JWT
 5. Redirect to app
 ```
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

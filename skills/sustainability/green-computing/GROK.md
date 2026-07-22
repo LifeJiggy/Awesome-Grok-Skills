@@ -11,9 +11,9 @@ tags: ["sustainability", "green-computing", "energy-efficiency", "carbon-aware"]
 
 Green Computing encompasses the practice of designing, manufacturing, using, and disposing of computing devices and systems in a way that minimizes environmental impact. This module provides a comprehensive framework for energy-efficient algorithm design, carbon-aware workload scheduling, server power management through Dynamic Voltage and Frequency Scaling (DVFS), and real-time monitoring of the environmental footprint of computational workloads. By integrating with carbon intensity APIs from electricity grids worldwide, applications can dynamically shift compute-intensive tasks to periods and locations where renewable energy supply is at its peak.
 
-The discipline sits at the intersection of computer science, environmental engineering, and energy policy. As data centers consume roughly 1-2% of global electricity and that share continues to rise with AI and cloud computing adoption, the need for software-level interventions has become critical. Green computing goes beyond simply turning off monitors — it involves restructuring algorithmic complexity, rethinking distributed systems architectures, implementing intelligent workload migration across geographic regions, and building observability stacks that track grams of CO2 per query, per transaction, or per training epoch.
+The discipline sits at the intersection of computer science, environmental engineering, and energy policy. As data centers consume roughly 1-2% of global electricity and that share continues to rise with AI and cloud computing adoption, the need for software-level interventions has become critical. Green computing goes beyond simply turning off monitors Ã¢â‚¬â€ it involves restructuring algorithmic complexity, rethinking distributed systems architectures, implementing intelligent workload migration across geographic regions, and building observability stacks that track grams of CO2 per query, per transaction, or per training epoch.
 
-This module equips engineers with tools to measure, reduce, and report the carbon footprint of their software systems. It includes carbon intensity data fetching, DVFS controller abstractions, workload schedulers that factor in grid carbon signals, green software metrics collection (SCI — Software Carbon Intensity), and power measurement interfaces for bare-metal and virtualized environments. The module is designed to be composable: each component can be used independently or orchestrated together for end-to-end carbon-aware computing.
+This module equips engineers with tools to measure, reduce, and report the carbon footprint of their software systems. It includes carbon intensity data fetching, DVFS controller abstractions, workload schedulers that factor in grid carbon signals, green software metrics collection (SCI Ã¢â‚¬â€ Software Carbon Intensity), and power measurement interfaces for bare-metal and virtualized environments. The module is designed to be composable: each component can be used independently or orchestrated together for end-to-end carbon-aware computing.
 
 ## Core Capabilities
 
@@ -159,7 +159,7 @@ config = {
 - **CI/CD Pipeline Carbon Budgeting**: Set carbon budgets for continuous integration pipelines. When a build exceeds its carbon budget, automatically defer non-critical test suites to lower-carbon periods or reduce parallelism.
 - **Cloud Region Selection**: When deploying new services, compare carbon intensity across cloud provider regions and select the one with the highest renewable energy fraction, not just the lowest latency.
 - **Data Lake Compaction**: Schedule periodic data compaction and garbage collection jobs during nighttime hours when wind generation peaks and carbon intensity drops below 100 gCO2eq/kWh in most grids.
-- **Video Transcoding Optimization**: Batch video transcoding jobs are ideal carbon-aware candidates — they are delay-tolerant, embarrassingly parallel, and compute-intensive. Schedule transcoding queues to follow solar generation curves.
+- **Video Transcoding Optimization**: Batch video transcoding jobs are ideal carbon-aware candidates Ã¢â‚¬â€ they are delay-tolerant, embarrassingly parallel, and compute-intensive. Schedule transcoding queues to follow solar generation curves.
 - **Carbon-Aware API Rate Limiting**: Implement dynamic rate limiting that throttles non-essential API traffic during high-carbon periods and relaxes limits during low-carbon windows, reducing the carbon cost of traffic spikes.
 
 ## Best Practices
@@ -177,22 +177,22 @@ config = {
 
 | Metric | Formula | Description |
 |--------|---------|-------------|
-| **SCI** | `(E × I + M) / R` | Software Carbon Intensity: Energy × Carbon Intensity + Embodied carbon, per Functional Unit |
+| **SCI** | `(E Ãƒâ€” I + M) / R` | Software Carbon Intensity: Energy Ãƒâ€” Carbon Intensity + Embodied carbon, per Functional Unit |
 | **Carbon Intensity** | `gCO2eq / kWh` | Grams of CO2 equivalent per kilowatt-hour of electricity consumed |
-| **Power Savings** | `(P_max - P_actual) × hours` | Energy saved by running at reduced frequency vs. maximum |
-| **Carbon Savings** | `Energy_saved × grid_intensity` | CO2 avoided by workload deferral to low-carbon periods |
+| **Power Savings** | `(P_max - P_actual) Ãƒâ€” hours` | Energy saved by running at reduced frequency vs. maximum |
+| **Carbon Savings** | `Energy_saved Ãƒâ€” grid_intensity` | CO2 avoided by workload deferral to low-carbon periods |
 | **DVFS Efficiency** | `P_actual / P_max` | Fraction of maximum power consumed at current frequency |
 | **Renewable Match** | `Renewable_generation / Total_load` | Fraction of load served by renewable energy |
 | **DVFS Power Ratio** | `P_actual / P_max_frequency` | Power consumption as fraction of max-frequency power |
-| **SCI Embodied Term** | `Embodied_carbon × (time_in_service / lifespan)` | Amortized embodied carbon per measurement period |
+| **SCI Embodied Term** | `Embodied_carbon Ãƒâ€” (time_in_service / lifespan)` | Amortized embodied carbon per measurement period |
 | **Carbon-Aware Delay** | `Current_CI - Forecast_min_CI` | Carbon intensity difference between now and optimal window |
 
 ## Related Modules
 
-- [green-it](../green-it/GROK.md) — IT infrastructure sustainability audits, data center PUE optimization, e-waste tracking, and hardware lifecycle management. Complements green computing by addressing the physical infrastructure layer.
-- [carbon-tracking](../carbon-tracking/GROK.md) — Scope 1/2/3 emissions calculation, GHG Protocol compliance, and carbon credit management. Provides the accounting framework that green computing metrics feed into.
-- [renewable-energy](../renewable-energy/GROK.md) — Solar/wind forecasting, battery storage optimization, and grid balancing. Supplies the renewable generation data that carbon-aware schedulers depend on.
-- [circular-economy](../circular-economy/GROK.md) — Material flow analysis, product lifecycle tracking, and circular design scoring. Addresses the embodied carbon and end-of-life phases of computing hardware.
+- [green-it](../green-it/GROK.md) Ã¢â‚¬â€ IT infrastructure sustainability audits, data center PUE optimization, e-waste tracking, and hardware lifecycle management. Complements green computing by addressing the physical infrastructure layer.
+- [carbon-tracking](../carbon-tracking/GROK.md) Ã¢â‚¬â€ Scope 1/2/3 emissions calculation, GHG Protocol compliance, and carbon credit management. Provides the accounting framework that green computing metrics feed into.
+- [renewable-energy](../renewable-energy/GROK.md) Ã¢â‚¬â€ Solar/wind forecasting, battery storage optimization, and grid balancing. Supplies the renewable generation data that carbon-aware schedulers depend on.
+- [circular-economy](../circular-economy/GROK.md) Ã¢â‚¬â€ Material flow analysis, product lifecycle tracking, and circular design scoring. Addresses the embodied carbon and end-of-life phases of computing hardware.
 
 ## Data Sources & APIs
 
@@ -751,15 +751,15 @@ client = CarbonProviderFactory.create(
 
 | Term | Definition |
 |------|-----------|
-| **SCI** | Software Carbon Intensity — grams of CO2 equivalent per functional unit |
-| **DVFS** | Dynamic Voltage and Frequency Scaling — CPU power management technique |
-| **PUE** | Power Usage Effectiveness — ratio of total facility power to IT equipment power |
-| **RAPL** | Running Average Power Limit — Intel CPU power measurement interface |
-| **gCO2eq** | Grams of CO2 equivalent — standardized unit for greenhouse gas emissions |
+| **SCI** | Software Carbon Intensity Ã¢â‚¬â€ grams of CO2 equivalent per functional unit |
+| **DVFS** | Dynamic Voltage and Frequency Scaling Ã¢â‚¬â€ CPU power management technique |
+| **PUE** | Power Usage Effectiveness Ã¢â‚¬â€ ratio of total facility power to IT equipment power |
+| **RAPL** | Running Average Power Limit Ã¢â‚¬â€ Intel CPU power measurement interface |
+| **gCO2eq** | Grams of CO2 equivalent Ã¢â‚¬â€ standardized unit for greenhouse gas emissions |
 | **Marginal Emissions** | The emissions from the next unit of electricity generation dispatched |
 | **Carbon Intensity** | Grams of CO2 equivalent per kilowatt-hour of electricity |
 | **Embodied Carbon** | Emissions from manufacturing, transport, and disposal of hardware |
-| **LPUE** | Location-based PUE — PUE calculated using average grid emission factors |
+| **LPUE** | Location-based PUE Ã¢â‚¬â€ PUE calculated using average grid emission factors |
 
 ## Changelog
 
@@ -814,3 +814,171 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

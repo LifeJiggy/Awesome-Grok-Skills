@@ -35,7 +35,7 @@ analyzer = TabOrderAnalyzer()
 tab_order = analyzer.analyze("https://example.com")
 print(f"Total focusable elements: {len(tab_order.elements)}")
 for elem in tab_order.elements:
-    print(f"  Tab {elem.tab_index}: <{elem.tag}> — {elem.text[:50]} (visible: {elem.is_visible})")
+    print(f"  Tab {elem.tab_index}: <{elem.tag}> Ã¢â‚¬â€ {elem.text[:50]} (visible: {elem.is_visible})")
 
 # Check for tab order violations
 violations = analyzer.check_logical_order(tab_order)
@@ -47,7 +47,7 @@ focus = FocusIndicator()
 results = focus.check_all("https://example.com")
 print(f"\nFocus indicator results: {results.passed}/{results.total}")
 for r in results.failures:
-    print(f"  FAIL: {r.selector} — {r.issue}")
+    print(f"  FAIL: {r.selector} Ã¢â‚¬â€ {r.issue}")
 ```
 
 ```python
@@ -57,7 +57,7 @@ from keyboard_navigation import ShortcutTester
 tester = ShortcutTester("https://example.com")
 shortcuts = tester.discover_shortcuts()
 for sc in shortcuts:
-    print(f"  {sc.key_combo} → {sc.action}")
+    print(f"  {sc.key_combo} Ã¢â€ â€™ {sc.action}")
     if sc.conflicts_with_at:
         print(f"    CONFLICT with assistive technology: {sc.conflicts_with_at}")
 
@@ -79,24 +79,24 @@ print(f"Focus returns to trigger: {'PASS' if result.focus_returned else 'FAIL'}"
 ## Best Practices
 
 - Every interactive element must be reachable via Tab key and operable via Enter/Space
-- Focus order must follow the logical reading order — avoid positive tabindex values
+- Focus order must follow the logical reading order Ã¢â‚¬â€ avoid positive tabindex values
 - Visible focus indicators must have at least 3:1 contrast ratio against adjacent colors
 - Modal dialogs must trap focus within the dialog and return focus to the trigger on close
 - Skip navigation links must be the first focusable element on the page
 - Custom widgets must implement the keyboard patterns from WAI-ARIA Authoring Practices
 - No element should capture keyboard events without providing an accessible alternative
 - Keyboard shortcuts must not conflict with screen reader shortcuts (NVDA: Insert, JAWS: Insert, VO: Control+Option)
-- Focus must never be moved without user-initiated action — unpredictable focus changes disorient users
-- Test with actual keyboards, not just programmatic focus — some behaviors only occur with real key events
+- Focus must never be moved without user-initiated action Ã¢â‚¬â€ unpredictable focus changes disorient users
+- Test with actual keyboards, not just programmatic focus Ã¢â‚¬â€ some behaviors only occur with real key events
 - Validate that disabled elements are focusable but not operable, or removed from tab order entirely
 
 ## Related Modules
 
-- **aria-implementation** — ARIA role and property patterns that keyboard behaviors depend on
-- **wcag-audit** — Full WCAG audit including keyboard criteria (2.1.1, 2.1.2, 2.4.3, 2.4.7)
-- **screen-reader-testing** — Screen reader interaction testing that complements keyboard testing
-- **color-contrast** — Focus indicator contrast ratio requirements
-- **ux-research** → **usability-testing** — Usability testing that includes keyboard-only users
+- **aria-implementation** Ã¢â‚¬â€ ARIA role and property patterns that keyboard behaviors depend on
+- **wcag-audit** Ã¢â‚¬â€ Full WCAG audit including keyboard criteria (2.1.1, 2.1.2, 2.4.3, 2.4.7)
+- **screen-reader-testing** Ã¢â‚¬â€ Screen reader interaction testing that complements keyboard testing
+- **color-contrast** Ã¢â‚¬â€ Focus indicator contrast ratio requirements
+- **ux-research** Ã¢â€ â€™ **usability-testing** Ã¢â‚¬â€ Usability testing that includes keyboard-only users
 
 ## Advanced Configuration
 
@@ -753,3 +753,171 @@ keyboard_scenarios = [
 - [ ] Custom widgets implement WAI-ARIA patterns
 - [ ] Shortcuts don't conflict with screen readers
 - [ ] Disabled elements are not focusable or are announced as disabled
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

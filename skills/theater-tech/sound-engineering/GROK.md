@@ -11,7 +11,7 @@ tags: ["theater-tech", "sound-engineering", "audio", "mixing", "dolby-atmos"]
 
 The sound engineering module provides a comprehensive Python API for digital audio mixing console control, speaker system optimization, acoustic simulation, and spatial audio rendering in theatrical and live entertainment environments. It interfaces with industry-standard digital mixing consoles (Yamaha CL/QL/TF, Allen & Heath dLive/SQ, Midas M32/H32, DiGiCo SD/Quantum) via MIDI, OSC, and proprietary protocols, enabling programmatic recall of show files, scene automation, and remote parameter control from a unified Python interface. The module supports both live show operation and pre-production planning, allowing sound designers to model room acoustics and speaker coverage before hardware is installed.
 
-Speaker array design and optimization is a core capability: the module implements delay alignment algorithms for line arrays, calculates coverage angles for point-source clusters, and performs room simulation using image-source modeling for early reflections and statistical models for late reverberation. It supports both predictive design (before the rig goes in the air) and measurement-based optimization (using transfer function analysis from calibrated measurement microphones). The integrated wireless frequency coordination engine scans the RF spectrum, identifies occupied frequencies, and assigns clean channels to wireless microphone systems while maintaining minimum intermodulation spacing — a critical workflow in venues where 40+ wireless channels share limited spectrum.
+Speaker array design and optimization is a core capability: the module implements delay alignment algorithms for line arrays, calculates coverage angles for point-source clusters, and performs room simulation using image-source modeling for early reflections and statistical models for late reverberation. It supports both predictive design (before the rig goes in the air) and measurement-based optimization (using transfer function analysis from calibrated measurement microphones). The integrated wireless frequency coordination engine scans the RF spectrum, identifies occupied frequencies, and assigns clean channels to wireless microphone systems while maintaining minimum intermodulation spacing Ã¢â‚¬â€ a critical workflow in venues where 40+ wireless channels share limited spectrum.
 
 Spatial audio rendering for Dolby Atmos and other immersive formats is handled through a renderer abstraction layer. The module can drive AtmosRenderer via Dolby's RMU (Rendering and Mastering Unit) protocol, d&b Soundscape via OSC, or L-Acoustics L-ISA via its processor API. Object-based audio metadata (position, size, diffusion) is computed from source positions in a virtual room model, allowing sound designers to place and move sound objects in 3D space that map to physical speaker arrays of arbitrary geometry.
 
@@ -29,22 +29,22 @@ Spatial audio rendering for Dolby Atmos and other immersive formats is handled t
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│              Show Control & Scene Automation             │
-│   (Scene Recall, Cue Lists, Snapshot A/B, GPIO)         │
-├─────────────────────────────────────────────────────────┤
-│              Audio Processing Pipeline                   │
-│  (EQ, Dynamics, Effects, Auto-Mix, Feedback Suppression)│
-├─────────────────────────────────────────────────────────┤
-│            Speaker Management & Optimization            │
-│   (Delay Alignment, Coverage, SPL Mapping, Arrays)      │
-├─────────────────────────────────────────────────────────┤
-│              Console Communication Layer                 │
-│        (OSC, MIDI, Yamaha CL, Midas M32, DiGiCo)        │
-├─────────────────────────────────────────────────────────┤
-│              Spatial Audio Rendering                    │
-│      (Dolby Atmos, d&b Soundscape, L-ISA, Objects)     │
-└─────────────────────────────────────────────────────────┘
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š              Show Control & Scene Automation             Ã¢â€â€š
+Ã¢â€â€š   (Scene Recall, Cue Lists, Snapshot A/B, GPIO)         Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š              Audio Processing Pipeline                   Ã¢â€â€š
+Ã¢â€â€š  (EQ, Dynamics, Effects, Auto-Mix, Feedback Suppression)Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š            Speaker Management & Optimization            Ã¢â€â€š
+Ã¢â€â€š   (Delay Alignment, Coverage, SPL Mapping, Arrays)      Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š              Console Communication Layer                 Ã¢â€â€š
+Ã¢â€â€š        (OSC, MIDI, Yamaha CL, Midas M32, DiGiCo)        Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š              Spatial Audio Rendering                    Ã¢â€â€š
+Ã¢â€â€š      (Dolby Atmos, d&b Soundscape, L-ISA, Objects)     Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Usage Examples
@@ -101,7 +101,7 @@ array = SpeakerArray(
 
 # Calculate coverage
 coverage = array.calculate_coverage()
-print(f"Total splay: {coverage['total_splay_deg']:.1f}°")
+print(f"Total splay: {coverage['total_splay_deg']:.1f}Ã‚Â°")
 
 # SPL at listener position
 spl_at_20m = array.calculate_spl_at_distance(20)
@@ -185,7 +185,7 @@ monitors.set_mix_level(1, 15, -6.0)  # Add drums to vocal monitor
 
 1. **Always start with all faders down when connecting to a live console.** The initial OSC/MIDI connection may trigger fader jumps if the console's snapshot doesn't match the software's cached state. This prevents sudden volume spikes.
 
-2. **Calibrate measurement microphones before every optimization session.** A ±2dB calibration error in a measurement mic cascades into incorrect EQ and delay calculations for the entire array. Use a calibrator that produces a known SPL at a known frequency.
+2. **Calibrate measurement microphones before every optimization session.** A Ã‚Â±2dB calibration error in a measurement mic cascades into incorrect EQ and delay calculations for the entire array. Use a calibrator that produces a known SPL at a known frequency.
 
 3. **Leave 6dB of headroom on every channel at sound check.** Performers sing louder during the show than during check; headroom prevents clipping without compression artifacts. Digital clipping at 0dBFS is unrecoverable.
 
@@ -195,7 +195,7 @@ monitors.set_mix_level(1, 15, -6.0)  # Add drums to vocal monitor
 
 6. **Use delay towers instead of increased main array power for far-field coverage.** Doubling SPL at the source only adds 6dB; a delay tower at the 2/3 point provides consistent coverage without deafening the front rows.
 
-7. **Maintain a 1:2 ratio between reverb time and show pacing.** Dense dialogue scenes need RT60 under 1.0s; musical numbers can tolerate 1.4–1.8s depending on tempo. Adjust room treatment accordingly.
+7. **Maintain a 1:2 ratio between reverb time and show pacing.** Dense dialogue scenes need RT60 under 1.0s; musical numbers can tolerate 1.4Ã¢â‚¬â€œ1.8s depending on tempo. Adjust room treatment accordingly.
 
 8. **Export and archive show files with firmware version metadata.** Console firmware updates can subtly change DSP behavior; knowing which firmware a show was designed on prevents debugging phantom issues.
 
@@ -205,10 +205,10 @@ monitors.set_mix_level(1, 15, -6.0)  # Add drums to vocal monitor
 
 ## Related Modules
 
-- [lighting-control](../lighting-control/GROK.md) — Audio-reactive lighting effects and sound-to-DMX triggering
-- [stage-automation](../stage-automation/GROK.md) — Automation cue timing and audio-visual synchronization
-- [projection-mapping](../projection-mapping/GROK.md) — Spatial audio alignment with projected visual environments
-- [audience-engagement](../audience-engagement/GROK.md) — Audience audio response capture and interactive soundscapes
+- [lighting-control](../lighting-control/GROK.md) Ã¢â‚¬â€ Audio-reactive lighting effects and sound-to-DMX triggering
+- [stage-automation](../stage-automation/GROK.md) Ã¢â‚¬â€ Automation cue timing and audio-visual synchronization
+- [projection-mapping](../projection-mapping/GROK.md) Ã¢â‚¬â€ Spatial audio alignment with projected visual environments
+- [audience-engagement](../audience-engagement/GROK.md) Ã¢â‚¬â€ Audience audio response capture and interactive soundscapes
 
 ---
 
@@ -248,54 +248,54 @@ room = RoomSimulator(
 
 ```
 Microphone / DI Input
-        │
-        ▼
-┌──────────────┐
-│  Preamp /    │── Gain staging, phantom power
-│  ADC Stage   │
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│  Channel     │── EQ, Dynamics, Gate
-│  Strip       │
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│  Bus / Group │── Mix bus, aux sends
-│  Routing     │
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│  Output /    │── Main L/R, monitors, subgroups
-│  Matrix      │
-└──────────────┘
+        Ã¢â€â€š
+        Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š  Preamp /    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Gain staging, phantom power
+Ã¢â€â€š  ADC Stage   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+       Ã¢â€â€š
+       Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š  Channel     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ EQ, Dynamics, Gate
+Ã¢â€â€š  Strip       Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+       Ã¢â€â€š
+       Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š  Bus / Group Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Mix bus, aux sends
+Ã¢â€â€š  Routing     Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+       Ã¢â€â€š
+       Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š  Output /    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Main L/R, monitors, subgroups
+Ã¢â€â€š  Matrix      Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ### Spatial Audio Pipeline
 
 ```
 Sound Source Position (x, y, z)
-        │
-        ▼
-┌──────────────┐
-│ Object       │── Position, size, diffusion metadata
-│ Renderer     │
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│ Speaker Map  │── Map objects to physical speaker array
-│ Optimizer    │
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│ Output       │── Per-speaker audio streams
-│ Feeds        │
-└──────────────┘
+        Ã¢â€â€š
+        Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Object       Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Position, size, diffusion metadata
+Ã¢â€â€š Renderer     Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+       Ã¢â€â€š
+       Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Speaker Map  Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Map objects to physical speaker array
+Ã¢â€â€š Optimizer    Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+       Ã¢â€â€š
+       Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Output       Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Per-speaker audio streams
+Ã¢â€â€š Feeds        Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Integration Guide
@@ -448,7 +448,7 @@ def test_eq_coefficients():
 
 | Term | Definition |
 |------|-----------|
-| **OSC** | Open Sound Control — network protocol for audio |
+| **OSC** | Open Sound Control Ã¢â‚¬â€ network protocol for audio |
 | **RT60** | Reverberation time (60dB decay) |
 | **SPL** | Sound Pressure Level in dB |
 | **Dante** | Digital Audio Network Through Ethernet |
@@ -488,7 +488,7 @@ Copyright (c) 2024 Awesome Grok Skills
 | Yamaha CL/QL | OSC | 8000 | Full parameter control |
 | Midas M32/H32 | OSC/MIDI | 10024 | Parameter + scene recall |
 | Allen & Heath dLive | TCP | 9923 | Deep integration |
-| DiGiCo SD/Quantum | Proprietary | — | Full console control |
+| DiGiCo SD/Quantum | Proprietary | Ã¢â‚¬â€ | Full console control |
 | Soundcraft Vi | TCP | 1234 | Basic parameter control |
 
 ### Speaker Array Design Reference
@@ -538,28 +538,28 @@ Copyright (c) 2024 Awesome Grok Skills
 ### Complete Signal Flow Reference
 
 ```
-Stage Input → Preamp → Channel Strip → Bus Routing → Matrix → Output
-    │              │           │              │          │         │
-    │              │           ├── EQ          ├── Main L/R ├── FOH L/R
-    │              │           ├── Compressor  ├── Subs     ├── Delays
-    │              │           ├── Gate        ├── Aux 1-12 ├── Monitors
-    │              │           ├── De-esser    ├── FX Send  ├── Recording
-    │              │           └── Delay       └── Matrix   └── Broadcast
-    │              │
-    └── Mic/DI → Phantom Power → Pad → HPF → Gain
+Stage Input Ã¢â€ â€™ Preamp Ã¢â€ â€™ Channel Strip Ã¢â€ â€™ Bus Routing Ã¢â€ â€™ Matrix Ã¢â€ â€™ Output
+    Ã¢â€â€š              Ã¢â€â€š           Ã¢â€â€š              Ã¢â€â€š          Ã¢â€â€š         Ã¢â€â€š
+    Ã¢â€â€š              Ã¢â€â€š           Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ EQ          Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Main L/R Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ FOH L/R
+    Ã¢â€â€š              Ã¢â€â€š           Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Compressor  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Subs     Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Delays
+    Ã¢â€â€š              Ã¢â€â€š           Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Gate        Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Aux 1-12 Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Monitors
+    Ã¢â€â€š              Ã¢â€â€š           Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ De-esser    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ FX Send  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Recording
+    Ã¢â€â€š              Ã¢â€â€š           Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Delay       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Matrix   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Broadcast
+    Ã¢â€â€š              Ã¢â€â€š
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Mic/DI Ã¢â€ â€™ Phantom Power Ã¢â€ â€™ Pad Ã¢â€ â€™ HPF Ã¢â€ â€™ Gain
 ```
 
 ### EQ Setting Reference by Source
 
 | Source | HPF | Low Cut | Boost | Cut | Presence | Air |
 |--------|-----|---------|-------|-----|----------|-----|
-| Lead Vocal | 80 Hz | — | 200 Hz +3 | 400 Hz -2 | 3 kHz +2 | 12 kHz +1 |
-| Acoustic Guitar | 80 Hz | — | 150 Hz +2 | 250 Hz -3 | 2.5 kHz +2 | 10 kHz +1 |
-| Electric Guitar | 100 Hz | — | 200 Hz +2 | 400 Hz -2 | 1.5 kHz +3 | — |
-| Bass DI | 30 Hz | — | 80 Hz +3 | 200 Hz -2 | 700 Hz +2 | — |
-| Kick Drum | 50 Hz | — | 60 Hz +4 | 300 Hz -4 | 3 kHz +2 | — |
-| Snare | 80 Hz | — | 200 Hz +2 | 400 Hz -2 | 5 kHz +3 | 10 kHz +1 |
-| Overheads | 200 Hz | — | — | 300 Hz -2 | 8 kHz +2 | 14 kHz +1 |
+| Lead Vocal | 80 Hz | Ã¢â‚¬â€ | 200 Hz +3 | 400 Hz -2 | 3 kHz +2 | 12 kHz +1 |
+| Acoustic Guitar | 80 Hz | Ã¢â‚¬â€ | 150 Hz +2 | 250 Hz -3 | 2.5 kHz +2 | 10 kHz +1 |
+| Electric Guitar | 100 Hz | Ã¢â‚¬â€ | 200 Hz +2 | 400 Hz -2 | 1.5 kHz +3 | Ã¢â‚¬â€ |
+| Bass DI | 30 Hz | Ã¢â‚¬â€ | 80 Hz +3 | 200 Hz -2 | 700 Hz +2 | Ã¢â‚¬â€ |
+| Kick Drum | 50 Hz | Ã¢â‚¬â€ | 60 Hz +4 | 300 Hz -4 | 3 kHz +2 | Ã¢â‚¬â€ |
+| Snare | 80 Hz | Ã¢â‚¬â€ | 200 Hz +2 | 400 Hz -2 | 5 kHz +3 | 10 kHz +1 |
+| Overheads | 200 Hz | Ã¢â‚¬â€ | Ã¢â‚¬â€ | 300 Hz -2 | 8 kHz +2 | 14 kHz +1 |
 
 ### Dynamic Processing Reference
 
@@ -653,29 +653,29 @@ print(f"DTV clearance: {report.dtv_clearance_ok}")
 
 ```
 PRE-SHOW WIRELESS CHECK
-    □ Scan RF spectrum for interference
-    □ Verify all transmitter battery levels > 50%
-    □ Check antenna connections and placement
-    □ Verify receiver lock on assigned frequencies
-    □ Test each channel with audio check
-    □ Set gain structure for each channel
-    □ Verify encryption keys are loaded
-    □ Check backup transmitter batteries
-    □ Test handoff between primary and backup
-    □ Log all frequency assignments
+    Ã¢â€“Â¡ Scan RF spectrum for interference
+    Ã¢â€“Â¡ Verify all transmitter battery levels > 50%
+    Ã¢â€“Â¡ Check antenna connections and placement
+    Ã¢â€“Â¡ Verify receiver lock on assigned frequencies
+    Ã¢â€“Â¡ Test each channel with audio check
+    Ã¢â€“Â¡ Set gain structure for each channel
+    Ã¢â€“Â¡ Verify encryption keys are loaded
+    Ã¢â€“Â¡ Check backup transmitter batteries
+    Ã¢â€“Â¡ Test handoff between primary and backup
+    Ã¢â€“Â¡ Log all frequency assignments
 
 DURING SHOW
-    □ Monitor RF signal strength continuously
-    □ Check battery levels at intermission
-    □ Monitor audio quality for dropouts
-    □ Be ready to switch to backup frequency
-    □ Log any interference incidents
+    Ã¢â€“Â¡ Monitor RF signal strength continuously
+    Ã¢â€“Â¡ Check battery levels at intermission
+    Ã¢â€“Â¡ Monitor audio quality for dropouts
+    Ã¢â€“Â¡ Be ready to switch to backup frequency
+    Ã¢â€“Â¡ Log any interference incidents
 
 POST-SHOW
-    □ Return all transmitters to charging stations
-    □ Log any frequency changes made
-    □ Note any battery performance issues
-    □ Clean and inspect all microphones
+    Ã¢â€“Â¡ Return all transmitters to charging stations
+    Ã¢â€“Â¡ Log any frequency changes made
+    Ã¢â€“Â¡ Note any battery performance issues
+    Ã¢â€“Â¡ Clean and inspect all microphones
 ```
 
 ### Acoustic Treatment Reference
@@ -715,31 +715,31 @@ Scene 54: FX - Dry (no effects)
 
 ```
 VOCALIST MONITOR MIX
-    ├── Self (vocal): 0 dB
-    ├── Band mix: -6 dB
-    ├── Reverb return: -12 dB
-    ├── Click track: -3 dB (if needed)
-    └── Notes: Prioritize vocal clarity
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Self (vocal): 0 dB
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Band mix: -6 dB
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reverb return: -12 dB
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Click track: -3 dB (if needed)
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Notes: Prioritize vocal clarity
 
 GUITARIST MONITOR MIX
-    ├── Self (guitar): 0 dB
-    ├── Kick drum: -6 dB
-    ├── Snare: -8 dB
-    ├── Bass: -10 dB
-    └── Notes: Needs rhythmic foundation
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Self (guitar): 0 dB
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Kick drum: -6 dB
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Snare: -8 dB
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Bass: -10 dB
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Notes: Needs rhythmic foundation
 
 DRUMMER MONITOR MIX
-    ├── Self (kick): 0 dB
-    ├── Self (snare): 0 dB
-    ├── Click track: 0 dB
-    ├── Band mix: -6 dB
-    └── Notes: Click is essential
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Self (kick): 0 dB
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Self (snare): 0 dB
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Click track: 0 dB
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Band mix: -6 dB
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Notes: Click is essential
 
 ACTOR/SPEAKER MONITOR MIX
-    ├── Self (vocal): 0 dB
-    ├── Playback: -6 dB
-    ├── Band: -12 dB
-    └── Notes: Clear voice reproduction
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Self (vocal): 0 dB
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Playback: -6 dB
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Band: -12 dB
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Notes: Clear voice reproduction
 ```
 ```
 
@@ -778,32 +778,32 @@ bed = AtmosBed(
 
 ```
 Feedback howl
-    │
-    ├── Identify feedback frequency → Use RTA
-    ├── Apply notch filter at frequency → Parametric EQ
-    ├── Reduce gain on offending channel → Check mic position
-    ├── Check monitor angle → Aim away from mic
-    ├── Engage HPF/LPF → Remove unused frequency range
-    ├── Check room acoustics → Add absorption if needed
-    └── Consider feedback suppressor → Adaptive notch filter
+    Ã¢â€â€š
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Identify feedback frequency Ã¢â€ â€™ Use RTA
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Apply notch filter at frequency Ã¢â€ â€™ Parametric EQ
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reduce gain on offending channel Ã¢â€ â€™ Check mic position
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check monitor angle Ã¢â€ â€™ Aim away from mic
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Engage HPF/LPF Ã¢â€ â€™ Remove unused frequency range
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check room acoustics Ã¢â€ â€™ Add absorption if needed
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Consider feedback suppressor Ã¢â€ â€™ Adaptive notch filter
 
 Wireless dropout
-    │
-    ├── Check RF signal strength → -70 dBm minimum
-    ├── Check antenna placement → Line of sight to stage
-    ├── Scan for interference → Find clean frequencies
-    ├── Check intermodulation spacing → 300 kHz minimum
-    ├── Check battery level → Replace if low
-    ├── Check for physical obstructions → Metal, concrete
-    └── Consider directional antennas → Directional for large venues
+    Ã¢â€â€š
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check RF signal strength Ã¢â€ â€™ -70 dBm minimum
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check antenna placement Ã¢â€ â€™ Line of sight to stage
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scan for interference Ã¢â€ â€™ Find clean frequencies
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check intermodulation spacing Ã¢â€ â€™ 300 kHz minimum
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check battery level Ã¢â€ â€™ Replace if low
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check for physical obstructions Ã¢â€ â€™ Metal, concrete
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Consider directional antennas Ã¢â€ â€™ Directional for large venues
 
 Audio latency in monitors
-    │
-    ├── Check buffer size → Reduce to 5ms minimum
-    ├── Check DSP processing load → Reduce plugin count
-    ├── Check network latency → Verify Dante/AES67 sync
-    ├── Check cable length → Digital preferred over analog
-    └── Use local monitor mixing → Reduce round-trip
+    Ã¢â€â€š
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check buffer size Ã¢â€ â€™ Reduce to 5ms minimum
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check DSP processing load Ã¢â€ â€™ Reduce plugin count
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check network latency Ã¢â€ â€™ Verify Dante/AES67 sync
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check cable length Ã¢â€ â€™ Digital preferred over analog
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Use local monitor mixing Ã¢â€ â€™ Reduce round-trip
 ```
 
 ### Performance Metrics
@@ -839,3 +839,171 @@ Audio latency in monitors
 | Concert (acoustic) | 85-95 | Orchestral dynamics |
 | Rock concert | 105-115 | Maximum safe exposure |
 | Pain threshold | 125 | Immediate damage risk |
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

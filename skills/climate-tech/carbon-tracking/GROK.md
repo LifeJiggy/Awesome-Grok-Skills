@@ -99,11 +99,11 @@ reporter.export_json(report, "ghg_report_2024.json")
 - Follow the GHG Protocol Corporate Standard for organizational emissions accounting
 - Use location-based AND market-based methods for Scope 2 electricity emissions
 - Collect primary data for Scope 3 categories where possible; use secondary data as fallback
-- Apply appropriate emission factors by region — global averages introduce significant error
-- Set science-based targets (SBTi) aligned with 1.5°C pathway
+- Apply appropriate emission factors by region Ã¢â‚¬â€ global averages introduce significant error
+- Set science-based targets (SBTi) aligned with 1.5Ã‚Â°C pathway
 - Verify emissions data annually through third-party assurance (ISO 14064)
 - Report emissions by business unit, facility, and activity for actionable insights
-- Prioritize Scope 3 categories by materiality — typically purchased goods and business travel
+- Prioritize Scope 3 categories by materiality Ã¢â‚¬â€ typically purchased goods and business travel
 - Retire carbon offsets immediately upon use to prevent double-counting
 - Maintain emissions data for at least 7 years for regulatory compliance
 
@@ -189,52 +189,52 @@ data_sources:
 
 ```
 Data Collection Layer:
-├── Direct Measurement
-│   ├── Energy meters (electricity, gas)
-│   ├── Fuel purchases
-│   ├── Process emissions
-│   └── Refrigerant leaks
-├── Activity Data
-│   ├── Distance traveled
-│   ├── Waste generated
-│   ├── Materials purchased
-│   └── Business travel
-├── Supplier Data
-│   ├── Tier 1 suppliers
-│   ├── Tier 2 suppliers
-│   └── Logistics providers
-└── Calculated Data
-    ├── Emission factors
-    ├── Grid factors
-    └── Industry averages
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Direct Measurement
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Energy meters (electricity, gas)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Fuel purchases
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Process emissions
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Refrigerant leaks
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Activity Data
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Distance traveled
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Waste generated
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Materials purchased
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Business travel
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Supplier Data
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tier 1 suppliers
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Tier 2 suppliers
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Logistics providers
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Calculated Data
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Emission factors
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Grid factors
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Industry averages
 
 Processing Layer:
-├── Data Validation
-│   ├── Range checks
-│   ├── Completeness checks
-│   ├── Consistency checks
-│   └── Outlier detection
-├── Emission Calculation
-│   ├── Scope 1 (direct)
-│   ├── Scope 2 (energy)
-│   ├── Scope 3 (value chain)
-│   └── Product footprints
-├── Allocation
-│   ├── Revenue-based
-│   ├── Mass-based
-│   └── Time-based
-└── Aggregation
-    ├── By facility
-    ├── By business unit
-    ├── By geography
-    └── By category
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data Validation
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Range checks
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Completeness checks
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Consistency checks
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Outlier detection
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Emission Calculation
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scope 1 (direct)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scope 2 (energy)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scope 3 (value chain)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Product footprints
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Allocation
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Revenue-based
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Mass-based
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Time-based
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Aggregation
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ By facility
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ By business unit
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ By geography
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ By category
 
 Output Layer:
-├── Dashboards
-├── Reports (GHG Protocol, CDP, TCFD)
-├── Trend analysis
-├── Reduction tracking
-└── Regulatory submissions
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Dashboards
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reports (GHG Protocol, CDP, TCFD)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Trend analysis
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reduction tracking
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Regulatory submissions
 ```
 
 ### Scope 3 Categories
@@ -387,23 +387,23 @@ print(f"Report generated in: {report.generation_seconds:.1f}s")
 
 ```
 Sensitive Emissions Data:
-├── Facility-level emissions
-├── Supplier-specific data
-├── Product footprints
-├── Reduction targets
-└── Financial implications
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Facility-level emissions
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Supplier-specific data
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Product footprints
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reduction targets
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Financial implications
 ```
 
 ### Data Integrity
 
 ```
 Integrity Controls:
-├── Input validation at entry
-├── Cross-source reconciliation
-├── Automated anomaly detection
-├── Manual review for outliers
-├── Version control for adjustments
-└── Audit trail for all changes
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Input validation at entry
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cross-source reconciliation
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Automated anomaly detection
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Manual review for outliers
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Version control for adjustments
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Audit trail for all changes
 ```
 
 ## Troubleshooting Guide
@@ -601,28 +601,28 @@ EmissionsFactor:
 
 ```
 1. Data Infrastructure
-   ├── Database (PostgreSQL)
-   ├── API layer (FastAPI)
-   ├── Frontend (React)
-   └── Report generation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Database (PostgreSQL)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ API layer (FastAPI)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Frontend (React)
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Report generation
 
 2. Data Sources
-   ├── Utility API integration
-   ├── ERP connection
-   ├── Manual data entry forms
-   └── Supplier portal
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Utility API integration
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ERP connection
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Manual data entry forms
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Supplier portal
 
 3. Configuration
-   ├── Organizational boundary
-   ├── Facility mapping
-   ├── Emission factor database
-   └── Reporting frameworks
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Organizational boundary
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Facility mapping
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Emission factor database
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Reporting frameworks
 
 4. Validation
-   ├── Data quality checks
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data quality checks
     against industry benchmarks
     against prior years
-   └── Third-party verification
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Third-party verification
 ```
 
 ### Database Setup
@@ -672,13 +672,13 @@ CREATE TABLE emission_factors (
 
 ```
 Carbon Dashboard:
-├── Total emissions trend
-├── Scope 1/2/3 breakdown
-├── Facility-level comparison
-├── Reduction progress
-├── Data quality score
-├── Reporting status
-└── Anomaly alerts
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Total emissions trend
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scope 1/2/3 breakdown
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Facility-level comparison
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reduction progress
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data quality score
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reporting status
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Anomaly alerts
 ```
 
 ## Testing Strategy
@@ -687,22 +687,22 @@ Carbon Dashboard:
 
 ```
 1. Unit Tests
-   ├── Emission factor application
-   ├── Unit conversions
-   ├── Scope calculations
-   └── Aggregation logic
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Emission factor application
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Unit conversions
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scope calculations
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Aggregation logic
 
 2. Integration Tests
-   ├── Data pipeline end-to-end
-   ├── Report generation
-   ├── API endpoints
-   └── Database operations
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data pipeline end-to-end
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Report generation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ API endpoints
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Database operations
 
 3. Validation Tests
-   ├── Known-answer calculations
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Known-answer calculations
     against published results
-   ├── Edge cases (zero, negative)
-   └── Large dataset handling
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Edge cases (zero, negative)
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Large dataset handling
 ```
 
 ## Versioning & Migration
@@ -711,21 +711,21 @@ Carbon Dashboard:
 
 ```
 v3.0: Major methodology change
-├── New emission factors
-├── Updated scope boundaries
-├── New calculation methods
-└── Regulatory changes
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New emission factors
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Updated scope boundaries
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New calculation methods
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Regulatory changes
 
 v2.x: Factor updates
-├── Annual factor refresh
-├── New activity categories
-├── Additional regions
-└── Improved accuracy
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Annual factor refresh
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New activity categories
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Additional regions
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Improved accuracy
 
 v2.0.x: Bug fixes
-├── Calculation corrections
-├── Data type fixes
-└── Documentation updates
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Calculation corrections
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data type fixes
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Documentation updates
 ```
 
 ## Glossary
@@ -806,3 +806,171 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

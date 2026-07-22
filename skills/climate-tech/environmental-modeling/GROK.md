@@ -163,97 +163,97 @@ ecosystem_models:
 
 ```
 Input Data Layer:
-├── Climate Data (CMIP6, ERA5, observations)
-├── Remote Sensing (Landsat, Sentinel, MODIS)
-├── Species Occurrences (GBIF, iNaturalist)
-├── Land Use (MODIS LC, ESA WorldCover)
-└── Topography (SRTM, ASTER GDEM)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Climate Data (CMIP6, ERA5, observations)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Remote Sensing (Landsat, Sentinel, MODIS)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Species Occurrences (GBIF, iNaturalist)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Land Use (MODIS LC, ESA WorldCover)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Topography (SRTM, ASTER GDEM)
 
 Processing Layer:
-├── Data Preprocessing
-│   ├── Quality control
-│   ├── Gap filling
-│   ├── Resampling
-│   └── Normalization
-├── Statistical Analysis
-│   ├── Trend detection
-│   ├── Anomaly analysis
-│   ├── Variability assessment
-│   └── Correlation analysis
-├── Process-Based Models
-│   ├── Carbon cycle models
-│   ├── Hydrological models
-│   ├── Vegetation dynamics
-│   └── Species distribution
-└── Machine Learning
-    ├── Random Forest
-    ├── Gradient Boosting
-    ├── Neural Networks
-    └── Ensemble methods
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data Preprocessing
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Quality control
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Gap filling
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Resampling
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Normalization
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Statistical Analysis
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Trend detection
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Anomaly analysis
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Variability assessment
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Correlation analysis
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Process-Based Models
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Carbon cycle models
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Hydrological models
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Vegetation dynamics
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Species distribution
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Machine Learning
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Random Forest
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Gradient Boosting
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Neural Networks
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Ensemble methods
 
 Output Layer:
-├── Projections (maps, time series)
-├── Uncertainty estimates
-├── Scenario comparisons
-├── Impact assessments
-└── Decision support tools
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Projections (maps, time series)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Uncertainty estimates
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Scenario comparisons
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Impact assessments
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Decision support tools
 ```
 
 ### Species Distribution Modeling Workflow
 
 ```
 1. Data Collection
-   ├── Occurrence records (GBIF)
-   ├── Environmental layers
-   ├── Pseudo-absence selection
-   └── Data quality filtering
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Occurrence records (GBIF)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Environmental layers
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Pseudo-absence selection
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Data quality filtering
 
 2. Model Fitting
-   ├── Algorithm selection
-   ├── Feature engineering
-   ├── Cross-validation
-   └── Hyperparameter tuning
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Algorithm selection
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Feature engineering
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cross-validation
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Hyperparameter tuning
 
 3. Projection
-   ├── Current suitability mapping
-   ├── Future scenario projections
-   ├── Uncertainty quantification
-   └── Range shift estimation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Current suitability mapping
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Future scenario projections
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Uncertainty quantification
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Range shift estimation
 
 4. Validation
-   ├── Independent test data
-   ├── Spatial cross-validation
-   ├── Extirpation analysis
-   └── Expert review
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Independent test data
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Spatial cross-validation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Extirpation analysis
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Expert review
 ```
 
 ### Carbon Cycle Model Architecture
 
 ```
 Carbon Pools:
-├── Atmosphere
-│   └── CO2 concentration
-├── Vegetation
-│   ├── Leaf carbon
-│   ├── Stem carbon
-│   ├── Root carbon
-│   └── Litter carbon
-├── Soil
-│   ├── Organic carbon
-│   ├── Mineral-associated carbon
-│   └── Peat carbon
-└── Ocean
-    ├── Surface layer
-    ├── Deep ocean
-    └── Sediment
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Atmosphere
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ CO2 concentration
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Vegetation
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Leaf carbon
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Stem carbon
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Root carbon
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Litter carbon
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Soil
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Organic carbon
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Mineral-associated carbon
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Peat carbon
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Ocean
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Surface layer
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Deep ocean
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Sediment
 
 Fluxes:
-├── Photosynthesis (GPP)
-├── Autotrophic respiration (Ra)
-├── Heterotrophic respiration (Rh)
-├── Decomposition
-├── Disturbance (fire, harvest)
-└── Lateral transport
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Photosynthesis (GPP)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Autotrophic respiration (Ra)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Heterotrophic respiration (Rh)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Decomposition
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Disturbance (fire, harvest)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Lateral transport
 ```
 
 ## Integration Guide
@@ -389,22 +389,22 @@ print(f"Optimized: {result.optimized_hours:.1f}h")
 
 ```
 Model Validation:
-├── Reproducibility checks
-├── Known-answer tests
-├── Peer review of methods
-├── Version control for models
-└── Documentation of assumptions
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reproducibility checks
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Known-answer tests
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Peer review of methods
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Version control for models
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Documentation of assumptions
 ```
 
 ### Data Privacy
 
 ```
 Sensitive Species Data:
-├── Location data for endangered species
-├── Restrict public access
-├── Coordinate fuzzing for public datasets
-├── Access logging for sensitive queries
-└── Data sharing agreements
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Location data for endangered species
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Restrict public access
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Coordinate fuzzing for public datasets
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Access logging for sensitive queries
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Data sharing agreements
 ```
 
 ## Troubleshooting Guide
@@ -583,29 +583,29 @@ EcosystemState:
 
 ```
 1. Hardware
-   ├── CPU: 16+ cores for parallel processing
-   ├── RAM: 64+ GB for large datasets
-   ├── Storage: 1TB+ NVMe for data
-   └── GPU: Optional for ML models
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ CPU: 16+ cores for parallel processing
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ RAM: 64+ GB for large datasets
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Storage: 1TB+ NVMe for data
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ GPU: Optional for ML models
 
 2. Software
-   ├── Python 3.10+
-   ├── Conda/Mamba environment
-   ├── GDAL/OGR for geospatial
-   ├── Xarray for NetCDF
-   └── Scikit-learn, PyTorch
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Python 3.10+
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Conda/Mamba environment
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ GDAL/OGR for geospatial
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Xarray for NetCDF
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Scikit-learn, PyTorch
 
 3. Data
-   ├── CMIP6 local mirror
-   ├── GBIF cached data
-   ├── Remote sensing archives
-   └── Topographic datasets
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ CMIP6 local mirror
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ GBIF cached data
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Remote sensing archives
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Topographic datasets
 
 4. Configuration
-   ├── Model parameters
-   ├── Output directories
-   ├── Parallelization settings
-   └── Logging configuration
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Model parameters
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Output directories
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Parallelization settings
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Logging configuration
 ```
 
 ### Data Pipeline Setup
@@ -638,13 +638,13 @@ export OUTPUT_DIR="/output/models"
 
 ```
 Environmental Model Dashboard:
-├── Active model runs
-├── Input data quality scores
-├── Model performance metrics
-├── Projection summaries
-├── Data availability status
-├── Resource utilization
-└── Error and warning logs
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Active model runs
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Input data quality scores
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Model performance metrics
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Projection summaries
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data availability status
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Resource utilization
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Error and warning logs
 ```
 
 ## Testing Strategy
@@ -653,23 +653,23 @@ Environmental Model Dashboard:
 
 ```
 1. Unit Tests
-   ├── Input validation
-   ├── Calculation correctness
-   ├── Edge case handling
-   └── Output format validation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Input validation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Calculation correctness
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Edge case handling
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Output format validation
 
 2. Integration Tests
-   ├── Data pipeline integrity
-   ├── Model chain connections
-   ├── Output consistency
-   └── Cross-model comparison
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data pipeline integrity
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Model chain connections
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Output consistency
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Cross-model comparison
 
 3. Validation Tests
-   ├── Known-answer tests
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Known-answer tests
     against observations
-   ├── Sensitivity analysis
-   ├── Uncertainty quantification
-   └── Peer review
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Sensitivity analysis
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Uncertainty quantification
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Peer review
 ```
 
 ## Versioning & Migration
@@ -678,28 +678,28 @@ Environmental Model Dashboard:
 
 ```
 v3.0: Major model updates
-├── New climate scenarios
-├── Updated algorithms
-├── New species groups
-└── Improved uncertainty
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New climate scenarios
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Updated algorithms
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New species groups
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Improved uncertainty
 
 v2.x: Model additions
-├── New species models
-├── New regions
-├── New algorithms
-└── Performance improvements
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New species models
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New regions
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ New algorithms
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Performance improvements
 
 v2.0.x: Bug fixes
-├── Parameter corrections
-├── Documentation updates
-└── Output format fixes
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Parameter corrections
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Documentation updates
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Output format fixes
 ```
 
 ## Glossary
 
 | Term | Definition |
 |------|-----------|
-| AUC | Area Under Curve — model accuracy metric |
+| AUC | Area Under Curve Ã¢â‚¬â€ model accuracy metric |
 | CMIP6 | Coupled Model Intercomparison Project Phase 6 |
 | GBIF | Global Biodiversity Information Facility |
 | GPP | Gross Primary Production |
@@ -773,3 +773,171 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

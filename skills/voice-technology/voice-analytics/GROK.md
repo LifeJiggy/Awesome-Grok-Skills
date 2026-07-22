@@ -5,17 +5,17 @@ version: "1.0.0"
 tags: ["voice-technology", "voice-analytics", "emotion-detection", "speaker-identification", "biometrics", "sentiment-analysis"]
 ---
 
-# Voice Analytics — Emotion Detection, Speaker ID & Speech Quality Assessment
+# Voice Analytics Ã¢â‚¬â€ Emotion Detection, Speaker ID & Speech Quality Assessment
 
 ## Overview
 
-Voice analytics extracts high-level insights from speech that go far beyond transcription. While ASR answers "what was said," voice analytics answers "who said it," "how they felt," and "how well they said it." This module provides production-grade capabilities for emotion detection from vocal characteristics, speaker identification and verification (voice biometrics), speech quality assessment, and call center analytics — transforming raw audio into actionable intelligence for customer experience, security, and compliance use cases.
+Voice analytics extracts high-level insights from speech that go far beyond transcription. While ASR answers "what was said," voice analytics answers "who said it," "how they felt," and "how well they said it." This module provides production-grade capabilities for emotion detection from vocal characteristics, speaker identification and verification (voice biometrics), speech quality assessment, and call center analytics Ã¢â‚¬â€ transforming raw audio into actionable intelligence for customer experience, security, and compliance use cases.
 
-Emotion detection from voice operates on acoustic features — pitch variability, speech rate, energy distribution, spectral tilt, and jitter/shimmer — that correlate with emotional states independent of lexical content. A speaker saying "I'm fine" in a flat, low-energy tone conveys a very different emotional state than the same words spoken with rising pitch and increased tempo. This module implements multi-model emotion recognition supporting discrete categories (happy, sad, angry, neutral, surprised, fear, disgust) and dimensional representations (valence-arousal-dominance) for nuanced affect detection.
+Emotion detection from voice operates on acoustic features Ã¢â‚¬â€ pitch variability, speech rate, energy distribution, spectral tilt, and jitter/shimmer Ã¢â‚¬â€ that correlate with emotional states independent of lexical content. A speaker saying "I'm fine" in a flat, low-energy tone conveys a very different emotional state than the same words spoken with rising pitch and increased tempo. This module implements multi-model emotion recognition supporting discrete categories (happy, sad, angry, neutral, surprised, fear, disgust) and dimensional representations (valence-arousal-dominance) for nuanced affect detection.
 
 Speaker identification and verification form the backbone of voice biometric systems. The module supports both text-independent (analyze any utterance) and text-dependent (verify a specific passphrase) approaches, using x-vector, ECAPA-TDNN, and ResNet-based speaker embeddings. The verification pipeline includes liveness detection to reject replay attacks, adaptive thresholds that account for environmental noise, and enrollment management for speaker gallery administration.
 
-Call center analytics leverage these capabilities alongside speech quality metrics to provide comprehensive conversation intelligence — detecting customer dissatisfaction, measuring agent compliance, and identifying training opportunities. The analytics pipeline processes complete call recordings to produce actionable reports with sentiment trajectories, emotion distributions, and compliance violation lists.
+Call center analytics leverage these capabilities alongside speech quality metrics to provide comprehensive conversation intelligence Ã¢â‚¬â€ detecting customer dissatisfaction, measuring agent compliance, and identifying training opportunities. The analytics pipeline processes complete call recordings to produce actionable reports with sentiment trajectories, emotion distributions, and compliance violation lists.
 
 The module also provides speech-to-text alignment for timestamped analytics, enabling precise temporal mapping of emotional shifts and speaker transitions within a conversation. This granular analysis supports post-call review workflows where supervisors need to locate specific moments of interest within long recordings.
 
@@ -189,7 +189,7 @@ print(f"Escalation rate: {daily_report.escalation_rate:.2%}")
 
 3. **Implement liveness detection for biometric systems**: Always verify that the audio originates from a live speaker, not a recording or synthetic voice. Replay attacks are the most common bypass vector for voice biometric systems. Use anti-spoof models trained on the latest attack vectors.
 
-4. **Use adaptive thresholds for speaker verification**: Fixed similarity thresholds fail across noise conditions. Adapt the threshold based on estimated SNR — lower thresholds in high-noise environments, stricter thresholds in clean conditions. A 10dB SNR change typically requires a 0.05 threshold adjustment.
+4. **Use adaptive thresholds for speaker verification**: Fixed similarity thresholds fail across noise conditions. Adapt the threshold based on estimated SNR Ã¢â‚¬â€ lower thresholds in high-noise environments, stricter thresholds in clean conditions. A 10dB SNR change typically requires a 0.05 threshold adjustment.
 
 5. **Correlate emotion with context, not just acoustics**: A low-valence detection during a billing complaint is expected behavior. Calibrate emotion-based alerts against conversational context to reduce false positives in emotionally negative but situationally appropriate interactions.
 
@@ -197,7 +197,7 @@ print(f"Escalation rate: {daily_report.escalation_rate:.2%}")
 
 7. **Separate real-time from batch analytics**: Real-time analytics (live emotion tracking, compliance monitoring) must operate under strict latency budgets (<100ms). Batch analytics (overnight call review, trend analysis) can use heavier models and full-context analysis for higher accuracy.
 
-8. **Validate metrics against human annotation**: Automated emotion and sentiment scores must be periodically benchmarked against human-labeled ground truth. Inter-annotator agreement sets the ceiling — no automated system should claim accuracy above human agreement levels (typically 70-80% for emotion, 85-90% for sentiment).
+8. **Validate metrics against human annotation**: Automated emotion and sentiment scores must be periodically benchmarked against human-labeled ground truth. Inter-annotator agreement sets the ceiling Ã¢â‚¬â€ no automated system should claim accuracy above human agreement levels (typically 70-80% for emotion, 85-90% for sentiment).
 
 ## Architecture Notes
 
@@ -211,10 +211,10 @@ Emotion detection models operate on fixed-length audio segments (typically 1-3 s
 
 ## Related Modules
 
-- [speech-processing](../speech-processing/) — Audio preprocessing and feature extraction for analytics
-- [speech-recognition](../speech-recognition/) — Transcription that provides text context for sentiment analysis
-- [voice-assistants](../voice-assistants/) — Real-time emotion adaptation for assistant responses
-- [text-to-speech](../text-to-speech/) — Synthesized speech quality comparison and naturalness assessment
+- [speech-processing](../speech-processing/) Ã¢â‚¬â€ Audio preprocessing and feature extraction for analytics
+- [speech-recognition](../speech-recognition/) Ã¢â‚¬â€ Transcription that provides text context for sentiment analysis
+- [voice-assistants](../voice-assistants/) Ã¢â‚¬â€ Real-time emotion adaptation for assistant responses
+- [text-to-speech](../text-to-speech/) Ã¢â‚¬â€ Synthesized speech quality comparison and naturalness assessment
 
 ---
 
@@ -259,62 +259,62 @@ verify_config = VerificationConfig(
 
 ```
 Audio Input
-    │
-    ▼
-┌──────────────┐
-│ Preprocessing│── VAD, normalization, segmentation
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Feature      │── Speaker embeddings, acoustic features
-│ Extraction   │
-└──────┬───────┘
-    │
-    ├──► Emotion Detection ──► Emotion Labels + VAD
-    │
-    ├──► Speaker ID ──► Speaker Labels + Confidence
-    │
-    └──► Quality Assessment ──► MOS, Clarity, Fluency
-            │
-            ▼
-┌──────────────┐
-│ Aggregation  │── Call-level analytics, trajectories
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š PreprocessingÃ¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ VAD, normalization, segmentation
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Feature      Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Speaker embeddings, acoustic features
+Ã¢â€â€š Extraction   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº Emotion Detection Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº Emotion Labels + VAD
+    Ã¢â€â€š
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº Speaker ID Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº Speaker Labels + Confidence
+    Ã¢â€â€š
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº Quality Assessment Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº MOS, Clarity, Fluency
+            Ã¢â€â€š
+            Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Aggregation  Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Call-level analytics, trajectories
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ### Biometric Verification Flow
 
 ```
 Audio Sample
-    │
-    ▼
-┌──────────────┐
-│ Anti-Spoof   │── Detect replay/TTS attacks
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Liveness     │── Verify live speaker
-│ Detection    │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Embedding    │── Extract speaker embedding
-│ Extraction   │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Gallery      │── Compare against enrolled speakers
-│ Matching     │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Decision     │── Accept/reject with confidence
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Anti-Spoof   Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Detect replay/TTS attacks
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Liveness     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Verify live speaker
+Ã¢â€â€š Detection    Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Embedding    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Extract speaker embedding
+Ã¢â€â€š Extraction   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Gallery      Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Compare against enrolled speakers
+Ã¢â€â€š Matching     Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Decision     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Accept/reject with confidence
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Integration Guide
@@ -584,7 +584,7 @@ for event in events:
 # Detect emotion shifts
 shifts = timeline.detect_shifts(threshold=0.3)
 for shift in shifts:
-    print(f"Shift at {shift.timestamp:.1f}s: {shift.from_emotion} → {shift.to_emotion}")
+    print(f"Shift at {shift.timestamp:.1f}s: {shift.from_emotion} Ã¢â€ â€™ {shift.to_emotion}")
 ```
 
 ### Compliance Monitoring Reference
@@ -768,3 +768,171 @@ print(f"Avg handle time: {daily.avg_handle_time_s:.0f}s")
 print(f"Customer satisfaction: {daily.avg_csat:.2f}")
 print(f"Agent compliance: {daily.avg_compliance:.2%}")
 ```
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

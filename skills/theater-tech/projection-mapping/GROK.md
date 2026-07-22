@@ -9,11 +9,11 @@ tags: ["theater-tech", "projection-mapping", "media-server", "3d-calibration", "
 
 ## Overview
 
-The projection mapping module provides a comprehensive Python API for 3D surface calibration, multi-projector alignment, edge blending, real-time content warping, and media server integration for theatrical and live entertainment environments. It abstracts the complexity of mapping flat or curved video content onto irregular 3D surfaces — architectural facades, scenic elements, performer costumes, stage floors, and custom-built set pieces — into a programmable pipeline that can be calibrated, tested, and automated from a single interface.
+The projection mapping module provides a comprehensive Python API for 3D surface calibration, multi-projector alignment, edge blending, real-time content warping, and media server integration for theatrical and live entertainment environments. It abstracts the complexity of mapping flat or curved video content onto irregular 3D surfaces Ã¢â‚¬â€ architectural facades, scenic elements, performer costumes, stage floors, and custom-built set pieces Ã¢â‚¬â€ into a programmable pipeline that can be calibrated, tested, and automated from a single interface.
 
 At its core, projection mapping solves the geometric problem of transforming a rectangular video source to fit an arbitrary 3D surface as seen from a specific projector position. The module implements homography-based warping for planar surfaces, mesh-based deformation for curved and organic shapes, and lenticular blending for multi-projector overlap zones. Each projector's output passes through a calibration pipeline: intrinsic lens correction (keystone, barrel distortion), extrinsic pose estimation (position and orientation relative to the surface), mesh warping (control-point-based deformation), and color matching (gamut and brightness alignment across projectors).
 
-Multi-projector setups require seamless edge blending: where two projectors overlap, their outputs must cross-fade smoothly to create the illusion of a single continuous image. The module handles both horizontal and vertical blend regions, with configurable gamma curves to compensate for the additive brightness in overlap zones. For curved surfaces, the blend width varies across the overlap — wider at the center where projectors are more perpendicular, narrower at the edges where viewing angles are oblique.
+Multi-projector setups require seamless edge blending: where two projectors overlap, their outputs must cross-fade smoothly to create the illusion of a single continuous image. The module handles both horizontal and vertical blend regions, with configurable gamma curves to compensate for the additive brightness in overlap zones. For curved surfaces, the blend width varies across the overlap Ã¢â‚¬â€ wider at the center where projectors are more perpendicular, narrower at the edges where viewing angles are oblique.
 
 Interactive projection mapping extends the pipeline with real-time tracking: the system can follow performer positions via computer vision (ArUco markers, depth cameras, or skeleton tracking) and adjust projected content to follow them across the stage. The module supports integration with depth sensors (Intel RealSense, Microsoft Azure Kinect) for 3D surface scanning, and it can generate mesh data from point clouds for automatic calibration of complex surfaces.
 
@@ -31,22 +31,22 @@ Interactive projection mapping extends the pipeline with real-time tracking: the
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│              Content & Media Server Layer                │
-│     (NDI, SDI, Media Playback, Generative Content)      │
-├─────────────────────────────────────────────────────────┤
-│              Warping & Blending Engine                   │
-│   (Mesh Deformation, Edge Blending, Color Matching)     │
-├─────────────────────────────────────────────────────────┤
-│              Calibration Pipeline                        │
-│  (Homography, Keystone, Lens Correction, Pose Est.)     │
-├─────────────────────────────────────────────────────────┤
-│              Surface & Projector Model                   │
-│    (3D Mesh, Curvature, Projector Optics, Position)     │
-├─────────────────────────────────────────────────────────┤
-│              Interactive Tracking Layer                  │
-│     (ArUco, Depth Sensors, Skeleton, IR Markers)        │
-└─────────────────────────────────────────────────────────┘
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š              Content & Media Server Layer                Ã¢â€â€š
+Ã¢â€â€š     (NDI, SDI, Media Playback, Generative Content)      Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š              Warping & Blending Engine                   Ã¢â€â€š
+Ã¢â€â€š   (Mesh Deformation, Edge Blending, Color Matching)     Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š              Calibration Pipeline                        Ã¢â€â€š
+Ã¢â€â€š  (Homography, Keystone, Lens Correction, Pose Est.)     Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š              Surface & Projector Model                   Ã¢â€â€š
+Ã¢â€â€š    (3D Mesh, Curvature, Projector Optics, Position)     Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š              Interactive Tracking Layer                  Ã¢â€â€š
+Ã¢â€â€š     (ArUco, Depth Sensors, Skeleton, IR Markers)        Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Usage Examples
@@ -210,18 +210,18 @@ uv = tracker.map_to_projection(480, 300, wall)
 
 | Parameter | Default | Range | Description |
 |-----------|---------|-------|-------------|
-| Blend Width | 200px | 50–500px | Edge blend region width in pixels |
-| Blend Gamma | 2.2 | 1.0–3.0 | Gamma curve for blend compensation |
-| Control Points | 8x8 | 2x2–32x32 | Mesh resolution for warping |
-| Mesh Smoothing | 0.5 | 0.0–1.0 | Smoothing strength for control points |
-| Color Temp Match | ±100K | ±50–500K | White-point matching tolerance |
+| Blend Width | 200px | 50Ã¢â‚¬â€œ500px | Edge blend region width in pixels |
+| Blend Gamma | 2.2 | 1.0Ã¢â‚¬â€œ3.0 | Gamma curve for blend compensation |
+| Control Points | 8x8 | 2x2Ã¢â‚¬â€œ32x32 | Mesh resolution for warping |
+| Mesh Smoothing | 0.5 | 0.0Ã¢â‚¬â€œ1.0 | Smoothing strength for control points |
+| Color Temp Match | Ã‚Â±100K | Ã‚Â±50Ã¢â‚¬â€œ500K | White-point matching tolerance |
 
 ## Related Modules
 
-- [lighting-control](../lighting-control/GROK.md) — Lighting color matching for projection ambient compensation
-- [stage-automation](../stage-automation/GROK.md) — Automated scenic movement tracking for dynamic projection surfaces
-- [sound-engineering](../sound-engineering/GROK.md) — Spatial audio alignment with projection-mapped environments
-- [audience-engagement](../audience-engagement/GROK.md) — Interactive audience-triggered projection content
+- [lighting-control](../lighting-control/GROK.md) Ã¢â‚¬â€ Lighting color matching for projection ambient compensation
+- [stage-automation](../stage-automation/GROK.md) Ã¢â‚¬â€ Automated scenic movement tracking for dynamic projection surfaces
+- [sound-engineering](../sound-engineering/GROK.md) Ã¢â‚¬â€ Spatial audio alignment with projection-mapped environments
+- [audience-engagement](../audience-engagement/GROK.md) Ã¢â‚¬â€ Interactive audience-triggered projection content
 
 ---
 
@@ -264,26 +264,26 @@ scanner.export_mesh(calibration, "surface_mesh.obj")
 
 ```
 Content Source (NDI/SDI)
-        │
-        ▼
-┌──────────────┐
-│ Color Match  │── Per-projector calibration
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│ Warp Engine  │── Mesh deformation per projector
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│ Blend Zone   │── Edge blending in overlap regions
-└──────┬───────┘
-       │
-       ▼
-┌──────────────┐
-│ Output       │── Per-projector output
-└──────────────┘
+        Ã¢â€â€š
+        Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Color Match  Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Per-projector calibration
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+       Ã¢â€â€š
+       Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Warp Engine  Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Mesh deformation per projector
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+       Ã¢â€â€š
+       Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Blend Zone   Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Edge blending in overlap regions
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+       Ã¢â€â€š
+       Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Output       Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Per-projector output
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ### Calibration Workflow
@@ -502,7 +502,7 @@ Copyright (c) 2024 Awesome Grok Skills
 | Parameter | Standard Throw | Short Throw | Ultra-Short Throw |
 |-----------|---------------|-------------|-------------------|
 | Throw Ratio | 1.5-2.5:1 | 0.8-1.5:1 | 0.2-0.8:1 |
-| Lens Shift | ±50% V | ±70% V | Fixed |
+| Lens Shift | Ã‚Â±50% V | Ã‚Â±70% V | Fixed |
 | Resolution | 1920x1200 | 1920x1200 | 4K (3840x2400) |
 | Brightness | 10,000-20,000 lm | 5,000-15,000 lm | 3,000-10,000 lm |
 | Best For | Large venue, high ceiling | Mid-size venue | Tight spaces, floor projection |
@@ -564,28 +564,28 @@ Copyright (c) 2024 Awesome Grok Skills
 
 ```
 Projection alignment off
-    │
-    ├── Verify projector position → Check mounting stability
-    ├── Check lens shift → Adjust mechanical lens shift
-    ├── Recalibrate → Run structured light scan
-    ├── Check surface flatness → Verify no warping
-    └── Check keystone → Adjust digital keystone correction
+    Ã¢â€â€š
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify projector position Ã¢â€ â€™ Check mounting stability
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check lens shift Ã¢â€ â€™ Adjust mechanical lens shift
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Recalibrate Ã¢â€ â€™ Run structured light scan
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check surface flatness Ã¢â€ â€™ Verify no warping
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Check keystone Ã¢â€ â€™ Adjust digital keystone correction
 
 Blend band visible
-    │
-    ├── Check gamma matching → Recalibrate blend curves
-    ├── Check projector brightness → Match output levels
-    ├── Check blend width → Increase if too narrow
-    ├── Check surface uniformity → Ensure consistent reflectance
-    └── Check ambient light → Eliminate competing light sources
+    Ã¢â€â€š
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check gamma matching Ã¢â€ â€™ Recalibrate blend curves
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check projector brightness Ã¢â€ â€™ Match output levels
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check blend width Ã¢â€ â€™ Increase if too narrow
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check surface uniformity Ã¢â€ â€™ Ensure consistent reflectance
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Check ambient light Ã¢â€ â€™ Eliminate competing light sources
 
 Content stutter on media server
-    │
-    ├── Check video codec → Use ProRes or DNxHR
-    ├── Check storage speed → Use SSD or RAID
-    ├── Check network bandwidth → Use 10GbE for NDI
-    ├── Check GPU utilization → Reduce layer count
-    └── Check content resolution → Match projector output
+    Ã¢â€â€š
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check video codec Ã¢â€ â€™ Use ProRes or DNxHR
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check storage speed Ã¢â€ â€™ Use SSD or RAID
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check network bandwidth Ã¢â€ â€™ Use 10GbE for NDI
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check GPU utilization Ã¢â€ â€™ Reduce layer count
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Check content resolution Ã¢â€ â€™ Match projector output
 ```
 
 ### Performance Metrics
@@ -593,26 +593,26 @@ Content stutter on media server
 | Metric | Target | Warning | Critical |
 |--------|--------|---------|----------|
 | Calibration accuracy | < 2mm error | 2-5mm | > 5mm |
-| Blend smoothness | ΔE < 1 | ΔE 1-3 | ΔE > 3 |
+| Blend smoothness | ÃŽâ€E < 1 | ÃŽâ€E 1-3 | ÃŽâ€E > 3 |
 | Frame rate | 60 fps | 30-60 fps | < 30 fps |
 | Input latency | < 1 frame | 1-2 frames | > 2 frames |
-| Color match (projectors) | ΔE < 2 | ΔE 2-5 | ΔE > 5 |
+| Color match (projectors) | ÃŽâ€E < 2 | ÃŽâ€E 2-5 | ÃŽâ€E > 5 |
 | Content load time | < 5s | 5-15s | > 15s |
 | Interactive tracking latency | < 50ms | 50-100ms | > 100ms |
 
 ### Projection Throw Distance Calculator
 
 ```
-Throw Distance = Throw Ratio × Image Width
+Throw Distance = Throw Ratio Ãƒâ€” Image Width
 
 Example:
   Projector: Throw Ratio 1.5:1
   Image Width: 6m
-  Throw Distance: 1.5 × 6 = 9m
+  Throw Distance: 1.5 Ãƒâ€” 6 = 9m
 
 For angled projection:
-  Horizontal Offset = tan(angle) × Throw Distance
-  Vertical Offset = tan(angle) × Throw Distance
+  Horizontal Offset = tan(angle) Ãƒâ€” Throw Distance
+  Vertical Offset = tan(angle) Ãƒâ€” Throw Distance
 ```
 
 ### Common Projection Scenarios
@@ -622,7 +622,7 @@ For angled projection:
 | Single flat wall | 1 | Flat | 1920x1200 | Low |
 | Multi-projector wall | 2-4 | Flat | 3840x2400 | Medium |
 | Curved cyclorama | 2-6 | Curved | 3840x2400+ | High |
-| 360° cylinder | 4-8 | Cylindrical | 7680x2400+ | Very high |
+| 360Ã‚Â° cylinder | 4-8 | Cylindrical | 7680x2400+ | Very high |
 | Object mapping | 1-4 | 3D object | Variable | Very high |
 | Floor projection | 1-2 | Floor | 1920x1200 | Medium |
 
@@ -640,12 +640,12 @@ For angled projection:
 
 | System | Latency | Accuracy | Range | Cost |
 |--------|---------|----------|-------|------|
-| ArUco Markers | 33ms | ±5mm | Camera FOV | Low |
-| Intel RealSense | 33ms | ±2mm | 0.2-10m | Medium |
-| Azure Kinect | 33ms | ±1mm | 0.5-5m | Medium |
-| OptiTrack | 8ms | ±0.1mm | 1-15m | High |
-| Vicon | 8ms | ±0.05mm | 1-30m | Very High |
-| IR Markers | 16ms | ±10mm | 5-50m | Medium |
+| ArUco Markers | 33ms | Ã‚Â±5mm | Camera FOV | Low |
+| Intel RealSense | 33ms | Ã‚Â±2mm | 0.2-10m | Medium |
+| Azure Kinect | 33ms | Ã‚Â±1mm | 0.5-5m | Medium |
+| OptiTrack | 8ms | Ã‚Â±0.1mm | 1-15m | High |
+| Vicon | 8ms | Ã‚Â±0.05mm | 1-30m | Very High |
+| IR Markers | 16ms | Ã‚Â±10mm | 5-50m | Medium |
 
 ### Content Format Reference
 
@@ -674,35 +674,35 @@ For angled projection:
 
 ```
 1. Prepare Surface
-    ├── Ensure surface is clean and dry
-    ├── Apply matte white coating if needed
-    ├── Mark reference points with tape
-    └── Darken room completely
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Ensure surface is clean and dry
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Apply matte white coating if needed
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Mark reference points with tape
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Darken room completely
 
 2. Position Scanner
-    ├── Place structured light projector
-    ├── Position cameras at known offsets
-    ├── Calibrate camera-projector system
-    └── Set exposure and focus
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Place structured light projector
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Position cameras at known offsets
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Calibrate camera-projector system
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Set exposure and focus
 
 3. Capture Patterns
-    ├── Project gray code sequence (24 patterns)
-    ├── Capture each pattern with camera
-    ├── Verify pattern visibility
-    └── Capture reference color patches
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Project gray code sequence (24 patterns)
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Capture each pattern with camera
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify pattern visibility
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Capture reference color patches
 
 4. Process Point Cloud
-    ├── Generate depth map from patterns
-    ├── Convert to 3D point cloud
-    ├── Remove noise and outliers
-    └── Export as OBJ/PLY mesh
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Generate depth map from patterns
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Convert to 3D point cloud
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Remove noise and outliers
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Export as OBJ/PLY mesh
 
 5. Generate Warping Mesh
-    ├── Import surface mesh
-    ├── Generate control point grid
-    ├── Map projector pixels to surface
-    ├── Test with alignment pattern
-    └── Export warping data for media server
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Import surface mesh
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Generate control point grid
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Map projector pixels to surface
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Test with alignment pattern
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Export warping data for media server
 
 ### Complete Projector Settings Reference
 
@@ -711,7 +711,7 @@ For angled projection:
 | Brightness | 10,000+ lm | 5,000+ lm | 10,000+ lm |
 | Contrast | > 10,000:1 | > 5,000:1 | > 10,000:1 |
 | Resolution | 1920x1200 | 1920x1200 | 1920x1200+ |
-| Lens shift | ±50% V | Fixed | ±50% V |
+| Lens shift | Ã‚Â±50% V | Fixed | Ã‚Â±50% V |
 | Throw ratio | 1.5-2.5:1 | 0.8-1.5:1 | 1.0-2.0:1 |
 | Lamp hours | 2,000-4,000 | 2,000-4,000 | 2,000-4,000 |
 
@@ -729,57 +729,57 @@ For angled projection:
 
 ```
 SURFACE PREPARATION CHECKLIST
-    □ Clean surface thoroughly (no dust, fingerprints)
-    □ Fill any holes or cracks with appropriate filler
-    □ Sand smooth any rough spots
-    □ Apply matte white projection paint (if needed)
-    □ Allow 24 hours drying time
-    □ Verify uniform reflectance with light meter
-    □ Mark reference points for calibration
-    □ Photograph surface from audience perspective
-    □ Document surface dimensions and curvature
+    Ã¢â€“Â¡ Clean surface thoroughly (no dust, fingerprints)
+    Ã¢â€“Â¡ Fill any holes or cracks with appropriate filler
+    Ã¢â€“Â¡ Sand smooth any rough spots
+    Ã¢â€“Â¡ Apply matte white projection paint (if needed)
+    Ã¢â€“Â¡ Allow 24 hours drying time
+    Ã¢â€“Â¡ Verify uniform reflectance with light meter
+    Ã¢â€“Â¡ Mark reference points for calibration
+    Ã¢â€“Â¡ Photograph surface from audience perspective
+    Ã¢â€“Â¡ Document surface dimensions and curvature
 ```
 
 ### Multi-Projector Alignment Procedure
 
 ```
 1. PHYSICAL ALIGNMENT
-    ├── Mount projectors securely
-    ├── Aim at center of respective surface areas
-    ├── Adjust lens shift for vertical alignment
-    ├── Verify overlap zones are sufficient
-    └── Check for keystone distortion
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Mount projectors securely
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Aim at center of respective surface areas
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Adjust lens shift for vertical alignment
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify overlap zones are sufficient
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Check for keystone distortion
 
 2. DIGITAL ALIGNMENT
-    ├── Project alignment grid
-    ├── Adjust keystone correction
-    ├── Fine-tune zoom and focus
-    ├── Verify pixel-level alignment
-    └── Document final positions
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Project alignment grid
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Adjust keystone correction
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Fine-tune zoom and focus
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify pixel-level alignment
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Document final positions
 
 3. COLOR MATCHING
-    ├── Warm up projectors 30 minutes
-    ├── Project white field
-    ├── Measure with colorimeter
-    ├── Adjust RGB gains to match
-    ├── Verify at blend boundaries
-    └── Generate correction LUT
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Warm up projectors 30 minutes
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Project white field
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Measure with colorimeter
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Adjust RGB gains to match
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify at blend boundaries
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Generate correction LUT
 
 4. EDGE BLENDING
-    ├── Identify overlap zones
-    ├── Set blend width (10%+ of resolution)
-    ├── Adjust blend gamma curves
-    ├── Verify smooth transition
-    ├── Check for banding artifacts
-    └── Fine-tune at multiple brightness levels
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Identify overlap zones
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Set blend width (10%+ of resolution)
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Adjust blend gamma curves
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify smooth transition
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check for banding artifacts
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Fine-tune at multiple brightness levels
 
 5. VERIFICATION
-    ├── Project test patterns
-    ├── Check color uniformity
-    ├── Verify blend smoothness
-    ├── Test with actual content
-    ├── Get designer approval
-    └── Document final settings
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Project test patterns
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Check color uniformity
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify blend smoothness
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Test with actual content
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Get designer approval
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Document final settings
 ```
 
 ### Content Resolution Recommendations
@@ -795,15 +795,183 @@ SURFACE PREPARATION CHECKLIST
 
 ```
 TRACKING CALIBRATION WORKFLOW
-    □ Position camera(s) for full stage view
-    □ Calibrate camera intrinsic parameters
-    □ Calibrate camera-projector homography
-    □ Place ArUco markers on tracking targets
-    □ Verify marker detection at all positions
-    □ Map camera coordinates to projection UV
-    □ Test tracking latency (< 50ms target)
-    □ Verify tracking across full stage area
-    □ Document camera positions and settings
-    □ Test with performers on stage
+    Ã¢â€“Â¡ Position camera(s) for full stage view
+    Ã¢â€“Â¡ Calibrate camera intrinsic parameters
+    Ã¢â€“Â¡ Calibrate camera-projector homography
+    Ã¢â€“Â¡ Place ArUco markers on tracking targets
+    Ã¢â€“Â¡ Verify marker detection at all positions
+    Ã¢â€“Â¡ Map camera coordinates to projection UV
+    Ã¢â€“Â¡ Test tracking latency (< 50ms target)
+    Ã¢â€“Â¡ Verify tracking across full stage area
+    Ã¢â€“Â¡ Document camera positions and settings
+    Ã¢â€“Â¡ Test with performers on stage
 ```
 ```
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

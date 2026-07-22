@@ -100,15 +100,15 @@ print(f"Auth: {spec.auth_type}")
 
 ## Best Practices
 
-- Design functions to be idempotent — serverless platforms may retry failed invocations
-- Minimize package size — include only required dependencies for faster cold starts
+- Design functions to be idempotent Ã¢â‚¬â€ serverless platforms may retry failed invocations
+- Minimize package size Ã¢â‚¬â€ include only required dependencies for faster cold starts
 - Use provisioned concurrency for latency-sensitive production workloads
 - Implement dead-letter queues for all async invocations to capture failures
-- Use environment variables for configuration — never hardcode in function code
+- Use environment variables for configuration Ã¢â‚¬â€ never hardcode in function code
 - Implement structured logging (JSON) for machine-parseable observability
-- Set appropriate memory allocation — more memory = more CPU = faster execution
+- Set appropriate memory allocation Ã¢â‚¬â€ more memory = more CPU = faster execution
 - Use API Gateway caching for frequently accessed, slow-to-generate responses
-- Design for eventual consistency — serverless databases often have read-after-write lag
+- Design for eventual consistency Ã¢â‚¬â€ serverless databases often have read-after-write lag
 - Implement circuit breakers for external service calls to prevent cascade failures
 
 ## Related Modules
@@ -210,72 +210,72 @@ environments:
 
 ```
 Serverless Architecture:
-├── API Layer
-│   ├── API Gateway (REST/HTTP)
-│   ├── AppSync (GraphQL)
-│   └── CloudFront (CDN)
-├── Compute Layer
-│   ├── Lambda (FaaS)
-│   ├── Step Functions (orchestration)
-│   └── Fargate (containers)
-├── Data Layer
-│   ├── DynamoDB (NoSQL)
-│   ├── Aurora Serverless (SQL)
-│   ├── S3 (objects)
-│   └── ElastiCache (cache)
-├── Event Layer
-│   ├── EventBridge (events)
-│   ├── SQS (queues)
-│   ├── SNS (notifications)
-│   └── Kinesis (streams)
-└── Integration
-    ├── Cognito (auth)
-    ├── AppSync (GraphQL)
-    └── Secrets Manager
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ API Layer
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ API Gateway (REST/HTTP)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AppSync (GraphQL)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ CloudFront (CDN)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Compute Layer
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Lambda (FaaS)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Step Functions (orchestration)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Fargate (containers)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data Layer
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ DynamoDB (NoSQL)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Aurora Serverless (SQL)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ S3 (objects)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ElastiCache (cache)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Event Layer
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ EventBridge (events)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SQS (queues)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SNS (notifications)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Kinesis (streams)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Integration
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Cognito (auth)
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AppSync (GraphQL)
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Secrets Manager
 ```
 
 ### Event-Driven Architecture
 
 ```
 Event Flow:
-├── Event Sources
-│   ├── API Gateway (HTTP)
-│   ├── S3 (object events)
-│   ├── DynamoDB (stream events)
-│   ├── SQS (message events)
-│   ├── IoT (device events)
-│   └── CloudWatch (scheduled)
-├── Event Processing
-│   ├── Lambda (processing)
-│   ├── Step Functions (workflow)
-│   └── EventBridge (routing)
-├── Event Targets
-│   ├── DynamoDB (state)
-│   ├── S3 (storage)
-│   ├── SNS (notification)
-│   └── External systems
-└── Event Patterns
-    ├── Content-based filtering
-    ├── Time-based scheduling
-    └── Fan-out distribution
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Event Sources
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ API Gateway (HTTP)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ S3 (object events)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ DynamoDB (stream events)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SQS (message events)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ IoT (device events)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ CloudWatch (scheduled)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Event Processing
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Lambda (processing)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Step Functions (workflow)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ EventBridge (routing)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Event Targets
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ DynamoDB (state)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ S3 (storage)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SNS (notification)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ External systems
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Event Patterns
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Content-based filtering
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Time-based scheduling
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Fan-out distribution
 ```
 
 ### Saga Pattern Architecture
 
 ```
 Saga Steps:
-├── Order Service
-│   ├── Create order
-│   ├── Reserve inventory
-│   └── Process payment
-├── Compensation
-│   ├── Payment failed → Release inventory
-│   ├── Inventory failed → Cancel order
-│   └── All failed → Notify customer
-└── Orchestration
-    ├── Step Functions (orchestration)
-    ├── Lambda (processing)
-    └── SQS (async communication)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Order Service
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Create order
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Reserve inventory
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Process payment
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Compensation
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Payment failed Ã¢â€ â€™ Release inventory
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Inventory failed Ã¢â€ â€™ Cancel order
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ All failed Ã¢â€ â€™ Notify customer
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Orchestration
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Step Functions (orchestration)
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Lambda (processing)
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ SQS (async communication)
 ```
 
 ## Integration Guide
@@ -353,12 +353,12 @@ events.put_entries(
 
 ```
 Memory-CPU Relationship (AWS Lambda):
-├── 128 MB — 0.08 vCPU
-├── 256 MB — 0.17 vCPU
-├── 512 MB — 0.33 vCPU
-├── 1024 MB — 0.58 vCPU
-├── 2048 MB — 1.0 vCPU
-└── 4096 MB — 2.0 vCPU
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 128 MB Ã¢â‚¬â€ 0.08 vCPU
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 256 MB Ã¢â‚¬â€ 0.17 vCPU
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 512 MB Ã¢â‚¬â€ 0.33 vCPU
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 1024 MB Ã¢â‚¬â€ 0.58 vCPU
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 2048 MB Ã¢â‚¬â€ 1.0 vCPU
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ 4096 MB Ã¢â‚¬â€ 2.0 vCPU
 
 Recommendation: Start at 256MB, increase if CPU-bound
 ```
@@ -367,12 +367,12 @@ Recommendation: Start at 256MB, increase if CPU-bound
 
 ```
 Cost Optimization Strategies:
-├── Right-size memory (price varies linearly)
-├── Use ARM64 (20% cheaper)
-├── Minimize execution time
-├── Use S3 Select instead of Lambda
-├── Use DynamoDB Accelerator (DAX) for caching
-└── Use API Gateway caching
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Right-size memory (price varies linearly)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Use ARM64 (20% cheaper)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Minimize execution time
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Use S3 Select instead of Lambda
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Use DynamoDB Accelerator (DAX) for caching
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Use API Gateway caching
 ```
 
 ## Security Considerations
@@ -535,23 +535,23 @@ APIGatewayEvent:
 
 ```
 1. Prerequisites
-   ├── AWS CLI configured
-   ├── Serverless Framework installed
-   ├── Node.js installed
-   └── IAM permissions
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AWS CLI configured
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Serverless Framework installed
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Node.js installed
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ IAM permissions
 
 2. Deployment Steps
-   ├── Install dependencies
-   ├── Package functions
-   ├── Deploy to AWS
-   ├── Verify deployment
-   └── Set up monitoring
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Install dependencies
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Package functions
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Deploy to AWS
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Verify deployment
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Set up monitoring
 
 3. Post-Deployment
-   ├── Test endpoints
-   ├── Configure alerts
-   ├── Set up logging
-   └── Document APIs
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Test endpoints
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Configure alerts
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Set up logging
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Document APIs
 ```
 
 ### CI/CD Pipeline
@@ -622,24 +622,24 @@ cloudwatch.put_dashboard(
 
 ```
 1. Unit Tests
-   ├── Handler logic
-   ├── Data transformations
-   └── Business logic
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Handler logic
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Data transformations
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Business logic
 
 2. Integration Tests
-   ├── Lambda + DynamoDB
-   ├── API Gateway + Lambda
-   └── Step Functions workflows
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Lambda + DynamoDB
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ API Gateway + Lambda
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Step Functions workflows
 
 3. Load Tests
-   ├── Artillery (load testing)
-   ├── AWS Load Testing Service
-   └── Locust (distributed)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Artillery (load testing)
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AWS Load Testing Service
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Locust (distributed)
 
 4. Contract Tests
-   ├── API schema validation
-   ├── Event schema validation
-   └── Service contracts
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ API schema validation
+   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Event schema validation
+   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Service contracts
 ```
 
 ## Versioning & Migration
@@ -648,19 +648,19 @@ cloudwatch.put_dashboard(
 
 ```
 Major: Architecture change
-├── Example: Monolith → Serverless
-├── Requires: Full testing, rollback plan
-└── Risk: High
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Monolith Ã¢â€ â€™ Serverless
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Full testing, rollback plan
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: High
 
 Minor: New functions/endpoints
-├── Example: Add new API endpoint
-├── Requires: API documentation
-└── Risk: Low
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Add new API endpoint
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: API documentation
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Low
 
 Patch: Bug fixes
-├── Example: Fix validation logic
-├── Requires: Basic testing
-└── Risk: Very low
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Example: Fix validation logic
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requires: Basic testing
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Risk: Very low
 ```
 
 ## Glossary
@@ -734,3 +734,171 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n

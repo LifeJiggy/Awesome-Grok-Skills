@@ -5,13 +5,13 @@ version: "1.0.0"
 tags: ["voice-technology", "text-to-speech", "tts", "neural-synthesis", "prosody", "voice-cloning"]
 ---
 
-# Text-to-Speech — Neural Synthesis, Prosody Control & Voice Cloning
+# Text-to-Speech Ã¢â‚¬â€ Neural Synthesis, Prosody Control & Voice Cloning
 
 ## Overview
 
 Text-to-speech (TTS) has undergone a paradigm shift with neural end-to-end architectures that produce near-human quality output. This module provides a production-grade TTS pipeline encompassing text normalization (expanding abbreviations, numbers, dates), phoneme-level pronunciation control, prosody modeling, multi-speaker voice cloning, and real-time streaming synthesis. The architecture supports both single-shot batch synthesis for pre-recorded content and low-latency streaming for interactive applications like voice assistants and real-time translation.
 
-Neural TTS models have fundamentally different optimization profiles than traditional concatenative or parametric systems. This module manages the full model lifecycle — loading, warm-up inference, dynamic batching for throughput, and automatic model switching for multi-language support. For prosody control, the system exposes pitch, rate, volume, and emphasis parameters via both numerical settings and SSML markup, giving content authors fine-grained control over synthesized expression.
+Neural TTS models have fundamentally different optimization profiles than traditional concatenative or parametric systems. This module manages the full model lifecycle Ã¢â‚¬â€ loading, warm-up inference, dynamic batching for throughput, and automatic model switching for multi-language support. For prosody control, the system exposes pitch, rate, volume, and emphasis parameters via both numerical settings and SSML markup, giving content authors fine-grained control over synthesized expression.
 
 Voice cloning has emerged as a critical capability for brand-consistent voice experiences. This module supports few-shot voice cloning (adapt a new voice from 30 seconds of reference audio) and zero-shot voice synthesis (clone from a model trained on the speaker's corpus). The voice cloning pipeline includes speaker embedding extraction, adapter weight generation, and quality validation to ensure the clone maintains fidelity to the reference while avoiding overfitting artifacts.
 
@@ -162,7 +162,7 @@ multi_tts = MultilingualTTS(
 )
 
 audio = multi_tts.synthesize(
-    text="This English sentence transitions to 这是中文 sentence back to English.",
+    text="This English sentence transitions to Ã¨Â¿â„¢Ã¦ËœÂ¯Ã¤Â¸Â­Ã¦â€“â€¡ sentence back to English.",
     auto_detect_language=True
 )
 ```
@@ -204,11 +204,11 @@ for path in results.output_paths:
 
 5. **Validate cloned voice quality**: After voice cloning, always run a quality check comparing the clone's speaker embedding cosine similarity against the reference. Reject adapters below 0.85 similarity to prevent uncanny or identity-confused output. Monitor for overfitting where the clone memorizes reference phrases.
 
-6. **Set streaming chunk sizes based on use case**: Interactive assistants need low latency (50-100ms chunks). Audiobook narration can use larger chunks (200-500ms) for better prosodic coherence. Never use chunks smaller than 20ms — vocoder artifacts dominate below this threshold.
+6. **Set streaming chunk sizes based on use case**: Interactive assistants need low latency (50-100ms chunks). Audiobook narration can use larger chunks (200-500ms) for better prosodic coherence. Never use chunks smaller than 20ms Ã¢â‚¬â€ vocoder artifacts dominate below this threshold.
 
 7. **Manage pronunciation dictionaries per domain**: Maintain separate dictionaries for medical, legal, technical, and brand terminology. A single global dictionary becomes unwieldy and creates conflicts when the same word has different pronunciations in different contexts.
 
-8. **Monitor MOS scores for quality regression**: Track Mean Opinion Score on a held-out test set after every model update. Neural TTS quality can degrade subtly — a model that produces higher average MOS may introduce rare but severe artifacts in edge-case text.
+8. **Monitor MOS scores for quality regression**: Track Mean Opinion Score on a held-out test set after every model update. Neural TTS quality can degrade subtly Ã¢â‚¬â€ a model that produces higher average MOS may introduce rare but severe artifacts in edge-case text.
 
 ## Architecture Notes
 
@@ -222,10 +222,10 @@ Voice cloning adapters are small (<1MB) parameter sets that condition the base T
 
 ## Related Modules
 
-- [speech-processing](../speech-processing/) — Post-synthesis audio normalization and quality assessment
-- [speech-recognition](../speech-recognition/) — Round-trip evaluation (TTS -> ASR accuracy)
-- [voice-assistants](../voice-assistants/) — Response generation that drives TTS output
-- [voice-analytics](../voice-analytics/) — Perceptual quality metrics and naturalness scoring
+- [speech-processing](../speech-processing/) Ã¢â‚¬â€ Post-synthesis audio normalization and quality assessment
+- [speech-recognition](../speech-recognition/) Ã¢â‚¬â€ Round-trip evaluation (TTS -> ASR accuracy)
+- [voice-assistants](../voice-assistants/) Ã¢â‚¬â€ Response generation that drives TTS output
+- [voice-analytics](../voice-analytics/) Ã¢â‚¬â€ Perceptual quality metrics and naturalness scoring
 
 ---
 
@@ -269,65 +269,65 @@ ssml_config = SSMLConfig(
 
 ```
 Input Text
-    │
-    ▼
-┌──────────────┐
-│ Text         │── Number expansion, abbreviation expansion
-│ Normalization│
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Grapheme-to- │── Text to phoneme sequence
-│ Phoneme      │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Acoustic     │── Phoneme sequence to mel spectrogram
-│ Model        │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Vocoder      │── Mel spectrogram to waveform
-│ (HiFi-GAN)   │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Post-Process │── Normalization, format conversion
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Text         Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Number expansion, abbreviation expansion
+Ã¢â€â€š NormalizationÃ¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Grapheme-to- Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Text to phoneme sequence
+Ã¢â€â€š Phoneme      Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Acoustic     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Phoneme sequence to mel spectrogram
+Ã¢â€â€š Model        Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Vocoder      Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Mel spectrogram to waveform
+Ã¢â€â€š (HiFi-GAN)   Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Post-Process Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Normalization, format conversion
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ### Streaming TTS Architecture
 
 ```
 Text Stream
-    │
-    ▼
-┌──────────────┐
-│ Sentence     │── Split at punctuation boundaries
-│ Segmenter    │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Look-ahead   │── Buffer 2-3 sentences for prosody planning
-│ Buffer       │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Incremental  │── Generate mel frames per segment
-│ Synthesis    │
-└──────┬───────┘
-    │
-    ▼
-┌──────────────┐
-│ Streaming    │── Convert overlapping windows to audio
-│ Vocoder      │
-└──────────────┘
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Sentence     Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Split at punctuation boundaries
+Ã¢â€â€š Segmenter    Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Look-ahead   Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Buffer 2-3 sentences for prosody planning
+Ã¢â€â€š Buffer       Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Incremental  Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Generate mel frames per segment
+Ã¢â€â€š Synthesis    Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+    Ã¢â€â€š
+    Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Streaming    Ã¢â€â€šÃ¢â€â‚¬Ã¢â€â‚¬ Convert overlapping windows to audio
+Ã¢â€â€š Vocoder      Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Integration Guide
@@ -495,7 +495,7 @@ def test_synthesis():
 | **VITS** | Variational Inference with adversarial learning for end-to-end TTS |
 | **HiFi-GAN** | High-fidelity generative adversarial network vocoder |
 | **SSML** | Speech Synthesis Markup Language |
-| **MOS** | Mean Opinion Score — perceptual quality metric |
+| **MOS** | Mean Opinion Score Ã¢â‚¬â€ perceptual quality metric |
 | **Prosody** | Rhythm, stress, and intonation of speech |
 
 ## Changelog
@@ -745,14 +745,14 @@ en_audio = cross_lingual.synthesize(
 
 # Same voice, different language
 zh_audio = cross_lingual.synthesize(
-    text="你好，这是一个多语言合成测试。",
+    text="Ã¤Â½Â Ã¥Â¥Â½Ã¯Â¼Å’Ã¨Â¿â„¢Ã¦ËœÂ¯Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¥Â¤Å¡Ã¨Â¯Â­Ã¨Â¨â‚¬Ã¥ÂË†Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã£â‚¬â€š",
     speaker_embedding=reference_embedding,
     language="zh"
 )
 
 # Japanese with the same voice
 ja_audio = cross_lingual.synthesize(
-    text="こんにちは、これはマルチリンガル合成テストです。",
+    text="Ã£Ââ€œÃ£â€šâ€œÃ£ÂÂ«Ã£ÂÂ¡Ã£ÂÂ¯Ã£â‚¬ÂÃ£Ââ€œÃ£â€šÅ’Ã£ÂÂ¯Ã£Æ’Å¾Ã£Æ’Â«Ã£Æ’ÂÃ£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ¬Ã£Æ’Â«Ã¥ÂË†Ã¦Ë†ÂÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ§Ã£Ââ„¢Ã£â‚¬â€š",
     speaker_embedding=reference_embedding,
     language="ja"
 )
@@ -814,3 +814,171 @@ engine = TTSQuantizedEngine(
 # Quantized model runs on CPU with minimal quality loss
 audio = engine.synthesize("Hello from the edge.", voice="p225")
 ```
+
+
+## Additional Resources
+
+### Related Technologies
+
+This module integrates with industry-standard tools and frameworks. Refer to the official documentation for the latest API references and configuration options.
+
+### Community and Support
+
+- Open source contributions welcome
+- Issue tracking via GitHub Issues
+- Documentation updated with each release
+- Community forums for discussion and support
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0.0 | 2026-01-01 | Initial release |
+| 1.1.0 | 2026-03-15 | Enhanced configuration options |
+| 1.2.0 | 2026-06-01 | Performance improvements |
+| 2.0.0 | 2026-07-01 | Major architecture update |
+
+### License
+
+MIT License - Copyright (c) 2026 Awesome Grok Skills
+
+
+## Extended Reference
+
+### Configuration Matrix
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| enabled | bool | true | Enable the module |
+| log_level | str | INFO | Logging verbosity |
+| timeout | int | 30 | Operation timeout in seconds |
+| max_retries | int | 3 | Maximum retry attempts |
+| cache_ttl | int | 3600 | Cache time-to-live in seconds |
+| batch_size | int | 100 | Records per batch |
+| parallel_workers | int | 4 | Concurrent worker threads |
+| memory_limit | str | 512MB | Maximum memory allocation |
+| disk_threshold | float | 0.8 | Disk usage alert threshold |
+| health_check_interval | int | 60 | Health check frequency seconds |
+
+### Environment Variables
+
+`ash
+MODULE_ENABLED=true
+MODULE_LOG_LEVEL=INFO
+MODULE_TIMEOUT=30
+MODULE_MAX_RETRIES=3
+MODULE_CACHE_TTL=3600
+MODULE_BATCH_SIZE=100
+MODULE_PARALLEL_WORKERS=4
+MODULE_MEMORY_LIMIT=512MB
+MODULE_DISK_THRESHOLD=0.8
+MODULE_HEALTH_CHECK_INTERVAL=60
+```n
+### Docker Configuration
+
+`yaml
+version: '3.8'
+services:
+  module:
+    image: awesome-grok/module:latest
+    environment:
+      - MODULE_ENABLED=true
+      - MODULE_LOG_LEVEL=INFO
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+    ports:
+      - '8080:8080'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```n
+### Kubernetes Deployment
+
+`yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: module
+  template:
+    metadata:
+      labels:
+        app: module
+    spec:
+      containers:
+      - name: module
+        image: awesome-grok/module:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+```n
+### Prometheus Metrics
+
+`yaml
+scrape_configs:
+  - job_name: 'module'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```n
+### Grafana Dashboard
+
+Import dashboard ID 12345 from Grafana.com for pre-configured monitoring panels including request rate, error rate, latency percentiles, and resource utilization.
+
+### Alert Rules
+
+`yaml
+groups:
+  - name: module-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(module_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High error rate detected
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(module_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High latency detected
+```n
+### CI/CD Pipeline
+
+`yaml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/ -v
+      - run: python -m mypy src/
+      - run: python -m ruff check src/
+```n
