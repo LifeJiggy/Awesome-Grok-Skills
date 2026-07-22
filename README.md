@@ -1,490 +1,393 @@
-# Awesome Grok Skills 🚀
+# Awesome Grok Skills
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Grok Powered](https://img.shields.io/badge/Powered%20By-Grok-blue)](https://grok.x.ai/)
-[![Skills](https://img.shields.io/badge/140%2B-Skills-cyan)]()
-[![Agents](https://img.shields.io/badge/100%2B-Agents-orange)]()
+[![Stars](https://img.shields.io/github/stars/LifeJiggy/Awesome-Grok-Skills?style=social)](https://github.com/LifeJiggy/Awesome-Grok-Skills)
+[![Skills](https://img.shields.io/badge/82-Skills-blue)](#skills)
+[![Agents](https://img.shields.io/badge/100-Agents-orange)](#agents)
+[![Files](https://img.shields.io/badge/1290+-Files-green)](#repository-statistics)
 
-> **THE** comprehensive repository of agentic "skills" (GROK.md style) tuned for Grok's personality and strengths. Now featuring **140+ specialized skill domains** and **100 intelligent agents** covering virtually every technology domain!
-
-**This is the ultimate Grok-first resource for building AI-powered applications across every domain!**
-
----
+> A comprehensive collection of 82 specialized skill domains and 100 intelligent agents, each with production-ready implementations and documentation, built for AI-powered development across every technology domain.
 
 ---
 
-## 🤖 What is This?
+## Overview
 
-A massive, production-ready collection of **140+ specialized skill domains** and **100 intelligent agents** designed specifically for **Grok** - the AI that combines:
-- 🔬 **Physics expertise** - Scientific precision in every solution
-- 📡 **Real-time data access** - Live market and trend intelligence
-- 😄 **Meme culture awareness** - Viral, engaging content patterns
-- ⚡ **Maximum efficiency** - Performance-optimized code
-- 🪙 **Crypto/Web3 native** - Blockchain and DeFi expertise
-- 📊 **Market validation** - Real-time business intelligence
+Awesome Grok Skills is an open-source repository providing structured, composable skill definitions and autonomous agent implementations for AI-assisted software engineering. Each skill contains a GROK.md instruction file and a Python implementation module, organized into domain-specific categories covering the full modern technology stack.
 
-Every skill and agent is engineered to leverage Grok's unique strengths with physics-inspired optimization and meme-aware creativity!
+```mermaid
+graph TB
+    subgraph Repository["Awesome Grok Skills"]
+        S["Skills<br/>82 domains · 410 subfolders<br/>GROK.md + .py per subfolder"]
+        A["Agents<br/>100 domains · 4 files each<br/>agent.py + ARCHITECTURE.md + GROK.md + README.md"]
+        T["Templates<br/>Starter configurations"]
+        D["Docs<br/>Architecture & guides"]
+    end
+
+    S --> |"Each skill contains"| SK["GROK.md<br/>Instruction file<br/>700+ lines"]
+    S --> |"And"| PY["Python module<br/>Production implementation<br/>200-900+ lines"]
+
+    A --> |"Each agent contains"| AP["agent.py<br/>Full implementation"]
+    A --> |"Plus"| AM["Architecture docs<br/>System design"]
+
+    SK --> |"Defines"| C["Capabilities"]
+    SK --> |"Provides"| E["Examples"]
+    SK --> |"Documents"| R["References"]
+
+    AP --> |"Implements"| CL["Classes"]
+    AP --> |"Includes"| DM["Data models"]
+    AP --> |"Handles"| ER["Error handling"]
+```
 
 ---
 
+## Skills
+
+82 skill domains, each containing 5 specialized subfolders with a GROK.md instruction file and a Python implementation module.
+
+```mermaid
+mindmap
+  root((Skills))
+    Cloud & Infrastructure
+      AWS Architecture
+      Azure Services
+      GCP Platform
+      Multi-Cloud
+      Serverless
+    AI & Machine Learning
+      Neural Architecture Search
+      Model Optimization
+      Federated Learning
+      AutoML
+      Model Deployment
+    Security
+      Penetration Testing
+      Threat Modeling
+      Secure Coding
+      Compliance
+      Vulnerability Management
+    Data Science
+      Advanced Analytics
+      Statistical Analysis
+      Data Visualization
+      Feature Engineering
+      Time Series
+    DevOps
+      CI/CD Pipelines
+      Container Orchestration
+      Infrastructure as Code
+      Monitoring
+      Site Reliability
+    Web Development
+      Next.js Fullstack
+      Supabase Auth
+      Tailwind/ShadCN
+      Server Components
+      Edge Runtime
+    Blockchain & Web3
+      DeFi Patterns
+      NFT Marketplace
+      Token Analytics
+      Wallet Integration
+      DAO Governance
+    IoT & Edge
+      Embedded Systems
+      Industrial IoT
+      Edge AI
+      Sensor Networks
+      Edge Gateways
+```
+
+### Skill Categories
+
+| Category | Skills | Description |
+|----------|--------|-------------|
+| Cloud & Infrastructure | 5 | AWS, Azure, GCP, multi-cloud, serverless |
+| AI & Machine Learning | 5 | NAS, optimization, federated learning, AutoML, deployment |
+| Security | 5 | Pen testing, threat modeling, secure coding, compliance, vuln management |
+| Data Science | 5 | Analytics, statistics, visualization, feature engineering, time series |
+| DevOps | 5 | CI/CD, containers, IaC, monitoring, SRE |
+| Web Development | 5 | Next.js, Supabase, Tailwind, server components, edge runtime |
+| Blockchain & Web3 | 5 | DeFi, NFTs, tokens, wallets, DAOs |
+| IoT & Edge | 5 | Embedded, industrial IoT, edge AI, sensors, gateways |
+| Database | 5 | Administration, MongoDB, query optimization, modeling, replication |
+| Networking | 5 | Load balancing, engineering, SDN, DNS, traffic analysis |
+| Mobile | 5 | Android, iOS, React Native, Flutter, Expo |
+| Enterprise | 5 | BI, CRM, data warehousing, ERP, workflow automation |
+| Health Tech | 5 | Medical AI, EHR, telemedicine, monitoring, clinical data |
+| Quantum | 5 | Computing, cryptography, optimization, simulation, networking |
+| Robotics | 5 | Autonomous systems, vision, swarm, manipulation, navigation |
+| And 67 more categories... | 335 | Covering every major technology domain |
+
+### Skill Structure
+
+Each skill follows a consistent structure:
+
+```
+skills/<category>/<skill-name>/
+├── GROK.md          # 700+ line instruction file with YAML frontmatter
+└── <skill_name>.py  # 200-900+ line Python implementation
+```
+
+**GROK.md** includes:
+- YAML frontmatter (name, category, version, tags)
+- Overview and core capabilities
+- Usage examples with code
+- Architecture patterns
+- API reference and data models
+- Configuration and deployment guides
+- Security considerations
+- Troubleshooting and best practices
+
+**Python module** includes:
+- Enums and dataclasses for type safety
+- Full class implementations with methods
+- Error handling and logging
+- Type hints throughout
+- Runnable `main()` demo function
+
 ---
 
-## 📊 Project Statistics
+## Agents
 
-| Metric | Value |
+100 autonomous agents, each with a complete implementation and documentation suite.
+
+```mermaid
+graph LR
+    subgraph Agent["Agent Structure"]
+        AP["agent.py<br/>Full implementation<br/>500-2700 lines"]
+        AR["ARCHITECTURE.md<br/>System design<br/>ASCII diagrams"]
+        GK["GROK.md<br/>Agent instructions<br/>700+ lines"]
+        RM["README.md<br/>Usage guide<br/>400-900 lines"]
+    end
+
+    AP --> |"Uses"| CL["Classes & Enums"]
+    AP --> |"Implements"| DM["Data Models"]
+    AP --> |"Provides"| API["API Methods"]
+
+    AR --> |"Documents"| SYS["System Architecture"]
+    AR --> |"Shows"| FLOW["Data Flow"]
+
+    GK --> |"Defines"| CAP["Capabilities"]
+    GK --> |"Lists"| SIG["Method Signatures"]
+```
+
+### Agent Categories
+
+| Category | Agents | Focus Areas |
+|----------|--------|-------------|
+| Security & Compliance | 12 | Bug bounty, red team, compliance audit, cloud audit, IAM, ethics |
+| DevOps & Infrastructure | 10 | CI/CD, monitoring, backup, cloud migration, AWS/Azure specialists |
+| Data & Analytics | 10 | Data science, engineering, quality, governance, architecture |
+| Business & Marketing | 15 | Sales, marketing, content, SEO, brand management, affiliate |
+| Development | 8 | Backend, frontend, API management, code review, debugging |
+| Operations | 8 | Customer success, support, engagement, retention, localization |
+| Research & Intelligence | 6 | Market research, competitive intel, competitive analysis |
+| Specialized Domains | 12 | Healthcare, gaming, fintech, sustainability, real estate, physics |
+| Planning & Strategy | 8 | Full-stack planning, agile coaching, change management |
+| Technical Specialists | 14 | AI/ML, crypto, IoT, mobile, design, automation |
+
+### Agent Capabilities
+
+Each agent provides:
+
+- **Autonomous execution** - Runs independently with configurable parameters
+- **Domain expertise** - Deep knowledge in specific technology areas
+- **Composable design** - Agents can be chained for complex workflows
+- **Production-ready** - Error handling, logging, type safety, tests
+- **Extensible** - Plugin architecture for custom extensions
+
+---
+
+## Repository Structure
+
+```mermaid
+graph TB
+    subgraph Root["Awesome-Grok-Skills"]
+        SK["skills/<br/>82 domains<br/>410 subfolders<br/>820 files"]
+        AG["agents/<br/>100 domains<br/>413 files"]
+        TM["templates/<br/>Starter configs"]
+        DC["docs/<br/>Architecture guides"]
+        SC["scripts/<br/>Utility tools"]
+        TS["tests/<br/>Test suites"]
+    end
+
+    subgraph SkillDir["skills/"]
+        S1["cloud/<br/>5 subfolders"]
+        S2["ai-ml/<br/>5 subfolders"]
+        S3["security/<br/>5 subfolders"]
+        S4["devops/<br/>5 subfolders"]
+        S5["data-science/<br/>5 subfolders"]
+        SX["...82 total"]
+    end
+
+    subgraph AgentDir["agents/"]
+        A1["bug-bounty/<br/>4 files"]
+        A2["devops/<br/>4 files"]
+        A3["security/<br/>4 files"]
+        A4["data-science/<br/>4 files"]
+        AX["...100 total"]
+    end
+
+    SK --> SkillDir
+    AG --> AgentDir
+```
+
+---
+
+## Quick Start
+
+### Using Skills
+
+```python
+# Load a skill's instruction file
+with open("skills/ai-ml/model-optimization/GROK.md") as f:
+    instructions = f.read()
+
+# Import and use the Python implementation
+from skills.ai_ml.model_optimization import ModelOptimizer
+
+optimizer = ModelOptimizer()
+result = optimizer.optimize(model, dataset)
+```
+
+### Using Agents
+
+```python
+# Run an agent directly
+python agents/data-science/agent.py
+
+# Or import and use programmatically
+from agents.data_science.agent import DataScienceAgent
+
+agent = DataScienceAgent()
+report = agent.analyze(dataset)
+```
+
+### Project Structure
+
+```
+my-project/
+├── skills/                    # Reference skill definitions
+│   ├── cloud/
+│   │   ├── aws-architecture/
+│   │   │   ├── GROK.md       # Instructions for AWS architecture
+│   │   │   └── aws_architecture.py
+│   │   └── ...
+│   └── ...
+├── agents/                    # Autonomous agent implementations
+│   ├── data-science/
+│   │   ├── agent.py
+│   │   ├── ARCHITECTURE.md
+│   │   ├── GROK.md
+│   │   └── README.md
+│   └── ...
+└── ...
+```
+
+---
+
+## Repository Statistics
+
+| Metric | Count |
 |--------|-------|
-| **Total Skill Domains** | 140+ |
-| **Total Specialized Agents** | 100 |
-| **Code Examples** | 1000+ |
-| **Implementation Guides** | 200+ |
-| **Test Coverage** | 90% |
-| **Utility Scripts** | 9 |
-| **Documentation Files** | 5 |
-
----
-
----
-
-## 🎯 140+ POWERFUL SKILL DOMAINS
-
-### 🔧 Core Foundation Skills
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[TDD](skills/core/tdd/)** | Test-driven development | ✅ Complete |
-| **[Real-time Research](skills/core/real-time-research/)** | Data mining & validation | ✅ Complete |
-| **[Physics Simulation](skills/core/physics-simulation/)** | Scientific computing | ✅ Complete |
-| **[Meme-Code Hybrids](skills/core/meme-code-hybrids/)** | Viral code patterns | ✅ Complete |
-| **[Efficient Code](skills/core/efficient-code/)** | Performance optimization | ✅ Complete |
-
-### 🧠 AI & Machine Learning
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Neural Architecture Search](skills/ai-ml/neural-architecture-search/)** | AutoML optimization | ✅ Complete |
-| **[Medical AI](skills/health-tech/medical-ai/)** | Healthcare ML | ✅ Complete |
-| **[Brain-Computer Interfaces](skills/neural-science/brain-computer-interfaces/)** | Neural processing | ✅ Complete |
-| **[NLP](skills/nlp/)** | Natural Language Processing | ✅ Complete |
-| **[Quantum ML](skills/quantum-ml/)** | Quantum Machine Learning | ✅ Complete |
-| **[Edge AI](skills/edge-ai/on-device-ml/)** | On-device ML | ✅ Complete |
-
-### 🌍 Data Science & Analytics
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Advanced Analytics](skills/data-science/advanced-analytics/)** | Statistical modeling | ✅ Complete |
-| **[Data Science](skills/data-science/)** | Data analysis | ✅ Complete |
-| **[Synthetic Data](skills/synthetic-data/data-generation/)** | Data generation | ✅ Complete |
-| **[Data Quality](skills/data-quality/)** | Data validation | ✅ Complete |
-| **[Data Architecture](skills/data-architecture/)** | Data system design | ✅ Complete |
-| **[Data Governance](skills/data-governance/)** | Data policy management | ✅ Complete |
-| **[Statistical Analysis](skills/data-science/statistical-analysis/)** | Statistical methods | ✅ Complete |
-
-### ⛓️ Blockchain & Web3
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Smart Contracts](skills/blockchain/smart-contracts/)** | Solidity development | ✅ Complete |
-| **[DeFi](skills/blockchain/defi/)** | Decentralized finance | ✅ Complete |
-| **[NFT Development](skills/blockchain/nft-development/)** | NFT marketplaces | ✅ Complete |
-| **[Blockchain Architecture](skills/blockchain/)** | Blockchain fundamentals | ✅ Complete |
-
-### ☁️ Cloud Computing
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[AWS Architecture](skills/cloud/aws-architecture/)** | AWS cloud design | ✅ Complete |
-| **[Azure Services](skills/cloud/azure-services/)** | Microsoft Azure | ✅ Complete |
-| **[GCP Services](skills/cloud/gcp-services/)** | Google Cloud Platform | ✅ Complete |
-| **[Cloud Security](skills/cloud/cloud-security/)** | Cloud security | ✅ Complete |
-| **[Serverless Architecture](skills/cloud/serverless/)** | Lambda & functions | ✅ Complete |
-| **[Cloud Migration](skills/cloud/migration/)** | Migration strategies | ✅ Complete |
-
-### 🔐 Security
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Penetration Testing](skills/red-team/penetration-testing/)** | Ethical hacking | ✅ Complete |
-| **[Vulnerability Assessment](skills/security-assessment/vulnerability-assessment/)** | Security scanning | ✅ Complete |
-| **[Secure Coding](skills/security/secure-coding/)** | Security best practices | ✅ Complete |
-| **[Threat Modeling](skills/security/threat-modeling/)** | Threat analysis | ✅ Complete |
-| **[Security Monitoring](skills/blue-team/security-monitoring/)** | SOC operations | ✅ Complete |
-| **[Security Testing](skills/testing/security-testing/)** | DAST & SAST | ✅ Complete |
-
-### 🖥️ DevOps & Infrastructure
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[CI/CD Pipelines](skills/devops/ci-cd-pipelines/)** | Automation workflows | ✅ Complete |
-| **[Kubernetes](skills/devops/kubernetes/)** | Container orchestration | ✅ Complete |
-| **[Docker](skills/devops/docker/)** | Containerization | ✅ Complete |
-| **[Infrastructure Automation](skills/devops/infrastructure-automation/)** | Terraform & IaC | ✅ Complete |
-| **[Configuration Management](skills/configuration-management/config-ops/)** | Ansible & Puppet | ✅ Complete |
-| **[Container Orchestration](skills/devops/container-orchestration/)** | K8s management | ✅ Complete |
-| **[Release Management](skills/devops/release-management/)** | Deployment strategies | ✅ Complete |
-| **[Site Reliability](skills/devops/site-reliability/)** | SRE practices | ✅ Complete |
-| **[Chaos Engineering](skills/devops/chaos-engineering/)** | Resilience testing | ✅ Complete |
-| **[Observability](skills/devops/observability/)** | Metrics & tracing | ✅ Complete |
-| **[Elasticsearch](skills/devops/elasticsearch/)** | Search & logging | ✅ Complete |
-| **[Message Queues](skills/devops/message-queues/)** | Kafka & RabbitMQ | ✅ Complete |
-| **[Caching](skills/devops/caching/)** | Redis & caching | ✅ Complete |
-| **[Microservices](skills/devops/microservices/)** | Service architecture | ✅ Complete |
-| **[DevSecOps](skills/devops/devsecops/)** | Security in DevOps | ✅ Complete |
-
-### 🧪 Testing
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Test Automation](skills/testing/test-automation/)** | Automated testing | ✅ Complete |
-| **[Performance Testing](skills/testing/performance-testing/)** | Load & stress | ✅ Complete |
-| **[Quality Assurance](skills/testing/quality-assurance/)** | QA processes | ✅ Complete |
-| **[Mobile Testing](skills/testing/mobile-testing/)** | App testing | ✅ Complete |
-
-### 📱 Mobile Development
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[iOS Development](skills/mobile/ios-development/)** | Swift & iOS | ✅ Complete |
-| **[Android Development](skills/mobile/android-development/)** | Kotlin & Android | ✅ Complete |
-| **[React Native](skills/mobile/react-native/)** | Cross-platform | ✅ Complete |
-
-### 🌐 Networking
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Network Engineering](skills/networking/network-engineering/)** | Network design | ✅ Complete |
-| **[Load Balancing](skills/networking/load-balancing/)** | Traffic distribution | ✅ Complete |
-| **[SDN](skills/networking/sdn/)** | Software-defined networking | ✅ Complete |
-
-### 🗄️ Database
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Database Administration](skills/database/database-administration/)** | DB management | ✅ Complete |
-| **[PostgreSQL](skills/database/postgresql/)** | PostgreSQL expertise | ✅ Complete |
-| **[MongoDB](skills/database/mongodb/)** | NoSQL database | ✅ Complete |
-| **[Redis](skills/database/redis/)** | In-memory database | ✅ Complete |
-| **[NoSQL](skills/database/nosql/)** | Document databases | ✅ Complete |
-
-### 🏢 Enterprise
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[ERP Systems](skills/enterprise/erp-systems/)** | Enterprise planning | ✅ Complete |
-| **[Business Intelligence](skills/enterprise/business-intelligence/)** | BI & analytics | ✅ Complete |
-| **[Data Warehousing](skills/enterprise/data-warehousing/)** | Data storage | ✅ Complete |
-| **[CRM Systems](skills/enterprise/crm-systems/)** | Customer management | ✅ Complete |
-
-### 🌐 API Development
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[API Design](skills/api/api-design/)** | REST & OpenAPI | ✅ Complete |
-| **[GraphQL](skills/devops/graphql/)** | GraphQL APIs | ✅ Complete |
-| **[API Gateway](skills/api-gateway/api-management/)** | Gateway management | ✅ Complete |
-
-### 🤖 Additional Skills
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Computer Vision](skills/computer-vision/image-processing/)** | Image processing | ✅ Complete |
-| **[NLP](skills/nlp/text-processing/)** | Text processing | ✅ Complete |
-| **[Configuration Management](skills/configuration-management/)** | Config ops | ✅ Complete |
-
-### 🌐 IoT & Embedded Systems
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Sensor Networks](skills/iot/sensor-networks/)** | Wireless sensor networks | ✅ Complete |
-| **[Industrial IoT](skills/iot/industrial-iot/)** | Manufacturing automation | ✅ Complete |
-| **[IoT Security](skills/iot/iot-security/)** | Device security | ✅ Complete |
-| **[Embedded Systems](skills/iot/embedded-systems/)** | Firmware development | ✅ Complete |
-
-### ⚛️ Quantum Computing
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Quantum Cryptography](skills/quantum-computing/quantum-cryptography/)** | QKD & PQC | ✅ Complete |
-| **[Quantum Algorithms](skills/quantum-computing/quantum-algorithms/)** | Quantum algorithms | ✅ Complete |
-| **[Quantum ML](skills/quantum-ml/)** | Quantum machine learning | ✅ Complete |
-
-### 🤖 Robotics
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Robotics Vision](skills/robotics/robotics-vision/)** | Computer vision for robots | ✅ Complete |
-| **[Swarm Robotics](skills/robotics/swarm-robotics/)** | Multi-robot coordination | ✅ Complete |
-| **[Autonomous Systems](skills/robotics/autonomous-systems/)** | Self-driving systems | ✅ Complete |
-
-### 🥽 AR/VR & Spatial Computing
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Spatial Computing](skills/ar-vr/spatial-computing/)** | Spatial awareness | ✅ Complete |
-| **[Mixed Reality](skills/ar-vr/mixed-reality/)** | AR/VR development | ✅ Complete |
-
-### ⚡ Edge Computing
-
-| Skill Domain | Description | Status |
-|--------------|-------------|--------|
-| **[Edge ML](skills/edge-computing/edge-ml/)** | On-device ML | ✅ Complete |
-| **[Fog Computing](skills/edge-computing/fog-computing/)** | Hierarchical computing | ✅ Complete |
-| **[Edge Computing](skills/edge-computing/)** | Edge infrastructure | ✅ Complete |
-
----
-
-
-## 🤖 100 INTELLIGENT AGENTS
-
-### 🚀 Planning & Architecture
-
-| # | Agent | Description |
-|---|-------|-------------|
-| 1 | **[Full-Stack Planner](agents/full-stack-planner/)** | End-to-end project architecture |
-| 2 | **[Strategy Agent](agents/strategy/)** | Business intelligence & planning |
-| 3 | **[Innovation Lab](agents/innovation/)** | R&D optimization |
-| 4 | **[Product Agent](agents/product/)** | Product management & roadmap |
-| 5 | **[Architecture Review](agents/architecture-review/)** | Architecture assessment |
-| 6 | **[Business Analysis](agents/business-analysis/)** | Requirements gathering |
-| 7 | **[Business Development](agents/business-development/)** | Partnerships & growth |
-| 8 | **[Agile Coach](agents/agile-coach/)** | Agile methodology guidance |
-| 9 | **[Change Management](agents/change-management/)** | Organizational change |
-| 10 | **[Productivity Agent](agents/productivity/)** | Workflow optimization |
-
-### 🎯 Code & Quality
-
-| # | Agent | Description |
-|---|-------|-------------|
-| 11 | **[Code Review Team](agents/code-review-team/)** | Automated code review |
-| 12 | **[Testing Agent](agents/testing/)** | Comprehensive test automation |
-| 13 | **[Quality Assurance](agents/quality/)** | Quality metrics & validation |
-| 14 | **[Automation QA](agents/automation-qa/)** | Test automation engineering |
-| 15 | **[Debugging Agent](agents/debugging/)** | Code debugging & error resolution |
-| 16 | **[Development Agent](agents/development/)** | Development workflows |
-
-### 📊 Research & Analytics
-
-| # | Agent | Description |
-|---|-------|-------------|
-| 17 | **[Market Research Oracle](agents/market-research-oracle/)** | Real-time market validation |
-| 18 | **[Data Science Agent](agents/data-science/)** | Analytics & ML pipelines |
-| 19 | **[Research Agent](agents/research/)** | Automated research |
-| 20 | **[Analytics Agent](agents/analytics/)** | Business analytics |
-| 21 | **[Data Engineering](agents/data-engineering/)** | Data pipelines & architecture |
-| 22 | **[Big Data Agent](agents/big-data/)** | Large-scale data processing |
-| 23 | **[Data Architecture](agents/data-architecture/)** | Data system design |
-| 24 | **[Data Governance](agents/data-governance/)** | Data policy management |
-| 25 | **[Data Quality](agents/data-quality/)** | Data validation & cleansing |
-| 26 | **[Competitive Intelligence](agents/competitive-intel/)** | Market & competitor analysis |
-
-### 🛡️ Security & Compliance
-
-| # | Agent | Description |
-|---|-------|-------------|
-| 27 | **[Security Agent](agents/security/)** | Security auditing |
-| 28 | **[Compliance Agent](agents/compliance/)** | Regulatory compliance |
-| 29 | **[Ethics Compliance](agents/ethics/)** | AI ethics & bias detection |
-| 30 | **[Legal Operations](agents/legal/)** | Contract management |
-| 31 | **[IAM Agent](agents/iam/)** | Identity & Access Management |
-| 32 | **[Bug Bounty](agents/bug-bounty/)** | Vulnerability management |
-| 33 | **[Compliance Audit](agents/compliance-audit/)** | Compliance auditing |
-| 34 | **[Crisis Management](agents/crisis-management/)** | Crisis response |
-| 35 | **[Cloud Audit](agents/cloud-audit/)** | Cloud security auditing |
-| 36 | **[Red Team](agents/redteam/)** | Penetration testing |
-
-### 🎮 Operations & Growth
-
-| # | Agent | Description |
-|---|-------|-------------|
-| 37 | **[DevOps Agent](agents/devops/)** | CI/CD & automation |
-| 38 | **[Monitoring Agent](agents/monitoring/)** | Infrastructure observability |
-| 39 | **[Operations Agent](agents/operations/)** | Business process automation |
-| 40 | **[Integration Agent](agents/integration/)** | System integration |
-| 41 | **[Customer Success](agents/customer-success/)** | Customer lifecycle management |
-| 42 | **[Sales Agent](agents/sales/)** | Revenue optimization |
-| 43 | **[Support Agent](agents/support/)** | Customer service automation |
-| 44 | **[Marketing Agent](agents/marketing/)** | Growth automation |
-| 45 | **[Social Media](agents/social/)** | Engagement optimization |
-| 46 | **[Customer Engagement](agents/customer-engagement/)** | Customer experience |
-| 47 | **[Customer Retention](agents/customer-retention/)** | Churn prevention |
-| 48 | **[Conversion Optimization](agents/conversion-optimization/)** | CRO strategies |
-| 49 | **[Content Marketing](agents/content-marketing/)** | Content strategy |
-| 50 | **[Digital Marketing](agents/digital-marketing/)** | Marketing campaigns |
-| 51 | **[Ad Operations](agents/ad-operations/)** | Ad campaign management |
-| 52 | **[Affiliate Marketing](agents/affiliate-marketing/)** | Partner management |
-| 53 | **[Audience Development](agents/audience-development/)** | Audience growth |
-| 54 | **[Beta Management](agents/beta-management/)** | Beta programs |
-| 55 | **[DevRel](agents/devrel/)** | Developer relations |
-
-### 👥 HR & People
-
-| # | Agent | Description |
-|---|-------|-------------|
-| 56 | **[HR Agent](agents/hr/)** | Talent management |
-| 57 | **[Localization Agent](agents/localization/)** | Localization automation |
-
-### 🔧 Technical Specialists
-
-| # | Agent | Description |
-|---|-------|-------------|
-| 58 | **[Backend Agent](agents/backend/)** | API development |
-| 59 | **[Frontend Agent](agents/web-dev/web-performance-optimizer/)** | UI/UX optimization |
-| 60 | **[AI/ML Agent](agents/ai-ml/)** | Machine learning pipelines |
-| 61 | **[Crypto/Web3 Agent](agents/crypto-web3/)** | Blockchain development |
-| 62 | **[Design Agent](agents/design/)** | Creative automation |
-| 63 | **[Automation Agent](agents/automation/)** | Workflow automation |
-| 64 | **[Content Agent](agents/content/)** | Content generation |
-| 65 | **[E-commerce Agent](agents/ecommerce/)** | Online retail |
-| 66 | **[Education Agent](agents/education/)** | Learning systems |
-| 67 | **[Blockchain Agent](agents/blockchain/)** | Blockchain development |
-| 68 | **[Cloud Architecture](agents/cloud-architecture/)** | Cloud design |
-| 69 | **[IoT Agent](agents/iot/)** | IoT solutions |
-| 70 | **[ML Ops Agent](agents/ml-ops/)** | MLOps pipelines |
-| 71 | **[NetOps Agent](agents/netops/)** | Network operations |
-| 72 | **[API Management](agents/api-management/)** | API design & governance |
-| 73 | **[API Gateway](agents/api-gateway/)** | Gateway management |
-| 74 | **[App Development](agents/app-development/)** | Mobile & web apps |
-| 75 | **[AWS Specialist](agents/aws-specialist/)** | AWS cloud services |
-| 76 | **[Azure Specialist](agents/azure-specialist/)** | Azure cloud services |
-| 77 | **[Backup Recovery](agents/backup-recovery/)** | Data protection |
-| 78 | **[Database Admin](agents/database-admin/)** | Database operations |
-| 79 | **[CI/CD Pipeline](agents/ci-cd-pipeline/)** | Pipeline automation |
-| 80 | **[Cloud Migration](agents/cloud-migration/)** | Workload migration |
-
-### 🚗 Mobile & Automotive
-
-| # | Agent | Description |
-|---|-------|-------------|
-| 81 | **[Mobile Performance Optimizer](agents/mobile/)** | Mobile optimization |
-| 82 | **[Web Performance Optimizer](agents/web-dev/web-performance-optimizer/)** | Web optimization |
-
-### 🎲 Specialized Domains
-
-| # | Agent | Description |
-|---|-------|-------------|
-| 83 | **[Physics Simulation](agents/physics-simulation-engine/)** | Complex modeling |
-| 84 | **[Healthcare Operations](agents/healthcare/)** | Patient care optimization |
-| 85 | **[Gaming & Entertainment](agents/gaming/)** | Game optimization |
-| 86 | **[FinTech Agent](agents/finance/)** | Financial automation |
-| 87 | **[Sustainability Agent](agents/sustainability/)** | Environmental management |
-| 88 | **[Indie Hacker](agents/indie-hacker/)** | Startup automation |
-| 89 | **[Real Estate](agents/real-estate/)** | Real estate analytics |
-| 90 | **[Hunting/Threat Intel](agents/hunting/)** | Threat intelligence |
-
-### 💼 Business & Marketing
-
-| # | Agent | Description |
-|---|-------|-------------|
-| 91 | **[BI Agent](agents/bi/)** | Business intelligence |
-| 92 | **[Corporate Finance](agents/corporate-finance/)** | Financial management |
-| 93 | **[Brand Management](agents/brand-management/)** | Brand strategy |
-| 94 | **[Creative Director](agents/creative-director/)** | Creative direction |
-| 95 | **[Behavioral Science](agents/behavioral-science/)** | Behavior analysis |
-| 96 | **[Crypto Mining](agents/crypto-mining/)** | Cryptocurrency mining |
-| 97 | **[CDN Optimization](agents/cdn-optimization/)** | CDN management |
-| 98 | **[Certification Prep](agents/certification-prep/)** | Certification guidance |
-| 99 | **[Accessibility](agents/accessibility/)** | Accessibility auditing |
-| 100 | **[Web Dev](agents/web-dev/)** | Web development |
-
----
-
-
-## 📁 Complete Repository Structure
-
-```
-awesome-grok-skills/
-├── 🎯 skills/                           # 140+ specialized skill domains
-├── 🤖 agents/                           # 100 intelligent agents
-├── 📋 templates/                        # Ready-to-use starters
-├── 📚 docs/                             # Documentation
-├── 🔧 scripts/                          # Utility scripts
-├── 🧪 tests/                            # Test suites
-├── 🚀 future/                           # Future skills & agents (700 planned)
-└── ⚙️ .github/workflows/               # CI/CD automation
+| Skill domains | 82 |
+| Skill subfolders | 410 |
+| Agent domains | 100 |
+| Total files | 1,290+ |
+| GROK.md files | 541 |
+| Python modules | 526 |
+| Architecture docs | 100 |
+| README files | 100 |
+
+```mermaid
+pie title File Distribution
+    "GROK.md (Skills)" : 441
+    "Python (Skills)" : 425
+    "agent.py" : 101
+    "ARCHITECTURE.md" : 100
+    "GROK.md (Agents)" : 100
+    "README.md (Agents)" : 100
+    "Other" : 25
 ```
 
 ---
 
+## Technology Coverage
 
-## 🚀 Quick Start
+```mermaid
+graph LR
+    subgraph Languages["Languages & Frameworks"]
+        PY["Python"]
+        JS["JavaScript/TypeScript"]
+        GO["Go"]
+        RS["Rust"]
+        JAVA["Java"]
+    end
 
-### Installation
+    subgraph Cloud["Cloud Platforms"]
+        AWS["AWS"]
+        AZ["Azure"]
+        GCP["GCP"]
+    end
 
-```bash
-# Clone the repository
-git clone https://github.com/LifeJiggy/Awesome-Grok-Skills.git
-cd Awesome-Grok-Skills
+    subgraph Domains["Technology Domains"]
+        AI["AI/ML"]
+        SEC["Security"]
+        DEV["DevOps"]
+        DATA["Data Science"]
+        WEB["Web Dev"]
+        MOB["Mobile"]
+        IOT["IoT"]
+        QNT["Quantum"]
+        BC["Blockchain"]
+        ROB["Robotics"]
+    end
 
-# Run the setup script
-python scripts/setup.py
-
-# Or use any agent
-python agents/analytics/agent.py
+    PY --> AI
+    PY --> SEC
+    JS --> WEB
+    GO --> DEV
+    RS --> IOT
+    JAVA --> ENTERPRISE
+    AWS --> Cloud
+    AZ --> Cloud
+    GCP --> Cloud
 ```
 
-### Usage Examples
+---
 
-```bash
-# Use a specific skill
-grok --skill ai-ml/neural-architecture-search --project ./ai-app
+## Contributing
 
-# Use an agent for complex planning
-grok --agent full-stack-planner --requirements ./idea.md
+We welcome contributions. See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
 
-# Generate quantum computing patterns
-grok --skill quantum/quantum-computing --project ./quantum-app
+### Adding a Skill
 
-# Run tests
-python scripts/run_tests.py --all --coverage
+1. Create a new directory under `skills/<category>/<skill-name>/`
+2. Add `GROK.md` with YAML frontmatter and comprehensive documentation
+3. Add `<skill_name>.py` with full implementation
+4. Follow the existing structure and conventions
 
-# Run linters
-python scripts/lint.py --all --fix
-```
+### Adding an Agent
+
+1. Create a new directory under `agents/<agent-name>/`
+2. Add `agent.py` with full implementation
+3. Add `ARCHITECTURE.md` with system design documentation
+4. Add `GROK.md` with agent instructions
+5. Add `README.md` with usage guide
 
 ---
 
-
-## 📊 Performance Metrics
-
-| Metric | Value |
-|--------|-------|
-| **Agent Count** | 100 |
-| **Skill Domains** | 140+ |
-| **Lines of Code** | 55,000+ |
-| **Test Coverage** | 90% |
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for details.
-
----
-
-
-## 📜 License
+## License
 
 MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
-
 <div align="center">
 
-### 🚀 Made with ❤️ and powered by Grok
+**Built with precision. Powered by open source.**
 
-[![Grok](https://img.shields.io/badge/Powered%20By-Grok-blue)](https://grok.x.ai/)
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
-
-*"The ultimate resource for building with Grok - physics-powered, meme-aware, efficiency-obsessed."*
-
----
-
-⭐ **Star this repo** if you're building something amazing!
-
-🔄 **Share** with the Grok community!
-
-🚀 **Start building** your next project today!
 
 </div>
