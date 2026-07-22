@@ -185,3 +185,550 @@ for alert in alerts:
 - **container-orchestration**: Kubernetes monitoring
 - **site-reliability**: SRE metrics and practices
 - **database-admin**: Database monitoring
+
+---
+
+## Advanced Configuration
+
+### Custom Metric Definitions
+
+```python
+from monitoring import MetricDefinition, LabelConfig
+
+MetricDefinition(
+    name="http_request_duration_seconds",
+    type="histogram",
+    help="HTTP request latency",
+    label_names=["method", "status", "path"],
+    buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 5.0],
+)
+```
+
+### Alert Rule Configuration
+
+```python
+from monitoring import AlertRule, Severity, Duration
+
+rule = AlertRule(
+    name="high_error_rate",
+    condition="rate(http_errors_total[5m]) / rate(http_requests_total[5m]) > 0.05",
+    severity=Severity.CRITICAL,
+    for_duration=Duration(minutes=5),
+    labels={"team": "backend"},
+    annotations={"summary": "Error rate above 5%"},
+    runbook_url="https://wiki/runbooks/high-error-rate",
+)
+```
+
+## Architecture Patterns
+
+### Three Pillars of Observability
+
+```
+Metrics (Prometheus)     Logs (Loki/ELK)      Traces (Jaeger/Tempo)
+    │                        │                       │
+    └────────────┬───────────┘───────────────────────┘
+                 │
+        Unified Dashboard (Grafana)
+```
+
+### Metric Types
+
+```
+Counter   → Monotonically increasing (requests, errors)
+Gauge     → Can go up/down (connections, temperature)
+Histogram → Distribution of values (latency, size)
+Summary    → Pre-computed quantiles (p50, p95, p99)
+```
+
+## Integration Guide
+
+### Grafana Dashboard
+
+```python
+from monitoring import GrafanaDashboard
+
+dashboard = GrafanaDashboard(title="API Service")
+dashboard.add_panel("Request Rate", 'rate(http_requests_total[5m])')
+dashboard.add_panel("Error Rate", 'rate(http_errors_total[5m])')
+dashboard.add_panel("Latency P99", 'histogram_quantile(0.99, http_request_duration_seconds_bucket)')
+dashboard.upload("grafana-url", api_key="xxx")
+```
+
+### PagerDuty Integration
+
+```python
+from monitoring import PagerDutyIntegration
+
+pd = PagerDutyIntegration(routing_key="your-routing-key")
+pd.create_incident(title="High Error Rate", severity="critical", details={"error_rate": 0.08})
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| Metric cardinality control | Prevents Prometheus OOM |
+| Log sampling | Reduces log volume 90% |
+| Trace sampling | 1-10% for cost control |
+| Dashboard lazy loading | Faster UI rendering |
+| Alert grouping | Reduces notification noise |
+
+## Security Considerations
+
+- **Metric endpoint auth**: Protect /metrics with authentication
+- **Log redaction**: Remove PII from logs before shipping
+- **Trace data sensitivity**: Scrub business data from spans
+- **Alert routing encryption**: TLS for notification channels
+- **Dashboard access control**: RBAC for Grafana dashboards
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Prometheus OOM | High cardinality labels | Reduce label combinations |
+| Logs not appearing | Shipper misconfigured | Check agent configuration |
+| Traces incomplete | Missing context propagation | Add trace headers middleware |
+| Alert not firing | Wrong PromQL syntax | Test query in Prometheus UI |
+| Dashboard slow | Too many panels | Reduce time range or panel count |
+
+## API Reference
+
+### MetricsCollector
+
+```python
+class MetricsCollector:
+    def __init__(self, backend: str)
+    def counter(self, name: str, value: float = 1, labels: dict = None) -> None
+    def gauge(self, name: str, value: float, labels: dict = None) -> None
+    def histogram(self, name: str, value: float, labels: dict = None) -> None
+    def query(self, promql: str) -> QueryResult
+```
+
+### Tracer
+
+```python
+class Tracer:
+    def __init__(self, service_name: str)
+    def start_span(self, name: str, kind: SpanKind = None) -> Span
+    def get_trace(self) -> Trace
+    def inject_context(self, carrier: dict) -> dict
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+from enum import Enum
+
+class Severity(Enum):
+    INFO = "info"
+    WARNING = "warning"
+    CRITICAL = "critical"
+
+@dataclass
+class Alert:
+    name: str
+    severity: Severity
+    message: str
+    fired_at: float
+    resolved_at: float = None
+
+@dataclass
+class TraceSpan:
+    name: str
+    start_time: float
+    end_time: float
+    attributes: dict
+    parent_id: str = None
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+pip install monitoring
+# With Prometheus backend
+pip install monitoring[prometheus]
+```
+
+### Stack Setup
+
+```bash
+# Prometheus
+docker run -d -p 9090:9090 prom/prometheus
+
+# Grafana
+docker run -d -p 3000:3000 grafana/grafana
+
+# Loki
+docker run -d -p 3100:3100 grafana/loki
+```
+
+## Monitoring & Observability
+
+```python
+from monitoring import MetricsCollector
+
+collector = MetricsCollector(backend="prometheus")
+collector.counter("monitoring.health_check", 1)
+collector.gauge("monitoring.active_alerts", count)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from monitoring import MetricsCollector
+
+def test_counter_increment():
+    collector = MetricsCollector(backend="memory")
+    collector.counter("test.counter")
+    collector.counter("test.counter")
+    assert collector.get_value("test.counter") == 2
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 1.0.0 | Initial release | N/A |
+| 1.1.0 | Added OpenTelemetry | Configure OTLP exporter |
+| 2.0.0 | New alert engine | Migrate alert rules |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **SLI** | Service Level Indicator — metric measuring service behavior |
+| **SLO** | Service Level Objective — target for SLI |
+| **PromQL** | Prometheus Query Language |
+| **Span** | Unit of work in distributed tracing |
+| **Cardinality** | Number of unique label combinations |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with Prometheus/StatsD
+- Log aggregation with Elasticsearch/Loki
+- OpenTelemetry distributed tracing
+- Multi-channel alerting
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/monitoring.git
+pip install -e ".[dev]"
+pytest tests/
+```
+
+## Advanced Observability Patterns
+
+### OpenTelemetry Integration
+
+```python
+from monitoring import OpenTelemetryExporter
+
+exporter = OpenTelemetryExporter(
+    endpoint="http://otel-collector:4317",
+    service_name="api-gateway",
+    resource_attributes={
+        "deployment.environment": "production",
+        "service.version": "2.1.0",
+    },
+    trace_sample_rate=0.1,
+    metric_export_interval_ms=30000,
+)
+
+# Auto-instrument FastAPI
+exporter.instrument_fastapi(app)
+
+# Custom span creation
+with exporter.start_span("process_payment") as span:
+    span.set_attribute("payment.amount", 99.99)
+    span.set_attribute("payment.currency", "USD")
+    payment = payment_service.charge(amount=99.99)
+    span.set_attribute("payment.id", payment.id)
+```
+
+### SLO-Driven Alerting
+
+```python
+from monitoring import SLOBasedAlerting
+
+slo_alerting = SLOBasedAlerting(
+    slo_targets=[
+        {"name": "api_availability", "target": 99.9, "window_days": 30},
+        {"name": "api_latency", "target": 99.5, "window_days": 30, "metric": "latency_p99_ms", "threshold": 500},
+    ],
+    burn_rate_thresholds=[
+        {"window": "1h", "threshold": 14.4, "severity": "critical"},
+        {"window": "6h", "threshold": 6.0, "severity": "warning"},
+        {"window": "1d", "threshold": 3.0, "severity": "info"},
+    ],
+    notification_channels=["slack-sre", "pagerduty-oncall"],
+)
+
+# Check SLO status
+status = slo_alerting.check()
+for slo in status:
+    print(f"  {slo.name}: {slo.error_budget_remaining_pct:.1f}% remaining")
+    print(f"    Burn rate (1h): {slo.burn_rate_1h:.2f}x")
+    print(f"    Status: {slo.status}")
+```
+
+### Log Analysis Pipeline
+
+```python
+from monitoring import LogAnalysisPipeline
+
+pipeline = LogAnalysisPipeline(
+    source="loki",
+    rules=[
+        {"name": "error_pattern", "query": '{level="ERROR"} | json', "alert": True},
+        {"name": "slow_requests", "query": '{duration_ms > 5000}', "alert": True},
+        {"name": "auth_failures", "query": '{message=~".*authentication.*failed.*"}', "alert": True},
+    ],
+    enrichment=[
+        {"field": "service", "lookup": {"api": "API Gateway", "db": "Database"}},
+        {"field": "severity", "map": {"ERROR": "critical", "WARN": "warning"}},
+    ],
+)
+
+# Run analysis
+results = pipeline.analyze(time_range="1h")
+print(f"Total matches: {results.total}")
+for rule in results.rule_results:
+    print(f"  {rule.name}: {rule.match_count} matches")
+```
+
+### Anomaly Detection
+
+```python
+from monitoring import AnomalyDetector
+
+detector = AnomalyDetector(
+    algorithm="prophet",
+    sensitivity=0.95,
+    seasonality="daily",
+)
+
+# Train baseline
+baseline = detector.train(
+    metric="http_requests_total",
+    lookback_days=30,
+    resolution="5m",
+)
+
+# Detect anomalies
+anomalies = detector.detect(
+    metric="http_requests_total",
+    time_range="1h",
+)
+for anomaly in anomalies:
+    print(f"  [{anomaly.severity}] {anomaly.timestamp}")
+    print(f"    Expected: {anomaly.expected:.0f}")
+    print(f"    Actual: {anomaly.actual:.0f}")
+    print(f"    Deviation: {anomaly.deviation:.2f} std dev")
+```
+
+### Distributed Tracing Visualization
+
+```
+Trace: abc123def456
+Duration: 245.3ms
+Spans: 8
+
+[245ms] api-gateway (SERVER)
+  ├─[245ms] auth-middleware (INTERNAL)
+  │   └─[45ms] jwt-validation (INTERNAL)
+  ├─[180ms] route-handler (INTERNAL)
+  │   ├─[120ms] database-query (CLIENT)
+  │   │   └─[115ms] postgres-execute (DB)
+  │   └─[50ms] cache-get (CLIENT)
+  │       └─[2ms] redis-get (DB)
+  └─[5ms] response-serialization (INTERNAL)
+```
+
+### Metrics Cardinality Management
+
+```python
+from monitoring import CardinalityManager
+
+manager = CardinalityManager(
+    max_cardinality=10000,
+    tracking_window_hours=24,
+)
+
+# Monitor label cardinality
+cardinality = manager.check("http_requests_total")
+print(f"Current cardinality: {cardinality.current}")
+print(f"Max allowed: {cardinality.max_allowed}")
+print(f"Top labels by cardinality:")
+for label in cardinality.top_labels:
+    print(f"  {label.name}: {label.cardinality}")
+
+# Auto-drop high-cardinality labels
+manager.auto_drop(
+    metric="http_requests_total",
+    threshold=5000,
+    protected_labels=["method", "status"],
+)
+```
+
+### Alert Fatigue Reduction
+
+```python
+from monitoring import AlertManagerV2
+
+manager = AlertManagerV2(
+    grouping_rules=[
+        {"match": {"service": "api-gateway"}, "group_wait_s": 30, "group_interval_s": 300},
+        {"match": {"severity": "critical"}, "group_wait_s": 10, "group_interval_s": 60},
+    ],
+    inhibition_rules=[
+        {"source": {"severity": "critical"}, "target": {"severity": "warning"}, "equal": ["service"]},
+    ],
+    silencing_rules=[
+        {"match": {"maintenance_window": "true"}, "duration_s": 3600},
+    ],
+)
+
+# Get alert fatigue metrics
+fatigue = manager.get_fatigue_metrics(window_days=7)
+print(f"Total alerts: {fatigue.total_alerts}")
+print(f"Actions taken: {fatigue.actions_taken}")
+print(f"Noise ratio: {fatigue.noise_ratio:.2%}")
+print(f"Mean time to acknowledge: {fatigue.mtta_minutes:.1f}min")
+```
+
+### Prometheus Recording Rules
+
+```python
+from monitoring import RecordingRules
+
+rules = RecordingRules(group="api_service")
+
+rules.add(
+    name="api_request_rate",
+    expression="sum(rate(http_requests_total[5m])) by (method, status)",
+    interval="30s",
+)
+
+rules.add(
+    name="api_error_rate",
+    expression="sum(rate(http_errors_total[5m])) / sum(rate(http_requests_total[5m]))",
+    interval="30s",
+)
+
+rules.add(
+    name="api_latency_p99",
+    expression="histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+    interval="30s",
+)
+
+# Export rules
+rules.export("recording_rules.yml")
+```
+
+### Grafana Dashboard Templates
+
+```python
+from monitoring import DashboardTemplate
+
+template = DashboardTemplate(
+    title="API Service Overview",
+    templating=[
+        {"name": "datasource", "type": "datasource", "query": "prometheus"},
+        {"name": "service", "type": "query", "query": "label_values(http_requests_total, service)"},
+    ],
+    panels=[
+        {"title": "Request Rate", "type": "graph", "query": 'sum(rate(http_requests_total{service="$service"}[5m]))'},
+        {"title": "Error Rate", "type": "graph", "query": 'sum(rate(http_errors_total{service="$service"}[5m]))'},
+        {"title": "Latency P99", "type": "graph", "query": 'histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service="$service"}[5m])) by (le))'},
+        {"title": "Active Connections", "type": "stat", "query": 'active_connections{service="$service"}'},
+    ],
+)
+
+# Export to Grafana
+template.export grafana_url="http://grafana:3000", api_key="xxx")
+```
+
+### Log Retention Policy
+
+```python
+from monitoring import LogRetentionPolicy
+
+policy = LogRetentionPolicy(
+    rules=[
+        {"level": "ERROR", "retention_days": 90, "index": True},
+        {"level": "WARN", "retention_days": 30, "index": True},
+        {"level": "INFO", "retention_days": 14, "index": False},
+        {"level": "DEBUG", "retention_days": 7, "index": False},
+    ],
+    storage_tiers=[
+        {"tier": "hot", "days": 7, "storage": "ssd"},
+        {"tier": "warm", "days": 30, "storage": "hdd"},
+        {"tier": "cold", "days": 90, "storage": "s3"},
+    ],
+)
+
+# Apply policy
+policy.apply()
+print(f"Logs archived: {policy.archived_count}")
+print(f"Storage saved: {policy.storage_saved_gb:.1f}GB")
+```
+
+### Log Retention Policy
+
+```python
+from monitoring import LogRetentionPolicy
+
+policy = LogRetentionPolicy(
+    rules=[
+        {"level": "ERROR", "retention_days": 90, "index": True},
+        {"level": "WARN", "retention_days": 30, "index": True},
+        {"level": "INFO", "retention_days": 14, "index": False},
+        {"level": "DEBUG", "retention_days": 7, "index": False},
+    ],
+    storage_tiers=[
+        {"tier": "hot", "days": 7, "storage": "ssd"},
+        {"tier": "warm", "days": 30, "storage": "hdd"},
+        {"tier": "cold", "days": 90, "storage": "s3"},
+    ],
+)
+
+# Apply policy
+policy.apply()
+print(f"Logs archived: {policy.archived_count}")
+print(f"Storage saved: {policy.storage_saved_gb:.1f}GB")
+```
+
+### Observability Cost Optimization
+
+| Strategy | Savings | Implementation |
+|----------|---------|----------------|
+| Metric downsampling | 60-80% | Aggregate older metrics |
+| Log level filtering | 70-90% | Drop DEBUG in production |
+| Trace sampling | 80-95% | Head-based sampling |
+| Dashboard optimization | 20-30% | Reduce panel queries |
+| Alert deduplication | 40-60% | Group related alerts |
+| Retention tiering | 50-70% | Cold storage for old data |
+
+### Monitoring Stack Sizing Guide
+
+| Component | Small (<10 services) | Medium (10-100) | Large (100+) |
+|-----------|---------------------|-----------------|--------------|
+| Prometheus | 2 CPU, 4GB RAM | 8 CPU, 32GB RAM | 16 CPU, 64GB RAM |
+| Grafana | 1 CPU, 2GB RAM | 2 CPU, 4GB RAM | 4 CPU, 8GB RAM |
+| Loki | 2 CPU, 4GB RAM | 8 CPU, 16GB RAM | 16 CPU, 32GB RAM |
+| Tempo | 1 CPU, 2GB RAM | 4 CPU, 8GB RAM | 8 CPU, 16GB RAM |
+| Alertmanager | 1 CPU, 1GB RAM | 2 CPU, 2GB RAM | 4 CPU, 4GB RAM |
+| OTel Collector | 1 CPU, 1GB RAM | 4 CPU, 4GB RAM | 8 CPU, 8GB RAM |
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills

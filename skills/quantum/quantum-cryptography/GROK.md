@@ -248,3 +248,634 @@ print(f"Excess noise: {session.excess_noise:.4f}")
 - arXiv:2003.06557 - Advances in quantum key distribution.
 - arXiv:2109.07425 - Practical challenges in quantum cryptography.
 - arXiv:2201.10763 - Device-independent quantum key distribution.
+
+---
+
+## Advanced QKD Protocols
+
+### Measurement-Device-Independent QKD
+
+MDI-QKD eliminates all detector side-channel attacks by having both Alice and Bob send quantum states to an untrusted Charlie for Bell state measurement.
+
+```python
+from quantum_crypto import MDIQKDProtocol, QuantumChannel
+
+# Configure MDI-QKD with two quantum channels
+alice_channel = QuantumChannel(
+    loss=0.1,
+    noise=0.02,
+    detector_efficiency=0.7,
+    dark_count_rate=1e-6
+)
+
+bob_channel = QuantumChannel(
+    loss=0.12,
+    noise=0.025,
+    detector_efficiency=0.65,
+    dark_count_rate=1e-6
+)
+
+mdiqkd = MDIQKDProtocol(
+    key_length=256,
+    security_parameter=100,
+    decoy_intensities=[0.1, 0.5, 1.0],
+    basis_choices=["rectilinear", "diagonal"]
+)
+
+session = mdiqkd.run(
+    alice_channel=alice_channel,
+    bob_channel=bob_channel,
+    charlie_efficiency=0.85,
+    charlie_dark_count=1e-7,
+    num_pulses=200000,
+    coincidence_window_ns=1.0
+)
+
+print(f"Secure key length: {session.secure_key_length} bits")
+print(f"QBER: {session.qber:.4f}")
+print(f"Key rate: {session.key_rate:.4f} bits/pulse")
+print(f"Finite-key security parameter: {session.security_parameter}")
+```
+
+### Twin-Field QKD
+
+Twin-field QKD overcomes the rate-distance limit of conventional QKD by using single-photon interference at a central node.
+
+```python
+from quantum_crypto import TwinFieldQKD, PhaseLocking
+
+# Configure twin-field QKD
+tf_qkd = TwinFieldQKD(
+    key_length=256,
+    security_parameter=128,
+    phase_tracking=True,
+    phase_noise_rate=0.01,
+    dead_time_ns=50
+)
+
+phase_lock = PhaseLocking(
+    method="active_feedback",
+    bandwidth_mhz=100,
+    lock_precision_rad=0.01
+)
+
+session = tf_qkd.run(
+    distance_km=500,
+    fiber_loss_db_per_km=0.2,
+    detector_efficiency=0.9,
+    dark_count_rate=100,  # Hz
+    pulse_rate_ghz=1.0,
+    num_pulses=1e9,
+    phase_lock=phase_lock
+)
+
+print(f"Secret key rate: {session.key_rate:.2f} bits/s")
+print(f"Maximum distance: {session.max_distance_km} km")
+print(f"Channel transmittance: {session.transmittance:.6f}")
+print(f"Phase drift compensated: {session.phase_compensated}")
+```
+
+### Continuous-Variable MDI-QKD
+
+```python
+from quantum_crypto import CVMDIQKD, GaussianModulation
+
+cv_mdi = CVMDIQKD(
+    reconciliation_method="multilevel",
+    security_proof="composite",
+    excess_noise_threshold=0.05
+)
+
+modulation = GaussianModulation(
+    variance=4.0,
+    modulation_bandwidth_mhz=100,
+    clipping_level=10.0
+)
+
+session = cv_mdi.run(
+    channel_transmittance=0.1,
+    excess_noise=0.01,
+    electronic_noise=0.01,
+    symbol_rate_mhz=100,
+    num_symbols=1e8,
+    modulation=modulation
+)
+
+print(f"Key rate: {session.key_rate:.2f} bits/symbol")
+print(f"Reconciliation efficiency: {session.reconciliation_efficiency:.4f}")
+print(f"Secret fraction: {session.secret_fraction:.4f}")
+```
+
+## Advanced Attack Analysis
+
+### Coherent Attack Simulation
+
+```python
+from quantum_crypto import CoherentAttack, BB84Protocol
+
+# Simulate the most general (coherent) quantum attack
+attack = CoherentAttack(
+    type="collective",
+    eavesdropper_memory_size=1000,
+    optimization_rounds=100
+)
+
+bb84 = BB84Protocol(key_length=256)
+
+# Run protocol under coherent attack
+session = bb84.run_with_attack(
+    attack=attack,
+    num_pulses=100000,
+    channel_loss=0.1,
+    detector_efficiency=0.7
+)
+
+print(f"QBER under attack: {session.qber:.4f}")
+print(f"Key rate under attack: {session.key_rate:.4f}")
+print(f"Security parameter achieved: {session.security_parameter}")
+print(f"Eve's information bound: {session.eve_information:.4f} bits")
+```
+
+### Photon-Number-Splitting Attack
+
+```python
+from quantum_crypto import PNSAttack, WCPSource
+
+# Simulate photon-number-splitting attack on weak coherent pulses
+source = WCPSource(
+    mean_photon_number=0.5,
+    multiphoton_probability=0.22,
+    dark_count_rate=1e-6
+)
+
+pns_attack = PNSAttack(
+    splitting_strategy="optimal",
+    photon_number_limit=5,
+    eavesdropper_efficiency=0.95
+)
+
+# Analyze vulnerability
+vulnerability = pns_attack.analyze(
+    source=source,
+    channel_loss=0.1,
+    detection_efficiency=0.7
+)
+
+print(f"PNS vulnerability: {vulnerability.is_vulnerable}")
+print(f"Optimal mean photon number: {vulnerability.optimal_mu:.4f}")
+print(f"Secure key rate with decoy: {vulnerability.decoy_key_rate:.4f}")
+print(f"Secure key rate without decoy: {vulnerability.no_decoy_key_rate:.4f}")
+```
+
+### Side-Channel Attack Detection
+
+```python
+from quantum_crypto import SideChannelDetector, AnomalyAnalyzer
+
+detector = SideChannelDetector(
+    timing_tolerance_ns=0.1,
+    intensity_tolerance=0.01,
+    wavelength_tolerance_nm=0.1
+)
+
+# Monitor for detector blinding attacks
+blinding_test = detector.test_blinding(
+    detector_response_func=lambda x: x,
+    control_light_intensity=0.5,
+    bright_light_intensity=1000.0,
+    num_samples=10000
+)
+
+print(f"Detector blinding possible: {blinding_test.is_vulnerable}")
+print(f"Bright light threshold: {blinding_test.threshold:.4f}")
+print(f"Countermeasure recommended: {blinding_test.countermeasure}")
+
+# Analyze timing side channels
+timing_analysis = detector.analyze_timing(
+    gate_width_ns=1.0,
+    jitter_ns=0.3,
+    afterpulse_probability=0.01
+)
+
+print(f"Timing vulnerability: {timing_analysis.is_vulnerable}")
+print(f"Information leakage rate: {timing_analysis.leakage_rate:.6f} bits/ns")
+```
+
+## Finite-Key Security Analysis
+
+### Finite-Key Effects on Key Rate
+
+```python
+from quantum_crypto import FiniteKeyAnalysis, SecurityParameter
+
+# Analyze finite-key effects for different block sizes
+analyzer = FiniteKeyAnalysis(
+    security_parameter=128,
+    qber=0.03,
+    channel_loss=0.1,
+    detector_efficiency=0.7
+)
+
+block_sizes = [1000, 10000, 100000, 1000000]
+for n in block_sizes:
+    result = analyzer.compute_key_rate(block_size=n)
+    print(f"Block size {n:>10}: key rate = {result.key_rate:.4f} bits/pulse")
+    print(f"  Statistical fluctuation: {result.statistical_fluctuation:.6f}")
+    print(f"  Privacy amplification cost: {result.privacy_cost:.4f}")
+    print(f"  Composable security: {result.security_parameter}")
+```
+
+### Parameter Estimation Under Finite Keys
+
+```python
+from quantum_crypto import ParameterEstimator, ConfidenceInterval
+
+# Estimate QBER with confidence intervals
+estimator = ParameterEstimator(
+    confidence_level=0.99,
+    method="chernoff_bound"
+)
+
+# Simulate measurement outcomes
+outcomes = estimator.simulate_measurements(
+    true_qber=0.03,
+    num_samples=10000,
+    seed=42
+)
+
+estimate = estimator.estimate_qber(outcomes)
+ci = estimator.confidence_interval(outcomes)
+
+print(f"Estimated QBER: {estimate:.6f}")
+print(f"True QBER: 0.030000")
+print(f"99% CI: [{ci.lower:.6f}, {ci.upper:.6f}]")
+print(f"CI width: {ci.width:.6f}")
+print(f"Estimation overhead: {estimator.overhead_factor:.4f}")
+```
+
+## Information Reconciliation
+
+### Cascade Protocol Implementation
+
+```python
+from quantum_crypto import CascadeReconciliation, ErrorCorrection
+
+# Configure Cascade protocol for efficient error correction
+cascade = CascadeReconciliation(
+    initial_block_size=128,
+    max_rounds=20,
+    target_error_rate=0.01,
+    verification_method="polynomial_hash"
+)
+
+# Reconcile a raw key
+raw_key = bytes(256)  # 2048-bit raw key
+reconciliation = cascade.reconcile(
+    raw_key=raw_key,
+    estimated_qber=0.03,
+    privacy_amplification_seed=None
+)
+
+print(f"Raw key length: {len(raw_key) * 8} bits")
+print(f"Reconciled key length: {len(reconciliation.reconciled_key) * 8} bits")
+print(f"Error rate after reconciliation: {reconciliation.residual_error_rate:.10f}")
+print(f"Information leaked: {reconciliation.leaked_bits} bits")
+print(f"Number of passes: {reconciliation.num_passes}")
+print(f"Efficiency: {reconciliation.efficiency:.4f}")
+```
+
+### LDPC-Based Reconciliation
+
+```python
+from quantum_crypto import LDPCReconciliation, LDPCCode
+
+# Use LDPC codes for high-efficiency reconciliation
+ldpc_code = LDPCCode(
+    block_length=65536,
+    rate=0.8,
+    design_snr_db=0.5,
+    max_iterations=50
+)
+
+reconciliation = LDPCReconciliation(
+    code=ldpc_code,
+    syndrome_bits=13107,
+    verification_bits=256
+)
+
+result = reconciliation.reconcile(
+    raw_key=raw_key,
+    qber=0.03
+)
+
+print(f"Code rate: {ldpc_code.rate:.2f}")
+print(f"Reconciliation efficiency: {result.efficiency:.4f}")
+print(f"Syndrome communication: {result.syndrome_bits} bits")
+print(f"Verification passed: {result.verified}")
+```
+
+## Privacy Amplification Details
+
+### Universal Hash Function Families
+
+```python
+from quantum_crypto import UniversalHashFamily, ToeplitzHash, PolynomialHash
+
+# Compare different universal hash families
+toeplitz = ToeplitzHash(seed_length=1024)
+polynomial = PolynomialHash(field_size=2**64, degree=10)
+
+key = bytes.fromhex("a1b2c3d4e5f67890" * 16)
+
+# Measure compression and randomness
+toeplitz_result = toeplitz.compress(key, output_length=256)
+polynomial_result = polynomial.compress(key, output_length=256)
+
+print(f"Input length: {len(key) * 8} bits")
+print(f"Toeplitz output: {toeplitz_result.hex()}")
+print(f"Polynomial output: {polynomial_result.hex()}")
+print(f"Toeplitz seed overhead: {toeplitz.seed_length} bits")
+print(f"Polynomial seed overhead: {polynomial.seed_length} bits")
+
+# Verify universality
+toeplitz_universal = toeplitz.verify_universality(num_tests=10000)
+polynomial_universal = polynomial.verify_universality(num_tests=10000)
+print(f"Toeplitz universality: {toeplitz_universal:.4f}")
+print(f"Polynomial universality: {polynomial_universal:.4f}")
+```
+
+### Privacy Amplification Pipeline
+
+```python
+from quantum_crypto import PrivacyAmplificationPipeline
+
+pipeline = PrivacyAmplificationPipeline(
+    security_parameter=128,
+    hash_function="toeplitz",
+    batch_size=1000,
+    parallel_workers=4
+)
+
+# Process multiple key blocks
+key_blocks = [bytes(256) for _ in range(100)]
+amplified_keys = pipeline.process_batch(
+    key_blocks=key_blocks,
+    leaked_info_per_block=20,
+    seed_rotation=True
+)
+
+print(f"Processed {len(key_blocks)} blocks")
+print(f"Output key length: {len(amplified_keys[0]) * 8} bits")
+print(f"Total throughput: {pipeline.throughput:.2f} bits/s")
+print(f"Security parameter per block: {pipeline.security_parameter}")
+```
+
+## Quantum Random Number Generation
+
+### Quantum RNG for Key Generation
+
+```python
+from quantum_crypto import QuantumRNG, QRNGSource
+
+# Configure quantum random number generator
+qrng = QuantumRNG(
+    source_type="vacuum_fluctuation",
+    min_entropy_threshold=0.99,
+    whitening_method="von_neumann"
+)
+
+# Generate random bits
+random_bits = qrng.generate(
+    num_bits=10000,
+    post_processing="extractor",
+    extractor_seed=bytes(64)
+)
+
+# Analyze randomness quality
+analysis = qrng.analyze(random_bits)
+print(f"Min-entropy: {analysis.min_entropy:.4f}")
+print(f"Collision entropy: {analysis.collision_entropy:.4f}")
+print(f"Guessing entropy: {analysis.guessing_entropy:.4f}")
+print(f"NIST SP 800-90B compliant: {analysis.compliant}")
+
+# Use for QKD basis selection
+basis_choices = qrng.generate_basis_choices(
+    num_pulses=100000,
+    bases=["rectilinear", "diagonal"],
+    bias=0.5
+)
+print(f"Basis bias: {analysis.bias:.4f}")
+```
+
+## Quantum Error Correction for QKD
+
+### Error Correction for Quantum Channels
+
+```python
+from quantum_crypto import QuantumErrorCorrection, SteaneCode
+
+# Apply error correction to protect quantum states in QKD
+steane = SteaneCode()
+
+# Encode qubits for transmission
+encoded_qubits = steane.encode(
+    qubit_state=[0.7071, 0.7071],  # |+> state
+    num_redundant=7
+)
+
+# Simulate channel noise
+noisy_qubits = steane.apply_noise(
+    encoded_qubits,
+    error_rate=0.05,
+    error_type="depolarizing"
+)
+
+# Decode and correct
+decoded, correction_info = steane.decode(
+    noisy_qubits,
+    syndrome_measurement=True
+)
+
+print(f"Encoded qubits: {encoded_qubits.shape}")
+print(f"Syndrome: {correction_info.syndrome}")
+print(f"Errors corrected: {correction_info.num_errors}")
+print(f"Output fidelity: {correction_info.fidelity:.4f}")
+```
+
+## Post-Quantum Cryptography Integration
+
+### Hybrid QKD + PQC Key Exchange
+
+```python
+from quantum_crypto import HybridKeyExchange, KyberKEM, DilithiumSignature
+
+# Combine QKD with post-quantum cryptography
+qkd_key = bytes(32)  # From QKD session
+pqc_keypair = KyberKEM(security_level=3).generate_keypair()
+encapsulation = KyberKEM(security_level=3).encapsulate(pqc_keypair.public_key)
+
+hybrid = HybridKeyExchange(
+    qkd_key=qkd_key,
+    pqc_shared_secret=encapsulation.shared_secret,
+    kdf="hkdf_sha256",
+    combination_method="concatenation_then_kdf"
+)
+
+final_key = hybrid.derive_key(
+    length=256,
+    context=b"quantum-secure-session",
+    info=b"hybrid-key-exchange"
+)
+
+print(f"Final key: {final_key.hex()}")
+print(f"Key length: {len(final_key) * 8} bits")
+print(f"Security level: {hybrid.security_level}")
+
+# Sign with dilithium for authentication
+signer = DilithiumSignature(security_level=3)
+signature = signer.sign(final_key)
+print(f"Signature size: {len(signature)} bytes")
+verified = signer.verify(final_key, signature, pqc_keypair.public_key)
+print(f"Signature verified: {verified}")
+```
+
+## Quantum Key Management
+
+### Key Lifecycle Management
+
+```python
+from quantum_crypto import KeyManager, KeyStore, KeyPolicy
+
+# Configure key management system
+key_store = KeyStore(
+    storage_type="hsm",
+    max_keys=10000,
+    encryption_algorithm="aes_256_gcm"
+)
+
+policy = KeyPolicy(
+    max_key_age_seconds=3600,
+    max_usage_count=1000000,
+    min_security_parameter=128,
+    auto_refresh=True
+)
+
+manager = KeyManager(store=key_store, policy=policy)
+
+# Generate and store QKD keys
+key_id = manager.generate_key(
+    source="qkd",
+    length=256,
+    metadata={"protocol": "BB84", "session_id": "abc123"}
+)
+
+# Retrieve and use key
+key = manager.get_key(key_id)
+print(f"Key ID: {key_id}")
+print(f"Key age: {key.age_seconds:.1f} seconds")
+print(f"Usage count: {key.usage_count}")
+print(f"Remaining budget: {key.remaining_budget}")
+
+# Key refresh
+new_key_id = manager.refresh_key(key_id)
+print(f"New key ID: {new_key_id}")
+```
+
+### Quantum Key Distribution Network Management
+
+```python
+from quantum_crypto import QKDNetworkManager, NetworkNode
+
+# Manage a multi-node QKD network
+network = QKDNetworkManager()
+
+# Add nodes
+alice = network.add_node("Alice", role="sender")
+bob = network.add_node("Bob", role="receiver")
+charlie = network.add_node("Charlie", role="trusted_relay")
+
+# Configure links
+network.add_link(
+    alice, charlie,
+    protocol="BB84",
+    key_rate=10000,
+    distance_km=50
+)
+network.add_link(
+    charlie, bob,
+    protocol="E91",
+    key_rate=5000,
+    distance_km=80
+)
+
+# Monitor network
+status = network.get_status()
+print(f"Network nodes: {len(status.nodes)}")
+print(f"Active links: {len(status.active_links)}")
+print(f"Total key rate: {status.total_key_rate:.1f} bits/s")
+print(f"Average QBER: {status.average_qber:.4f}")
+
+# Route key from Alice to Bob
+route = network.find_route("Alice", "Bob")
+print(f"Route: {' → '.join(route.path)}")
+print(f"Hops: {route.hops}")
+print(f"End-to-end key rate: {route.key_rate:.1f} bits/s")
+```
+
+## Security Proof Framework
+
+### Composable Security Proofs
+
+```python
+from quantum_crypto import SecurityProof, ComposableSecurity
+
+# Verify composable security of a QKD protocol
+proof = SecurityProof(
+    protocol="BB84_decoy",
+    attack_model="coherent",
+    finite_key=True,
+    composable=True
+)
+
+security_result = proof.verify(
+    qber=0.03,
+    block_size=1000000,
+    privacy_amplification_factor=0.8,
+    error_correction_efficiency=0.95
+)
+
+print(f"Security parameter: {security_result.security_parameter}")
+print(f"Composable security: {security_result.is_composable}")
+print(f"Key rate lower bound: {security_result.key_rate_bound:.4f}")
+print(f"Proof assumptions: {security_result.assumptions}")
+print(f"Proof method: {proof.proof_method}")
+```
+
+## Performance Benchmarking
+
+### QKD Protocol Benchmarking Suite
+
+```python
+from quantum_crypto import QKDBenchmark, BenchmarkSuite
+
+# Run comprehensive QKD benchmarking
+suite = BenchmarkSuite(
+    protocols=["BB84", "E91", "MDI_QKD", "TF_QKD"],
+    distances_km=[10, 50, 100, 200, 500],
+    channel_models=["ideal", "realistic", "noisy"]
+)
+
+results = suite.run(
+    num_shots=1000000,
+    include_statistical_analysis=True
+)
+
+for protocol, protocol_results in results.items():
+    print(f"\n{protocol}:")
+    for distance, dist_results in protocol_results.items():
+        print(f"  {distance} km:")
+        print(f"    Key rate: {dist_results.key_rate:.2f} bits/s")
+        print(f"    QBER: {dist_results.qber:.4f}")
+        print(f"    Secure key fraction: {dist_results.secure_fraction:.4f}")
+        print(f"    Execution time: {dist_results.execution_time:.2f} s")
+```

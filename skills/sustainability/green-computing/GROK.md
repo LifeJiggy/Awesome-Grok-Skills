@@ -205,3 +205,612 @@ The module integrates with the following external data providers for carbon inte
 | EPA eGRID | US regions | Annual average | Annual |
 | IEA | Global | Country-level | Annual |
 | DEFRA | UK | Conversion factors | Annual |
+
+---
+
+## Advanced Configuration
+
+The green computing module supports advanced configuration for fine-tuning carbon-aware scheduling, DVFS behavior, and power model calibration. These options are available through the `AdvancedConfig` class or via environment variables for containerized deployments.
+
+```python
+from green_computing import AdvancedConfig
+
+config = AdvancedConfig(
+    # Carbon API resilience settings
+    carbon_api_timeout_ms=5000,
+    carbon_api_retry_count=3,
+    carbon_api_circuit_breaker_threshold=5,
+    carbon_api_circuit_breaker_recovery_seconds=60,
+
+    # Scheduler tuning
+    scheduler_algorithm="greedy",  # greedy, genetic, simulated_annealing
+    scheduler_population_size=100,
+    scheduler_generations=500,
+    scheduler_mutation_rate=0.1,
+
+    # DVFS advanced settings
+    dvfs_transition_latency_ms=50,
+    dvfs_sampling_interval_ms=100,
+    dvfs_pid_kp=0.8,
+    dvfs_pid_ki=0.2,
+    dvfs_pid_kd=0.1,
+
+    # Power model calibration
+    power_model_calibration_window_hours=168,
+    power_model_min_samples=100,
+    power_model_outlier_threshold_sigma=3.0,
+
+    # Carbon intensity forecasting
+    forecast_horizon_hours=48,
+    forecast_update_interval_minutes=15,
+    forecast_ensemble_weights={
+        "nwp": 0.4,
+        "satellite": 0.3,
+        "persistence": 0.15,
+        "ml_model": 0.15
+    }
+)
+```
+
+Environment variables provide an alternative configuration path:
+
+```bash
+# Carbon API configuration
+export GREEN_COMPUTING_CARBON_API_PROVIDER="watttime"
+export GREEN_COMPUTING_CARBON_API_KEY="your-api-key"
+export GREEN_COMPUTING_CARBON_API_CACHE_TTL="300"
+
+# Scheduler behavior
+export GREEN_COMPUTING_SCHEDULER_MAX_DELAY_HOURS="24"
+export GREEN_COMPUTING_SCHEDULER_MIN_SAVINGS_PERCENT="10"
+export GREEN_COMPUTING_SCHEDULER_RESCHEDULE_INTERVAL="900"
+
+# DVFS control
+export GREEN_COMPUTING_DVFS_GOVERNOR="powersave"
+export GREEN_COMPUTING_DVFS_MIN_FREQ_MHZ="800"
+export GREEN_COMPUTING_DVFS_MAX_FREQ_MHZ="4500"
+
+# Logging and observability
+export GREEN_COMPUTING_LOG_LEVEL="INFO"
+export GREEN_COMPUTING_METRICS_ENABLED="true"
+export GREEN_COMPUTING_TRACING_ENDPOINT="http://localhost:4317"
+```
+
+## Architecture Patterns
+
+The green computing module employs several architectural patterns to achieve reliable carbon-aware computing at scale.
+
+### Event-Driven Carbon Scheduling
+
+Carbon intensity changes are published as events, and the scheduler reacts to new signals without polling:
+
+```python
+from green_computing import CarbonEventBus, CarbonAwareScheduler
+
+bus = CarbonEventBus()
+scheduler = CarbonAwareScheduler()
+
+@bus.on("carbon_intensity_update")
+def handle_intensity_change(event):
+    if event.intensity < scheduler.current_intensity * 0.7:
+        scheduler.escalate_pending_workloads()
+    elif event.intensity > scheduler.current_intensity * 1.3:
+        scheduler.defer_non_critical_workloads()
+
+@bus.on("renewable_forecast_update")
+def handle_forecast(event):
+    scheduler.update_optimal_windows(event.forecast)
+```
+
+### Circuit Breaker for Carbon APIs
+
+External carbon intensity APIs can fail or become slow. A circuit breaker prevents cascading failures:
+
+```python
+from green_computing import CircuitBreaker, CarbonIntensityClient
+
+breaker = CircuitBreaker(
+    failure_threshold=5,
+    recovery_timeout_seconds=60,
+    half_open_max_calls=2
+)
+
+client = CarbonIntensityClient(breaker=breaker)
+
+def get_fallback_intensity(region):
+    try:
+        return client.get_current_intensity(region)
+    except CircuitOpenError:
+        return CarbonIntensity(
+            gCO2_per_kWh=400.0,
+            source="fallback_default",
+            confidence=0.5
+        )
+```
+
+### Observer Pattern for DVFS Monitoring
+
+DVFS state changes are observed by multiple subscribers for logging, alerting, and re-optimization:
+
+```python
+from green_computing import DVFSController, DVFSObserver
+
+class PowerAlertObserver(DVFSObserver):
+    def __init__(self, threshold_watts=300):
+        self.threshold = threshold_watts
+
+    def on_frequency_change(self, event):
+        if event.estimated_power_watts > self.threshold:
+            self.send_alert(
+                f"CPU {event.cpu_id} power exceeds threshold: "
+                f"{event.estimated_power_watts:.1f}W at {event.frequency_mhz}MHz"
+            )
+
+dvfs = DVFSController(cpu_id=0)
+dvfs.attach_observer(PowerAlertObserver(threshold_watts=280))
+```
+
+## Integration Guide
+
+### Cloud Provider Integration
+
+```python
+from green_computing import CloudCarbonOptimizer
+
+# AWS integration
+optimizer = CloudCarbonOptimizer(provider="aws")
+optimizer.configure(
+    regions=["us-west-2", "eu-west-1", "ap-southeast-1"],
+    strategy="lowest_carbon",
+    instance_types=["c5.xlarge", "c5.2xlarge", "m5.xlarge"]
+)
+
+# Find lowest-carbon region for a workload
+recommendation = optimizer.recommend_region(
+    workload_type="ml_training",
+    duration_hours=8,
+    memory_gb=64,
+    gpu_count=4
+)
+print(f"Recommended: {recommendation.region}")
+print(f"Carbon intensity: {recommendation.carbon_intensity} gCO2eq/kWh")
+print(f"Savings vs worst region: {recommendation.savings_percent:.1f}%")
+
+# GCP integration
+gcp_optimizer = CloudCarbonOptimizer(provider="gcp")
+gcp_recommendation = gcp_optimizer.recommend_region(
+    workload_type="data_processing",
+    duration_hours=2,
+    vcpus=8
+)
+
+# Azure integration
+azure_optimizer = CloudCarbonOptimizer(provider="azure")
+azure_recommendation = azure_optimizer.recommend_region(
+    workload_type="batch_analysis",
+    duration_hours=4,
+    vms=10
+)
+```
+
+### Kubernetes Integration
+
+```python
+from green_computing import K8sCarbonScheduler
+
+scheduler = K8sCarbonScheduler(namespace="production")
+
+# Carbon-aware pod scheduling
+scheduler.configure(
+    carbon_api_region="US-CAL-CISO",
+    min_carbon_savings_percent=15,
+    respect_node_affinity=True,
+    fallback_to_any_region=False
+)
+
+# Schedule carbon-aware batch jobs
+job = scheduler.create_carbon_aware_job(
+    name="data-pipeline",
+    image="myapp/pipeline:latest",
+    cpu_request="4",
+    memory_request="16Gi",
+    max_delay_hours=6,
+    deadline_hours=24
+)
+```
+
+## Performance Optimization
+
+### Carbon Intensity Caching
+
+Carbon intensity data changes every 5 minutes. Caching reduces API calls and improves response times:
+
+```python
+from green_computing import CarbonIntensityCache
+
+cache = CarbonIntensityCache(
+    backend="redis",
+    redis_url="redis://localhost:6379",
+    default_ttl_seconds=300,
+    stale_ttl_seconds=3600
+)
+
+# Cache hit returns immediately
+intensity = cache.get("DE", fallback_provider="electricitymaps")
+print(f"Source: {intensity.source}")
+print(f"Cached: {intensity.from_cache}")
+```
+
+### Batch Workload Optimization
+
+For workloads that process many items, the optimizer batches requests to minimize carbon overhead:
+
+```python
+from green_computing import BatchCarbonOptimizer
+
+optimizer = BatchCarbonOptimizer(
+    items=100000,
+    batch_size=1000,
+    carbon_budget_grams=500
+)
+
+schedule = optimizer.create_schedule(
+    available_windows=[
+        {"start": "2025-01-15T02:00Z", "intensity": 150},
+        {"start": "2025-01-15T06:00Z", "intensity": 250},
+        {"start": "2025-01-15T14:00Z", "intensity": 350}
+    ]
+)
+print(f"Batches allocated: {len(schedule.allocations)}")
+print(f"Total carbon: {schedule.total_carbon_grams:.1f}g")
+```
+
+## Security Considerations
+
+### API Key Management
+
+Carbon intensity API keys must be stored securely and rotated regularly:
+
+```python
+from green_computing import SecureCarbonClient
+
+client = SecureCarbonClient(
+    key_vault="azure_key_vault",  # or "aws_secrets_manager", "hashicorp_vault"
+    secret_name="carbon-api-key",
+    rotation_days=90,
+    cache_key_in_memory=False
+)
+```
+
+### Data Integrity
+
+Carbon accounting data must be tamper-evident for audit purposes:
+
+```python
+from green_computing import AuditableCarbonLog
+
+log = AuditableCarbonLog(
+    storage="append_only",
+    hash_algorithm="sha256",
+    sign_with="ed25519"
+)
+
+# Each measurement is signed and chained
+log.append({
+    "timestamp": "2025-01-15T10:00:00Z",
+    "region": "DE",
+    "intensity_gCO2": 320.5,
+    "source": "electricitymaps"
+})
+```
+
+## Troubleshooting Guide
+
+| Issue | Possible Cause | Resolution |
+|-------|---------------|------------|
+| Carbon intensity returns stale data | Cache TTL too long or API down | Reduce TTL to 120s, check API status page |
+| DVFS frequency not changing | Governor locked or BIOS restriction | Check `cpupower frequency-info`, verify BIOS allows DVFS |
+| Scheduler not deferring workloads | Carbon savings below threshold | Lower `min_carbon_savings_percent` or check `max_delay_hours` |
+| Power model inaccurate | Model not calibrated to hardware | Run calibration with RAPL data for 7+ days |
+| Workload migration fails | Target region capacity full | Implement retry with exponential backoff |
+| Carbon API rate limited | Too many requests per minute | Increase cache TTL, implement request coalescing |
+
+```python
+# Diagnostic script
+from green_computing import DiagnosticRunner
+
+diag = DiagnosticRunner()
+results = diag.run_all()
+for check in results:
+    status = "PASS" if check.passed else "FAIL"
+    print(f"[{status}] {check.name}: {check.message}")
+```
+
+## API Reference
+
+### CarbonIntensityClient
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `get_current_intensity(region)` | region: str | `CarbonIntensity` | Current grid carbon intensity |
+| `get_forecast(region, hours)` | region: str, hours: int | `List[CarbonIntensity]` | Hourly forecast |
+| `get_historical(region, start, end)` | region: str, start: datetime, end: datetime | `List[CarbonIntensity]` | Historical data |
+
+### WorkloadScheduler
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `find_low_carbon_window(duration, max_delay)` | duration: timedelta, max_delay: timedelta | `OptimalWindow` | Best time window for workload |
+| `schedule_workload(workload, window)` | workload: Workload, window: OptimalWindow | `ScheduledJob` | Schedule a workload |
+| `cancel_scheduled(job_id)` | job_id: str | `bool` | Cancel a scheduled job |
+
+### DVFSController
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `set_frequency_mhz(freq)` | freq: int | `None` | Set CPU frequency |
+| `set_governor(governor)` | governor: str | `None` | Set CPU governor |
+| `estimate_power_watts()` | - | `float` | Estimated power at current settings |
+| `get_available_frequencies()` | - | `List[int]` | Available frequency steps |
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional, List
+
+@dataclass
+class CarbonIntensity:
+    gCO2_per_kWh: float
+    renewable_percent: float
+    source: str
+    timestamp: datetime
+    region: str
+    confidence: float = 1.0
+    from_cache: bool = False
+
+@dataclass
+class WorkloadProfile:
+    name: str
+    duration_hours: float
+    cpu_cores: int
+    memory_gb: float
+    priority: str  # interactive, batch, deferrable
+    carbon_tolerance: str  # strict, moderate, flexible
+
+@dataclass
+class OptimalWindow:
+    start: datetime
+    end: datetime
+    avg_gCO2_per_kWh: float
+    peak_gCO2_per_kWh: float
+    renewable_fraction: float
+    savings_vs_current_percent: float
+
+@dataclass
+class PowerMeasurement:
+    timestamp: datetime
+    cpu_power_watts: float
+    memory_power_watts: float
+    total_power_watts: float
+    cpu_utilization: float
+    frequency_mhz: int
+```
+
+## Deployment Guide
+
+### Docker Deployment
+
+```dockerfile
+FROM python:3.11-slim
+
+RUN pip install green-computing[all]
+
+# Copy configuration
+COPY config.yaml /etc/green-computing/config.yaml
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s \
+  CMD python -c "from green_computing import health_check; health_check()"
+
+ENTRYPOINT ["green-computing"]
+CMD ["--config", "/etc/green-computing/config.yaml"]
+```
+
+### Kubernetes Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: green-computing-scheduler
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: green-computing
+  template:
+    metadata:
+      labels:
+        app: green-computing
+    spec:
+      containers:
+      - name: scheduler
+        image: green-computing:1.0.0
+        env:
+        - name: GREEN_COMPUTING_CARBON_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: carbon-api-keys
+              key: watttime-key
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+```
+
+## Monitoring & Observability
+
+### Prometheus Metrics
+
+```python
+from green_computing import MetricsExporter
+
+exporter = MetricsExporter()
+
+# Custom metrics
+exporter.register_histogram(
+    "carbon_intensity_gCO2_per_kWh",
+    "Current grid carbon intensity",
+    buckets=[50, 100, 150, 200, 300, 400, 500, 700]
+)
+
+exporter.register_counter(
+    "workloads_deferred_total",
+    "Total workloads deferred for carbon optimization"
+)
+
+exporter.register_gauge(
+    "power_savings_watts",
+    "Current power savings from DVFS optimization"
+)
+```
+
+### Distributed Tracing
+
+```python
+from green_computing import TracedCarbonScheduler
+
+scheduler = TracedCarbonScheduler(
+    service_name="green-scheduler",
+    otlp_endpoint="http://otel-collector:4317",
+    sample_rate=0.1
+)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from green_computing import CarbonIntensityClient, WorkloadScheduler
+
+class TestCarbonAwareScheduler:
+    def test_defer_workload_when_high_carbon(self):
+        client = CarbonIntensityClient(mock_intensities=[500, 200, 150])
+        scheduler = WorkloadScheduler(carbon_client=client)
+        result = scheduler.schedule(
+            workload="batch-job",
+            current_intensity=500,
+            delay_tolerance_hours=12
+        )
+        assert result.deferred is True
+        assert result.scheduled_intensity < 300
+
+    def test_dvfs_reduces_power(self):
+        dvfs = DVFSController(cpu_id=0, mock=True)
+        power_high = dvfs.estimate_power_watts(frequency_mhz=3000)
+        power_low = dvfs.estimate_power_watts(frequency_mhz=1200)
+        assert power_low < power_high
+
+    def test_carbon_api_fallback(self):
+        client = CarbonIntensityClient(fail_api=True, fallback_intensity=400)
+        intensity = client.get_current_intensity("US")
+        assert intensity.gCO2_per_kWh == 400
+        assert intensity.source == "fallback"
+```
+
+## Versioning & Migration
+
+### Semantic Versioning
+
+The module follows semantic versioning (MAJOR.MINOR.PATCH):
+
+- **MAJOR**: Breaking changes to public API or configuration schema
+- **MINOR**: New features, new carbon API providers, new scheduling algorithms
+- **PATCH**: Bug fixes, performance improvements, documentation updates
+
+### Migration Guide
+
+When upgrading between major versions:
+
+```python
+# v1.x to v2.x migration
+# Old API
+client = CarbonIntensityClient(api_key="key", provider="watttime")
+
+# New API
+from green_computing import CarbonProviderFactory
+client = CarbonProviderFactory.create(
+    provider="watttime",
+    credentials=SecretRef("carbon-api-key")
+)
+```
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **SCI** | Software Carbon Intensity — grams of CO2 equivalent per functional unit |
+| **DVFS** | Dynamic Voltage and Frequency Scaling — CPU power management technique |
+| **PUE** | Power Usage Effectiveness — ratio of total facility power to IT equipment power |
+| **RAPL** | Running Average Power Limit — Intel CPU power measurement interface |
+| **gCO2eq** | Grams of CO2 equivalent — standardized unit for greenhouse gas emissions |
+| **Marginal Emissions** | The emissions from the next unit of electricity generation dispatched |
+| **Carbon Intensity** | Grams of CO2 equivalent per kilowatt-hour of electricity |
+| **Embodied Carbon** | Emissions from manufacturing, transport, and disposal of hardware |
+| **LPUE** | Location-based PUE — PUE calculated using average grid emission factors |
+
+## Changelog
+
+### v1.0.0 (2025-01-15)
+- Initial release with carbon intensity API integration
+- DVFS controller for CPU power management
+- Workload scheduler with carbon-aware deferral
+- SCI calculator implementation
+- Green metrics dashboard
+
+### v1.1.0 (2025-02-01)
+- Added Electricity Maps API support
+- Improved forecast accuracy with ML ensemble
+- Added Kubernetes integration
+
+### v1.2.0 (2025-03-01)
+- Added multi-cloud region optimization
+- Circuit breaker for API resilience
+- Performance improvements in caching layer
+
+## Contributing Guidelines
+
+1. **Fork the repository** and create a feature branch from `main`
+2. **Write tests** for all new functionality with >80% coverage
+3. **Follow PEP 8** style guidelines with type hints
+4. **Update documentation** for any API changes
+5. **Add changelog entries** under `[Unreleased]` section
+6. **Submit a pull request** with a clear description of changes
+
+### Code Review Checklist
+
+- [ ] Tests pass and coverage meets threshold
+- [ ] No hardcoded API keys or secrets
+- [ ] Carbon calculations are auditable with data lineage
+- [ ] Error handling covers API failures gracefully
+- [ ] Performance impact assessed for scheduler changes
+
+## License
+
+This module is licensed under the Apache License, Version 2.0. See the LICENSE file for full terms.
+
+Copyright 2025 Green Computing Contributors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

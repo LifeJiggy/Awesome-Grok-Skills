@@ -306,3 +306,873 @@ The architecture follows a layered pipeline: classical data is preprocessed and 
 - Skolik, A., et al. (2021). Quantum neural networks in the NISQ era: a review. arXiv:2104.10066.
 - PennyLane documentation: https://pennylane.ai/qml/
 - Qiskit Machine Learning: https://qiskit.org/machine-learning/
+
+## Advanced Configuration
+
+### Backend Selection Matrix
+
+| Backend | Max Qubits | Noise Model | Gradient Method | Use Case |
+|---------|-----------|-------------|-----------------|----------|
+| `default.qubit` | 25+ | None | Analytic | Development, validation |
+| `lightning.qubit` | 30+ | None | Adjoint | Large-scale simulation |
+| `ibm_qasm_simulator` | 32 | Configurable | Parameter-shift | Noisy simulation |
+| `ibm_brisbane` | 127 | Hardware | Parameter-shift | Real hardware testing |
+| `ionq_harmony` | 11 | IonQ noise | Parameter-shift | Ion trap algorithms |
+| `amazon_braket_sv` | 25 | None | Adjoint | AWS ecosystem |
+
+### Circuit Architecture Configuration
+
+```python
+from quantum_neural_networks import CircuitArchitecture, LayerConfig
+
+# Define a custom circuit architecture
+arch = CircuitArchitecture(
+    name="custom_hybrid",
+    encoding_layers=[
+        LayerConfig(type="angle_encoding", axis="y", n_features=4),
+        LayerConfig(type="amplitude_encoding", n_features=8),
+    ],
+    variational_layers=[
+        LayerConfig(type="strongly_entangling", n_rotations=3, entanglement="circular"),
+        LayerConfig(type="hardware_efficient", entanglement="linear"),
+    ],
+    measurement_config={
+        "basis": "pauli_z",
+        "shots": 1024,
+        "mitigation": "zero_noise_extrapolation",
+    }
+)
+
+qnn = QuantumNeuralNetwork.from_architecture(arch)
+```
+
+### Advanced Optimizer Configuration
+
+```python
+from quantum_neural_networks import OptimizerConfig, LearningRateSchedule
+
+# Configure advanced optimizer
+optimizer_config = OptimizerConfig(
+    name="adam",
+    learning_rate=0.01,
+    beta1=0.9,
+    beta2=0.999,
+    epsilon=1e-8,
+    weight_decay=1e-4,
+    schedule=LearningRateSchedule(
+        type="cosine_annealing",
+        T_max=100,
+        eta_min=1e-6,
+    ),
+    gradient_clipping=1.0,
+    warmup_steps=10,
+)
+
+# SPSA for noisy environments
+spsa_config = OptimizerConfig(
+    name="spsa",
+    learning_rate=0.1,
+    perturbation=0.1,
+    alpha=0.602,
+    gamma=0.101,
+    blocking=True,
+    allowed_increase=0.05,
+)
+```
+
+### Noise Model Configuration
+
+```python
+from quantum_neural_networks import NoiseConfig, ThermalNoise, ReadoutNoise
+
+noise_config = NoiseConfig(
+    depolarizing=0.005,
+    thermal=ThermalNoise(
+        t1=50e3,  # microseconds
+        t2=70e3,
+        gate_time_1q=35,
+        gate_time_2q=300,
+    ),
+    readout=ReadoutNoise(
+        assignment_error=[[0.98, 0.02], [0.01, 0.99]],
+    ),
+    crosstalk_rate=0.001,
+)
+
+config = QNNConfig(
+    n_qubits=6,
+    n_layers=3,
+    noise_model=noise_config,
+    mitigation="dynamical_decoupling",
+)
+```
+
+## Architecture Patterns
+
+### Pipeline Pattern for Multi-Stage QNN
+
+```python
+from quantum_neural_networks import QNNPipeline, PipelineStage
+
+# Multi-stage QNN with preprocessing
+pipeline = QNNPipeline(stages=[
+    PipelineStage(
+        name="preprocessing",
+        type="classical",
+        processor=lambda x: normalize_features(x),
+    ),
+    PipelineStage(
+        name="quantum_encoder",
+        type="quantum",
+        processor=lambda x: encode_amplitude(x),
+    ),
+    PipelineStage(
+        name="variational_layer",
+        type="quantum",
+        processor=lambda x: apply_variational_circuit(x),
+    ),
+    PipelineStage(
+        name="measurement",
+        type="quantum",
+        processor=lambda x: measure_pauli_z(x),
+    ),
+    PipelineStage(
+        name="postprocessing",
+        type="classical",
+        processor=lambda x: apply_softmax(x),
+    ),
+])
+
+result = pipeline.execute(X_train)
+```
+
+### Ensemble Pattern for Quantum-Classical Hybrid
+
+```python
+from quantum_neural_networks import QNNEnsemble, EnsembleStrategy
+
+# Build ensemble of QNNs with different architectures
+ensemble = QNNEnsemble(
+    models=[
+        QuantumNeuralNetwork(QNNConfig(n_qubits=4, ansatz="hardware_efficient")),
+        QuantumNeuralNetwork(QNNConfig(n_qubits=4, ansatz="strongly_entangling")),
+        QuantumNeuralNetwork(QNNConfig(n_qubits=4, ansatz="custom")),
+    ],
+    strategy=EnsembleStrategy.STACKING,
+    meta_learner="logistic_regression",
+)
+
+ensemble.fit(X_train, y_train)
+accuracy = ensemble.score(X_test, y_test)
+print(f"Ensemble accuracy: {accuracy:.3f}")
+```
+
+### Callback Pattern for Training Monitoring
+
+```python
+from quantum_neural_networks import TrainingCallback, CallbackEvent
+
+class MonitoringCallback(TrainingCallback):
+    def on_epoch_end(self, epoch, logs):
+        if logs['gradient_variance'] < 1e-6:
+            print(f"Barren plateau detected at epoch {epoch}")
+            self.model.reduce_depth()
+    
+    def on_batch_end(self, batch, logs):
+        if logs['loss'] > 10 * self.initial_loss:
+            print(f"Loss explosion at batch {batch}")
+            self.model.clip_gradients(1.0)
+
+callback = MonitoringCallback()
+qnn.fit(X_train, y_train, callbacks=[callback])
+```
+
+### Checkpoint and Resume Pattern
+
+```python
+from quantum_neural_networks import CheckpointManager
+
+# Save checkpoints during training
+checkpoint_mgr = CheckpointManager(
+    save_dir="./checkpoints",
+    save_freq=10,  # every 10 epochs
+    keep_last=5,
+    save_optimizer=True,
+)
+
+qnn.fit(
+    X_train, y_train,
+    epochs=100,
+    callbacks=[checkpoint_mgr],
+)
+
+# Resume from checkpoint
+latest = checkpoint_mgr.latest()
+qnn.load_checkpoint(latest)
+qnn.fit(X_train, y_train, epochs=50, initial_epoch=latest.epoch)
+```
+
+## Integration Guide
+
+### Scikit-learn Integration
+
+```python
+from quantum_neural_networks import QuantumNeuralNetwork, QNNConfig
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import GridSearchCV
+
+# QNN as sklearn estimator
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('qnn', QuantumNeuralNetwork(QNNConfig(n_qubits=4, n_layers=2)))
+])
+
+# Hyperparameter search
+param_grid = {
+    'qnn__n_layers': [2, 3, 4],
+    'qnn__learning_rate': [0.01, 0.05, 0.1],
+    'qnn__ansatz': ['hardware_efficient', 'strongly_entangling'],
+}
+
+search = GridSearchCV(pipeline, param_grid, cv=3, scoring='accuracy')
+search.fit(X_train, y_train)
+print(f"Best params: {search.best_params_}")
+print(f"Best score: {search.best_score_:.3f}")
+```
+
+### PyTorch Integration
+
+```python
+import torch
+from quantum_neural_networks import QuantumNeuralNetwork, QNNConfig
+
+# Wrap QNN as PyTorch module
+class QuantumLayer(torch.nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        self.qnn = QuantumNeuralNetwork(config)
+        self.qnn.initialize_parameters()
+    
+    def forward(self, x):
+        return self.qnn.forward(x)
+
+# Build hybrid model
+model = torch.nn.Sequential(
+    torch.nn.Linear(10, 4),
+    QuantumLayer(QNNConfig(n_qubits=4, n_layers=2)),
+    torch.nn.Linear(1, 1),
+)
+
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+```
+
+### TensorFlow/Keras Integration
+
+```python
+import tensorflow as tf
+from quantum_neural_networks import QuantumNeuralNetwork, QNNConfig
+
+# Custom Keras layer
+class QuantumLayer(tf.keras.layers.Layer):
+    def __init__(self, config):
+        super().__init__()
+        self.qnn = QuantumNeuralNetwork(config)
+        self.qnn.initialize_parameters()
+    
+    def call(self, inputs):
+        return self.qnn.forward(inputs.numpy())
+
+# Build model
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(4, activation='relu'),
+    QuantumLayer(QNNConfig(n_qubits=4, n_layers=2)),
+    tf.keras.layers.Dense(1, activation='sigmoid'),
+])
+```
+
+## Performance Optimization
+
+### Circuit Execution Optimization
+
+```python
+from quantum_neural_networks import CircuitOptimizer
+
+optimizer = CircuitOptimizer(
+    optimization_level=3,
+    target_gates=["cx", "u3"],
+    coupling_map="ibmq_mumbai",
+)
+
+# Optimize QNN circuit
+optimized_circuit = optimizer.optimize(qnn.circuit)
+print(f"Original depth: {qnn.circuit.depth()}")
+print(f"Optimized depth: {optimized_circuit.depth()}")
+print(f"Gate reduction: {(1 - optimized_circuit.depth()/qnn.circuit.depth())*100:.1f}%")
+```
+
+### Batch Processing Optimization
+
+```python
+from quantum_neural_networks import BatchProcessor
+
+processor = BatchProcessor(
+    batch_size=32,
+    n_workers=4,
+    prefetch_factor=2,
+)
+
+# Process large datasets efficiently
+results = processor.process_batch(
+    model=qnn,
+    data=X_large,
+    strategy="parallel_circuits",
+)
+print(f"Processed {len(results)} samples in {results.elapsed_time:.1f}s")
+print(f"Throughput: {results.samples_per_second:.1f} samples/s")
+```
+
+### Memory Optimization for Large Datasets
+
+```python
+from quantum_neural_networks import MemoryOptimizer
+
+mem_opt = MemoryOptimizer(
+    strategy="gradient_checkpointing",
+    checkpoint_every=5,
+    offload_to_disk=True,
+    disk_path="/fast_ssd/qnn_cache",
+)
+
+# Memory-efficient training
+qnn.fit(
+    X_large, y_large,
+    epochs=50,
+    memory_optimizer=mem_opt,
+)
+```
+
+### Parameter Reuse Optimization
+
+```python
+from quantum_neural_networks import ParameterSharing
+
+# Share parameters across layers for efficiency
+sharing = ParameterSharing(
+    strategy="circular",
+    n_unique_params=10,
+    n_layers=5,
+)
+
+config = QNNConfig(
+    n_qubits=4,
+    n_layers=5,
+    parameter_sharing=sharing,
+)
+
+qnn = QuantumNeuralNetwork(config)
+print(f"Unique parameters: {qnn.n_unique_parameters}")
+print(f"Total parameters: {qnn.n_total_parameters}")
+```
+
+## Troubleshooting Guide
+
+### Common Issues and Solutions
+
+#### 1. Barren Plateaus Detected
+
+**Symptom**: Gradient variance drops below 1e-6, training stalls
+
+**Solution**:
+```python
+from quantum_neural_networks import QuantumNeuralNetwork, QNNConfig
+
+# Reduce circuit depth
+config = QNNConfig(
+    n_qubits=4,
+    n_layers=2,  # Reduce from 5
+    ansatz="hardware_efficient",
+    initialization="identity",  # Initialize near identity
+)
+
+# Or use local cost function
+config.measurement = "local_pauli_z"  # Instead of global
+```
+
+#### 2. Training Loss Oscillates
+
+**Symptom**: Loss bounces between values without converging
+
+**Solution**:
+```python
+# Reduce learning rate
+config.learning_rate = 0.005  # From 0.05
+
+# Use gradient clipping
+config.gradient_clipping = 1.0
+
+# Switch to SPSA for noisy environments
+config.optimizer = "spsa"
+config.spsa_perturbation = 0.1
+```
+
+#### 3. Circuit Depth Too Large
+
+**Symptom**: Circuit exceeds hardware limits, transpilation fails
+
+**Solution**:
+```python
+from quantum_neural_networks import compress_circuit
+
+# Compress circuit
+compressed = compress_circuit(
+    qnn.circuit,
+    strategy="gate_cancellation",
+    target_depth=100,
+)
+qnn.circuit = compressed
+```
+
+#### 4. Measurement Statistics Insufficient
+
+**Symptom**: High variance in expectation values
+
+**Solution**:
+```python
+config = QNNConfig(
+    n_qubits=4,
+    shots=4096,  # Increase from 1024
+    measurement_mitigation=True,
+    readout_mitigation_shots=2048,
+)
+```
+
+#### 5. Overfitting on Small Datasets
+
+**Symptom**: Training accuracy high, test accuracy low
+
+**Solution**:
+```python
+config = QNNConfig(
+    n_qubits=4,
+    n_layers=2,  # Reduce complexity
+    regularization="l2",
+    regularization_strength=0.01,
+    dropout=0.1,
+)
+```
+
+## API Reference
+
+### Core Classes
+
+#### `QuantumNeuralNetwork`
+Main entry point for QNN construction and training.
+
+```python
+class QuantumNeuralNetwork:
+    def __init__(self, config: QNNConfig) -> None: ...
+    
+    def initialize_parameters(self, seed: int = 42) -> None: ...
+    def fit(self, X: np.ndarray, y: np.ndarray, epochs: int = 50, **kwargs) -> TrainingHistory: ...
+    def predict(self, X: np.ndarray) -> np.ndarray: ...
+    def score(self, X: np.ndarray, y: np.ndarray) -> float: ...
+    def cross_validate(self, X: np.ndarray, y: np.ndarray, k: int = 5) -> CVResult: ...
+    def predict_with_uncertainty(self, X: np.ndarray, n_samples: int = 100) -> Tuple[np.ndarray, np.ndarray]: ...
+    def save_checkpoint(self, path: str) -> None: ...
+    def load_checkpoint(self, path: str) -> None: ...
+```
+
+#### `QNNConfig`
+Configuration for quantum neural network.
+
+```python
+@dataclass
+class QNNConfig:
+    n_qubits: int
+    n_layers: int = 2
+    ansatz: AnsatzType = AnsatzType.HARDWARE_EFFICIENT
+    encoding: EncodingStrategy = EncodingStrategy.ANGLE
+    measurement: MeasurementBasis = MeasurementBasis.PAULI_Z
+    entanglement: str = "linear"
+    learning_rate: float = 0.01
+    batch_size: int = 32
+    shots: Optional[int] = None
+    noise_model: Optional[NoiseModel] = None
+    mitigation: Optional[str] = None
+    regularization: Optional[str] = None
+    regularization_strength: float = 0.01
+```
+
+### Data Classes
+
+#### `TrainingHistory`
+```python
+@dataclass
+class TrainingHistory:
+    losses: List[float]
+    accuracies: List[float]
+    gradient_norms: List[float]
+    gradient_variances: List[float]
+    epoch_times: List[float]
+    metadata: Dict[str, Any]
+```
+
+#### `QNNResult`
+```python
+@dataclass
+class QNNResult:
+    predictions: np.ndarray
+    probabilities: Optional[np.ndarray]
+    uncertainties: Optional[np.ndarray]
+    metadata: Dict[str, Any]
+```
+
+## Data Models
+
+### QNN Configuration Schema
+
+```json
+{
+  "name": "qnn_classifier",
+  "version": "1.0.0",
+  "architecture": {
+    "n_qubits": 4,
+    "n_layers": 3,
+    "ansatz": "strongly_entangling",
+    "entanglement": "circular",
+    "rotation_gates": ["RX", "RY", "RZ"],
+    "entangling_gate": "CZ"
+  },
+  "training": {
+    "optimizer": "adam",
+    "learning_rate": 0.01,
+    "epochs": 50,
+    "batch_size": 32,
+    "early_stopping": true,
+    "patience": 10
+  },
+  "measurement": {
+    "basis": "pauli_z",
+    "shots": null,
+    "mitigation": "zero_noise_extrapolation"
+  }
+}
+```
+
+### Training Metrics Schema
+
+```json
+{
+  "training_id": "uuid-v4",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "model": {
+    "n_qubits": 4,
+    "n_layers": 3,
+    "n_parameters": 48
+  },
+  "metrics": {
+    "final_loss": 0.1234,
+    "final_accuracy": 0.956,
+    "best_loss": 0.1234,
+    "best_epoch": 45,
+    "total_training_time_ms": 125000,
+    "avg_epoch_time_ms": 2500
+  },
+  "hardware": {
+    "backend": "aer_simulator",
+    "shots": 1024,
+    "noise_model": "depolarizing_0.005"
+  }
+}
+```
+
+## Deployment Guide
+
+### Docker Deployment
+
+```dockerfile
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y gcc g++ && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY quantum_neural_networks/ /app/quantum_neural_networks/
+WORKDIR /app
+
+ENV QNN_BACKEND=default.qubit
+ENV QNN_SHOTS=1024
+ENV QNN_OPTIMIZATION_LEVEL=2
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "from quantum_neural_networks import health_check; health_check()"
+
+CMD ["python", "-m", "quantum_neural_networks.server"]
+```
+
+### Kubernetes Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quantum-nn
+  namespace: quantum-ml
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: quantum-nn
+  template:
+    metadata:
+      labels:
+        app: quantum-nn
+    spec:
+      containers:
+      - name: quantum-nn
+        image: quantum-nn:latest
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2000m"
+          limits:
+            memory: "16Gi"
+            cpu: "8000m"
+        env:
+        - name: QNN_BACKEND
+          value: "lightning.qubit"
+        ports:
+        - containerPort: 8080
+```
+
+## Monitoring & Observability
+
+### Metrics Collection
+
+```python
+from quantum_neural_networks import MetricsCollector
+
+collector = MetricsCollector(backend="prometheus")
+
+# Track training metrics
+collector.register_metric("qnn_training_loss", type="gauge")
+collector.register_metric("qnn_gradient_variance", type="gauge")
+collector.register_metric("qnn_circuit_depth", type="gauge")
+collector.register_metric("qnn_execution_time", type="histogram")
+
+# Record during training
+collector.set("qnn_training_loss", loss)
+collector.set("qnn_gradient_variance", grad_var)
+collector.observe("qnn_execution_time", execution_ms)
+```
+
+### Distributed Tracing
+
+```python
+from quantum_neural_networks import Tracer
+
+tracer = Tracer(service="quantum-nn")
+
+with tracer.start_span("training_epoch") as span:
+    span.set_attribute("epoch", epoch)
+    span.set_attribute("batch_size", batch_size)
+    
+    with tracer.start_span("circuit_execution"):
+        result = qnn.forward_batch(X_batch)
+        span.set_attribute("circuit_depth", qnn.circuit.depth())
+    
+    with tracer.start_span("gradient_computation"):
+        gradients = qnn.compute_gradients(X_batch, y_batch)
+        span.set_attribute("gradient_norm", np.linalg.norm(gradients))
+```
+
+### Logging Configuration
+
+```python
+import logging
+from quantum_neural_networks import QuantumLogger
+
+logger = QuantumLogger(
+    name="quantum-nn",
+    level=logging.INFO,
+    format="json",
+    output="stdout",
+)
+
+logger.info("Training started",
+    n_qubits=4,
+    n_layers=3,
+    n_parameters=qnn.n_parameters,
+)
+```
+
+## Testing Strategy
+
+### Unit Tests
+
+```python
+import pytest
+from quantum_neural_networks import QuantumNeuralNetwork, QNNConfig
+
+class TestQNN:
+    def setup_method(self):
+        self.config = QNNConfig(n_qubits=4, n_layers=2)
+        self.qnn = QuantumNeuralNetwork(self.config)
+    
+    def test_initialization(self):
+        self.qnn.initialize_parameters(seed=42)
+        assert self.qnn.n_parameters > 0
+    
+    def test_forward_pass(self):
+        self.qnn.initialize_parameters()
+        X = np.random.randn(10, 4)
+        output = self.qnn.forward(X)
+        assert output.shape == (10, 1)
+    
+    def test_gradient_computation(self):
+        self.qnn.initialize_parameters()
+        X = np.random.randn(5, 4)
+        y = np.random.randint(0, 2, (5, 1))
+        grads = self.qnn.compute_gradients(X, y)
+        assert grads.shape == (self.qnn.n_parameters,)
+```
+
+### Integration Tests
+
+```python
+class TestQNNIntegration:
+    @pytest.mark.integration
+    def test_training_convergence(self):
+        config = QNNConfig(n_qubits=4, n_layers=2, learning_rate=0.05)
+        qnn = QuantumNeuralNetwork(config)
+        
+        X, y = make_classification(n_samples=100, n_features=4)
+        history = qnn.fit(X, y, epochs=30)
+        
+        assert history.losses[-1] < history.losses[0]
+    
+    @pytest.mark.integration
+    def test_cross_validation(self):
+        config = QNNConfig(n_qubits=4, n_layers=2)
+        qnn = QuantumNeuralNetwork(config)
+        
+        X, y = make_classification(n_samples=100, n_features=4)
+        cv_result = qnn.cross_validate(X, y, k=3)
+        
+        assert cv_result.mean_accuracy > 0.5
+```
+
+## Versioning & Migration
+
+### Semantic Versioning
+
+- **Major (X.0.0)**: Breaking API changes, new ansatz types, backend deprecation
+- **Minor (0.X.0)**: New features, algorithm improvements, backend additions
+- **Patch (0.0.X)**: Bug fixes, documentation updates, performance improvements
+
+### Migration Guide (v1.x to v2.0)
+
+```python
+# v1.x (deprecated)
+from quantum_neural_networks import QNN
+model = QNN(n_qubits=4)
+model.train(X, y)
+
+# v2.0 (current)
+from quantum_neural_networks import QuantumNeuralNetwork, QNNConfig
+config = QNNConfig(n_qubits=4, n_layers=2)
+model = QuantumNeuralNetwork(config)
+model.fit(X, y, epochs=50)
+```
+
+### Changelog
+
+#### v2.0.0 (2024-01-15)
+- **Breaking**: New `QNNConfig` API replaces separate config classes
+- **Added**: Multi-backend support (PennyLane, Qiskit, Cirq)
+- **Added**: Noise-aware training with mitigation strategies
+- **Added**: Checkpoint and resume functionality
+- **Improved**: 2x faster gradient computation
+- **Fixed**: Memory leak in long training sessions
+
+#### v1.1.0 (2023-09-01)
+- **Added**: Data reuploading support
+- **Added**: Custom ansatz architecture
+- **Improved**: Gradient variance monitoring
+- **Fixed**: Batch processing edge cases
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **Ansatz** | Parameterized quantum circuit architecture |
+| **Barren Plateau** | Exponential vanishing of gradients in deep circuits |
+| **Data Reuploading** | Re-encoding classical data in each variational layer |
+| **Parameter-Shift Rule** | Exact gradient computation for parameterized circuits |
+| **QNN** | Quantum Neural Network; hybrid quantum-classical model |
+| **Variational Circuit** | Parameterized quantum circuit with trainable angles |
+| **Expressivity** | Ability of a circuit to represent diverse quantum states |
+| **Entanglement** | Quantum correlation between qubits |
+
+## Contributing Guidelines
+
+### Development Setup
+
+```bash
+git clone https://github.com/example/quantum-nn.git
+cd quantum-nn
+python -m venv venv
+source venv/bin/activate
+pip install -e ".[dev]"
+pytest tests/ -v
+ruff check .
+mypy quantum_neural_networks/
+```
+
+### Code Style
+
+- Follow PEP 8 with line length 100
+- Use type hints for all public functions
+- Document public API with Google-style docstrings
+- Keep functions under 50 lines
+
+### Pull Request Process
+
+1. Create feature branch from `main`
+2. Write tests for new functionality
+3. Ensure all tests pass
+4. Update documentation
+5. Add changelog entry
+6. Request review from maintainers
+7. Squash and merge
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Quantum ML Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+*Last updated: 2024-01-15*
+*Version: 2.0.0*

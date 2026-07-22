@@ -196,3 +196,526 @@ for span in trace.spans:
 - **network-debugging**: Network-level tracing and analysis
 - **crash-analysis**: Crash dump analysis and post-mortem debugging
 - **reverse-engineering**: Binary analysis and reverse engineering
+
+---
+
+## Advanced Configuration
+
+### Advanced Profiling Configuration
+
+```python
+from dynamic_analysis import Profiler, ProfileMode, SamplingConfig
+
+# Configure advanced profiling
+profiler = Profiler(
+    mode=ProfileMode.CPU,
+    sampling=SamplingConfig(
+        enabled=True,
+        interval_us=1000,  # 1ms sampling
+        stack_depth=64,
+        thread_filter=["main", "worker-*"],
+    ),
+    output=ProfileOutput(
+        format="flamegraph",
+        include_inlined=True,
+        include_system_frames=False,
+        min_sample_count=10,
+    ),
+)
+
+# Profile with custom filters
+with profiler.profile(
+    name="api_handler",
+    tags={"endpoint": "/api/users", "method": "GET"},
+    ignore_below_ms=10,  # Ignore calls < 10ms
+) as p:
+    result = handle_api_request()
+```
+
+### Advanced Memory Profiling
+
+```python
+from dynamic_analysis import MemoryProfiler, MemoryConfig
+
+profiler = MemoryProfiler(
+    config=MemoryConfig(
+        track_allocations=True,
+        track_deallocations=True,
+        sampling_rate=0.01,  # 1% sampling
+        capture_call_stacks=True,
+        max_call_stack_depth=32,
+    ),
+)
+
+# Start profiling
+profiler.start()
+
+# Run workload
+for _ in range(10000):
+    process_request()
+
+# Get detailed report
+report = profiler.get_report()
+print(f"Total allocations: {report.total_allocations:,}")
+print(f"Total bytes: {report.total_bytes / 1024 / 1024:.1f} MB")
+print(f"Top allocation sites:")
+for site in report.top_sites[:10]:
+    print(f"  {site.function}:{site.line}: {site.count:,} allocations ({site.bytes / 1024:.1f} KB)")
+```
+
+### Advanced Distributed Tracing
+
+```python
+from dynamic_analysis import DistributedTracer, TraceConfig
+
+tracer = DistributedTracer(
+    service_name="payment-service",
+    config=TraceConfig(
+        sampling_rate=0.1,  # 10% sampling
+        max_spans_per_trace=1000,
+        propagation_format="w3c",
+        baggage_enabled=True,
+        compression="gzip",
+    ),
+)
+
+# Create trace with baggage
+with tracer.start_trace(
+    "process_payment",
+    baggage={"user_id": "123", "order_id": "456"},
+) as trace:
+    # Child span
+    with tracer.start_span("validate") as span:
+        span.set_attribute("validation_type", "schema")
+        validate_payment()
+    
+    # Another child span
+    with tracer.start_span("charge") as span:
+        span.set_attribute("payment_method", "credit_card")
+        charge_card()
+```
+
+## Architecture Patterns
+
+### Dynamic Analysis Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                Dynamic Analysis Architecture                │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │              Instrumentation Layer                   │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
+│  │  │  Bytecode   │  │  Function   │  │  Event      │ │   │
+│  │  │  Instrum.   │  │  Hooking    │  │  Tracing    │ │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘ │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                 │
+│  ┌────────────────────────┴─────────────────────────────┐   │
+│  │              Collection Layer                         │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
+│  │  │  Sampling   │  │  Stacking   │  │  Filtering  │ │   │
+│  │  │  Engine     │  │  Engine     │  │  Engine     │ │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘ │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                 │
+│  ┌────────────────────────┴─────────────────────────────┐   │
+│  │              Analysis Layer                          │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
+│  │  │  Symbol     │  │  Pattern    │  │  Anomaly    │ │   │
+│  │  │  Resolution │  │  Detection  │  │  Detection  │ │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘ │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                 │
+│  ┌────────────────────────┴─────────────────────────────┐   │
+│  │              Visualization Layer                     │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
+│  │  │  Flame      │  │  Call       │  │  Timeline   │ │   │
+│  │  │  Graphs     │  │  Graphs     │  │  Views      │ │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘ │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Profiling Data Flow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   Profiling Data Flow                       │
+├─────────────────────────────────────────────────────────────┤
+│  1. Instrument Code                                        │
+│     └─► Add profiling hooks at function entry/exit          │
+│  2. Collect Samples                                        │
+│     └─► Periodic stack traces at configurable interval      │
+│  3. Symbolicate                                            │
+│     └─► Resolve addresses to function names                 │
+│  4. Aggregate                                              │
+│     └─► Group by function, file, line                       │
+│  5. Analyze                                                │
+│     └─► Identify hotspots, bottlenecks                      │
+│  6. Visualize                                              │
+│     └─► Generate flame graphs, call trees                   │
+│  7. Report                                                 │
+│     └─► Produce actionable recommendations                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Integration Guide
+
+### Application Integration
+
+```python
+# Integration with FastAPI
+from fastapi import FastAPI, Request
+from dynamic_analysis import Tracer, Profiler
+
+app = FastAPI()
+tracer = Tracer(service_name="api-service")
+profiler = Profiler(mode=ProfileMode.CPU)
+
+@app.middleware("http")
+async def profiling_middleware(request: Request, call_next):
+    # Start trace
+    with tracer.start_span(f"{request.method} {request.url.path}") as span:
+        span.set_attribute("http.method", request.method)
+        span.set_attribute("http.url", str(request.url))
+        
+        # Profile request
+        with profiler.profile(f"request:{request.url.path}"):
+            response = await call_next(request)
+        
+        span.set_attribute("http.status_code", response.status_code)
+    
+    return response
+```
+
+### Prometheus Integration
+
+```python
+# Integration with Prometheus
+from prometheus_client import Counter, Histogram, Gauge
+
+REQUEST_COUNT = Counter('http_requests_total', 'Total requests', ['method', 'path', 'status'])
+REQUEST_DURATION = Histogram('http_request_duration_seconds', 'Request duration', ['method', 'path'])
+ACTIVE_REQUESTS = Gauge('http_active_requests', 'Active requests')
+
+class ProfilingMetrics:
+    def __init__(self, profiler: Profiler):
+        self.profiler = profiler
+    
+    def record_request(self, method: str, path: str, status: int, duration: float):
+        REQUEST_COUNT.labels(method=method, path=path, status=status).inc()
+        REQUEST_DURATION.labels(method=method, path=path).observe(duration)
+    
+    def get_profile_metrics(self):
+        report = self.profiler.get_report()
+        return {
+            "cpu_hotspots": len(report.top_functions),
+            "total_samples": report.total_samples,
+        }
+```
+
+## Performance Optimization
+
+### Profiling Overhead
+
+| Mode | CPU Overhead | Memory Overhead | I/O Overhead |
+|------|--------------|-----------------|--------------|
+| CPU Sampling | 1-3% | < 1% | Low |
+| CPU Tracing | 10-30% | 2-5% | Medium |
+| Memory Sampling | 2-5% | 5-10% | Low |
+| Memory Tracing | 15-40% | 10-20% | Medium |
+| I/O Profiling | 3-8% | 1-3% | High |
+
+### Optimized Profiling
+
+```python
+from dynamic_analysis import OptimizedProfiler
+
+profiler = OptimizedProfiler()
+
+# Configure for minimal overhead
+profiler.configure(
+    sampling=True,
+    sampling_rate=0.01,  # 1% sampling
+    stack_depth=32,
+    buffering=True,
+    buffer_size=10000,
+    flush_interval_seconds=10,
+)
+
+# Profile with filtering
+profiler.filter_functions(
+    include=["app.*", "service.*"],
+    exclude=["test.*", "vendor.*"],
+)
+```
+
+## Security Considerations
+
+### Sensitive Data in Profiles
+
+```python
+from dynamic_analysis import ProfileSanitizer
+
+sanitizer = ProfileSanitizer()
+
+# Configure sanitization
+sanitizer.configure(
+    # Redact sensitive variables
+    redact_variables=["password", "token", "secret", "api_key"],
+    
+    # Redact sensitive arguments
+    redact_arguments=["auth", "credential"],
+    
+    # Redact file paths
+    redact_paths=["/home/*", "/etc/*"],
+    
+    # Redact URLs
+    redact_urls=["https://api.example.com/*"],
+)
+
+# Sanitize profile
+sanitized = sanitizer.sanitize(profile)
+```
+
+## Troubleshooting Guide
+
+### Common Issues
+
+| Issue | Symptom | Solution |
+|-------|---------|----------|
+| High overhead | Application slows down | Reduce sampling rate, use filtering |
+| Missing symbols | Unresolved addresses | Ensure debug symbols available |
+| Incomplete stacks | Truncated call stacks | Increase stack depth |
+| Memory pressure | OOM during profiling | Reduce buffer size, flush more often |
+| Thread contention | Profiler blocks application | Use lock-free profiling |
+
+### Diagnostic Queries
+
+```python
+# Check profiler health
+from dynamic_analysis import ProfilerHealth
+
+health = ProfilerHealth()
+status = health.check()
+print(f"Profiler status: {status.status}")
+print(f"Sampling rate: {status.sampling_rate}")
+print(f"Buffer usage: {status.buffer_usage_pct:.1f}%")
+print(f"Overhead: {status.estimated_overhead_pct:.1f}%")
+```
+
+## API Reference
+
+### Profiler
+
+```python
+class Profiler:
+    def __init__(self, mode: ProfileMode = ProfileMode.CPU, **kwargs)
+    def start(self, name: str = None)
+    def stop(self) -> ProfileReport
+    def profile(self, name: str = None, **kwargs) -> ContextManager
+    def get_report(self) -> ProfileReport
+    def export_flame_graph(self, filename: str)
+    def export_json(self, filename: str)
+    def reset(self)
+```
+
+### MemoryProfiler
+
+```python
+class MemoryProfiler:
+    def __init__(self, config: MemoryConfig = None)
+    def start(self)
+    def stop(self) -> MemoryReport
+    def snapshot(self, name: str) -> HeapSnapshot
+    def compare(self, snapshot1: str, snapshot2: str) -> SnapshotDiff
+    def detect_leaks(self) -> list[Leak]
+    def get_report(self) -> MemoryReport
+```
+
+### Tracer
+
+```python
+class Tracer:
+    def __init__(self, service_name: str, config: TraceConfig = None)
+    def start_trace(self, name: str, **kwargs) -> ContextManager
+    def start_span(self, name: str, **kwargs) -> ContextManager
+    def get_trace(self) -> Trace
+    def export_jaeger(self, filename: str)
+    def export_zipkin(self, filename: str)
+    def inject_context(self, headers: dict) -> dict
+    def extract_context(self, headers: dict) -> dict
+```
+
+### ThreadDebugger
+
+```python
+class ThreadDebugger:
+    def __init__(self)
+    def detect_deadlocks(self) -> list[Deadlock]
+    def analyze_lock_contention(self) -> ContentionReport
+    def get_thread_states(self) -> list[ThreadState]
+    def get_thread_pool_stats(self) -> ThreadPoolStats
+    def take_thread_dump(self) -> ThreadDump
+```
+
+## Data Models
+
+### Core Data Structures
+
+```python
+from dataclasses import dataclass, field
+from typing import Optional, List, Dict
+from enum import Enum
+from datetime import datetime
+
+class ProfileMode(Enum):
+    CPU = "cpu"
+    MEMORY = "memory"
+    IO = "io"
+    THREAD = "thread"
+
+@dataclass
+class ProfileReport:
+    mode: ProfileMode
+    duration_ms: float
+    total_samples: int
+    top_functions: List['FunctionStats']
+    flame_graph_url: Optional[str]
+    timestamp: datetime
+
+@dataclass
+class FunctionStats:
+    name: str
+    file: str
+    line: int
+    samples: int
+    percentage: float
+    self_time_ms: float
+    total_time_ms: float
+    children: List['FunctionStats'] = field(default_factory=list)
+
+@dataclass
+class MemoryReport:
+    total_allocations: int
+    total_bytes: int
+    top_sites: List['AllocationSite']
+    potential_leaks: List['Leak']
+    gc_stats: Optional['GCStats']
+
+@dataclass
+class Trace:
+    trace_id: str
+    spans: List['Span']
+    duration_ms: float
+    status: str
+
+@dataclass
+class Span:
+    span_id: str
+    name: str
+    start_ms: float
+    duration_ms: float
+    attributes: Dict[str, str]
+    status: str
+    parent_id: Optional[str]
+```
+
+## Deployment Guide
+
+### Docker Deployment
+
+```yaml
+version: '3.8'
+services:
+  app:
+    image: app:latest
+    environment:
+      PROFILER_ENABLED: "true"
+      PROFILER_MODE: "cpu"
+      PROFILER_SAMPLING_RATE: "0.01"
+    volumes:
+      - ./profiles:/profiles
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+```
+
+## Monitoring & Observability
+
+### Metrics Collection
+
+```python
+from dynamic_analysis import MetricsCollector
+
+collector = MetricsCollector()
+
+# Collect profiling metrics
+collector.gauge("profiler.active", 1 if active else 0)
+collector.histogram("profiler.duration.seconds", duration)
+collector.counter("profiler.samples.total", count)
+collector.gauge("profiler.overhead.percentage", overhead)
+```
+
+## Testing Strategy
+
+### Unit Tests
+
+```python
+import pytest
+from dynamic_analysis import Profiler, ProfileMode
+
+@pytest.fixture
+def profiler():
+    return Profiler(mode=ProfileMode.CPU)
+
+def test_profiling(profiler):
+    with profiler.profile("test"):
+        sum(range(1000000))
+    report = profiler.get_report()
+    assert report.total_samples > 0
+```
+
+## Versioning & Migration
+
+### Version Compatibility
+
+| Component | Minimum Version | Recommended |
+|-----------|-----------------|-------------|
+| Python | 3.8 | 3.11+ |
+| Linux | 4.0 | 5.10+ |
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **Flame Graph** | Visual representation of stack traces |
+| **Sampling** | Periodic collection of stack traces |
+| **Hotspot** | Function consuming most CPU time |
+| **Span** | Single unit of work in distributed trace |
+| **Trace** | Complete request path through system |
+
+## Changelog
+
+### Version 3.0.0 (2024-01-15)
+- Added distributed tracing support
+- New flame graph visualization
+- Improved memory profiling
+- Added thread debugging
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/awesome-grok/dynamic-analysis.git
+cd dynamic-analysis
+pip install -e ".[dev]"
+pytest
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills

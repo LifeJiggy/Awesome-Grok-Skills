@@ -543,3 +543,362 @@ The **Reporting Layer** generates comprehensive reports for different audiences.
 - **Risk Assessment**: Evaluating security risks and priorities
 - **Compliance**: Meeting regulatory and industry security requirements
 - **Training**: Security awareness and professional skill development
+
+## Operational Methodology
+
+### Campaign Planning Framework
+
+Effective red team campaigns require meticulous planning that balances realism, safety, and testing objectives. The planning framework ensures comprehensive coverage while maintaining operational security.
+
+**Threat Intelligence Integration**
+
+```python
+from red_team_operations import ThreatIntelProcessor, CampaignPlanner
+
+# Initialize threat intelligence processor
+intel_processor = ThreatIntelProcessor(
+    sources=["misp", "otx", "commercial_feeds", "government_advisories"],
+    auto_enrichment=True,
+    confidence_scoring=True
+)
+
+# Process threat intelligence for campaign planning
+threat_intel = intel_processor.process(
+    target_organization="example.com",
+    time_range="90d",
+    adversary_filter="apt29",
+    technique_focus=["initial_access", "persistence", "exfiltration"]
+)
+
+# Analyze threat landscape
+threat_analysis = intel_processor.analyze(threat_intel)
+print("Threat Landscape Analysis:")
+print(f"  Relevant threat actors: {len(threat_analysis.threat_actors)}")
+print(f"  Common TTPs: {threat_analysis.common_ttps}")
+print(f"  Targeted industries: {threat_analysis.targeted_industries}")
+print(f"  Recent campaigns: {threat_analysis.recent_campaigns}")
+
+# Generate campaign plan based on threat intelligence
+planner = CampaignPlanner()
+campaign_plan = planner.create_plan(
+    threat_intelligence=threat_intel,
+    target_organization="example.com",
+    objectives=["data_exfiltration", "credential_harvest", "persistence"],
+    duration_days=30,
+    team_size=5,
+    risk_tolerance="medium"
+)
+
+print(f"\nCampaign Plan:")
+print(f"  Name: {campaign_plan.name}")
+print(f"  Duration: {campaign_plan.duration_days} days")
+print(f"  Phases: {len(campaign_plan.phases)}")
+print(f"  Estimated cost: ${campaign_plan.estimated_cost}")
+print(f"  Risk level: {campaign_plan.risk_level}")
+```
+
+**Resource Allocation and Scheduling**
+
+```python
+from red_team_operations import ResourceAllocator, CampaignScheduler
+
+# Initialize resource allocator
+allocator = ResourceAllocator(
+    team_members=["operator1", "operator2", "operator3"],
+    infrastructure=["c2_server", "phishing_server", "exfil_server"],
+    tools=["cobalt_strike", "metasploit", "custom_tools"]
+)
+
+# Allocate resources based on campaign requirements
+allocation = allocator.allocate(
+    campaign_plan=campaign_plan,
+    skill_matrix={
+        "operator1": ["exploitation", "post_exploitation"],
+        "operator2": ["social_engineering", "physical_access"],
+        "operator3": ["web_exploitation", "cloud"]
+    },
+    availability_schedule={
+        "operator1": "full_time",
+        "operator2": "part_time",
+        "operator3": "full_time"
+    }
+)
+
+print("Resource Allocation:")
+for role, details in allocation.items():
+    print(f"\n{role}:")
+    print(f"  Responsibilities: {details.responsibilities}")
+    print(f"  Time allocation: {details.time_allocation}%")
+    print(f"  Required tools: {details.tools}")
+
+# Create campaign schedule
+scheduler = CampaignScheduler()
+schedule = scheduler.create_schedule(
+    campaign_plan=campaign_plan,
+    allocation=allocation,
+    milestones=["initial_access", "persistence", "data_exfiltration"],
+    reporting_intervals="weekly"
+)
+
+print(f"\nCampaign Schedule:")
+for phase in schedule.phases:
+    print(f"\nPhase: {phase.name}")
+    print(f"  Start: {phase.start_date}")
+    print(f"  End: {phase.end_date}")
+    print(f"  Objectives: {phase.objectives}")
+    print(f"  Assigned operators: {phase.operators}")
+```
+
+### Operational Security (OPSEC) Framework
+
+Operational security is critical for maintaining stealth during red team operations and preventing premature detection.
+
+**OPSEC Monitoring and Enforcement**
+
+```python
+from red_team_operations import OPSECMonitor, DetectionRiskAssessor
+
+# Initialize OPSEC monitor
+opsec_monitor = OPSECMonitor(
+    monitoring_level="maximum",
+    alert_threshold="medium",
+    auto_enforce=True
+)
+
+# Define OPSEC rules
+opsec_rules = opsec_monitor.define_rules(
+    rules=[
+        {"name": "infrastructure_isolation", "description": "Red team infra isolated from production", "enforcement": "strict"},
+        {"name": "communication_encryption", "description": "All comms encrypted", "enforcement": "strict"},
+        {"name": "credential_rotation", "description": "Credentials rotated daily", "enforcement": "strict"},
+        {"name": "behavioral_mimicry", "description": "Mimic legitimate user behavior", "enforcement": "moderate"},
+        {"name": "timing_randomization", "description": "Randomize activity timing", "enforcement": "moderate"},
+        {"name": "noise_minimization", "description": "Minimize network noise", "enforcement": "strict"}
+    ]
+)
+
+# Monitor OPSEC compliance during operations
+monitoring_results = opsec_monitor.monitor(
+    campaign_id="campaign_001",
+    real_time=True,
+    log_violations=True,
+    auto_correct=True
+)
+
+print("OPSEC Monitoring Results:")
+print(f"  Overall compliance: {monitoring_results.compliance_score}%")
+print(f"  Violations detected: {monitoring_results.violations}")
+print(f"  Auto-corrections applied: {monitoring_results.auto_corrections}")
+print(f"  Detection risk: {monitoring_results.detection_risk}")
+
+# Assess detection risk
+risk_assessor = DetectionRiskAssessor()
+risk_assessment = risk_assessor.assess(
+    current_activities=monitoring_results.activities,
+    target_defenses=["siem", "edr", "ids", "waf"],
+    historical_detection_events=[]
+)
+
+print(f"\nDetection Risk Assessment:")
+print(f"  Risk level: {risk_assessment.risk_level}")
+print(f"  Risk factors: {risk_assessment.risk_factors}")
+print(f"  Recommended actions: {risk_assessment.recommended_actions}")
+print(f"  Estimated detection probability: {risk_assessment.detection_probability}%")
+```
+
+**Infrastructure Compartmentalization**
+
+```python
+from red_team_operations import InfrastructureCompartmentalizer, NetworkSegmentation
+
+# Initialize infrastructure compartmentalizer
+compartmentalizer = InfrastructureCompartmentalizer()
+
+# Design compartmentalized infrastructure
+infra_design = compartmentalizer.design(
+    components={
+        "c2_infrastructure": {
+            "primary_c2": {"location": "cloud", "provider": "aws"},
+            "redirectors": [
+                {"location": "cdn", "provider": "cloudflare"},
+                {"location": "vps", "provider": "digitalocean"}
+            ],
+            "fallback_c2": {"location": "bulletproof", "provider": "custom"}
+        },
+        "phishing_infrastructure": {
+            "landing_pages": {"location": "cloud", "provider": "aws"},
+            "email_server": {"location": "vps", "provider": "vultr"}
+        },
+        "exfiltration_infrastructure": {
+            "exfil_server": {"location": "bulletproof", "provider": "custom"},
+            "dns_server": {"location": "vps", "provider": "linode"}
+        }
+    },
+    segmentation_rules={
+        "no_shared_credentials": True,
+        "no_shared_ip_ranges": True,
+        "no_shared_registration_info": True,
+        "independent_dns_resolution": True
+    }
+)
+
+print("Compartmentalized Infrastructure:")
+for component, details in infra_design.items():
+    print(f"\n{component}:")
+    print(f"  Location: {details.location}")
+    print(f"  Provider: {details.provider}")
+    print(f"  Isolation level: {details.isolation_level}")
+    print(f"  Compartmentalization: {details.compartmentalization}")
+
+# Configure network segmentation
+segmentation = NetworkSegmentation()
+segmentation.configure(
+    segments=["red_team", "management", "data"],
+    access_rules={
+        "red_team_to_management": "denied",
+        "red_team_to_data": "denied",
+        "management_to_red_team": "allowed",
+        "data_to_red_team": "denied"
+    },
+    firewall_rules="strict"
+)
+```
+
+### Objective Validation and Reporting
+
+Validating campaign objectives and generating comprehensive reports are essential for demonstrating value to stakeholders and driving remediation efforts.
+
+**Objective Validation Framework**
+
+```python
+from red_team_operations import ObjectiveValidator, CampaignMetricsCalculator
+
+# Initialize objective validator
+validator = ObjectiveValidator(
+    campaign_id="campaign_001",
+    validation_methods=["technical_verification", "evidence_collection", "reproduction"]
+)
+
+# Define campaign objectives with validation criteria
+objectives = validator.define_objectives(
+    objectives=[
+        {
+            "name": "data_exfiltration",
+            "description": "Exfiltrate sensitive data from target network",
+            "validation_criteria": [
+                "successful_data_extraction",
+                "exfil_channel_established",
+                "data_integrity_verified"
+            ],
+            "evidence_requirements": ["pcap", "screenshots", "logs"],
+            "success_threshold": 0.8
+        },
+        {
+            "name": "persistence",
+            "description": "Establish persistent access to target network",
+            "validation_criteria": [
+                "backdoor_installed",
+                "survives_reboot",
+                "communication_established"
+            ],
+            "evidence_requirements": ["process_list", "network_connections", "registry_entries"],
+            "success_threshold": 1.0
+        },
+        {
+            "name": "credential_harvest",
+            "description": "Harvest credentials from target environment",
+            "validation_criteria": [
+                "credentials_obtained",
+                "credentials_valid",
+                "privilege_escalation_achieved"
+            ],
+            "evidence_requirements": ["credential_dump", "privilege_escalation_log"],
+            "success_threshold": 0.7
+        }
+    ]
+)
+
+# Validate campaign objectives
+validation_results = validator.validate(
+    campaign_results=campaign_manager.get_results("campaign_001"),
+    objectives=objectives,
+    evidence_storage="./evidence"
+)
+
+print("Objective Validation Results:")
+for objective, result in validation_results.items():
+    print(f"\n{objective}:")
+    print(f"  Status: {result.status}")
+    print(f"  Validation score: {result.validation_score}")
+    print(f"  Evidence collected: {result.evidence_count}")
+    print(f"  Criteria met: {result.criteria_met}/{result.total_criteria}")
+
+# Calculate campaign metrics
+metrics_calculator = CampaignMetricsCalculator()
+metrics = metrics_calculator.calculate(
+    campaign_results=campaign_manager.get_results("campaign_001"),
+    validation_results=validation_results
+)
+
+print(f"\nCampaign Metrics:")
+print(f"  Overall success rate: {metrics.success_rate}%")
+print(f"  Mean time to detection: {metrics.mean_time_to_detection} minutes")
+print(f"  Mean time to response: {metrics.mean_time_to_response} minutes")
+print(f"  Detection coverage: {metrics.detection_coverage}%")
+print(f"  OPSEC compliance: {metrics.opsec_compliance}%")
+print(f"  Cost per finding: ${metrics.cost_per_finding}")
+```
+
+**Comprehensive Campaign Report**
+
+```python
+from red_team_operations import CampaignReportGenerator, ExecutiveBriefGenerator
+
+# Initialize report generator
+report_gen = CampaignReportGenerator(
+    campaign_id="campaign_001",
+    report_types=["executive", "technical", "detection_validation"],
+    output_formats=["pdf", "html", "json"]
+)
+
+# Generate executive brief
+exec_brief = ExecutiveBriefGenerator()
+executive_summary = exec_brief.generate(
+    campaign_results=campaign_manager.get_results("campaign_001"),
+    validation_results=validation_results,
+    metrics=metrics,
+    business_context=True,
+    roi_analysis=True
+)
+
+print("Executive Summary:")
+print(f"  Key findings: {len(executive_summary.key_findings)}")
+print(f"  Risk level: {executive_summary.risk_level}")
+print(f"  Business impact: {executive_summary.business_impact}")
+print(f"  Recommendations: {len(executive_summary.recommendations)}")
+print(f"  ROI: {executive_summary.roi}")
+
+# Generate technical report
+technical_report = report_gen.generate_technical_report(
+    campaign_results=campaign_manager.get_results("campaign_001"),
+    validation_results=validation_results,
+    include_poc=True,
+    include_remediation=True,
+    mitre_attack_mapping=True,
+    detection_gap_analysis=True
+)
+
+# Export reports
+report_gen.export(
+    executive_summary=executive_summary,
+    technical_report=technical_report,
+    formats=["pdf", "html"],
+    output_directory="./reports"
+)
+
+print(f"\nReports Generated:")
+print(f"  Executive Summary: ./reports/executive_summary.pdf")
+print(f"  Technical Report: ./reports/technical_report.pdf")
+print(f"  Interactive Report: ./reports/interactive_report.html")
+print(f"  Raw Data: ./reports/campaign_data.json")
+```

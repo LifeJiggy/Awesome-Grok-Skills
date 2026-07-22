@@ -193,3 +193,591 @@ for rec in recs:
 - **incident-response**: Incident management automation
 - **chaos-engineering**: Reliability testing practices
 - **cost-optimization**: Cost-aware reliability engineering
+
+---
+
+## Advanced Configuration
+
+### Multi-Window Burn Rate Alerting
+
+```python
+from site_reliability import BurnRateAlert
+
+burn_rate = BurnRateAlert(
+    slo_target=99.9,
+    short_window_minutes=5,
+    long_window_minutes=60,
+    burn_rate_threshold=14.4,  # 14.4x for 1-hour error budget consumption
+)
+```
+
+### Error Budget Policy
+
+```python
+from site_reliability import ErrorBudgetPolicy
+
+policy = ErrorBudgetPolicy(
+    slo_name="api_availability",
+    remaining_budget_thresholds={
+        "warning": 50,     # Alert when 50% consumed
+        "critical": 80,    # Alert when 80% consumed
+        "exhausted": 100,  # Freeze deployments
+    },
+    deployment_freeze=True,
+    notify_channels=["slack-sre", "pagerduty-oncall"],
+)
+```
+
+## Architecture Patterns
+
+### SRE Practice Framework
+
+```
+SLO Definition → Error Budget → Incident Response → Postmortem → Toil Reduction
+```
+
+### Error Budget Lifecycle
+
+```
+Budget Allocated → Budget Consumed → Alert → Investigation → Remediation → Budget Recovery
+```
+
+## Integration Guide
+
+### PagerDuty Integration
+
+```python
+from site_reliability import PagerDutyIntegration
+
+pd = PagerDutyIntegration(routing_key="xxx")
+pd.create_incident(
+    title="API Error Budget Critical",
+    severity="critical",
+    description="Error budget below 20%",
+)
+```
+
+### Status Page Integration
+
+```python
+from site_reliability import StatusPage
+
+page = StatusPage(provider="opsgenie")
+page.update_component("API Service", status="degraded")
+page.create_incident(title="Elevated Error Rates", impact="major")
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| SLI metric caching | Faster error budget calculation |
+| Incident timeline automation | Reduced MTTR |
+| Toil detection ML | Automated toil identification |
+| Capacity forecasting | Proactive scaling |
+
+## Security Considerations
+
+- **Incident data confidentiality**: Restrict postmortem access
+- **Status page auth**: Prevent unauthorized updates
+- **Runbook access control**: Sensitive procedures restricted
+- **Audit trail**: Log all SLO changes
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Error budget exhausts too fast | SLO too aggressive | Revisit SLO target |
+| Burn rate alert flapping | Window too short | Increase window duration |
+| Toil underreported | No time tracking | Add toil logging |
+| Incident response slow | No runbooks | Create runbooks for common incidents |
+
+## API Reference
+
+### SLOManager
+
+```python
+class SLOManager:
+    def __init__(self)
+    def create_slo(self, name: str, sli: SLIDefinition, target: float, window_days: int) -> SLO
+    def get_error_budget(self, slo: SLO) -> ErrorBudget
+    def get_burn_rate(self, slo: SLO, window_minutes: int) -> float
+```
+
+### IncidentManager
+
+```python
+class IncidentManager:
+    def __init__(self)
+    def create_incident(self, title: str, severity: Severity, service: str, description: str) -> Incident
+    def update(self, incident_id: str, update: str) -> None
+    def resolve(self, incident_id: str, resolution: str) -> None
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+from enum import Enum
+
+class Severity(Enum):
+    P1 = "P1"
+    P2 = "P2"
+    P3 = "P3"
+    P4 = "P4"
+
+@dataclass
+class SLO:
+    name: str
+    sli: SLIDefinition
+    target: float
+    window_days: int
+
+@dataclass
+class ErrorBudget:
+    slo: SLO
+    remaining_pct: float
+    consumed_pct: float
+    days_remaining: float
+
+@dataclass
+class Incident:
+    id: str
+    title: str
+    severity: Severity
+    status: str
+    oncall_engineer: str
+    created_at: float
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+pip install site-reliability
+```
+
+### SRE Practice Setup
+
+1. Define SLIs for all services
+2. Set SLO targets (start with 99.9%)
+3. Configure error budget alerting
+4. Create incident response runbooks
+5. Establish postmortem process
+6. Track and reduce toil
+
+## Monitoring & Observability
+
+```python
+from site_reliability import MetricsCollector
+
+collector = MetricsCollector()
+collector.gauge("sre.slo.error_budget_remaining_pct", budget.remaining_pct, tags={"slo": slo.name})
+collector.counter("sre.incidents.total", count, tags={"severity": sev})
+collector.gauge("sre.toil.hours_per_month", hours)
+collector.histogram("sre.mttr.minutes", mttr)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from site_reliability import SLOManager, SLIDefinition
+
+def test_error_budget():
+    manager = SLOManager()
+    sli = SLIDefinition(name="availability", metric="success/total", good_event="status != 5xx", total_event="all")
+    slo = manager.create_slo("api_avail", sli, 99.9, 30)
+    budget = manager.get_error_budget(slo)
+    assert budget.remaining_pct == 100.0
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 1.0.0 | Initial release | N/A |
+| 1.1.0 | Added burn rate alerting | Configure alert windows |
+| 2.0.0 | New incident workflow | Migrate to new API |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **SLI** | Service Level Indicator |
+| **SLO** | Service Level Objective |
+| **SLA** | Service Level Agreement |
+| **Error Budget** | Allowed unreliability within SLO |
+| **MTTR** | Mean Time To Recovery |
+| **Toil** | Manual, repetitive, automatable work |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with SLO management
+- Error budget tracking and burn rate alerting
+- Incident management workflows
+- Toil reduction tracking
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/site-reliability.git
+pip install -e ".[dev]"
+pytest tests/
+```
+
+## Advanced SRE Practices
+
+### Error Budget Policy Automation
+
+```python
+from site_reliability import ErrorBudgetAutomation
+
+automation = ErrorBudgetAutomation(
+    slo_targets=[
+        {"name": "api_availability", "target": 99.9, "window_days": 30},
+        {"name": "api_latency", "target": 99.5, "window_days": 30},
+    ],
+    policies=[
+        {"budget_consumed_pct": 50, "action": "notify", "channels": ["slack-sre"]},
+        {"budget_consumed_pct": 75, "action": "restrict_deployments", "scope": "non-critical"},
+        {"budget_consumed_pct": 90, "action": "freeze_deployments", "scope": "all"},
+        {"budget_consumed_pct": 100, "action": "escalate", "channels": ["pagerduty-oncall"]},
+    ],
+)
+
+# Check and enforce policies
+result = automation.check_and_enforce()
+print(f"Budget status: {result.budget_status}")
+print(f"Action taken: {result.action_taken}")
+print(f"Deployments restricted: {result.deployments_restricted}")
+```
+
+### Incident Commander Workflow
+
+```python
+from site_reliability import IncidentCommander
+
+ic = IncidentCommander()
+
+# Start incident
+incident = ic.start_incident(
+    title="Payment processing degraded",
+    severity=Severity.P1,
+    service="payment-service",
+    description="Payment success rate dropped to 85%",
+)
+
+# Assign roles
+ic.assign_role(incident.id, role="scribe", engineer="bob")
+ic.assign_role(incident.id, role="subject_matter_expert", engineer="alice")
+
+# Post updates
+ic.update(incident.id, update="Identified root cause: payment gateway rate limiting")
+ic.update(incident.id, update="Implementing circuit breaker fallback")
+
+# Communicate
+ic.announce(
+    incident.id,
+    channel="status-page",
+    message="Payment processing degraded. Some transactions may fail. Working on resolution.",
+)
+
+# Resolve
+ic.resolve(
+    incident.id,
+    resolution="Enabled circuit breaker fallback to secondary payment gateway",
+    root_cause="Primary payment gateway rate limiting due to upstream issue",
+    duration_minutes=45,
+)
+```
+
+### Postmortem Automation
+
+```python
+from site_reliability import PostmortemGenerator
+
+generator = PostmortemGenerator()
+
+# Generate postmortem from incident data
+postmortem = generator.generate(
+    incident_id="INC-1234",
+    template="blameless",
+    sections=[
+        "summary",
+        "impact",
+        "timeline",
+        "root_cause",
+        "action_items",
+        "lessons_learned",
+    ],
+)
+
+# Generate timeline from alerts and updates
+timeline = generator.build_timeline(incident_id="INC-1234")
+for event in timeline:
+    print(f"  [{event.timestamp}] {event.source}: {event.description}")
+
+# Export to Confluence
+generator.export_confluence(postmortem, space_key="SRE", parent_page="Postmortems")
+```
+
+### Toil Measurement Framework
+
+```python
+from site_reliability import ToilFramework
+
+framework = ToilFramework(
+    categories=[
+        {"name": "manual_operations", "weight": 1.0},
+        {"name": "repetitive_tasks", "weight": 0.8},
+        {"name": "automatable_work", "weight": 0.9},
+        {"name": "interrupt_driven", "weight": 0.7},
+    ],
+)
+
+# Log toil activities
+framework.log(
+    task="Manual certificate renewal",
+    category="repetitive_tasks",
+    duration_minutes=30,
+    frequency="monthly",
+    engineer="alice",
+    automation_difficulty="low",
+)
+
+# Generate toil report
+report = framework.report(engineering_team_size=10)
+print(f"Total toil hours/month: {report.total_hours:.1f}")
+print(f"Toil ratio: {report.toil_ratio:.1%}")
+print(f"Target toil ratio: {report.target_ratio:.1%}")
+print(f"Toil reduction needed: {report.reduction_needed_hours:.1f}h/month")
+print(f"Top toil tasks:")
+for task in report.top_tasks:
+    print(f"  {task.name}: {task.hours_per_month:.1f}h/month ({task.automation_difficulty})")
+```
+
+### Capacity Planning Models
+
+```python
+from site_reliability import CapacityModel
+
+model = CapacityModel(service="api-gateway")
+
+# Add resource metrics
+model.add_resource(
+    name="cpu",
+    current_utilization=0.65,
+    peak_utilization=0.85,
+    growth_rate_daily=0.02,
+)
+
+model.add_resource(
+    name="memory",
+    current_utilization=0.70,
+    peak_utilization=0.90,
+    growth_rate_daily=0.01,
+)
+
+model.add_resource(
+    name="disk",
+    current_utilization=0.45,
+    peak_utilization=0.60,
+    growth_rate_daily=0.05,
+)
+
+# Generate forecast
+forecast = model.forecast(days=90)
+print(f"CPU capacity reached: {forecast.cpu_days_until_capacity}")
+print(f"Memory capacity reached: {forecast.memory_days_until_capacity}")
+print(f"Disk capacity reached: {forecast.disk_days_until_capacity}")
+
+# Get recommendations
+recs = model.recommendations()
+for rec in recs:
+    print(f"  [{rec.priority}] {rec.action}")
+    print(f"    Resource: {rec.resource}")
+    print(f"    Deadline: {rec.deadline}")
+    print(f"    Cost impact: {rec.cost_impact}")
+```
+
+### SRE Maturity Model
+
+| Level | Practice | Metrics | Tools |
+|-------|----------|---------|-------|
+| 1 — Initial | Manual incident response | MTTR, incident count | Ticketing system |
+| 2 — Managed | Defined runbooks, basic SLOs | Error budget, MTTR | Monitoring stack |
+| 3 — Defined | Automated SLO tracking, game days | SLO burn rate, toil ratio | Full observability |
+| 4 — Quantitative | Predictive capacity, automated remediation | Forecast accuracy, automation rate | ML-based alerting |
+| 5 — Optimizing | Self-healing, continuous improvement | Reliability score, engineering velocity | AI-driven operations |
+
+### Reliability Scorecard
+
+```python
+from site_reliability import ReliabilityScorecard
+
+scorecard = ReliabilityScorecard(service="api-gateway")
+
+# Calculate score
+score = scorecard.calculate(
+    metrics={
+        "availability_pct": 99.95,
+        "mttr_minutes": 15,
+        "error_budget_remaining_pct": 65,
+        "toil_ratio": 0.25,
+        "incident_count_per_month": 2,
+        "postmortem_completion_rate": 1.0,
+        "action_item_completion_rate": 0.85,
+    },
+)
+
+print(f"Reliability score: {score.total:.1f}/100")
+print(f"Breakdown:")
+for category in score.categories:
+    print(f"  {category.name}: {category.score:.1f}/100 (weight: {category.weight:.0%})")
+print(f"Grade: {score.grade}")
+```
+
+### Runbook Automation
+
+```python
+from site_reliability import RunbookAutomation
+
+runbook = RunbookAutomation(
+    name="high-error-rate-response",
+    triggers=[
+        {"metric": "http_error_rate", "condition": "> 0.05", "duration_s": 300},
+    ],
+    steps=[
+        {"action": "check_service_health", "command": "kubectl get pods -l app=api-service"},
+        {"action": "check_dependencies", "command": "curl -s https://status.internal/health"},
+        {"action": "collect_logs", "command": "kubectl logs -l app=api-service --tail=100"},
+        {"action": "notify_oncall", "channel": "slack-sre", "message": "Automated investigation complete"},
+    ],
+    max_duration_s=600,
+)
+
+# Execute runbook
+result = runbook.execute(trigger_data={"error_rate": 0.08})
+print(f"Runbook: {result.runbook_name}")
+print(f"Status: {result.status}")
+print(f"Steps completed: {result.steps_completed}/{result.total_steps}")
+for step in result.step_results:
+    print(f"  [{step.status}] {step.action}: {step.output[:100]}")
+```
+
+### SLI Definitions Library
+
+```python
+from site_reliability import SLILibrary
+
+library = SLILibrary()
+
+# Availability SLI
+library.register(
+    name="availability",
+    description="Percentage of successful requests",
+    metric="sum(http_requests_total{status!~'5..'}) / sum(http_requests_total)",
+    good_event="status != 5xx",
+    total_event="all_requests",
+    unit="percentage",
+)
+
+# Latency SLI
+library.register(
+    name="latency",
+    description="Percentage of requests under latency threshold",
+    metric="sum(http_request_duration_seconds < 0.5) / sum(http_request_duration_seconds)",
+    good_event="duration < 0.5",
+    total_event="all_requests",
+    unit="percentage",
+)
+
+# Freshness SLI
+library.register(
+    name="freshness",
+    description="Data freshness for batch jobs",
+    metric="time() - max(last_successful_run_timestamp)",
+    good_event="freshness < 3600",
+    total_event="all_batch_jobs",
+    unit="seconds",
+)
+
+# Get all SLIs
+for sli in library.list():
+    print(f"  {sli.name}: {sli.description}")
+```
+
+### Multi-Region SLO Aggregation
+
+```python
+from site_reliability import MultiRegionSLO
+
+slo = MultiRegionSLO(
+    name="global_availability",
+    target=99.9,
+    window_days=30,
+    regions=[
+        {"name": "us-east-1", "weight": 0.4, "sli": "availability"},
+        {"name": "eu-west-1", "weight": 0.35, "sli": "availability"},
+        {"name": "ap-south-1", "weight": 0.25, "sli": "availability"},
+    ],
+)
+
+# Calculate global SLO
+status = slo.get_status()
+print(f"Global availability: {status.global_availability:.3f}%")
+for region in status.regions:
+    print(f"  {region.name}: {region.availability:.3f}% (weight: {region.weight:.0%})")
+print(f"Global error budget remaining: {status.error_budget_remaining_pct:.1f}%")
+```
+
+### Incident Metrics Dashboard
+
+| Metric | Last 7 Days | Last 30 Days | Target |
+|--------|-------------|--------------|--------|
+| Incidents | 3 | 8 | < 5 |
+| MTTR (minutes) | 22 | 18 | < 30 |
+| MTBF (hours) | 56 | 90 | > 100 |
+| P1 Incidents | 0 | 1 | < 1 |
+| Error Budget Used | 15% | 35% | < 50% |
+| Postmortem Rate | 100% | 100% | 100% |
+| Action Item Completion | 80% | 85% | > 80% |
+| Toil Ratio | 20% | 25% | < 30% |
+
+### Reliability Review Template
+
+```python
+from site_reliability import ReliabilityReview
+
+review = ReliabilityReview(
+    service="api-gateway",
+    period="2024-Q1",
+    attendees=["sre-team", "backend-team"],
+)
+
+# Generate review data
+data = review.generate(
+    metrics=[
+        "availability_slo",
+        "latency_slo",
+        "error_budget",
+        "incidents",
+        "mttr",
+        "toil_ratio",
+        "capacity_utilization",
+    ],
+)
+
+# Create review document
+review.export_markdown("reliability_review_q1_2024.md")
+review.export_pdf("reliability_review_q1_2024.pdf")
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills

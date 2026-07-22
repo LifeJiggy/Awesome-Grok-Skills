@@ -245,3 +245,469 @@ class SidebarSlot(ServerComponent):
 - **edge-runtime** — Deploying Server Components at the edge
 - **tailwind-shadcn** — UI components that work across server and client boundaries
 - **supabase-auth** — Auth state management across server and client components
+
+---
+
+## Advanced Configuration
+
+### RSC Payload Configuration
+
+```python
+from server_components import RSCConfig
+
+config = RSCConfig(
+    stream_enabled=True,
+    suspense_boundaries="auto",
+    cache_strategy="request",
+    max_stream_depth=10,
+    enable_partial_hydration=True,
+)
+```
+
+### Component Cache Strategy
+
+```python
+from server_components import CacheStrategy
+
+cache = CacheStrategy(
+    dedup_enabled=True,
+    cache_scope="request",  # request | session | global
+    ttl_seconds=300,
+    stale_while_revalidate=True,
+)
+```
+
+## Architecture Patterns
+
+### Server/Client Boundary
+
+```
+Server Components (zero JS)
+    │
+    │ Props (serializable only)
+    ▼
+Client Components (hydrated)
+    │
+    │ Event handlers, state
+    ▼
+Browser
+```
+
+### Streaming with Suspense
+
+```
+Initial Shell (immediate)
+    │
+    ├── Suspense Boundary 1 → Fallback → Resolved Content
+    │
+    ├── Suspense Boundary 2 → Fallback → Resolved Content
+    │
+    └── Suspense Boundary 3 → Fallback → Resolved Content
+```
+
+## Integration Guide
+
+### Database Integration
+
+```python
+from server_components import ServerComponent, db
+
+class UserList(ServerComponent):
+    async def render(self, props):
+        users = await db.user.find_many(order={"name": "asc"})
+        return self.html("<ul>", *[f"<li>{u.name}</li>" for u in users], "</ul>")
+```
+
+### Client Component Interop
+
+```python
+from server_components import ClientComponent, useState
+
+class Counter(ClientComponent):
+    def render(self, props):
+        count = self.use_state("count", props.get("initial", 0))
+        return self.html(
+            f'<button onClick=lambda: self.set_state("count", {count} + 1)>',
+            f'Count: {count}',
+            '</button>',
+        )
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| React.cache() dedup | Single DB call per request |
+| Streaming Suspense | Immediate shell, progressive content |
+| Partial hydration | Only interactive parts ship JS |
+| Component-level caching | Skip re-render for unchanged data |
+
+## Security Considerations
+
+- **No secrets in Server Components**: They run on server only
+- **Serializable boundary**: Functions don't cross server/client
+- **Server Action validation**: Always validate form data server-side
+- **CSRF protection**: Server Actions include CSRF tokens
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Hydration error | Server/client render mismatch | Use useEffect for client state |
+| Function passed to client | Non-serializable prop | Use Server Action instead |
+| Streaming not working | Missing Suspense boundary | Wrap async component in Suspense |
+| Cache not deduplicating | Different cache keys | Use React.cache() for same fetch |
+
+## API Reference
+
+### ServerComponent
+
+```python
+class ServerComponent:
+    async def render(self, props: dict) -> str
+    def html(self, *parts) -> str
+```
+
+### ClientComponent
+
+```python
+class ClientComponent:
+    def render(self, props: dict) -> str
+    def use_state(self, key: str, initial: any) -> any
+    def use_effect(self, fn: callable, deps: list) -> None
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ComponentConfig:
+    type: str  # "server" | "client"
+    ssr: bool = True
+    streaming: bool = False
+
+@dataclass
+class RSCPayload:
+    type: str
+    id: str
+    children: list
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+npx create-next-app@latest my-app --app
+# Server Components are default in App Router
+```
+
+## Monitoring & Observability
+
+```python
+from server_components import MetricsCollector
+
+collector = MetricsCollector()
+collector.histogram("rsc.render.duration_ms", duration, tags={"component": name})
+collector.counter("rsc.cache.hit", count)
+collector.counter("rsc.cache.miss", count)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from server_components import ServerComponent
+
+def test_server_component():
+    class TestComponent(ServerComponent):
+        async def render(self, props):
+            return self.html("<div>Hello</div>")
+    component = TestComponent()
+    result = asyncio.run(component.render({}))
+    assert "Hello" in result
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 18.0 | Server Components introduced | Add 'use client' to interactive components |
+| 19.0 | Actions stable | Use Server Actions for mutations |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **RSC** | React Server Components |
+| **RSC Payload** | Serialized wire format between server and client |
+| **Hydration** | Client-side event attachment to server HTML |
+| **Suspense** | React boundary for async loading states |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with Server/Client Component model
+- Streaming SSR with Suspense
+- React.cache() for deduplication
+- Server Actions
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/server-components.git
+npm install
+npm test
+```
+
+## Advanced Patterns
+
+### Parallel Data Fetching with Suspense
+
+```tsx
+// app/dashboard/page.tsx
+import { Suspense } from 'react'
+import { RevenueChart } from './revenue-chart'
+import { RecentSales } from './recent-sales'
+import { StatsCards } from './stats-cards'
+
+export default function DashboardPage() {
+  return (
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Dashboard</h1>
+
+      {/* Parallel data fetching — each component fetches independently */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Suspense fallback={<StatsCardSkeleton />}>
+          <StatsCards />
+        </Suspense>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-7">
+        <div className="col-span-4">
+          <Suspense fallback={<ChartSkeleton />}>
+            <RevenueChart />
+          </Suspense>
+        </div>
+        <div className="col-span-3">
+          <Suspense fallback={<SalesSkeleton />}>
+            <RecentSales />
+          </Suspense>
+        </div>
+      </div>
+    </div>
+  )
+}
+```
+
+### Server Component with Error Boundary
+
+```tsx
+// app/dashboard/error.tsx
+'use client'
+
+export default function DashboardError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string }
+  reset: () => void
+}) {
+  return (
+    <div className="rounded-lg border border-destructive/50 p-6">
+      <h2 className="text-lg font-semibold text-destructive">
+        Something went wrong
+      </h2>
+      <p className="mt-2 text-sm text-muted-foreground">
+        {error.message}
+      </p>
+      <button
+        onClick={() => reset()}
+        className="mt-4 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground"
+      >
+        Try again
+      </button>
+    </div>
+  )
+}
+```
+
+### Server Action with Revalidation
+
+```tsx
+// app/actions.ts
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+
+export async function createPost(formData: FormData) {
+  const title = formData.get('title') as string
+  const content = formData.get('content') as string
+
+  await db.post.create({ data: { title, content } })
+
+  // Revalidate the blog listing page
+  revalidatePath('/blog')
+  // Redirect after mutation
+  redirect('/blog')
+}
+
+export async function deletePost(id: string) {
+  await db.post.delete({ where: { id } })
+
+  // Revalidate specific paths
+  revalidatePath('/blog')
+  revalidatePath(`/blog/${id}`)
+}
+```
+
+### Streaming with Generators
+
+```tsx
+// app/api/progress/route.ts
+export async function GET() {
+  const encoder = new TextEncoder()
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      for (let i = 0; i <= 100; i += 10) {
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify({ progress: i })}\n\n`)
+        )
+        await new Promise(r => setTimeout(r, 500))
+      }
+      controller.close()
+    }
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    }
+  })
+}
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills
+
+---
+
+## Extended Reference
+
+### Server vs Client Component Decision Guide
+
+| Use Server Component | Use Client Component |
+|---------------------|---------------------|
+| Data fetching | useState, useEffect |
+| Database queries | Event handlers |
+| File system access | Browser APIs |
+| Sensitive data | Interactive UI |
+| Heavy computation | Third-party client libs |
+| SEO content | Drag and drop |
+| Layouts | Media playback |
+
+### Serializable Props Reference
+
+| Serializable | Not Serializable |
+|-------------|-----------------|
+| Strings, numbers | Functions |
+| Plain objects | Class instances |
+| Arrays | Promises |
+| Dates | Symbols |
+| null, undefined | Maps, Sets |
+| Blobs | DOM nodes |
+
+### React.cache() Reference
+
+```typescript
+// Deduplicate within a request
+const getUser = React.cache(async (id: string) => {
+  return await db.users.findUnique({ where: { id } })
+})
+
+// Multiple components call getUser(123)
+// Only one database query is made
+async function Profile({ userId }) {
+  const user = await getUser(userId)
+  return <h1>{user.name}</h1>
+}
+
+async function Stats({ userId }) {
+  const user = await getUser(userId)
+  return <p>{user.email}</p>
+}
+```
+
+### use() Hook Reference
+
+```typescript
+// Read promises and context in render
+function Comments({ commentsPromise }) {
+  const comments = use(commentsPromise)
+  return comments.map(c => <p key={c.id}>{c.text}</p>)
+}
+
+// Read context
+function Theme() {
+  const theme = use(ThemeContext)
+  return <div className={theme}>...</div>
+}
+```
+
+### Streaming Patterns
+
+```typescript
+// Suspense boundary with fallback
+<Suspense fallback={<Skeleton />}>
+  <SlowComponent />
+</Suspense>
+
+// Multiple independent Suspense boundaries
+<Suspense fallback={<NavSkeleton />}>
+  <Navigation />
+</Suspense>
+<Suspense fallback={<ContentSkeleton />}>
+  <Content />
+</Suspense>
+<Suspense fallback={<SidebarSkeleton />}>
+  <Sidebar />
+</Suspense>
+```
+
+### Server Action Patterns
+
+```typescript
+// With revalidation
+async function createPost(formData: FormData) {
+  'use server'
+  await db.posts.create({ data: { title: formData.get('title') } })
+  revalidatePath('/posts')
+}
+
+// With redirect
+async function login(formData: FormData) {
+  'use server'
+  const user = await authenticate(formData)
+  if (user) redirect('/dashboard')
+}
+
+// With error handling
+async function riskyAction() {
+  'use server'
+  try {
+    await doSomethingRisky()
+    return { success: true }
+  } catch (e) {
+    return { error: e.message }
+  }
+}
+```

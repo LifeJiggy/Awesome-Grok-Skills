@@ -33,12 +33,17 @@ dev = [
 ]
 
 [project.scripts]
-grok = "awesome_grok_skills.cli:main"
+grok = "cli:main"
 
 [project.urls]
 Homepage = "https://github.com/LifeJiggy/Awesome-Grok-Skills"
 Repository = "https://github.com/LifeJiggy/Awesome-Grok-Skills.git"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["awesome_grok_skills*"]
+# Source lives under `src/` (src-layout). The single importable module is
+# `src/cli.py`, exposed as a top-level module `cli` so the `grok` entry point
+# above resolves. py-modules (single-module distribution) is intentionally used
+# instead of packages.find, since there is no package directory named
+# `awesome_grok_skills/` in the repo.
+[tool.setuptools]
+py-modules = ["cli"]
+package-dir = {"" = "src"}

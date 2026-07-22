@@ -217,6 +217,596 @@ The three-layer hybrid architecture separates concerns cleanly. The deliberative
 - **manipulation** — Arm control and grasping for autonomous manipulation tasks
 - **swarm-robotics** — Multi-agent coordination and distributed task allocation
 
+## Advanced Configuration
+
+### Control Frequency Tuning
+
+```yaml
+# autonomous_config.yaml
+control_loop:
+  reactive_frequency_hz: 100
+  sequencing_frequency_hz: 25
+  planner_frequency_hz: 5
+  world_model_update_hz: 50
+
+safety:
+  max_velocity_ms: 2.0
+  max_acceleration_ms2: 1.0
+  emergency_stop_distance_m: 0.15
+  geofence_enabled: true
+  geofence_buffer_m: 5.0
+
+fault_detection:
+  imu:
+    timeout_ms: 100
+    stale_threshold_ms: 200
+    on_fault: restart_sensor
+  gps:
+    timeout_ms: 500
+    stale_threshold_ms: 1000
+    on_fault: switch_to_odometry
+  lidar:
+    timeout_ms: 200
+    max_range_m: 30.0
+    min_range_m: 0.1
+
+planner:
+  algorithm: a_star
+  max_computation_ms: 200
+  replan_trigger_distance_m: 2.0
+  cost_function: weighted_euclidean
+  inflation_radius_m: 0.5
+```
+
+### World Model Configuration
+
+```yaml
+world_model:
+  global:
+    resolution_m: 0.1
+    size_cells: [500, 500]
+    update_rate_hz: 5
+  local:
+    resolution_m: 0.02
+    size_cells: [200, 200]
+    update_rate_hz: 25
+  object_tracking:
+    max_age_s: 10.0
+    min_hits: 3
+    distance_threshold_m: 2.0
+    kalman:
+      process_noise: 0.1
+      measurement_noise: 0.3
+```
+
+### Multi-Vehicle Fleet Configuration
+
+```yaml
+fleet:
+  protocol: mesh_gossip
+  max_vehicles: 100
+  heartbeat_interval_s: 2
+  heartbeat_timeout_s: 10
+  message_ttl_s: 30
+  encryption: aes_128_gcm
+
+formation:
+  algorithm: virtual_structure
+  reconfiguration_time_s: 5.0
+  min_spacing_m: 1.5
+  leader_re_election: true
+```
+
+## Architecture Patterns
+
+### Three-Layer Hybrid Pattern
+
+The autonomous systems module implements a three-layer hybrid architecture where each layer operates at a different frequency and abstraction level:
+
+```
+Layer 1: Deliberative (1-10 Hz)
+  └─ Mission decomposition, long-horizon planning
+  └─ Global path planning, goal sequencing
+  └─ Resource allocation, constraint satisfaction
+
+Layer 2: Sequencing (10-50 Hz)
+  └─ Discrete action selection, state transitions
+  └─ Behavior tree evaluation, condition checking
+  └─ Action parameter generation
+
+Layer 3: Reactive (50-200 Hz)
+  └─ Obstacle avoidance, emergency stop
+  └─ Velocity limiting, geofence enforcement
+  └─ Hardware safety interlocks
+```
+
+### Sense-Plan-Act Pattern
+
+```
+Sense: Sensor data acquisition and world model update
+  ├─ LiDAR scan → occupancy grid update
+  ├─ Camera frame → object detection → object tracking
+  ├─ IMU/Odom → pose estimation → odometry fusion
+  └─ GPS → absolute position correction
+
+Plan: Decision making and trajectory generation
+  ├─ Mission planner → task sequence
+  ├─ Global planner → rough path
+  └─ Local planner → collision-free trajectory
+
+Act: Command execution and motor control
+  ├─ Trajectory tracker → velocity commands
+  ├─ Safety layer → velocity/acceleration limits
+  └─ Actuator interface → motor commands
+```
+
+### Fault Detection, Isolation, and Recovery (FDIR) Pattern
+
+```
+Detection:
+  ├─ Watchdog timer (timeout)
+  ├─ Range check (value bounds)
+  ├─ Stale data check (age threshold)
+  ├─ Consistency check (cross-sensor)
+  └─ Anomaly detection (statistical)
+
+Isolation:
+  ├─ Identify faulty sensor/actuator
+  ├─ Mark component as degraded
+  ├─ Select alternative sensor suite
+  └─ Update world model with degraded inputs
+
+Recovery:
+  ├─ Restart sensor
+  ├─ Switch to redundant sensor
+  ├─ Reduce capability (degrade gracefully)
+  └─ Abort mission (last resort)
+```
+
+### Event-Driven Telemetry Pattern
+
+```python
+# Telemetry architecture
+TelemetryBus:
+  topics:
+    - /sensors/lidar          # 10 Hz, full scan data
+    - /sensors/camera         # 30 Hz, frame data
+    - /sensors/imu            # 100 Hz, IMU data
+    - /planner/path           # 5 Hz, planned path
+    - /planner/status         # 1 Hz, planner state
+    - /actuator/cmd           # 100 Hz, motor commands
+    - /actuator/state         # 50 Hz, motor feedback
+    - /fdir/alerts            # on-demand, fault events
+    - /mission/status         # 1 Hz, mission progress
+```
+
+## Integration Guide
+
+### ROS 2 Integration
+
+```python
+# bridge to ROS 2
+from autonomous_systems.ros2_bridge import ROS2Bridge
+
+bridge = ROS2Bridge(node_name="autonomous_systems")
+bridge.subscribe("/scan", lidar_callback)
+bridge.subscribe("/imu", imu_callback)
+bridge.publish("/cmd_vel", velocity_command)
+
+# Bridge handles ROS 2 DDS discovery, QoS profiles,
+# message serialization, and topic remapping automatically.
+```
+
+### Gazebo Simulation Integration
+
+```python
+# Launch autonomous system in Gazebo
+from autonomous_systems.sim_bridge import GazeboBridge
+
+sim = GazeboBridge(
+    world_file="field_survey.world",
+    robot_model="rover.urdf",
+    physics_rate=1000,
+    real_time_factor=1.0
+)
+sim.start()
+# Autonomous engine runs against simulated sensors
+```
+
+### Flight Controller Integration (PX4/ArduPilot)
+
+```python
+# MAVLink integration for UAV platforms
+from autonomous_systems.mavlink_bridge import MAVLinkBridge
+
+mav = MAVLinkBridge(
+    connection_string="udp:localhost:14550",
+    vehicle_type="multicopter",
+    heartbeat_interval_ms=1000
+)
+mav.arm()
+mav.takeoff(altitude_m=10.0)
+mav.goto_waypoint(x=10, y=5, z=10, yaw=0)
+```
+
+### Sensor Driver Integration
+
+| Sensor Type | Interface | Protocol | Typical Rate |
+|-------------|-----------|----------|--------------|
+| LiDAR | Ethernet | UDP/TCP | 10-20 Hz |
+| Camera | USB3/GigE | ROS topic | 30-60 Hz |
+| IMU | SPI/I2C | Register | 100-400 Hz |
+| GPS | UART | NMEA/UBX | 1-10 Hz |
+| Wheel Encoder | CAN/CANOpen | Message | 50-100 Hz |
+| Force/Torque | Ethernet | EtherCAT | 500-1000 Hz |
+
+## Performance Optimization
+
+### Critical Path Analysis
+
+The critical path for the reactive safety layer must execute within 5-10 ms (for 100-200 Hz control). Profile each component:
+
+| Component | Typical Latency | Budget |
+|-----------|----------------|--------|
+| Sensor read | 0.5-2 ms | 2 ms |
+| World model update | 1-5 ms | 5 ms |
+| Obstacle check | 0.5-1 ms | 1 ms |
+| Safety logic | 0.1-0.3 ms | 0.5 ms |
+| Command publish | 0.1-0.2 ms | 0.3 ms |
+| **Total** | **2-8.5 ms** | **8.8 ms** |
+
+### Memory Optimization
+
+- **Occupancy grid compression**: Use run-length encoding for sparse grids. A typical indoor environment is 80%+ free space, achieving 5-10x compression.
+- **Object tracking buffer**: Pre-allocate fixed-size arrays for Kalman filter state rather than using dynamic allocation. Avoid garbage collection pauses in the control loop.
+- **Telemetry ring buffers**: Use lock-free ring buffers for sensor data passing between threads. Avoid mutex contention in the hot path.
+
+### CPU Optimization
+
+- **SIMD instructions**: Use vectorized operations for occupancy grid updates, point cloud processing, and Kalman filter prediction/update steps.
+- **Thread affinity**: Pin the reactive safety layer to a dedicated CPU core. Isolate it from non-real-time threads using CPU affinity masks.
+- **Pre-computation**: Cache lookup tables for trigonometric functions, rotation matrices, and distance transforms. Regenerate on configuration change.
+
+### Network Optimization for Multi-Vehicle
+
+- **Gossip protocol tuning**: Increase gossip interval to 2-5 seconds for large swarms. Use piggyback gossip on existing messages to reduce overhead.
+- **Message compression**: Delta-encode position updates (send only changes). Use varint encoding for sequence numbers and timestamps.
+- **Prioritize safety messages**: Reserve a dedicated channel for emergency stop commands with guaranteed delivery.
+
+## Troubleshooting Guide
+
+### Common Issues
+
+| Symptom | Likely Cause | Solution |
+|---------|-------------|----------|
+| Planner timeout | Grid too large or complex | Reduce resolution or use hierarchical planning |
+| Oscillating path | Inflation radius too small | Increase inflation radius to match robot size |
+| Sensor watchdog timeout | Communication failure | Check cable connections, restart sensor driver |
+| High CPU usage | World model update rate too high | Reduce global update rate, optimize grid operations |
+| Path oscillation at waypoint | Waypoint tolerance too tight | Increase waypoint acceptance radius |
+| GPS drift in tunnels | GPS loss | Switch to visual odometry or IMU dead-reckoning |
+| Emergency stop loop | Sensor noise triggering false positives | Increase minimum obstacle distance threshold |
+| Fleet message loss | Network congestion | Reduce message frequency, increase message priority |
+
+### Debugging Tools
+
+```python
+from autonomous_systems import DebugVisualization
+
+viz = DebugVisualization()
+viz.show_occupancy_grid(world_model.occupancy_grid)
+viz.show_path(planned_path, color="green")
+viz.show_robot_pose(current_pose)
+viz.show_velocity_vector(velocity_command)
+viz.record_session("debug_session.bag")
+```
+
+### Log Analysis
+
+```python
+from autonomous_systems import LogAnalyzer
+
+analyzer = LogAnalyzer("mission_log.jsonl")
+analyzer.find_faults()
+analyzer.find_slow_decisions(threshold_ms=100)
+analyzer.find_replanning_events()
+analyzer.generate_summary()
+```
+
+## API Reference
+
+### Core Classes
+
+| Class | Description |
+|-------|-------------|
+| `AutonomousEngine` | Main engine class; manages the control loop, sensor fusion, and planning |
+| `Mission` | Mission definition with waypoints, abort conditions, and callbacks |
+| `Waypoint` | Single waypoint with position, orientation, and constraints |
+| `BehaviorLayer` | Abstract base class for reactive behavior layers |
+| `FDIRManager` | Fault detection, isolation, and recovery manager |
+| `OccupancyGrid` | Probabilistic occupancy grid with update and query methods |
+| `AStarPlanner` | A* path planner with configurable heuristic and cost function |
+| `FleetManager` | Multi-vehicle fleet coordinator with task allocation |
+| `TelemetryRecorder` | Structured telemetry recording to bag files |
+| `ReplayPlayer` | Telemetry replay for debugging and analysis |
+
+### Configuration Keys
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `control_frequency_hz` | int | 50 | Main control loop frequency |
+| `safety_enabled` | bool | true | Enable reactive safety layer |
+| `max_velocity_ms` | float | 2.0 | Maximum robot velocity (m/s) |
+| `max_acceleration_ms2` | float | 1.0 | Maximum acceleration (m/s²) |
+| `world_model_resolution` | float | 0.1 | Grid cell size in meters |
+| `planner_algorithm` | str | "a_star" | Path planning algorithm |
+| `telemetry_enabled` | bool | true | Enable telemetry recording |
+
+## Data Models
+
+### Pose2D
+
+```
+Pose2D:
+  x: float          # meters
+  y: float          # meters
+  theta: float      # radians [-π, π]
+  timestamp: float  # seconds since epoch
+```
+
+### VelocityCommand
+
+```
+VelocityCommand:
+  linear: float     # m/s (positive = forward)
+  angular: float    # rad/s (positive = left)
+  emergency: bool   # true = emergency stop
+  timestamp: float
+```
+
+### SensorHealth
+
+```
+SensorHealth:
+  sensor_id: str
+  status: enum     # OK, STALE, TIMEOUT, DEGRADED, FAILED
+  last_update_ms: float
+  error_count: int
+  warning_count: int
+  restart_count: int
+```
+
+### MissionResult
+
+```
+MissionResult:
+  mission_name: str
+  status: enum     # COMPLETED, ABORTED, FAILED, CANCELLED
+  duration_s: float
+  waypoints_reached: int
+  total_waypoints: int
+  abort_reason: str | None
+  telemetry_path: str
+```
+
+## Deployment Guide
+
+### Hardware Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| CPU | 4 cores, 2.0 GHz | 8 cores, 3.5 GHz |
+| RAM | 8 GB | 16-32 GB |
+| GPU | Not required | NVIDIA Jetson Orin (for vision) |
+| Storage | 64 GB SSD | 256 GB NVMe |
+| Network | Ethernet, 100 Mbps | Gigabit Ethernet + WiFi 6 |
+| Real-time OS | Not required | PREEMPT_RT kernel for safety layer |
+
+### Deployment Steps
+
+1. **Install dependencies**: `pip install -r requirements.txt` or use Docker image
+2. **Calibrate sensors**: Run `auto_calibrate --all` to calibrate camera, LiDAR, and IMU
+3. **Load configuration**: `auto_engine --config mission_config.yaml`
+4. **Run simulation**: `auto_engine --mode sim --world test.world`
+5. **Deploy to hardware**: `auto_engine --mode hardware --config production.yaml`
+6. **Verify safety interlocks**: Run `safety_check --all` before autonomous operation
+
+### Docker Deployment
+
+```dockerfile
+FROM ros:humble-desktop
+COPY . /workspace/src/autonomous_systems
+RUN pip install -e /workspace/src/autonomous_systems
+ENTRYPOINT ["ros2", "launch", "autonomous_systems", "full_system.launch.py"]
+```
+
+## Monitoring & Observability
+
+### Metrics to Monitor
+
+| Metric | Alert Threshold | Description |
+|--------|----------------|-------------|
+| `control_loop_hz` | < 80% of target | Control loop frequency dropping |
+| `planner_latency_ms` | > 200 ms | Planner exceeding time budget |
+| `sensor_timeout_count` | > 0 | Any sensor has timed out |
+| `emergency_stop_count` | > 0 | Emergency stop triggered |
+| `world_model_age_ms` | > 100 ms | World model stale |
+| `battery_voltage` | < 20% | Battery low |
+
+### Prometheus Metrics Integration
+
+```python
+from prometheus_client import Counter, Histogram, Gauge
+
+sensor_timeout = Counter('auto_sensor_timeouts_total', 'Sensor timeout events', ['sensor_id'])
+planner_latency = Histogram('auto_planner_latency_seconds', 'Planner computation time')
+control_loop_freq = Gauge('auto_control_loop_hz', 'Actual control loop frequency')
+emergency_stops = Counter('auto_emergency_stops_total', 'Emergency stop count')
+```
+
+### Health Check Endpoint
+
+```
+GET /health
+{
+  "status": "healthy",
+  "sensors": {"lidar": "ok", "imu": "ok", "gps": "degraded"},
+  "planner": {"status": "ok", "last_plan_ms": 45},
+  "safety": {"status": "ok", "last_check_ms": 8},
+  "mission": {"status": "running", "progress": 0.65},
+  "uptime_s": 3600
+}
+```
+
+## Testing Strategy
+
+### Unit Testing
+
+```python
+# test_planner.py
+def test_astar_finds_path():
+    grid = OccupancyGrid(resolution=0.1, size=(100, 100))
+    grid.set_obstacle(50, 50, 10, 10)
+    planner = AStarPlanner(grid)
+    path = planner.plan(start=(0, 0), goal=(99, 99))
+    assert path is not None
+    assert not grid.is_occupied(path[0])
+    assert not grid.is_occupied(path[-1])
+
+def test_safety_layer_overrides_planner():
+    layer = EmergencyStopLayer()
+    sensor = SensorInput(lidar_min_distance_m=0.1)
+    cmd = layer.evaluate(sensor)
+    assert cmd.emergency is True
+    assert cmd.linear == 0.0
+```
+
+### Integration Testing
+
+```python
+# test_mission_integration.py
+def test_mission_completion():
+    engine = AutonomousEngine(name="test-rover")
+    engine.configure(control_frequency_hz=100, safety_enabled=True)
+    mission = Mission(name="test-mission", waypoints=[...])
+    result = engine.run(mission)
+    assert result.status == MissionStatus.COMPLETED
+    assert result.waypoints_reached == result.total_waypoints
+```
+
+### Fault Injection Testing
+
+```python
+# test_fault_recovery.py
+def test_gps_timeout_recovery():
+    fdir = FDIRManager()
+    fdir.register_watchdog("gps", timeout_ms=500)
+    # Simulate GPS timeout
+    fdir.simulate_fault("gps", "timeout")
+    action = fdir.get_recovery_action("gps")
+    assert action == RecoveryAction.SWITCH_TO_ODOMETRY
+```
+
+### Simulation Testing
+
+```python
+# test_simulation_regression.py
+def test_simulation_no_collisions():
+    sim = GazeboBridge(world_file="regression_test.world")
+    engine = AutonomousEngine(name="test-rover")
+    mission = Mission(name="regression", waypoints=[...])
+    result = engine.run_in_simulation(sim, mission)
+    assert result.collision_count == 0
+    assert result.safety_violations == 0
+```
+
+## Versioning & Migration
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.0.0 | 2024-01-15 | Major release: hybrid architecture, fleet management, telemetry replay |
+| 1.5.0 | 2023-09-01 | Added FDIR framework, world model improvements |
+| 1.0.0 | 2023-03-15 | Initial release: planning, basic safety, odometry fusion |
+| 0.9.0 | 2022-11-01 | Beta release for internal testing |
+
+### Migration Guide (1.x → 2.0)
+
+1. **API changes**: `AutonomousEngine.run()` now returns `MissionResult` instead of status string
+2. **Configuration**: Move all YAML keys under `control_loop`, `safety`, and `planner` sections
+3. **FDIR**: `SensorWatchdog` replaced by `FDIRManager` with explicit register/watch/catch pattern
+4. **Telemetry**: Switch from custom format to ROS bag format for interoperability
+5. **Fleet**: New fleet module — update multi-vehicle code to use `FleetManager`
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **FDIR** | Fault Detection, Isolation, and Recovery — systematic approach to handling component failures |
+| **HTN** | Hierarchical Task Network — planning method that decomposes high-level tasks into primitives |
+| **PDDL** | Planning Domain Definition Language — standard language for AI planning problems |
+| **Subsumption** | Architecture where higher-priority behaviors override lower-priority ones |
+| **Geofence** | Virtual boundary defining the allowed operating area for the robot |
+| **Watchdog** | Timer that detects when a component fails to produce output within expected intervals |
+| **Bag file** | Structured file format for recording and replaying sensor/actuator data |
+| **Odometry** | Position estimation from wheel encoders and IMU (prone to drift) |
+| **SLAM** | Simultaneous Localization and Mapping — building a map while localizing within it |
+
+## Changelog
+
+### 2.0.0 — 2024-01-15
+
+- **Added**: Three-layer hybrid architecture with deliberative, sequencing, and reactive layers
+- **Added**: Fleet management with leader-follower formation control
+- **Added**: Telemetry recording and replay system
+- **Added**: Configurable fault detection, isolation, and recovery framework
+- **Improved**: World model now supports multi-resolution occupancy grids
+- **Improved**: Path planner supports A*, Dijkstra, and RRT algorithms
+- **Fixed**: Sensor timeout handling now properly triggers recovery actions
+- **Fixed**: GPS drift correction improved by 40%
+
+### 1.5.0 — 2023-09-01
+
+- **Added**: Basic FDIR framework with watchdog timers
+- **Added**: Kalman filter-based object tracking
+- **Improved**: Occupancy grid update performance by 3x
+- **Fixed**: Emergency stop now operates at hardware interrupt level
+
+## Contributing Guidelines
+
+### Development Setup
+
+1. Fork the repository and create a feature branch
+2. Install development dependencies: `pip install -e ".[dev]"`
+3. Run linting: `ruff check src/`
+4. Run tests: `pytest tests/ -v`
+5. Submit a pull request with a clear description of changes
+
+### Code Standards
+
+- Follow PEP 8 with 100-character line limit
+- Type hints required for all public functions
+- Docstrings required for all public classes and methods
+- Unit test coverage target: 85%+
+- All safety-critical code requires peer review from two maintainers
+
+### Commit Convention
+
+Use conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
+
+## License
+
+This module is released under the Apache License, Version 2.0.
+
+Copyright 2024 Autonomous Systems Contributors.
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
 ## References
 
 - Thrun, S., Burgard, W., & Fox, D. (2005). *Probabilistic Robotics*. MIT Press.

@@ -90,3 +90,689 @@ report.export_json("crop_report_2024.json")
 - **agricultural-iot** — Deploy ground sensors for continuous field monitoring
 - **supply-chain** — Track crop quality from field to market
 - **data-science** → **time-series** — Time-series analysis for phenology tracking
+
+## Advanced Configuration
+
+### YAML Configuration
+```yaml
+version: "2.0.0"
+settings:
+  mode: "production"
+  concurrency: 4
+  timeout_ms: 30000
+  retry:
+    max_attempts: 3
+    backoff_ms: 1000
+  logging:
+    level: "info"
+    format: "json"
+  data_sources:
+    primary: "database"
+    cache: "redis"
+    storage: "s3"
+```
+
+### JSON Configuration
+```json
+{"version":"2.0.0","settings":{"mode":"production","concurrency":4,"timeout_ms":30000}}
+```
+
+### Environment Variables
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SKILL_MODE` | Runtime mode | `production` |
+| `SKILL_CONCURRENCY` | Max concurrent ops | `4` |
+| `SKILL_TIMEOUT` | Timeout (ms) | `30000` |
+| `SKILL_LOG_LEVEL` | Log verbosity | `info` |
+| `SKILL_DB_URL` | Database URL | -- |
+
+## Architecture Patterns
+
+### System Architecture
+```
++---------------------------------------------------+
+|                   Client Layer                     |
+|  +----------+  +----------+  +------------------+  |
+|  |  Web UI  |  | CLI Tool |  |  API Consumer    |  |
+|  +----+-----+  +----+-----+  +--------+---------+  |
++-------------------+-------------------------------+
+|              Processing Layer                      |
+|  +----------+  +----------+  +------------------+  |
+|  | Collector|  | Analyzer |  |  Generator       |  |
+|  +----+-----+  +----+-----+  +--------+---------+  |
++-------------------+-------------------------------+
+|                 Data Layer                          |
+|  +----------+  +----------+  +------------------+  |
+|  |  Cache   |  | TimeSrs  |  |  File Storage    |  |
+|  |  (Redis) |  | (InfluxDB|  |  (S3/GCS)       |  |
+|  +----------+  +----------+  +------------------+  |
++---------------------------------------------------+
+```
+
+### Data Flow
+```
+Input -> Validate -> Transform -> Process -> Enrich -> Store -> Response
+  |         |           |          |         |        |
+  |    [Schema]    [Mapping]   [Core]    [Merge]  [Persist]
+  +---------+-----------+----------+---------+--------+
+                    Error Handling Pipeline
+```
+
+## Integration Guide
+
+### REST API
+```python
+import requests
+response = requests.post("https://api.example.com/v1/integration", json={"source": "field-sensor"})
+```
+
+### Webhook
+```python
+webhook = {"url": "https://your-system.com/webhooks/data", "events": ["data.received"]}
+```
+
+## Performance Optimization
+
+### Benchmarks
+| Operation | Throughput | Latency (p50) | Latency (p99) |
+|-----------|-----------|---------------|---------------|
+| Data Ingest | 50,000 pts/s | 2ms | 15ms |
+| Query | 5,000 ops/s | 20ms | 100ms |
+| Analysis | 1,000 ops/s | 100ms | 500ms |
+
+### Optimization Tips
+1. **Batch Ingestion**: Group readings into batches
+2. **Downsampling**: Reduce resolution for historical data
+3. **Edge Computing**: Process locally to reduce bandwidth
+4. **Connection Pooling**: Reuse connections
+5. **Compression**: Use gzip for transfers
+
+## Security Considerations
+
+### Threat Model
+| Threat | Risk | Mitigation |
+|--------|------|------------|
+| Data tampering | High | HMAC signing, audit logging |
+| Unauthorized access | High | OAuth 2.0, mTLS |
+| Data exfiltration | High | Encryption at rest |
+| Man-in-the-middle | Medium | TLS 1.3 |
+
+### Security Checklist
+- [ ] All data encrypted in transit
+- [ ] API keys in secure vault
+- [ ] Firmware signed and verified
+- [ ] Network segmentation for IoT
+- [ ] Audit logging enabled
+
+## Troubleshooting Guide
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Sensor offline | Battery/signal | Check battery, verify range |
+| Data gaps | Network outage | Enable edge buffering |
+| Incorrect readings | Sensor drift | Recalibrate |
+| High latency | Bottleneck | Scale workers |
+| Storage full | Retention | Adjust retention policy |
+
+## API Reference
+
+### `init(config: Config) -> Instance`
+Initialize the skill.
+
+### `process(input: Input) -> Result`
+Process input data.
+
+### `validate(input: Input) -> ValidationResult`
+Validate input schema.
+
+## Data Models
+
+### Sensor Reading Schema
+```json
+{"type":"object","required":["sensor_id","timestamp","value"],"properties":{"sensor_id":{"type":"string"},"timestamp":{"type":"string","format":"date-time"},"value":{"type":"number"}}}
+```
+
+## Deployment Guide
+
+### Docker
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8000
+HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
+CMD ["python", "-m", "uvicorn", "main:app"]
+```
+
+### Kubernetes
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skill-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: skill
+  template:
+    spec:
+      containers:
+      - name: skill
+        image: skill:2.0.0
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+```
+
+## Monitoring & Observability
+
+| Metric | Type | Description | Alert Threshold |
+|--------|------|-------------|-----------------|
+| `ingest_total` | Counter | Data ingested | -- |
+| `ingest_latency_ms` | Histogram | Ingest latency | p99 > 100ms |
+| `error_rate` | Gauge | Error rate | > 5% |
+| `sensor_offline` | Gauge | Offline sensors | > 0 |
+
+## Testing Strategy
+
+### Unit Tests
+```python
+def test_process():
+    result = skill.process(test_input)
+    assert result.status == "success"
+```
+
+### Integration Tests
+```python
+@pytest.mark.integration
+def test_pipeline():
+    result = skill.process(sensor_data)
+    assert result.status == "success"
+```
+
+## Versioning & Migration
+
+- Major version for breaking changes
+- 6-month deprecation notice
+- Migration guide provided
+
+### Changelog
+- **[2.0.0]** -- New architecture
+- **[1.5.0]** -- Performance improvements
+- **[1.0.0]** -- Initial release
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **Pipeline** | Ordered processing steps |
+| **Schema** | Data structure definition |
+| **Ingestion** | Collecting and storing data |
+| **Downsampling** | Reducing data resolution |
+| **Time-Series** | Time-indexed data |
+| **Edge Computing** | Processing near source |
+| **TTL** | Time-to-live |
+
+## Changelog
+
+### [2.0.0] -- 2024-12-01
+- Major release with new architecture
+
+### [1.5.0] -- 2024-06-15
+- Performance improvements
+
+### [1.0.0] -- 2024-01-01
+- Initial stable release
+
+## Contributing Guidelines
+
+### Development Setup
+```bash
+git clone https://github.com/example/skill.git
+cd skill
+pip install -e ".[dev]"
+pytest
+```
+
+### Pull Request Process
+1. Fork the repository
+2. Create a feature branch
+3. Commit changes
+4. Push to branch
+5. Open a Pull Request
+
+## License
+
+MIT License -- Copyright (c) 2024
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## Advanced Concepts
+
+### Multi-Spectral Band Combinations
+| Index | Formula | Application | Sensitivity |
+|-------|---------|-------------|-------------|
+| NDVI | (NIR-Red)/(NIR+Red) | General health | Moderate |
+| NDRE | (NIR-RE)/(NIR+RE) | Nitrogen status | High in dense canopy |
+| SAVI | ((NIR-Red)/(NIR+Red+L))*(1+L) | Bare soil correction | Moderate |
+| EVI | G*(NIR-Red)/(NIR+C1*Red-C2*Blue+L) | Dense vegetation | High |
+| GNDVI | (NIR-Green)/(NIR+Green) | Chlorophyll | Moderate |
+| NDWI | (NIR-SWIR)/(NIR+SWIR) | Water content | High |
+| PSRI | (Red-Green)/RE | Senescence | High |
+| PRI | (R1-R2)/(R1+R2) | Photosynthetic efficiency | High |
+| MCARI | ((Red-RE)-0.2*(Red-Green))*(Red/RE) | Chlorophyll | High |
+| OSAVI | (NIR-Red)/(NIR+Red+0.16) | Optimized SAVI | High |
+
+### Automated Stress Classification
+```python
+from crop_monitoring import StressClassifier
+
+classifier = StressClassifier()
+
+# Classify stress type from spectral signature
+result = classifier.classify(
+    ndvi=0.42,
+    ndre=0.28,
+    red=0.12,
+    nir=0.38,
+    red_edge=0.20,
+    temperature_c=35.5,
+    rainfall_mm_7d=0,
+)
+
+print(f"Stress type: {result.stress_type}")  # 'nitrogen', 'water', 'disease', 'none'
+print(f"Confidence: {result.confidence:.1%}")
+print(f"Severity: {result.severity}")  # 'mild', 'moderate', 'severe'
+print(f"Recommended action: {result.recommendation}")
+```
+
+### Phenology Stage Classification
+```python
+from crop_monitoring import PhenologyClassifier
+
+phen = PhenologyClassifier(crop="corn")
+stages = phen.classify_season(
+    ndvi_timeseries=ndvi_data,
+    dates=date_series,
+    planting_date="2024-04-20",
+)
+for stage in stages:
+    print(f"  {stage.date}: {stage.name} (NDVI={stage.ndvi:.3f}, GDD={stage.gdd:.0f})")
+
+# Corn growth stages: VE, V1-Vn, VT, R1-R6
+# Soybean stages: VE, VC, V1-Vn, R1-R8
+# Wheat stages: emergence, tillering, stem elongation, heading, grain fill, maturity
+```
+
+### Drone Flight Planning
+```python
+from crop_monitoring import DroneFlightPlanner
+
+planner = DroneFlightPlanner(drone_model="DJI-M350")
+
+# Plan mapping mission
+mission = planner.plan_mapping(
+    field_boundary=boundary,
+    altitude_m=60,
+    overlap_pct=75,  # 75% forward overlap
+    sidelap_pct=65,  # 65% side overlap
+    speed_kmh=10,
+    camera="MicaSense-RedEdge-P",
+)
+print(f"Flight time: {mission.estimated_flight_time_min:.0f} min")
+print(f"Number of flights: {mission.num_flights}")
+print(f"Image count: {mission.estimated_image_count}")
+print(f"Ground resolution: {mission.gsd_cm_px:.2f} cm/pixel")
+print(f"Coverage area: {mission.coverage_acres:.1f} acres")
+```
+
+### Image Stitching Pipeline
+```python
+from crop_monitoring import ImageStitcher
+
+stitcher = ImageStitcher()
+
+# Create orthomosaic from drone images
+mosaic = stitcher.stitch(
+    image_folder="raw_images/",
+    output_path="orthomosaic.tif",
+    gcp_file="ground_control_points.csv",
+    projection="EPSG:32614",
+    resolution_cm=3,
+    color_correction=True,
+    blend_mode="multiband",
+)
+print(f"Mosaic size: {mosaic.width_px}x{mosaic.height_px}")
+print(f"File size: {mosaic.file_size_mb:.1f} MB")
+print(f"GCP RMS error: {mosaic.gcp_rms_error_cm:.2f} cm")
+```
+
+### Cloud Detection and Removal
+```python
+from crop_monitoring import CloudDetector
+
+detector = CloudDetector()
+
+# Detect clouds in satellite imagery
+cloud_mask = detector.detect(
+    image="sentinel2_tile.tif",
+    method="s2cloudless",  # or 'fmask', 's2cloud'
+    cloud_threshold=0.6,
+    shadow_detection=True,
+)
+print(f"Cloud coverage: {cloud_mask.cloud_pct:.1f}%")
+print(f"Shadow coverage: {cloud_mask.shadow_pct:.1f}%")
+print(f"Clear pixels: {cloud_mask.clear_pct:.1f}%")
+
+# Generate cloud-free composite
+composite = detector.create_cloud_free_composite(
+    image_folder="satellite_images/",
+    time_range=("2024-06-01", "2024-06-30"),
+    method="median_composite",
+)
+composite.export("cloud_free_june.tif")
+```
+
+### Vegetation Index Time Series Analysis
+```python
+from crop_monitoring import VITimeSeries
+
+ts = VITimeSeries(field_id="FIELD-001")
+ts.load("ndvi_timeseries_2024.csv")
+
+# Fit phenology curve
+curve = ts.fit_phenology_curve(
+    model="logistic",  # or 'double_logistic', 'savitzky_golay'
+    interpolation="linear",
+)
+print(f"Green-up date: {curve.greenup_date}")
+print(f"Peak NDVI date: {curve.peak_date}")
+print(f"Peak NDVI value: {curve.peak_value:.3f}")
+print(f"Senescence date: {curve.senescence_date}")
+print(f"Season integral: {curve.season_integral:.3f}")
+
+# Detect anomalies
+anomalies = ts.detect_anomalies(
+    baseline_years=[2019, 2020, 2021, 2022, 2023],
+    threshold_sigma=2.0,
+)
+for anomaly in anomalies:
+    print(f"  Anomaly at {anomaly.date}: NDVI={anomaly.ndvi:.3f} (expected {anomaly.expected:.3f})")
+```
+
+### Disease Detection Models
+```python
+from crop_monitoring import DiseaseDetector
+
+detector = DiseaseDetector(crop="tomato")
+
+# Detect from RGB image
+detections = detector.detect(
+    image="field_photo.jpg",
+    confidence_threshold=0.7,
+)
+for d in detections:
+    print(f"  Disease: {d.name}")
+    print(f"  Confidence: {d.confidence:.1%}")
+    print(f"  Location: ({d.bbox_x}, {d.bbox_y})")
+    print(f"  Severity: {d.severity}")
+    print(f"  Recommended treatment: {d.treatment}")
+
+# Supported diseases
+# Tomato: Early Blight, Late Blight, Septoria Leaf Spot, Bacterial Speck
+# Corn: Gray Leaf Spot, Northern Corn Leaf Blight, Common Rust, Tar Spot
+# Wheat: Fusarium Head Blight, Stripe Rust, Powdery Mildew
+# Soybean: Frogeye Leaf Spot, Brown Spot, Sudden Death Syndrome
+```
+
+### Satellite Data Sources
+| Source | Revisit | Resolution | Bands | Latency |
+|--------|---------|------------|-------|---------|
+| Sentinel-2 | 5 days | 10m | 13 | 2-5 days |
+| Landsat 8/9 | 16 days | 30m | 11 | 1-2 days |
+| Planet SkySat | Daily | 0.5m | 4-5 | 1-3 hours |
+| Planet SuperDove | Daily | 3m | 8 | 1-3 hours |
+| WorldView-3 | < 1 day | 0.31m | 28 | < 24 hours |
+| Drone (MicaSense) | On-demand | 2-5 cm | 5-10 | Real-time |
+
+### NDVI Thresholds by Crop Stage
+| Crop | Stage | Low NDVI | Medium | High |
+|------|-------|----------|--------|------|
+| Corn | V6 | 0.3-0.4 | 0.4-0.5 | 0.5-0.6 |
+| Corn | VT | 0.6-0.7 | 0.7-0.8 | 0.8-0.9 |
+| Soybean | V3 | 0.2-0.3 | 0.3-0.4 | 0.4-0.5 |
+| Soybean | R3 | 0.5-0.6 | 0.6-0.7 | 0.7-0.8 |
+| Wheat | Heading | 0.5-0.6 | 0.6-0.7 | 0.7-0.8 |
+| Wheat | Grain fill | 0.4-0.5 | 0.5-0.6 | 0.6-0.7 |
+
+### Weather Data Integration
+```python
+from crop_monitoring import WeatherIntegrator
+
+weather = WeatherIntegrator()
+
+# Fetch weather data for field
+data = weather.fetch(
+    latitude=38.01,
+    longitude=-98.01,
+    start_date="2024-06-01",
+    end_date="2024-06-30",
+    sources=["openweathermap", "noaa"],
+)
+
+# Calculate growing degree days
+gdd = weather.calculate_gdd(
+    daily_temps=data.daily_temps,
+    base_temp_f=50,
+    upper_temp_f=86,
+    method="modified",
+)
+print(f"Accumulated GDD: {gdd.accumulated:.0f}")
+print(f"Current growth stage: {gdd.estimated_stage}")
+
+# Correlate weather with crop stress
+correlation = weather.correlate_with_stress(
+    weather_data=data,
+    ndvi_data=ndvi_timeseries,
+    lag_days=14,
+)
+print(f"Correlation with rainfall: {correlation.rainfall_r:.3f}")
+print(f"Correlation with temp: {correlation.temp_r:.3f}")
+```
+
+### Yield Prediction Model
+```python
+from crop_monitoring import YieldPredictor
+
+predictor = YieldPredictor(crop="corn")
+
+# Predict yield from vegetation indices
+prediction = predictor.predict(
+    ndvi_peak=0.82,
+    ndvi_season_integral=45.2,
+    gdd_accumulated=2750,
+    rainfall_total_mm=450,
+    field_area_acres=160,
+    historical_yield_avg=185,
+)
+print(f"Predicted yield: {prediction.yield_bu_ac:.0f} bu/ac")
+print(f"Confidence interval: {prediction.ci_low:.0f}-{prediction.ci_high:.0f}")
+print(f"R-squared (model fit): {prediction.model_r_squared:.3f}")
+print(f"Field total: {prediction.total_bushels:.0f} bu")
+```
+
+### Multi-Date Image Comparison
+```python
+from crop_monitoring import ChangeDetector
+
+change = ChangeDetector()
+
+# Compare two dates
+diff = change.compare(
+    image_date1="2024-06-01.tif",
+    image_date2="2024-07-01.tif",
+    index="ndvi",
+    threshold=0.1,
+)
+print(f"Pixels improved: {diff.improved_pct:.1f}%")
+print(f"Pixels declined: {diff.declined_pct:.1f}%")
+print(f"Pixels stable: {diff.stable_pct:.1f}%")
+diff.export_change_map("change_map_june_july.tif")
+diff.export_report("change_report.pdf")
+```
+
+### Alert Configuration
+```python
+from crop_monitoring import AlertConfig, AlertManager
+
+config = AlertConfig(
+    ndvi_low_threshold=0.3,
+    ndvi_critical_threshold=0.2,
+    temperature_high_f=105,
+    temperature_low_f=28,
+    wind_speed_high_mph=45,
+    humidity_low_pct=15,
+    notification_channels=["sms", "email", "push"],
+    recipients=["farmer@example.com", "scout@example.com"],
+    quiet_hours_start=22,
+    quiet_hours_end=6,
+)
+
+alerts = AlertManager(config)
+alerts.configure_field_rules(
+    field_id="FIELD-001",
+    crop_type="corn",
+    growth_stage_aware=True,
+)
+```
+
+### Image Processing Pipeline
+```python
+from crop_monitoring import ImageProcessor
+
+processor = ImageProcessor()
+
+# Atmospheric correction
+corrected = processor.atmospheric_correction(
+    raw_image="sentinel2_L1C.tif",
+    method="sen2cor",  # or '6s', 'flaash'
+    dem="srtm_dem.tif",
+)
+corrected.export("sentinel2_L2A.tif")
+
+# Radiometric calibration
+calibrated = processor.radiometric_calibration(
+    drone_image="raw_dng.dng",
+    reflectance_panel="calibration_panel.jpg",
+    panel_reflectance=0.50,
+)
+calibrated.export("calibrated.tif")
+
+# Vegetation index calculation
+indices = processor.calculate_indices(
+    image=corrected,
+    indices=["ndvi", "ndre", "savi", "evi", "gndvi"],
+)
+for idx_name, idx_image in indices.items():
+    idx_image.export(f"{idx_name}.tif")
+```
+
+### Ground Truth Validation
+```python
+from crop_monitoring import GroundTruth
+
+gt = GroundTruth(field_id="FIELD-001")
+
+# Record field scouting observations
+gt.add_observation(
+    date="2024-07-15",
+    location=(38.0123, -98.0123),
+    crop_stage="VT",
+    observations=["healthy canopy", "no pest pressure", "adequate moisture"],
+    ndvi_reading=0.78,
+    soil_moisture_pct=42,
+    photos=["scout_photo_1.jpg", "scout_photo_2.jpg"],
+)
+
+# Validate remote sensing against ground truth
+validation = gt.validate_remote_sensing(
+    remote_data=stress_map,
+    tolerance=0.1,
+)
+print(f"Accuracy: {validation.accuracy_pct:.1f}%")
+print(f"False positives: {validation.false_positive_pct:.1f}%")
+print(f"False negatives: {validation.false_negative_pct:.1f}%")
+```
+
+### Drone Sensor Calibration
+```python
+from crop_monitoring import DroneCalibration
+
+cal = DroneCalibration(drone_model="DJI-M350", camera="MicaSense-RedEdge-P")
+
+# Calibrate radiometric response
+cal_response = cal.calibrate_radiometric(
+    dark_images="dark_frames/",
+    panel_images="calibration_panel/",
+    panel_reflectance=0.50,
+)
+print(f"Calibration R-squared: {cal_response.r_squared:.4f}")
+
+# Geometric calibration
+geo_cal = cal.calibrate_geometric(
+    checkerboard_images="checkerboard/",
+    checkerboard_size_mm=25,
+    num_images=20,
+)
+print(f"Reprojection error: {geo_cal.reprojection_error_px:.3f} px")
+```
+
+### Crop Health Scoring
+```python
+from crop_monitoring import HealthScorer
+
+scorer = HealthScorer()
+
+score = scorer.score_field(
+    ndvi_mean=0.72,
+    ndvi_std=0.08,
+    stress_pct=5.0,
+    disease_detections=[],
+    growth_stage="VT",
+    crop="corn",
+)
+print(f"Health score: {score.total:.0f}/100")
+print(f"  Vegetation: {score.vegetation:.0f}/100")
+print(f"  Uniformity: {score.uniformity:.0f}/100")
+print(f"  Stress: {score.stress:.0f}/100")
+print(f"  Overall: {score.grade}")  # A, B, C, D, F
+```
+
+---
+
+## Return format (required)
+
+Your FINAL assistant message — what the spawning agent will receive — MUST start with this header block:
+
+  **Status**: success | partial | failed | blocked
+  **Summary**: <one sentence describing what happened>
+
+After the header, include the actual deliverable (whatever the task asked for in its prompt).
+
+If applicable, also include below the deliverable:
+
+  **Files touched**: <comma-separated paths or "(none)">
+  **Findings worth promoting**: <bullet list of cross-task transferable facts; "(none)" if just routine work>
+
+This format lets the spawning agent and the checkpoint writer extract your progress without parsing free-form prose. Do NOT precede the header with an introduction — your final message must start with "**Status**:".

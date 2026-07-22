@@ -214,3 +214,846 @@ The localization module provides the pose estimate used by all other layers. The
 - ROS 2 Navigation2 Documentation: https://docs.ros.org/en/humble/Tutorials/Navigation.html
 - Navigation2 GitHub Repository: https://github.com/ros-navigation/navigation2
 - Autoware Foundation: https://autoware.org/
+
+## Path Planning Algorithms Deep Dive
+
+### A* Algorithm — Implementation Details
+
+A* combines the advantages of Dijkstra's algorithm (guaranteed optimality) and greedy best-first search (heuristic guidance). The evaluation function is f(n) = g(n) + h(n).
+
+```python
+import heapq
+from navigation import Costmap, GridCell
+
+def a_star_search(costmap, start, goal, heuristic="euclidean"):
+    open_set = []
+    heapq.heappush(open_set, (0, start))
+    
+    came_from = {}
+    g_score = {start: 0}
+    f_score = {start: heuristic_fn(start, goal, heuristic)}
+    
+    while open_set:
+        _, current = heapq.heappop(open_set)
+        
+        if current == goal:
+            return reconstruct_path(came_from, current)
+        
+        for neighbor, cost in costmap.get_neighbors(current):
+            tentative_g = g_score[current] + cost
+            
+            if tentative_g < g_score.get(neighbor, float('inf')):
+                came_from[neighbor] = current
+                g_score[neighbor] = tentative_g
+                f_score[neighbor] = tentative_g + heuristic_fn(neighbor, goal, heuristic)
+                heapq.heappush(open_set, (f_score[neighbor], neighbor))
+    
+    return None  # no path found
+
+def heuristic_fn(a, b, method="euclidean"):
+    dx = abs(a[0] - b[0])
+    dy = abs(a[1] - b[1])
+    if method == "euclidean":
+        return (dx**2 + dy**2) ** 0.5
+    elif method == "manhattan":
+        return dx + dy
+    elif method == "octile":
+        return max(dx, dy) + (2**0.5 - 1) * min(dx, dy)
+    elif method == "chebyshev":
+        return max(dx, dy)
+```
+
+### RRT and RRT* — Rapidly-exploring Random Trees
+
+RRT grows a tree by randomly sampling the configuration space and extending toward random samples. RRT* adds rewiring for asymptotic optimality.
+
+```python
+import numpy as np
+from navigation import OccupancyGrid, RRTConfig
+
+class RRTPlanner:
+    def __init__(self, config):
+        self.config = config
+        self.tree = None
+        self.max_iterations = config.max_iterations
+        self.step_size = config.step_size
+        self.goal_threshold = config.goal_threshold
+        self.goal_bias = config.goal_bias
+    
+    def plan(self, start, goal, obstacle_map):
+        tree = [start]
+        parent = {start: None}
+        
+        for i in range(self.max_iterations):
+            # Sample with goal bias
+            if np.random.random() < self.goal_bias:
+                sample = goal
+            else:
+                sample = self.random_sample(obstacle_map)
+            
+            nearest = self.find_nearest(tree, sample)
+            new_node = self.steer(nearest, sample, self.step_size)
+            
+            if new_node and not self.collision(nearest, new_node, obstacle_map):
+                tree.append(new_node)
+                parent[new_node] = nearest
+                
+                if self.distance(new_node, goal) < self.goal_threshold:
+                    return self.extract_path(parent, new_node)
+        
+        return None  # no path found
+    
+    def steer(self, from_node, to_node, step_size):
+        direction = np.array(to_node) - np.array(from_node)
+        dist = np.linalg.norm(direction)
+        if dist < 1e-6:
+            return None
+        direction = direction / dist
+        new_pos = np.array(from_node) + direction * min(step_size, dist)
+        return tuple(new_pos)
+
+class RRTStarPlanner(RRTPlanner):
+    def __init__(self, config):
+        super().__init__(config)
+        self.rewire_radius = config.rewire_radius
+    
+    def rewire(self, tree, new_node, parent):
+        neighbors = self.find_neighbors(tree, new_node, self.rewire_radius)
+        
+        # Find best parent
+        best_parent = parent[new_node]
+        best_cost = self.cost(parent[new_node]) + self.distance(parent[new_node], new_node)
+        
+        for neighbor in neighbors:
+            candidate_cost = self.cost(neighbor) + self.distance(neighbor, new_node)
+            if candidate_cost < best_cost and not self.collision(neighbor, new_node):
+                best_parent = neighbor
+                best_cost = candidate_cost
+        
+        parent[new_node] = best_parent
+        
+        # Rewire neighbors through new_node
+        for neighbor in neighbors:
+            new_cost = self.cost(new_node) + self.distance(new_node, neighbor)
+            if new_cost < self.cost(neighbor):
+                if not self.collision(new_node, neighbor):
+                    parent[neighbor] = new_node
+```
+
+### PRM — Probabilistic Roadmap
+
+PRM builds a roadmap of collision-free configurations by random sampling and local connection. It is multi-query: the roadmap is built once and reused for many queries.
+
+```python
+class PRMPlanner:
+    def __init__(self, config):
+        self.num_samples = config.num_samples
+        self.k_neighbors = config.k_neighbors
+        self.connection_distance = config.connection_distance
+    
+    def build_roadmap(self, obstacle_map, bounds):
+        samples = []
+        for _ in range(self.num_samples):
+            sample = self.sample_free_space(obstacle_map, bounds)
+            if sample:
+                samples.append(sample)
+        
+        # Build graph with k-nearest neighbor connections
+        graph = {s: [] for s in samples}
+        for s in samples:
+            neighbors = self.k_nearest(samples, s, self.k_neighbors)
+            for neighbor in neighbors:
+                if (self.distance(s, neighbor) < self.connection_distance and
+                    not self.collision(s, neighbor, obstacle_map)):
+                    cost = self.distance(s, neighbor)
+                    graph[s].append((neighbor, cost))
+                    graph[neighbor].append((s, cost))
+        
+        return graph
+    
+    def query(self, roadmap, start, goal, obstacle_map):
+        # Connect start and goal to roadmap
+        roadmap[start] = []
+        roadmap[goal] = []
+        
+        for node in list(roadmap.keys()):
+            if node in (start, goal):
+                continue
+            if (self.distance(start, node) < self.connection_distance and
+                not self.collision(start, node, obstacle_map)):
+                roadmap[start].append((node, self.distance(start, node)))
+                roadmap[node].append((start, self.distance(start, node)))
+            if (self.distance(goal, node) < self.connection_distance and
+                not self.collision(goal, node, obstacle_map)):
+                roadmap[goal].append((node, self.distance(goal, node)))
+                roadmap[node].append((goal, self.distance(goal, node)))
+        
+        # A* on roadmap
+        return a_star_on_graph(roadmap, start, goal)
+```
+
+### Kinodynamic Planning with RRT
+
+For nonholonomic vehicles (car-like robots), kinodynamic RRT considers differential constraints during tree extension.
+
+```python
+class KinodynamicRRT:
+    def __init__(self, config):
+        self.step_size = config.step_size
+        self.num_controls = config.num_control_samples
+        self.dt = config.integration_timestep
+    
+    def extend(self, state, target, obstacle_map):
+        best_state = state
+        best_dist = float('inf')
+        
+        for _ in range(self.num_controls):
+            # Sample control (linear velocity, steering angle)
+            v = np.random.uniform(0, self.max_speed)
+            phi = np.random.uniform(-self.max_steer, self.max_steer)
+            
+            # Forward simulate
+            new_state = self.integrate(state, v, phi, self.step_size)
+            
+            if not self.collision(state, new_state, obstacle_map):
+                dist = self.distance(new_state, target)
+                if dist < best_dist:
+                    best_dist = dist
+                    best_state = new_state
+        
+        return best_state
+    
+    def integrate(self, state, v, phi, dt):
+        x, y, theta = state
+        L = self.wheelbase
+        
+        # Bicycle model integration
+        dx = v * np.cos(theta) * dt
+        dy = v * np.sin(theta) * dt
+        dtheta = (v / L) * np.tan(phi) * dt
+        
+        return (x + dx, y + dy, theta + dtheta)
+```
+
+## SLAM Algorithms in Detail
+
+### Scan Matching — Iterative Closest Point (ICP)
+
+ICP aligns two point clouds by iteratively finding correspondences and computing the optimal rigid transformation.
+
+```python
+import numpy as np
+from navigation import PointCloud
+
+def icp(source, target, max_iterations=50, tolerance=1e-6):
+    # Initialize transformation
+    R = np.eye(3)
+    t = np.zeros(3)
+    
+    for iteration in range(max_iterations):
+        # Transform source
+        source_transformed = (R @ source.T).T + t
+        
+        # Find closest points in target
+        distances, indices = nearest_neighbors(source_transformed, target)
+        
+        # Filter outliers
+        inlier_mask = distances < np.percentile(distances, 90)
+        source_inliers = source_transformed[inlier_mask]
+        target_inliers = target[indices[inlier_mask]]
+        
+        # Compute optimal transformation
+        R_new, t_new = rigid_transform_svd(source_inliers, target_inliers)
+        
+        # Update transformation
+        R = R_new @ R
+        t = R_new @ t + t_new
+        
+        # Check convergence
+        if np.linalg.norm(t_new) < tolerance and np.linalg.norm(R_new - np.eye(3)) < tolerance:
+            break
+    
+    return R, t
+
+def rigid_transform_svd(A, B):
+    centroid_A = np.mean(A, axis=0)
+    centroid_B = np.mean(B, axis=0)
+    
+    H = (A - centroid_A).T @ (B - centroid_B)
+    U, S, Vt = np.linalg.svd(H)
+    
+    R = Vt.T @ U.T
+    if np.linalg.det(R) < 0:
+        Vt[-1, :] *= -1
+        R = Vt.T @ U.T
+    
+    t = centroid_B - R @ centroid_A
+    return R, t
+```
+
+### Normal Distributions Transform (NDT)
+
+NDT represents the target scan as a set of normal distributions in a voxel grid, then optimizes the pose to maximize the likelihood of the source scan under these distributions.
+
+```python
+from navigation import NDTScanMatcher, VoxelGrid
+
+class NDTMatcher:
+    def __init__(self, voxel_size=0.5):
+        self.voxel_size = voxel_size
+    
+    def build_ndt(self, target_cloud):
+        voxel_grid = VoxelGrid(self.voxel_size)
+        voxel_grid.insert(target_cloud)
+        
+        ndt = {}
+        for voxel_idx, points in voxel_grid.get_voxels():
+            mean = np.mean(points, axis=0)
+            cov = np.cov(points.T) + np.eye(3) * 1e-6  # regularization
+            ndt[voxel_idx] = (mean, np.linalg.inv(cov))
+        
+        return ndt
+    
+    def match(self, source_cloud, ndt, initial_pose):
+        pose = initial_pose.copy()
+        
+        for iteration in range(50):
+            score = 0
+            gradient = np.zeros(6)
+            hessian = np.zeros((6, 6))
+            
+            for point in source_cloud:
+                transformed = self.transform_point(point, pose)
+                voxel_idx = self.get_voxel_idx(transformed)
+                
+                if voxel_idx in ndt:
+                    mean, cov_inv = ndt[voxel_idx]
+                    diff = transformed - mean
+                    score += -0.5 * diff.T @ cov_inv @ diff
+                    
+                    # Compute Jacobian and accumulate
+                    J = self.point_jacobian(point, pose)
+                    gradient += -J.T @ cov_inv @ diff
+                    hessian += -J.T @ cov_inv @ J
+            
+            # Update pose
+            delta = np.linalg.solve(hessian, -gradient)
+            pose = self.update_pose(pose, delta)
+            
+            if np.linalg.norm(delta) < 1e-6:
+                break
+        
+        return pose
+```
+
+### Loop Closure Detection
+
+Loop closure recognition uses visual or geometric features to detect when the robot revisits a location.
+
+```python
+from navigation import LoopClosureDetector, BagOfWords
+
+class LoopClosureDetector:
+    def __init__(self, vocab_size=1000, min_score=0.7):
+        self.bow = BagOfWords(vocab_size)
+        self.database = {}
+        self.min_score = min_score
+        self.current_query_id = 0
+    
+    def add_keyframe(self, features, descriptors):
+        bow_vector = self.bow.quantize(descriptors)
+        self.database[self.current_query_id] = {
+            'bow': bow_vector,
+            'features': features,
+            'descriptors': descriptors,
+        }
+        self.current_query_id += 1
+    
+    def detect(self, query_descriptors, current_pose, max_distance=10.0):
+        query_bow = self.bow.quantize(query_descriptors)
+        
+        candidates = []
+        for kid, kf in self.database.items():
+            score = self.bow.compare(query_bow, kf['bow'])
+            if score > self.min_score:
+                # Verify geometric consistency
+                if self几何验证(query_descriptors, kf['descriptors']):
+                    distance = np.linalg.norm(
+                        np.array(current_pose[:2]) - np.array(self.get_keyframe_pose(kid)[:2])
+                    )
+                    if distance > max_distance:  # not too close
+                        candidates.append((kid, score, distance))
+        
+        if candidates:
+            best = max(candidates, key=lambda x: x[1])
+            return best[0]
+        return None
+```
+
+## Sensor Fusion Algorithms
+
+### Extended Kalman Filter — Full Implementation
+
+```python
+import numpy as np
+from navigation import SensorModel
+
+class ExtendedKalmanFilter:
+    def __init__(self, state_dim, process_noise):
+        self.state_dim = state_dim
+        self.x = np.zeros(state_dim)
+        self.P = np.eye(state_dim) * 1.0
+        self.Q = process_noise
+    
+    def predict(self, u, dt):
+        # State transition (bicycle model or differential drive)
+        x, y, theta, v = self.x
+        self.x[0] = x + v * np.cos(theta) * dt
+        self.x[1] = y + v * np.sin(theta) * dt
+        self.x[2] = theta + u[1] * dt  # u = [v, omega]
+        self.x[3] = u[0]
+        
+        # Jacobian of state transition
+        F = np.eye(self.state_dim)
+        F[0, 2] = -v * np.sin(theta) * dt
+        F[0, 3] = np.cos(theta) * dt
+        F[1, 2] = v * np.cos(theta) * dt
+        F[1, 3] = np.sin(theta) * dt
+        F[2, 2] = 1.0
+        
+        self.P = F @ self.P @ F.T + self.Q
+    
+    def update(self, z, H, R):
+        # Innovation
+        y = z - H @ self.x
+        S = H @ self.P @ H.T + R
+        K = self.P @ H.T @ np.linalg.inv(S)
+        
+        self.x = self.x + K @ y
+        self.P = (np.eye(self.state_dim) - K @ H) @ self.P
+    
+    def get_pose(self):
+        return (self.x[0], self.x[1], self.x[2])
+
+# Usage
+ekf = ExtendedKalmanFilter(
+    state_dim=4,
+    process_noise=np.diag([0.1, 0.1, 0.01, 0.1])
+)
+
+for odom, lidar in sensor_stream:
+    # Predict with odometry
+    ekf.predict([odom.linear_velocity, odom.angular_velocity], dt=0.05)
+    
+    # Update with LiDAR scan matching
+    if lidar.matched:
+        H = np.zeros((3, 4))
+        H[:3, :3] = np.eye(3)
+        R = np.diag([0.05, 0.05, 0.01])
+        ekf.update(np.array(lidar.pose), H, R)
+```
+
+### Particle Filter Localization — Implementation
+
+```python
+import numpy as np
+from navigation import OccupancyGrid
+
+class ParticleFilter:
+    def __init__(self, num_particles, map_grid, motion_noise, sensor_noise):
+        self.num_particles = num_particles
+        self.map = map_grid
+        self.motion_noise = motion_noise
+        self.sensor_noise = sensor_noise
+        
+        # Initialize particles uniformly
+        free_cells = map_grid.get_free_cells()
+        indices = np.random.choice(len(free_cells), num_particles)
+        self.particles = np.array([free_cells[i] for i in indices])
+        self.weights = np.ones(num_particles) / num_particles
+    
+    def predict(self, odom_delta):
+        # Motion model with noise
+        noise = np.random.normal(0, self.motion_noise, self.particles.shape)
+        self.particles[:, 0] += odom_delta[0] * np.cos(self.particles[:, 2]) + noise[:, 0]
+        self.particles[:, 1] += odom_delta[0] * np.sin(self.particles[:, 2]) + noise[:, 1]
+        self.particles[:, 2] += odom_delta[1] + noise[:, 2]
+        
+        # Map matching
+        for i, p in enumerate(self.particles):
+            if not self.map.is_free(p[0], p[1]):
+                self.particles[i] = self.map.random_free_cell()
+    
+    def update_weights(self, lidar_scan):
+        for i, p in enumerate(self.particles):
+            self.weights[i] = self.sensor_model(p, lidar_scan)
+        
+        self.weights /= np.sum(self.weights)
+    
+    def resample(self):
+        indices = np.random.choice(
+            self.num_particles,
+            size=self.num_particles,
+            p=self.weights
+        )
+        self.particles = self.particles[indices].copy()
+        self.weights = np.ones(self.num_particles) / self.num_particles
+    
+    def get_estimate(self):
+        # Weighted average
+        x = np.average(self.particles[:, 0], weights=self.weights)
+        y = np.average(self.particles[:, 1], weights=self.weights)
+        theta = np.average(self.particles[:, 2], weights=self.weights)
+        return (x, y, theta)
+    
+    def get_covariance(self):
+        return np.cov(self.particles.T, aweights=self.weights)
+```
+
+## Local Planning Algorithms
+
+### Timed Elastic Band (TEB)
+
+TEB optimizes a trajectory with respect to time, obstacle avoidance, velocity limits, and acceleration limits.
+
+```python
+from navigation import TEBPlanner, TEBConfig
+
+class TEBPlannerImpl:
+    def __init__(self, config):
+        self.config = config
+        self.teb = None
+    
+    def plan(self, global_path, start_vel, goal_vel, obstacles):
+        # Initialize TEB from global path
+        teb = self.initialize_teb(global_path, start_vel, goal_vel)
+        
+        # Optimize
+        for iteration in range(self.config.max_iterations):
+            # Obstacle cost
+            obstacle_cost = self.compute_obstacle_cost(teb, obstacles)
+            
+            # Velocity/acceleration cost
+            kinematic_cost = self.compute_kinematic_cost(teb)
+            
+            # Time cost
+            time_cost = self.compute_time_cost(teb)
+            
+            # Update via Levenberg-Marquardt
+            delta = self.levenberg_marquardt_step(teb, obstacle_cost + kinematic_cost + time_cost)
+            teb = self.apply_update(teb, delta)
+            
+            if np.linalg.norm(delta) < self.config.convergence_threshold:
+                break
+        
+        return teb
+
+    def compute_obstacle_cost(self, teb, obstacles):
+        cost = 0
+        for i, pose in enumerate(teb.poses):
+            for obs in obstacles:
+                dist = self.distance_to_obstacle(pose, obs)
+                if dist < self.config.obstacle_gain_threshold:
+                    cost += 0.5 * self.config.obstacle_gain / (dist**2)
+        return cost
+```
+
+### Model Predictive Control (MPC) for Navigation
+
+```python
+import numpy as np
+from navigation import MPCConfig, VehicleModel
+
+class MPCController:
+    def __init__(self, config, vehicle_model):
+        self.config = config
+        self.model = vehicle_model
+        self.horizon = config.horizon
+        self.dt = config.dt
+    
+    def solve(self, current_state, reference_trajectory):
+        # Initialize control sequence
+        u_seq = np.zeros((self.horizon, 2))  # [v, omega]
+        
+        for iteration in range(self.config.max_iterations):
+            # Forward simulate with current controls
+            predicted_states = self.model.simulate(current_state, u_seq, self.dt)
+            
+            # Compute cost
+            cost = self.compute_cost(predicted_states, u_seq, reference_trajectory)
+            
+            # Compute gradient via finite differences
+            gradient = self.compute_gradient(current_state, u_seq, reference_trajectory)
+            
+            # Update controls
+            u_seq = u_seq - self.config.step_size * gradient
+            
+            # Apply constraints
+            u_seq = self.clip_controls(u_seq)
+        
+        return u_seq[0]  # return first control
+    
+    def compute_cost(self, states, controls, reference):
+        tracking_cost = 0
+        control_cost = 0
+        
+        for i in range(self.horizon):
+            # Tracking error
+            error = states[i] - reference[i]
+            tracking_cost += error.T @ self.config.Q @ error
+            
+            # Control effort
+            control_cost += controls[i].T @ self.config.R @ controls[i]
+            
+            # Terminal cost
+            if i == self.horizon - 1:
+                terminal_error = states[i] - reference[i]
+                tracking_cost += terminal_error.T @ self.config.Q_terminal @ terminal_error
+        
+        return tracking_cost + control_cost
+```
+
+## Trajectory Tracking Controllers
+
+### Stanley Controller
+
+Stanley controller uses both heading error and cross-track error for path following, providing smooth convergence to the path.
+
+```python
+import numpy as np
+
+class StanleyController:
+    def __init__(self, k_heading, k_cross_track, wheelbase):
+        self.k_heading = k_heading
+        self.k_cross_track = k_cross_track
+        self.wheelbase = wheelbase
+    
+    def compute(self, current_pose, path, current_velocity):
+        x, y, theta = current_pose
+        
+        # Find closest point on path
+        closest_idx = self.find_closest_point(path, (x, y))
+        closest_point = path[closest_idx]
+        
+        # Heading of path at closest point
+        if closest_idx < len(path) - 1:
+            path_heading = np.arctan2(
+                path[closest_idx + 1][1] - closest_point[1],
+                path[closest_idx + 1][0] - closest_point[0]
+            )
+        else:
+            path_heading = theta
+        
+        # Cross-track error
+        cross_track_error = self.compute_cross_track_error((x, y), path)
+        
+        # Heading error
+        heading_error = path_heading - theta
+        heading_error = np.arctan2(np.sin(heading_error), np.cos(heading_error))
+        
+        # Steering command
+        steering = heading_error + np.arctan2(
+            self.k_cross_track * cross_track_error,
+            max(current_velocity, 0.1)
+        )
+        
+        # Clamp steering
+        steering = np.clip(steering, -self.max_steer, self.max_steer)
+        
+        return steering
+    
+    def compute_cross_track_error(self, point, path):
+        # Find perpendicular distance to nearest segment
+        min_dist = float('inf')
+        for i in range(len(path) - 1):
+            p1, p2 = path[i], path[i + 1]
+            dist = self.point_to_segment_distance(point, p1, p2)
+            min_dist = min(min_dist, dist)
+        
+        # Sign based on left/right of path
+        closest_idx = self.find_closest_point(path, point)
+        path_dir = np.array(path[min(closest_idx + 1, len(path) - 1)]) - np.array(path[closest_idx])
+        to_point = np.array(point) - np.array(path[closest_idx])
+        sign = np.sign(np.cross(path_dir, to_point))
+        
+        return sign * min_dist
+```
+
+### Pure Pursuit with Curvature Constraint
+
+```python
+class PurePursuitEnhanced:
+    def __init__(self, lookahead_min, lookahead_max, max_curvature):
+        self.lookahead_min = lookahead_min
+        self.lookahead_max = lookahead_max
+        self.max_curvature = max_curvature
+    
+    def compute(self, robot_pose, path, velocity):
+        # Adaptive lookahead based on curvature
+        lookahead = self.compute_lookahead(path, velocity)
+        
+        # Find lookahead point
+        target = self.find_lookahead_point(robot_pose, path, lookahead)
+        
+        # Compute curvature
+        dx = target[0] - robot_pose[0]
+        dy = target[1] - robot_pose[1]
+        L = np.sqrt(dx**2 + dy**2)
+        
+        # Angle to target
+        alpha = np.arctan2(dy, dx) - robot_pose[2]
+        alpha = np.arctan2(np.sin(alpha), np.cos(alpha))
+        
+        # Curvature
+        curvature = 2 * np.sin(alpha) / L
+        
+        # Clamp curvature
+        curvature = np.clip(curvature, -self.max_curvature, self.max_curvature)
+        
+        # Angular velocity
+        angular_velocity = curvature * velocity
+        
+        return angular_velocity
+    
+    def compute_lookahead(self, path, velocity):
+        # Scale lookahead with velocity
+        lookahead = self.lookahead_min + (self.lookahead_max - self.lookahead_min) * (velocity / 2.0)
+        return np.clip(lookahead, self.lookahead_min, self.lookahead_max)
+```
+
+## Occupancy Grid Mapping
+
+### Bayesian Occupancy Grid Update
+
+```python
+import numpy as np
+
+class OccupancyGridMapper:
+    def __init__(self, width, height, resolution, prior=0.5):
+        self.resolution = resolution
+        self.grid = np.full((height, width), prior)
+        self.log_odds_grid = np.zeros((height, width))
+        
+        # Log-odds parameters
+        self.l_occ = 0.85   # log-odds of occupied
+        self.l_free = -0.4   # log-odds of free
+        self.l_min = -5.0    # lower bound
+        self.l_max = 5.0     # upper bound
+    
+    def update(self, robot_pose, scan):
+        for angle, range_val in scan.ranges:
+            if range_val >= scan.range_max:
+                continue
+            
+            # Ray endpoints
+            end_x = robot_pose[0] + range_val * np.cos(robot_pose[2] + angle)
+            end_y = robot_pose[1] + range_val * np.sin(robot_pose[2] + angle)
+            
+            # Mark cells along ray as free
+            free_cells = self.raycast(robot_pose[:2], (end_x, end_y))
+            for cell in free_cells:
+                self.update_cell(cell, self.l_free)
+            
+            # Mark endpoint as occupied
+            occ_cell = self.world_to_grid(end_x, end_y)
+            self.update_cell(occ_cell, self.l_occ)
+    
+    def update_cell(self, cell, log_odds_update):
+        x, y = cell
+        if 0 <= x < self.grid.shape[1] and 0 <= y < self.grid.shape[0]:
+            self.log_odds_grid[y, x] = np.clip(
+                self.log_odds_grid[y, x] + log_odds_update,
+                self.l_min, self.l_max
+            )
+            self.grid[y, x] = 1.0 / (1.0 + np.exp(-self.log_odds_grid[y, x]))
+```
+
+## Configuration Reference
+
+### Navigation Stack Configuration
+
+```yaml
+navigation:
+  global_planner:
+    algorithm: "astar"
+    heuristic: "octile"
+    allow_unknown: false
+    default_tolerance: 0.2
+    
+  local_planner:
+    algorithm: "dwa"
+    max_speed: 1.5
+    max_accel: 2.0
+    max_yaw_rate: 3.0
+    heading_weight: 0.15
+    clearance_weight: 0.1
+    velocity_weight: 0.1
+    
+  costmap:
+    global_frame: "map"
+    robot_base_frame: "base_link"
+    update_frequency: 5.0
+    publish_frequency: 2.0
+    resolution: 0.05
+    
+    static_layer:
+      enabled: true
+      map_topic: "/map"
+      
+    obstacle_layer:
+      enabled: true
+      observation_sources: ["lidar", "sonar"]
+      lidar:
+        topic: "/scan"
+        sensor_frame: "laser_link"
+        max_obstacle_height: 2.0
+        
+    inflation_layer:
+      enabled: true
+      inflation_radius: 0.55
+      cost_scaling_factor: 10.0
+      
+  recovery_behaviors:
+    - name: "conservative_reset"
+      behavior: "clear_costmap"
+      area: 2.0
+    - name: "rotate_recovery"
+      behavior: "rotate_in_place"
+      max_angular_vel: 0.5
+    - name: "aggressive_reset"
+      behavior: "clear_costmap"
+      area: 5.0
+```
+
+### SLAM Configuration
+
+```yaml
+slam:
+  algorithm: "cartographer"
+  
+  scan_matching:
+    type: "ceres"
+    max_iterations: 10
+    convergence_threshold: 1e-6
+    
+  loop_closure:
+    enabled: true
+    strategy: "visual_bow"
+    min_interval_frames: 50
+    min_score: 0.7
+    max_distance_m: 10.0
+    
+  submap:
+    num_range_data: 90
+    resolution: 0.05
+    
+  pose_graph:
+    optimization_interval: 90
+    max_num_iterations: 10
+    homogeneous_cost_threshold: 1.0e-6
+    
+  motion_filter:
+    max_time_seconds: 0.5
+    max_distance_meters: 0.1
+    max_angle_radians: 0.1
+```

@@ -230,3 +230,557 @@ The privacy architecture enforces a strict boundary between on-device and cloud 
 - [speech-processing](../speech-processing/) — Audio preprocessing before wake word and ASR
 - [text-to-speech](../text-to-speech/) — Response synthesis for spoken output
 - [voice-analytics](../voice-analytics/) — Emotion detection for context-aware response tone
+
+---
+
+## Advanced Configuration
+
+### Wake Word Model Tuning
+
+```python
+from voice_assistants import WakeWordConfig
+
+config = WakeWordConfig(
+    model="custom_wake_v2",
+    sensitivity=0.6,
+    false_positive_rate_target=0.01,
+    detection_threshold=0.7,
+    audio_buffer_seconds=3.0,
+    sample_rate=16000,
+    energy_gate_db=-40,
+    spectral_gate_enabled=True,
+)
+```
+
+### Intent Classifier Configuration
+
+```python
+from voice_assistants import IntentConfig
+
+intent_config = IntentConfig(
+    model="intent_transformer_v3",
+    confidence_threshold=0.65,
+    fallback_intent="unknown",
+    max_intents_per_utterance=3,
+    slot_filling_strategy="greedy",
+    context_window_turns=5,
+    entity_linking_enabled=True,
+)
+```
+
+## Architecture Patterns
+
+### Voice Assistant Pipeline
+
+```
+Audio Stream
+    │
+    ▼
+┌──────────────┐
+│ Wake Word    │── On-device keyword spotting
+│ Detection    │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ ASR          │── Speech-to-text transcription
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ NLU          │── Intent classification + slot filling
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Dialogue     │── Context management, disambiguation
+│ Manager      │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Skill Router │── Dispatch to appropriate skill
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ TTS          │── Text-to-speech response
+└──────────────┘
+```
+
+### Dialogue State Machine
+
+```
+IDLE → LISTENING → PROCESSING → AWAITING_SLOT → EXECUTING → RESPONDING → IDLE
+  ↑                                                                    │
+  └────────────────────────────────────────────────────────────────────┘
+
+Additional transitions:
+- PROCESSING → AWAITING_CONFIRMATION (destructive actions)
+- AWAITING_SLOT → LISTENING (user provides slot)
+- RESPONDING → LISTENING (follow-up question)
+```
+
+## Integration Guide
+
+### Smart Home Integration
+
+```python
+from voice_assistants import SmartHomeSkill, DeviceRegistry
+
+registry = DeviceRegistry()
+registry.add_device("kitchen_light", "light", capabilities=["on_off", "brightness", "color"])
+registry.add_device("thermostat", "thermostat", capabilities=["temperature", "mode"])
+
+skill = SmartHomeSkill(device_registry=registry)
+router.register("control_lights", skill, priority=10)
+```
+
+### Multi-Turn Context Management
+
+```python
+from voice_assistants import ContextManager
+
+context = ContextManager(session_timeout_s=300)
+context.set_slot("user_123", "genre", "jazz")
+context.set_slot("user_123", "mood", "relaxing")
+
+# Later turn: "How about something faster?"
+# Context carries forward genre=jazz, mood updates to energetic
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| On-device wake word | Zero latency, zero network |
+| NLU model quantization | 2x inference speed |
+| Intent caching | Skip re-classification |
+| Pre-fetched skill data | Faster response generation |
+| TTS audio caching | Zero-latency repeated phrases |
+
+## Security Considerations
+
+- **On-device wake word**: Audio never leaves device until wake confirmation
+- **Ephemeral audio buffers**: Audio discarded after processing
+- **Domain-level consent**: Separate consent for health, finance, location
+- **Data retention controls**: User-configurable retention periods
+- **Secure skill execution**: Sandboxed skill environments
+- **Intent verification**: Confirm high-stakes actions before execution
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Wake word false positives | Sensitivity too high | Reduce sensitivity to 0.5 |
+| Intent misclassification | Insufficient training data | Add more utterance examples |
+| Slot filling fails | Ambiguous entity | Add disambiguation prompts |
+| Response latency high | TTS cold start | Pre-warm TTS model |
+| Context lost between turns | Session timeout too short | Increase timeout to 600s |
+| Skill not found | Missing registration | Register skill with router |
+
+## API Reference
+
+### WakeWordDetector
+
+```python
+class WakeWordDetector:
+    def __init__(self, model: str, sensitivity: float, false_positive_suppression: bool, audio_buffer_seconds: float)
+    def process(self, audio_chunk: ndarray) -> WakeWordResult
+    def get_buffered_audio(self) -> ndarray
+```
+
+### IntentClassifier
+
+```python
+class IntentClassifier:
+    def __init__(self, model: str, intents: list, confidence_threshold: float)
+    def classify(self, text: str) -> IntentResult
+    def set_confidence_threshold(self, threshold: float) -> None
+```
+
+### DialogueManager
+
+```python
+class DialogueManager:
+    def __init__(self, max_turns: int, context_expiry_seconds: int, correction_enabled: bool, interruption_enabled: bool)
+    def process_utterance(self, session_id: str, utterance: str, context: dict, router: SkillRouter) -> DialogueResponse
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class WakeWordResult:
+    activated: bool
+    timestamp: float
+    confidence: float
+    buffered_audio: ndarray
+
+@dataclass
+class IntentResult:
+    intent: str
+    confidence: float
+    slots: dict
+
+@dataclass
+class DialogueResponse:
+    action: str
+    speech: str
+    slots: dict
+    requires_confirmation: bool
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+pip install voice-assistants
+```
+
+### Skill Registration
+
+```python
+from voice_assistants import SkillRouter
+
+router = SkillRouter()
+router.register("play_music", MusicSkill(), priority=10)
+router.register("set_timer", TimerSkill(), priority=5)
+router.register("control_lights", LightsSkill(), priority=8)
+```
+
+## Monitoring & Observability
+
+```python
+from voice_assistants import MetricsCollector
+
+collector = MetricsCollector()
+collector.counter("assistant.wake_detected", count)
+collector.histogram("assistant.nlu.latency_ms", latency)
+collector.counter("assistant.intent.total", count, tags={"intent": intent})
+collector.gauge("assistant.intent.confidence", confidence)
+collector.counter("assistant.slot.fill_rate", rate, tags={"slot": slot})
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from voice_assistants import IntentClassifier
+
+def test_intent_classification():
+    classifier = IntentClassifier(model="test_model", intents=["play_music", "set_timer"], confidence_threshold=0.5)
+    result = classifier.classify("play some jazz music")
+    assert result.intent == "play_music"
+    assert result.confidence > 0.5
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 1.0.0 | Initial release | N/A |
+| 1.1.0 | Added multi-turn dialogue | Enable context manager |
+| 2.0.0 | New NLU model | Re-train intent classifier |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **NLU** | Natural Language Understanding |
+| **Intent** | User's desired action from an utterance |
+| **Slot** | Extracted entity from an utterance |
+| **Wake Word** | Keyword that activates the assistant |
+| **VUI** | Voice User Interface |
+| **Dialogue Management** | Tracking conversation state across turns |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with wake word detection
+- Intent classification and slot filling
+- Multi-turn dialogue management
+- Skill routing and chaining
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/voice-assistants.git
+pip install -e ".[dev]"
+pytest tests/
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills
+
+---
+
+## Extended Reference
+
+### Intent Classification Reference
+
+| Intent | Example Utterance | Slots | Confidence |
+|--------|------------------|-------|------------|
+| play_music | "Play jazz by Miles Davis" | genre, artist | High |
+| set_timer | "Set a timer for 10 minutes" | duration | High |
+| get_weather | "What's the weather in NYC?" | location | High |
+| send_message | "Text Alice I'll be late" | recipient, body | Medium |
+| control_lights | "Dim lights to 50%" | brightness | High |
+| make_call | "Call mom" | contact | High |
+| search_web | "Search for nearest pizza" | query | Medium |
+
+### Slot Type Reference
+
+| Type | Examples | Validation |
+|------|----------|------------|
+| duration | "10 minutes", "1 hour" | Convert to seconds |
+| datetime | "tomorrow at 3pm", "next Friday" | Parse to ISO |
+| location | "New York", "here" | Geocode if needed |
+| contact | "Alice", "Mom" | Match to contacts |
+| number | "5", "3.5" | Parse numeric value |
+| genre | "jazz", "rock" | Match to music library |
+| color | "red", "warm white" | Convert to RGB |
+
+### Dialogue Management Reference
+
+| State | Description | Next States |
+|-------|-------------|-------------|
+| IDLE | Waiting for wake word | LISTENING |
+| LISTENING | Capturing audio | PROCESSING |
+| PROCESSING | Running NLU | AWAITING_SLOT, EXECUTING, RESPONDING |
+| AWAITING_SLOT | Asking for missing info | PROCESSING |
+| AWAITING_CONFIRMATION | Confirming action | EXECUTING, LISTENING |
+| EXECUTING | Running skill | RESPONDING |
+| RESPONDING | Speaking response | IDLE, LISTENING |
+
+### VUI Design Patterns
+
+| Pattern | When to Use | Example |
+|---------|------------|---------|
+| Explicit confirmation | Destructive actions | "Delete all? Say yes to confirm." |
+| Implicit confirmation | Low-risk actions | "Setting timer for 10 minutes." |
+| Disambiguation | Multiple matches | "Did you mean Alice Smith or Alice Jones?" |
+| Error recovery | Failed understanding | "Sorry, I didn't catch that. Try again." |
+| Progressive disclosure | Complex tasks | "OK, what type of music?" |
+| Context carryover | Follow-up questions | "And for the same artist?" |
+
+### Multi-Turn Context Reference
+
+| Context Type | Persistence | Example |
+|-------------|-------------|---------|
+| Session | Duration of conversation | Current music genre |
+| User | Across sessions | User preferences |
+| Device | Per device | Device location |
+| Skill | Per skill invocation | Current playlist |
+| Conversation | Within topic | Previous search query |
+
+### Skill Registration Reference
+
+| Skill | Intents | Priority | Dependencies |
+|-------|---------|----------|-------------|
+| Music | play_music, pause_music, next_track | 10 | Music API |
+| Timer | set_timer, cancel_timer, timer_status | 5 | System clock |
+| Lights | control_lights, light_status | 8 | Smart home API |
+| Weather | get_weather, forecast | 3 | Weather API |
+| Messages | send_message, read_messages | 7 | Messaging API |
+| Calendar | create_event, list_events | 6 | Calendar API |
+
+## NLU Pipeline Deep Dive
+
+### Transformer-Based Intent Classification
+
+```python
+from voice_assistants import TransformerIntentClassifier, IntentModelConfig
+
+config = IntentModelConfig(
+    model_type="bert",
+    hidden_size=768,
+    num_attention_heads=12,
+    num_hidden_layers=12,
+    num_intents=50,
+    max_sequence_length=128,
+    dropout=0.1,
+    label_smoothing=0.1
+)
+
+classifier = TransformerIntentClassifier(config)
+classifier.load_weights("intent_bert_v3.ckpt")
+
+# Classify with token-level confidence
+result = classifier.classify("play jazz music by Miles Davis")
+print(f"Intent: {result.intent}")
+print(f"Confidence: {result.confidence:.3f}")
+
+# Get top-k predictions
+top_k = classifier.classify_top_k("set a timer for 10 minutes", k=3)
+for pred in top_k:
+    print(f"  {pred.intent}: {pred.confidence:.3f}")
+# set_timer: 0.94
+# set_reminder: 0.04
+# play_music: 0.01
+```
+
+### Entity Linking and Resolution
+
+```python
+from voice_assistants import EntityLinker, EntityResolver
+
+# Link extracted entities to knowledge base
+linker = EntityLinker(
+    knowledge_base="assistant_kb.json",
+    entity_types=["person", "location", "song", "device"],
+    fuzzy_match=True,
+    fuzzy_threshold=0.7
+)
+
+# Resolve ambiguous entities
+resolver = EntityResolver(
+    context_manager=context_mgr,
+    disambiguation_strategy="most_recent"  # most_recent | most_frequent | ask_user
+)
+
+# Process utterance with entity linking
+utterance = "play some songs by the artist I was listening to earlier"
+entities = linker.link(utterance)
+# {'artist': {'text': 'the artist I was listening to earlier', 'type': 'reference', 'resolved': 'Miles Davis'}}
+
+resolved = resolver.resolve(entities, session_id="user_123")
+```
+
+### Multi-Intent Handling
+
+```python
+from voice_assistants import MultiIntentClassifier
+
+# Handle utterances with multiple intents
+multi_classifier = MultiIntentClassifier(
+    model="multi_intent_transformer_v1",
+    max_intents=5,
+    separation_strategy="sequential"  # sequential | parallel | priority
+)
+
+result = multi_classifier.classify(
+    "set a timer for 10 minutes and play some jazz and dim the lights to 30%"
+)
+print(f"Intents detected: {len(result.intents)}")
+for intent in result.intents:
+    print(f"  {intent.name}: {intent.confidence:.2f} slots={intent.slots}")
+# Intents detected: 3
+#   set_timer: 0.95 slots={'duration': '10 minutes'}
+#   play_music: 0.92 slots={'genre': 'jazz'}
+#   control_lights: 0.88 slots={'brightness': '30%'}
+```
+
+### Context-Aware Slot Filling
+
+```python
+from voice_assistants import ContextualSlotFiller
+
+filler = ContextualSlotFiller(
+    context_window=5,         # Remember last 5 turns
+    slot_carry_over=True,     # Carry unfilled slots forward
+    entity_memory=True        # Remember mentioned entities
+)
+
+# Track slots across turns
+session = filler.new_session(session_id="user_123")
+
+# Turn 1
+result1 = filler.fill(
+    utterance="play some music",
+    intent="play_music",
+    session=session
+)
+print(f"Missing required slots: {result1.missing_slots}")
+# Missing required: ['genre']
+
+# Turn 2 — context carries over
+result2 = filler.fill(
+    utterance="jazz please",
+    intent="play_music",
+    session=session
+)
+print(f"Filled slots: {result2.filled_slots}")
+# Filled slots: {'genre': 'jazz'}
+```
+
+### Response Generation Templates
+
+```python
+from voice_assistants import ResponseGenerator, ResponseTemplate
+
+# Define response templates for all dialogue states
+templates = {
+    "confirmation": ResponseTemplate(
+        templates=[
+            "I'll {action} for you. Should I proceed?",
+            "Got it — {action}. Confirm?",
+            "You want me to {action}. Is that right?"
+        ],
+        variables=["action"],
+        fill_strategy="random"
+    ),
+    "error_slot_missing": ResponseTemplate(
+        templates=[
+            "I need to know {slot_name}. {prompt}",
+            "What {slot_name} should I use? {prompt}",
+            "Which {slot_name} do you mean? {prompt}"
+        ],
+        variables=["slot_name", "prompt"],
+        fill_strategy="sequential"
+    ),
+    "success": ResponseTemplate(
+        templates=[
+            "Done. {action_description}.",
+            "{action_description} — all set!",
+            "OK, I've {action_description}."
+        ],
+        variables=["action_description"],
+        fill_strategy="random"
+    )
+}
+
+generator = ResponseGenerator(templates=templates)
+response = generator.generate(
+    state="success",
+    context={"action_description": "set a timer for 10 minutes"}
+)
+print(response.text)
+```
+
+### Wake Word Customization
+
+```python
+from voice_assistants import CustomWakeWordTrainer
+
+# Train a custom wake word
+trainer = CustomWakeWordTrainer(
+    base_model="hey_assistant_v3",
+    training_data="custom_wake_samples/",
+    augmentation=True,
+    augmentation_config={
+        "noise_levels": [5, 10, 15, 20],
+        "speed_perturb": [0.9, 1.0, 1.1],
+        "room_impulse": ["office", "living_room", "car"]
+    }
+)
+
+# Train and validate
+model = trainer.train(
+    epochs=100,
+    learning_rate=1e-4,
+    validation_split=0.2
+)
+
+# Evaluate
+metrics = trainer.evaluate(model, test_data="test_wake_samples/")
+print(f"Detection rate: {metrics.detection_rate:.2%}")
+print(f"False positive rate: {metrics.false_positive_rate:.4%}")
+print(f"Average latency: {metrics.latency_ms:.0f}ms")
+```

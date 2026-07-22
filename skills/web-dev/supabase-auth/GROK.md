@@ -252,3 +252,523 @@ async def get_server_session(request_cookies: dict) -> dict | None:
 - **edge-runtime** — Deploying Supabase Edge Functions with auth middleware
 - **server-components** — Using Supabase auth state in React Server Components
 - **tailwind-shadcn** — UI patterns for auth forms and login pages
+
+---
+
+## Advanced Configuration
+
+### Custom JWT Claims
+
+```python
+from supabase_auth import JWTClaimsConfig
+
+claims_config = JWTClaimsConfig(
+    custom_claims={
+        "role": "app_metadata.role",
+        "permissions": "app_metadata.permissions",
+        "org_id": "app_metadata.org_id",
+    },
+    token_lifetime_seconds=3600,
+    refresh_token_lifetime_seconds=604800,
+)
+```
+
+### RLS Policy Templates
+
+```python
+from supabase_auth import RLSTemplate
+
+templates = RLSTemplate(
+    owner_policy="auth.uid() = user_id",
+    org_policy="auth.uid() IN (SELECT user_id FROM org_members WHERE org_id = org_id)",
+    admin_policy="auth.jwt()->>'role' = 'admin'",
+    public_read_policy="status = 'published'",
+)
+```
+
+## Architecture Patterns
+
+### Auth Flow Architecture
+
+```
+Client Request
+    │
+    ▼
+┌──────────────┐
+│ Middleware    │── JWT verification, session refresh
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Server       │── Session validation, user context
+│ Component    │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ PostgREST    │── Sets auth.uid() from JWT
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ RLS Policy   │── Filters rows based on auth.uid()
+│ Evaluation   │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Database     │── Returns only authorized rows
+│ Query        │
+└──────────────┘
+```
+
+## Integration Guide
+
+### Next.js Middleware Integration
+
+```python
+from supabase_auth import SupabaseMiddleware
+
+middleware = SupabaseMiddleware(
+    supabase_url="https://your-project.supabase.co",
+    anon_key="your-anon-key",
+    protected_paths=["/dashboard", "/settings"],
+    public_paths=["/", "/login"],
+)
+```
+
+### Edge Function Integration
+
+```python
+from supabase_auth import EdgeFunctionAuth
+
+auth = EdgeFunctionAuth(jwt_secret="your-jwt-secret")
+
+async def handler(request):
+    user = await auth.verify_request(request)
+    if not user:
+        return {"status": 401, "error": "Unauthorized"}
+    return {"status": 200, "user_id": user.id}
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| JWT caching | Skip repeated verification |
+| RLS policy caching | Faster query planning |
+| Session refresh batching | Reduce refresh storms |
+| Connection pooling | Handle auth spikes |
+
+## Security Considerations
+
+- **Never expose service_role key**: Use only server-side
+- **Short-lived JWTs**: 1-hour access tokens
+- **Refresh token rotation**: Detect token theft
+- **MFA enforcement**: Require for admin users
+- **RLS on every table**: Defense in depth
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| 401 on valid request | JWT expired | Implement token refresh |
+| RLS blocks legitimate access | Policy missing | Add permissive policy |
+| Session not persisting | Cookie not set | Configure cookie options |
+| OAuth callback fails | Redirect URL mismatch | Update provider config |
+
+## API Reference
+
+### SupabaseClient
+
+```python
+class SupabaseClient:
+    def __init__(self, url: str, anon_key: str, service_role_key: str = None)
+    async def sign_up(self, email: str, password: str, options: dict = None) -> AuthResult
+    async def sign_in(self, email: str, password: str) -> AuthResult
+    async def sign_out(self) -> None
+    async def get_user(self) -> User
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    id: str
+    email: str
+    role: str
+    app_metadata: dict
+    user_metadata: dict
+
+@dataclass
+class Session:
+    access_token: str
+    refresh_token: str
+    expires_at: int
+    user: User
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+pip install supabase-auth
+```
+
+### Environment Setup
+
+```bash
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+
+## Monitoring & Observability
+
+```python
+from supabase_auth import MetricsCollector
+
+collector = MetricsCollector()
+collector.counter("auth.signin.total", count, tags={"method": method, "status": status})
+collector.counter("auth.signup.total", count, tags={"status": status})
+collector.histogram("auth.jwt.verify_ms", duration)
+collector.counter("auth.mfa.challenge_total", count, tags={"method": method})
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from supabase_auth import SupabaseClient
+
+@pytest.fixture
+def client():
+    return SupabaseClient(url="http://localhost:54321", anon_key="test-key")
+
+async def test_sign_up(client):
+    result = await client.sign_up(email="test@example.com", password="password123")
+    assert result.user is not None
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 1.0.0 | Initial release | N/A |
+| 1.1.0 | Added passkey support | Enable WebAuthn |
+| 2.0.0 | New RLS policy format | Migrate policies |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **RLS** | Row-Level Security |
+| **JWT** | JSON Web Token |
+| **OAuth** | Open Authorization protocol |
+| **MFA** | Multi-Factor Authentication |
+| **PostgREST** | RESTful API for PostgreSQL |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with email/password and OAuth
+- RLS policy management
+- MFA support
+- Edge Function auth middleware
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/supabase-auth.git
+pip install -e ".[dev]"
+pytest tests/
+```
+
+## Advanced Authentication Patterns
+
+### Multi-Factor Authentication Setup
+
+```typescript
+import { supabase } from './client'
+
+async function signInWithMFA(email: string, password: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+  if (error) throw error
+
+  // Check if MFA is enrolled
+  const { data: factors } = await supabase.auth.mfa.listFactors()
+  if (factors?.totp.length === 0) {
+    // No MFA enrolled — redirect to setup
+    return { requiresSetup: true }
+  }
+
+  // Challenge the first TOTP factor
+  const factorId = factors.totp[0].id
+  const { data: challenge, error: challengeError } =
+    await supabase.auth.mfa.challenge({ factorId })
+  if (challengeError) throw challengeError
+
+  return { requiresChallenge: true, challengeId: challenge.id, factorId }
+}
+
+async function verifyMFA(code: string, factorId: string, challengeId: string) {
+  const { data, error } = await supabase.auth.mfa.verify({
+    factorId,
+    challengeId,
+    code,
+  })
+  if (error) throw error
+  return data.session
+}
+```
+
+### Row-Level Security with Auth Context
+
+```sql
+-- Policy: Users can only read their own data
+CREATE POLICY "Users read own data"
+  ON documents
+  FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Policy: Team members can read team documents
+CREATE POLICY "Team members read team docs"
+  ON documents
+  FOR SELECT
+  USING (
+    team_id IN (
+      SELECT team_id FROM team_members
+      WHERE user_id = auth.uid()
+    )
+  );
+
+-- Policy: Only admins can delete
+CREATE POLICY "Admins can delete"
+  ON documents
+  FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM team_members
+      WHERE user_id = auth.uid()
+      AND role = 'admin'
+    )
+  );
+```
+
+### Session Refresh Strategy
+
+```typescript
+import { supabase } from './client'
+
+// Proactive session refresh before expiry
+async function maintainSession() {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return
+
+  const expiresAt = session.expires_at * 1000
+  const now = Date.now()
+  const timeUntilExpiry = expiresAt - now
+
+  // Refresh if less than 5 minutes until expiry
+  if (timeUntilExpiry < 5 * 60 * 1000) {
+    const { error } = await supabase.auth.refreshSession()
+    if (error) {
+      // Session refresh failed — user needs to re-authenticate
+      await supabase.auth.signOut()
+      window.location.href = '/login'
+    }
+  }
+}
+
+// Check every minute
+setInterval(maintainSession, 60 * 1000)
+```
+
+### Auth Middleware Pattern
+
+```typescript
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export async function middleware(request: NextRequest) {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: { getAll: () => request.cookies.getAll() } }
+  )
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Protected routes
+  const protectedPaths = ['/dashboard', '/settings', '/admin']
+  if (protectedPaths.some(p => request.nextUrl.pathname.startsWith(p))) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+  }
+
+  // Role-based routes
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user!.id)
+      .single()
+
+    if (profile?.role !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+  }
+
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/settings/:path*', '/admin/:path*']
+}
+```
+
+### OAuth Provider Configuration Table
+
+| Provider | Scopes | Profile Fields | Notes |
+|----------|--------|----------------|-------|
+| Google | email profile | email name picture | Most common |
+| GitHub | read:user user:email | login email name avatar_url | Developer-focused |
+| Discord | identify email | id username email avatar | Gaming/social apps |
+| Twitter | tweet.read users.read | id name username | OAuth 2.0 only |
+| Apple | name email | name email | Required for iOS apps |
+
+### JWT Claims Reference
+
+```typescript
+// Accessing JWT claims in Supabase
+const { data: { user } } = await supabase.auth.getUser()
+
+// Standard claims
+console.log(user?.id)                    // UUID
+console.log(user?.email)                 // User email
+console.log(user?.user_metadata)         // Custom user data
+console.log(user?.app_metadata)          // App-level data
+
+// Custom claims via edge functions
+// Set in Supabase dashboard > Auth > JWT Templates
+// {
+//   "role": "{{ .user_metadata.role }}",
+//   "plan": "{{ .app_metadata.plan }}",
+//   "org_id": "{{ .user_metadata.org_id }}"
+// }
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills
+
+---
+
+## Extended Reference
+
+### OAuth Provider Reference
+
+| Provider | Scopes | Notes |
+|----------|--------|-------|
+| Google | openid, email, profile | Most common |
+| GitHub | user:email, read:user | Developer-focused |
+| Discord | email, identify | Gaming/community |
+| Twitter | email, users.read | Social |
+| Apple | name, email | iOS apps required |
+| Facebook | email, public_profile | Social |
+| Azure AD | openid, email | Enterprise |
+
+### RLS Policy Examples
+
+```sql
+-- Users can read their own data
+CREATE POLICY "Users read own data" ON items
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Users can insert their own data
+CREATE POLICY "Users insert own data" ON items
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Team members can read team data
+CREATE POLICY "Team members read" ON items
+  FOR SELECT USING (
+    team_id IN (
+      SELECT team_id FROM team_members WHERE user_id = auth.uid()
+    )
+  );
+
+-- Admins can do everything
+CREATE POLICY "Admins full access" ON items
+  FOR ALL USING (
+    auth.jwt()->>'role' = 'admin'
+  );
+```
+
+### MFA Configuration Reference
+
+| Method | Security | User Experience | Use Case |
+|--------|----------|-----------------|----------|
+| TOTP | High | Good | Standard MFA |
+| SMS | Medium | Excellent | Fallback |
+| Backup codes | High | Good | Recovery |
+| WebAuthn | Very high | Excellent | High-security |
+
+### Session Management Reference
+
+| Parameter | Default | Recommended | Description |
+|-----------|---------|-------------|-------------|
+| Access token expiry | 3600s | 1800-3600s | Short-lived token |
+| Refresh token expiry | 604800s | 604800s | 7 days |
+| Token refresh interval | 300s | 300-600s | Auto-refresh |
+| Session timeout | — | 86400s | Inactivity timeout |
+
+### JWT Claims Reference
+
+| Claim | Description | Example |
+|-------|-------------|---------|
+| `sub` | User ID | UUID |
+| `email` | User email | user@example.com |
+| `role` | User role | authenticated |
+| `aud` | Audience | authenticated |
+| `iss` | Issuer | https://project.supabase.co |
+| `exp` | Expiration | Unix timestamp |
+| `iat` | Issued at | Unix timestamp |
+| `app_metadata` | App metadata | role, provider |
+| `user_metadata` | User metadata | name, avatar |
+
+### Auth Flow Reference
+
+```
+Email/Password Sign-Up:
+1. User submits email + password
+2. Supabase creates user in auth.users
+3. Confirmation email sent
+4. User clicks link → email confirmed
+5. Session created with JWT
+
+OAuth Sign-In:
+1. User clicks provider button
+2. Redirect to provider OAuth screen
+3. User authorizes app
+4. Callback with authorization code
+5. Supabase exchanges code for tokens
+6. User profile created/updated
+7. Session created with JWT
+
+Magic Link:
+1. User enters email
+2. Supabase sends magic link email
+3. User clicks link
+4. Session created with JWT
+5. Redirect to app
+```

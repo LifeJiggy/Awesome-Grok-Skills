@@ -214,3 +214,503 @@ print(f"Low discoverability gestures: {coverage['low_discoverability']}")
 - [usability-testing](../usability-testing/GROK.md) — Testing interaction patterns with real users
 - [information-architecture](../information-architecture/GROK.md) — Navigation interaction patterns and information hierarchy
 - [accessibility](../accessibility/GROK.md) — Accessible interaction alternatives and WCAG compliance
+
+---
+
+## Advanced Configuration
+
+### Spring Physics Configuration
+
+```python
+from interaction_design import SpringConfig
+
+spring = SpringConfig(
+    damping=0.7,
+    stiffness=120,
+    mass=1.0,
+    initial_velocity=0,
+)
+curve = spring.compute_bezier(duration_ms=400)
+```
+
+### State Machine Validation Rules
+
+```python
+from interaction_design import ValidationRules
+
+rules = ValidationRules(
+    require_initial_state=True,
+    require_final_state=True,
+    check_unreachable_states=True,
+    check_dead_ends=True,
+    max_transitions_per_state=10,
+    warn_self_transitions=True,
+)
+issues = machine.validate_with_rules(rules)
+```
+
+## Architecture Patterns
+
+### Micro-Interaction Structure
+
+```
+Trigger
+    │
+    ▼
+┌──────────────┐
+│ Rules        │── Preconditions, state checks
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Feedback     │── Visual, haptic, auditory
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Loops        │── Repeat, reversal, success state
+└──────────────┘
+```
+
+### State Machine Pattern
+
+```
+IDLE ──trigger──> ACTIVE ──complete──> SUCCESS
+  │                 │                    │
+  │                 ▼                    │
+  │              ERROR ──retry──> ACTIVE │
+  │                                    │
+  └────────reset───────────────────────┘
+```
+
+## Integration Guide
+
+### Design Token Integration
+
+```python
+from interaction_design import DesignTokenBridge
+
+bridge = DesignTokenBridge()
+bridge.export_figma_tokens("tokens.json")
+bridge.export_css_variables("motion-tokens.css")
+bridge.sync_storybook()
+```
+
+### Accessibility Checker Integration
+
+```python
+from interaction_design import AccessibilityChecker
+
+checker = AccessibilityChecker()
+issues = checker.check_interaction_patterns(component_library)
+for issue in issues:
+    print(f"[{issue.severity}] {issue.description}")
+    print(f"  WCAG: {issue.wcag_criterion}")
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| Pre-computed timing curves | Zero-frame animation start |
+| Will-change hints | GPU-accelerated transforms |
+| RequestAnimationFrame batching | Jank-free 60fps animations |
+| Reduced motion media query | Accessible performance |
+| CSS containment | Isolate layout recalculations |
+
+## Security Considerations
+
+- **Input validation**: Validate all user interaction inputs
+- **CSRF protection**: Token-based form submissions
+- **Clickjacking prevention**: X-Frame-Options on sensitive pages
+- **Rate limiting**: Prevent rapid repeated interactions
+- **Focus management**: Prevent focus hijacking attacks
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Animation jank | Layout thrashing | Use transform/opacity only |
+| Focus lost after modal | Focus not restored | Implement focus restoration |
+| State machine dead-end | Missing error transition | Add error state transitions |
+| Dark pattern detected | Deceptive UI | Replace with transparent pattern |
+| Gesture conflict | Overlapping gesture handlers | Use gesture disambiguation |
+
+## API Reference
+
+### MicroInteraction
+
+```python
+class MicroInteraction:
+    def __init__(self, name: str, trigger: TriggerType, context: str)
+    def set_rules(self, rules: dict) -> None
+    def set_feedback(self, feedback: dict) -> None
+    def set_loops(self, loops: dict) -> None
+    def spec(self) -> InteractionSpec
+```
+
+### StateMachine
+
+```python
+class StateMachine:
+    def __init__(self, name: str)
+    def add_state(self, state: State) -> None
+    def add_transition(self, transition: Transition) -> None
+    def validate(self) -> list[Issue]
+    def render(self) -> str
+    def dead_ends(self) -> list[str]
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+from enum import Enum
+
+class TriggerType(Enum):
+    CLICK = "click"
+    DOUBLE_CLICK = "double_click"
+    LONG_PRESS = "long_press"
+    SWIPE = "swipe"
+    HOVER = "hover"
+    FOCUS = "focus"
+
+class MotionPurpose(Enum):
+    ENTRANCE = "entrance"
+    EXIT = "exit"
+    EMPHASIS = "emphasis"
+    ATTENTION = "attention"
+
+@dataclass
+class State:
+    name: str
+    is_initial: bool = False
+    is_final: bool = False
+
+@dataclass
+class Transition:
+    from_state: str
+    to_state: str
+    trigger: str
+    guard: str = None
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+pip install interaction-design
+```
+
+### Design System Setup
+
+1. Define motion tokens (timing, easing, spring)
+2. Create micro-interaction library
+3. Build state machines for complex flows
+4. Run dark pattern audit
+5. Validate accessibility alternatives
+6. Export to design system documentation
+
+## Monitoring & Observability
+
+```python
+from interaction_design import MetricsCollector
+
+collector = MetricsCollector()
+collector.counter("interaction.dark_patterns_found", count, tags={"type": ptype})
+collector.gauge("interaction.accessibility.alternatives覆盖率", coverage)
+collector.histogram("interaction.animation.duration_ms", duration)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from interaction_design import StateMachine, State, Transition
+
+def test_dead_end_detection():
+    sm = StateMachine(name="Test")
+    sm.add_state(State("A", is_initial=True))
+    sm.add_state(State("B"))
+    sm.add_transition(Transition("A", "B", "go"))
+    assert sm.dead_ends() == ["B"]
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 1.0.0 | Initial release | N/A |
+| 1.1.0 | Spring physics support | Update animation configs |
+| 2.0.0 | Dark pattern scanner | Re-audit existing patterns |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **Micro-Interaction** | Single-purpose interaction (like, toggle, swipe) |
+| **State Machine** | Formal model of states and transitions |
+| **Spring Physics** | Natural-feeling animation using damped oscillation |
+| **Dark Pattern** | Deceptive UI that manipulates users |
+| **Progressive Disclosure** | Revealing complexity gradually |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with micro-interaction design
+- State machine modeling and validation
+- Dark pattern detection
+- Accessibility-first interaction patterns
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/interaction-design.git
+pip install -e ".[dev]"
+pytest tests/
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills
+
+---
+
+## Extended Reference
+
+### Micro-Interaction Pattern Library
+
+| Pattern | Trigger | Feedback | Loop | Use Case |
+|---------|---------|----------|------|----------|
+| Like Button | Click | Heart fills, scales up | Toggle | Social media |
+| Toggle Switch | Click | Slider moves, color change | State persist | Settings |
+| Pull to Refresh | Drag | Spinner, release triggers | Complete | Feed updates |
+| Infinite Scroll | Scroll | New content loads | Continue | Feed browsing |
+| Swipe to Delete | Swipe left | Item slides, confirm button | Undo option | List management |
+| Long Press Menu | Long press | Context menu appears | Select action | Mobile navigation |
+| Double Tap Zoom | Double tap | Smooth zoom | Toggle zoom | Image viewing |
+| Drag and Drop | Drag | Item follows cursor, drop zone highlights | Complete | File management |
+
+### State Machine Patterns
+
+| Pattern | States | Use Case |
+|---------|--------|----------|
+| Simple Toggle | OFF → ON → OFF | Light switch, mute |
+| Three-State | OFF → LOADING → ON → OFF | Async toggle |
+| Wizard | STEP1 → STEP2 → STEP3 → COMPLETE | Multi-step forms |
+| Modal | CLOSED → OPEN → CLOSED | Dialogs, overlays |
+| Loading | IDLE → LOADING → SUCCESS/ERROR | Async operations |
+| Undo | NORMAL → UNDOABLE → RESTORED | Delete with undo |
+
+### Animation Timing Reference
+
+| Purpose | Duration | Easing | Example |
+|---------|----------|--------|---------|
+| Button press | 100-150ms | ease-out | Touch feedback |
+| Page transition | 200-300ms | ease-in-out | Route changes |
+| Modal open | 200-250ms | ease-out | Dialog appear |
+| Modal close | 150-200ms | ease-in | Dialog disappear |
+| Tooltip show | 150-200ms | ease-out | Hover tooltip |
+| Tooltip hide | 100-150ms | ease-in | Hover end |
+| Notification | 300-500ms | ease-in-out | Toast appear |
+| Loading spinner | 800-1200ms | linear | Continuous rotation |
+
+### Gesture Recognition Reference
+
+| Gesture | Platform | Action | Discoverability |
+|---------|----------|--------|-----------------|
+| Tap | Both | Select/activate | 1.0 (universal) |
+| Double tap | Both | Zoom/special action | 0.8 |
+| Long press | Both | Context menu | 0.6 |
+| Swipe left | iOS | Delete/more | 0.7 |
+| Swipe right | iOS | Back | 0.9 |
+| Swipe up | Both | Dismiss/scroll | 0.9 |
+| Swipe down | Both | Refresh/scroll | 0.9 |
+| Pinch in | Both | Zoom out | 0.8 |
+| Pinch out | Both | Zoom in | 0.8 |
+| Rotate | Both | Rotate object | 0.5 |
+
+### Dark Pattern Taxonomy
+
+| Pattern | Type | Description | Severity |
+|---------|------|-------------|----------|
+| Confirm Shaming | Misdirection | Guilt-tripping opt-out | Medium |
+| Hidden Costs | Hidden Info | Fees revealed at checkout | High |
+| Forced Continuity | Roach Motel | Hard to cancel subscription | High |
+| Bait and Switch | Misdirection | Advertise X, deliver Y | High |
+| Privacy Zuckering | Misdirection | Confusing privacy settings | High |
+| Roach Motel | Force | Easy to get in, hard to get out | High |
+| Trick Questions | Misdirection | Confusing double negatives | Medium |
+| Hidden unsubscribe | Hidden Info | Buried unsubscribe link | Medium |
+| Visual interference | Guided | Making option visually prominent | Low |
+
+### Accessibility Interaction Checklist
+
+```
+KEYBOARD ACCESSIBILITY
+    □ All interactive elements reachable via Tab
+    □ Tab order follows visual reading order
+    □ Focus indicator visible on all elements
+    □ Enter/Space activates buttons and links
+    □ Escape closes modals and menus
+    □ Arrow keys navigate within components
+    □ Focus trapped in modals
+    □ Focus restored after modal close
+
+SCREEN READER ACCESSIBILITY
+    □ All images have alt text
+    □ Form inputs have labels
+    □ Headings are properly nested
+    □ Landmarks are properly defined
+    □ Dynamic content announced via aria-live
+    □ Interactive elements have accessible names
+    □ Custom widgets have ARIA roles
+```
+
+### Design Token Reference
+
+| Token Category | Examples | Usage |
+|---------------|----------|-------|
+| Color | primary, secondary, accent | Brand colors |
+| Typography | heading-1, body-large, caption | Text styles |
+| Spacing | space-1, space-2, space-4 | Margins, padding |
+| Border | radius-sm, radius-md, radius-lg | Corner rounding |
+| Shadow | shadow-sm, shadow-md, shadow-lg | Elevation |
+| Motion | duration-fast, duration-normal | Animation timing |
+
+### Complete Micro-Interaction Specification Template
+
+```markdown
+# Micro-Interaction: [Name]
+
+## Trigger
+- **Type:** [Click/Long Press/Swipe/Automatic]
+- **Element:** [Button/Link/Gesture]
+- **Context:** [Where this occurs]
+
+## Rules
+- **Pre-conditions:** [What must be true]
+- **Post-conditions:** [What changes]
+- **Constraints:** [Limitations]
+
+## Feedback
+- **Visual:** [What the user sees]
+- **Haptic:** [What the user feels]
+- **Auditory:** [What the user hears]
+- **Duration:** [Animation length]
+- **Easing:** [Timing function]
+
+## Loops
+- **Repeat:** [Does it repeat?]
+- **Reversal:** [How to undo]
+- **Success state:** [What happens on completion]
+- **Failure state:** [What happens on error]
+```
+
+### Complete State Machine Specification Template
+
+```markdown
+# State Machine: [Name]
+
+## States
+| State | Description | Entry Action | Exit Action |
+|-------|-------------|-------------|-------------|
+| IDLE | Waiting for input | Show placeholder | Hide placeholder |
+| LOADING | Processing request | Show spinner | Hide spinner |
+| SUCCESS | Operation complete | Show checkmark | — |
+| ERROR | Operation failed | Show error message | Clear error |
+
+## Transitions
+| From | To | Trigger | Guard | Action |
+|------|----|---------|-------|--------|
+| IDLE | LOADING | User submits | Form valid | Submit data |
+| LOADING | SUCCESS | Data received | — | Update UI |
+| LOADING | ERROR | Request fails | — | Show error |
+| ERROR | IDLE | User dismisses | — | Reset form |
+| SUCCESS | IDLE | Timeout | — | Reset form |
+
+## Initial State: IDLE
+## Final State: SUCCESS
+```
+
+### Complete Gesture Specification Template
+
+```markdown
+# Gesture: [Name]
+
+## Recognition
+- **Type:** [Tap/Swipe/Pinch/Rotate]
+- **Fingers:** [1/2/3+]
+- **Direction:** [Up/Down/Left/Right/Any]
+- **Min distance:** [Pixels]
+- **Max duration:** [ms]
+
+## Response
+- **Immediate:** [What happens during gesture]
+- **Complete:** [What happens on completion]
+- **Cancel:** [What happens if cancelled]
+
+## Conflicts
+- **Overlaps with:** [Other gestures]
+- **Disambiguation:** [How to resolve]
+
+## Accessibility
+- **Keyboard alternative:** [Key combination]
+- **Screen reader:** [ARIA description]
+- **Switch access:** [Switch pattern]
+```
+
+### Complete Dark Pattern Audit Checklist
+
+```
+DARK PATTERN AUDIT
+
+MISDIRECTION
+    □ Check for visual hierarchy manipulation
+    □ Verify equal prominence for all options
+    □ Look for pre-checked opt-in boxes
+    □ Check for hidden costs at checkout
+    □ Verify cancellation is as easy as signup
+
+ROACH MOTEL
+    □ Test signup flow (easy?)
+    □ Test cancellation flow (also easy?)
+    □ Check for hidden unsubscribe links
+    □ Verify account deletion process
+
+FORCE
+    □ Check for forced account creation
+    □ Verify social login alternatives
+    □ Check for forced continuity
+    □ Verify free trial conversion process
+
+CONFIRM SHAMING
+    □ Check opt-out language for guilt-tripping
+    □ Verify neutral language for all options
+    □ Look for "No, I don't want to save money"
+    □ Check unsubscribe confirmation text
+
+URGENCY/MANIPULATION
+    □ Check for fake scarcity ("Only 2 left!")
+    □ Verify countdown timers are real
+    □ Look for social proof manipulation
+    □ Check for hidden sponsorship/ads
+```
+
+### Complete Accessibility Interaction Patterns
+
+| Pattern | ARIA Role | Keyboard | Screen Reader |
+|---------|-----------|----------|---------------|
+| Button | button | Enter/Space | "button, [label]" |
+| Link | link | Enter | "link, [label]" |
+| Checkbox | checkbox | Space | "checkbox, [label], checked/unchecked" |
+| Radio | radio | Arrow keys | "radio, [label], selected" |
+| Select | listbox | Arrow keys | "listbox, [option], selected" |
+| Tab | tab | Arrow keys | "tab, [label], selected/unselected" |
+| Modal | dialog | Escape to close | "dialog, [title]" |
+| Menu | menu | Arrow keys | "menu, [item]" |
+| Tooltip | tooltip | — | "tooltip, [text]" |
+| Accordion | button + region | Enter/Space | "button, [label], expanded/collapsed" |

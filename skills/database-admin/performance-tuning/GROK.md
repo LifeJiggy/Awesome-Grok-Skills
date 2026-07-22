@@ -193,3 +193,602 @@ for hour in workload.peak_hours:
 - **db-management**: Database configuration and maintenance
 - **monitoring**: Real-time performance monitoring
 - **security-hardening**: Security configuration that may impact performance
+
+---
+
+## Advanced Configuration
+
+### Advanced Query Analysis
+
+```python
+from performance_tuning import QueryAnalyzer, PerformanceReport
+
+analyzer = QueryAnalyzer(connection_string="postgresql://admin:pass@localhost/prod")
+
+# Advanced query analysis with resource attribution
+report = analyzer.analyze_queries(
+    threshold_ms=100,
+    top_n=50,
+    time_range_hours=168,  # 1 week
+    include_plans=True,
+    include_statistics=True,
+    group_by="fingerprint",
+)
+
+print(f"Total queries analyzed: {report.total_queries}")
+print(f"Unique query patterns: {report.unique_patterns}")
+print(f"Total execution time: {report.total_time_seconds:.1f}s")
+
+# Detailed analysis per query
+for query in report.top_queries[:10]:
+    print(f"\n  Query: {query.fingerprint[:60]}...")
+    print(f"    Calls: {query.calls}")
+    print(f"    Avg time: {query.avg_duration_ms:.1f}ms")
+    print(f"    Total time: {query.total_duration_seconds:.1f}s")
+    print(f"    CPU time: {query.cpu_time_seconds:.1f}s")
+    print(f"    I/O time: {query.io_time_seconds:.1f}s")
+    print(f"    Rows returned: {query.total_rows}")
+    print(f"    Impact score: {query.impact_score:.1f}")
+    
+    if query.issues:
+        print(f"    Issues:")
+        for issue in query.issues:
+            print(f"      - {issue.description}")
+```
+
+### Advanced Index Tuning
+
+```python
+from performance_tuning import IndexTuner, IndexRecommendation
+
+tuner = IndexTuner(connection_string="postgresql://admin:pass@localhost/prod")
+
+# Comprehensive index analysis
+analysis = tuner.analyze_indexes(
+    include_usage=True,
+    include_bloat=True,
+    include_size=True,
+    include_missing=True,
+    include_redundant=True,
+    min_usage_days=30,
+)
+
+print("Current Indexes:")
+for idx in analysis.current_indexes:
+    print(f"  {idx.name}: {idx.size_mb:.1f} MB, {idx.scans} scans, {idx.scans_per_day:.1f} scans/day")
+
+print("\nMissing Indexes:")
+for idx in analysis.missing_indexes:
+    print(f"  {idx.definition}")
+    print(f"    Estimated improvement: {idx.estimated_improvement:.1f}%")
+    print(f"    Size estimate: {idx.size_estimate_mb:.1f} MB")
+    print(f"    Queries helped: {len(idx.queries_affected)}")
+
+print("\nRedundant Indexes:")
+for idx in analysis.redundant_indexes:
+    print(f"  {idx.name} can be dropped (covered by {idx.covering_index})")
+```
+
+### Advanced Memory Tuning
+
+```python
+from performance_tuning import MemoryTuner, MemoryAnalysis
+
+tuner = MemoryTuner(connection_string="postgresql://admin:pass@localhost/prod")
+
+# Comprehensive memory analysis
+analysis = tuner.analyze_memory(
+    include_cache=True,
+    include_work_mem=True,
+    include_shared_buffers=True,
+    include_os_memory=True,
+)
+
+print("Memory Configuration:")
+for param in analysis.current_settings:
+    print(f"  {param.name}: {param.value} (recommended: {param.recommended_value})")
+
+print("\nCache Analysis:")
+print(f"  Shared buffers hit ratio: {analysis.cache_hit_ratio:.3f}")
+print(f"  Buffer cache hit ratio: {analysis.buffer_hit_ratio:.3f}")
+print(f"  Tuple cache hit ratio: {analysis.tuple_hit_ratio:.3f}")
+print(f"  Index cache hit ratio: {analysis.index_hit_ratio:.3f}")
+
+print("\nMemory Pressure:")
+print(f"  Active pages: {analysis.active_pages}")
+print(f"  Dirty pages: {analysis.dirty_pages}")
+print(f"  Eviction rate: {analysis.eviction_rate_per_second:.1f}/s")
+print(f"  Free memory: {analysis.free_memory_mb:.1f} MB")
+```
+
+## Architecture Patterns
+
+### Performance Tuning Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  Performance Tuning Architecture            │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │              Analysis Layer                         │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
+│  │  │   Query     │  │   Index     │  │   Memory    │ │   │
+│  │  │   Analyzer  │  │   Tuner     │  │   Tuner     │ │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘ │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                 │
+│  ┌────────────────────────┴─────────────────────────────┐   │
+│  │              Recommendation Engine                   │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
+│  │  │   Query     │  │   Config    │  │   Workload  │ │   │
+│  │  │   Rewrite   │  │   Advisor   │  │   Analyzer  │ │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘ │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                           │                                 │
+│  ┌────────────────────────┴─────────────────────────────┐   │
+│  │              Monitoring Layer                        │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │   │
+│  │  │   Baseline  │  │   Regression│  │   Alerting  │ │   │
+│  │  │   Tracker   │  │   Detector  │  │             │ │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘ │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Workload Analysis Flow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   Workload Analysis Flow                    │
+├─────────────────────────────────────────────────────────────┤
+│  1. Collect Statistics                                      │
+│     └─► pg_stat_statements, pg_stat_activity                │
+│  2. Group Queries                                           │
+│     └─► Fingerprinting, pattern matching                    │
+│  3. Analyze Resource Usage                                  │
+│     └─► CPU, I/O, memory attribution                        │
+│  4. Identify Bottlenecks                                    │
+│     └─► Top-N by impact, wait events                        │
+│  5. Generate Recommendations                                │
+│     └─► Indexes, config, query rewrites                     │
+│  6. Estimate Impact                                         │
+│     └─► Before/after projections                            │
+│  7. Prioritize Actions                                      │
+│     └─► ROI ranking, quick wins                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Integration Guide
+
+### Application Integration
+
+```python
+# Integration with FastAPI
+from fastapi import FastAPI, Depends
+from performance_tuning import QueryAnalyzer
+
+app = FastAPI()
+analyzer = QueryAnalyzer(connection_string=connection_string)
+
+@app.get("/admin/performance/slow-queries")
+async def get_slow_queries(threshold_ms: int = 1000, limit: int = 10):
+    report = analyzer.analyze_slow_queries(threshold_ms=threshold_ms, top_n=limit)
+    return report.top_queries
+
+@app.get("/admin/performance/index-recommendations")
+async def get_index_recommendations():
+    tuner = IndexTuner(connection_string=connection_string)
+    recommendations = tuner.recommend_indexes()
+    return recommendations
+```
+
+### Monitoring Integration
+
+```python
+# Integration with Prometheus
+from prometheus_client import Counter, Histogram, Gauge
+
+QUERY_DURATION = Histogram('db_query_duration_seconds', 'Query duration', ['fingerprint'])
+QUERY_CALLS = Counter('db_query_calls_total', 'Query calls', ['fingerprint'])
+SLOW_QUERIES = Counter('db_slow_query_total', 'Slow queries')
+INDEX_RECOMMENDATIONS = Gauge('db_index_recommendations', 'Index recommendations')
+
+class PerformanceMetrics:
+    def record_query(self, fingerprint: str, duration: float):
+        QUERY_DURATION.labels(fingerprint=fingerprint).observe(duration)
+        QUERY_CALLS.labels(fingerprint=fingerprint).inc()
+        
+        if duration > 1.0:
+            SLOW_QUERIES.inc()
+    
+    def record_recommendations(self, count: int):
+        INDEX_RECOMMENDATIONS.set(count)
+```
+
+## Performance Optimization
+
+### Query Performance Tuning
+
+| Metric | Target | Warning | Critical |
+|--------|--------|---------|----------|
+| Query duration p95 | < 100ms | 100-500ms | > 500ms |
+| Query duration p99 | < 500ms | 500-2000ms | > 2000ms |
+| Slow query rate | < 1% | 1-5% | > 5% |
+| Cache hit ratio | > 99% | 95-99% | < 95% |
+| Index hit ratio | > 99% | 95-99% | < 95% |
+
+### Index Performance
+
+```sql
+-- Analyze index usage
+SELECT
+    schemaname,
+    tablename,
+    indexname,
+    idx_scan,
+    idx_tup_read,
+    idx_tup_fetch,
+    pg_size_pretty(pg_relation_size(indexrelid)) AS index_size
+FROM pg_stat_user_indexes
+ORDER BY idx_scan DESC;
+
+-- Find missing indexes
+SELECT
+    relname AS table_name,
+    seq_scan,
+    seq_tup_read,
+    idx_scan,
+    CASE WHEN seq_scan > 0 THEN seq_tup_read / seq_scan ELSE 0 END AS avg_seq_tup
+FROM pg_stat_user_tables
+WHERE seq_scan > 100
+AND n_live_tup > 10000
+ORDER BY seq_tup_read DESC;
+
+-- Check index bloat
+SELECT
+    schemaname,
+    tablename,
+    indexname,
+    pg_size_pretty(pg_relation_size(indexrelid)) AS index_size,
+    ROUND(100 - (pg_stat_get_live_tuples(indexrelid)::float / 
+        NULLIF(pg_stat_get_dead_tuples(indexrelid) + pg_stat_get_live_tuples(indexrelid), 0) * 100), 2) AS bloat_percentage
+FROM pg_user_indexes
+WHERE pg_relation_size(indexrelid) > 1024 * 1024
+ORDER BY pg_relation_size(indexrelid) DESC;
+```
+
+### Memory Performance
+
+```sql
+-- Check cache hit ratios
+SELECT
+    'table' AS type,
+    sum(heap_blks_hit) AS hits,
+    sum(heap_blks_read) AS reads,
+    ROUND(sum(heap_blks_hit)::float / NULLIF(sum(heap_blks_hit) + sum(heap_blks_read), 0) * 100, 2) AS hit_ratio
+FROM pg_statio_user_tables
+UNION ALL
+SELECT
+    'index' AS type,
+    sum(idx_blks_hit) AS hits,
+    sum(idx_blks_read) AS reads,
+    ROUND(sum(idx_blks_hit)::float / NULLIF(sum(idx_blks_hit) + sum(idx_blks_read), 0) * 100, 2) AS hit_ratio
+FROM pg_statio_user_indexes;
+
+-- Check buffer usage
+SELECT
+    datname,
+    blks_read,
+    blks_hit,
+    ROUND(blks_hit::float / NULLIF(blks_hit + blks_read, 0) * 100, 2) AS hit_ratio
+FROM pg_stat_database
+WHERE datname NOT LIKE 'template%'
+ORDER BY hit_ratio;
+```
+
+## Security Considerations
+
+### Performance Impact of Security Features
+
+```python
+from performance_tuning import SecurityImpactAnalyzer
+
+analyzer = SecurityImpactAnalyzer()
+
+# Analyze impact of security configurations
+impact = analyzer.analyze_impact(
+    enable_ssl=True,
+    enable_audit_logging=True,
+    enable_row_level_security=True,
+    enable_column_encryption=True,
+)
+
+print("Security Impact Analysis:")
+for feature in impact.features:
+    print(f"  {feature.name}: {feature.impact_percentage:.1f}% overhead")
+    print(f"    CPU impact: {feature.cpu_impact:.1f}%")
+    print(f"    I/O impact: {feature.io_impact:.1f}%")
+    print(f"    Memory impact: {feature.memory_impact:.1f}%")
+```
+
+## Troubleshooting Guide
+
+### Common Issues
+
+| Issue | Symptom | Solution |
+|-------|---------|----------|
+| Slow queries | High p95 latency | Add indexes, rewrite queries |
+| Cache misses | Low hit ratio | Increase shared_buffers |
+| Lock contention | High wait events | Reduce transaction scope |
+| I/O bottleneck | High read/write latency | Faster storage, reduce I/O |
+| Memory pressure | High eviction rate | Increase memory settings |
+
+### Diagnostic Queries
+
+```sql
+-- Find long-running queries
+SELECT
+    pid,
+    now() - pg_stat_activity.query_start AS duration,
+    query,
+    state,
+    wait_event_type,
+    wait_event
+FROM pg_stat_activity
+WHERE state != 'idle'
+AND now() - pg_stat_activity.query_start > interval '5 minutes'
+ORDER BY duration DESC;
+
+-- Check lock contention
+SELECT
+    blocked_locks.pid AS blocked_pid,
+    blocked_activity.usename AS blocked_user,
+    blocking_locks.pid AS blocking_pid,
+    blocking_activity.usename AS blocking_user,
+    blocked_activity.query AS blocked_statement,
+    blocking_activity.query AS blocking_statement
+FROM pg_catalog.pg_locks blocked_locks
+JOIN pg_catalog.pg_stat_activity blocked_activity ON blocked_activity.pid = blocked_locks.pid
+JOIN pg_catalog.pg_locks blocking_locks ON blocking_locks.locktype = blocked_locks.locktype
+AND blocking_locks.relation = blocked_locks.relation
+AND blocking_locks.pid != blocked_locks.pid
+JOIN pg_catalog.pg_stat_activity blocking_activity ON blocking_activity.pid = blocking_locks.pid
+WHERE NOT blocked_locks.granted;
+
+-- Check I/O statistics
+SELECT
+    relname,
+    seq_scan,
+    seq_tup_read,
+    idx_scan,
+    idx_tup_fetch,
+    n_tup_ins,
+    n_tup_upd,
+    n_tup_del,
+    n_live_tup,
+    n_dead_tup,
+    ROUND(n_dead_tup::float / NULLIF(n_live_tup, 0) * 100, 2) AS dead_ratio
+FROM pg_stat_user_tables
+ORDER BY n_dead_tup DESC;
+```
+
+## API Reference
+
+### QueryAnalyzer
+
+```python
+class QueryAnalyzer:
+    def __init__(self, connection_string: str)
+    def analyze_slow_queries(self, threshold_ms: int, top_n: int, time_range_hours: int = 24) -> PerformanceReport
+    def analyze_queries(self, **kwargs) -> PerformanceReport
+    def get_query_plan(self, query: str) -> ExecutionPlan
+    def compare_plans(self, plan1: ExecutionPlan, plan2: ExecutionPlan) -> PlanComparison
+    def get_query_statistics(self, fingerprint: str) -> QueryStatistics
+```
+
+### IndexTuner
+
+```python
+class IndexTuner:
+    def __init__(self, connection_string: str)
+    def analyze_indexes(self, **kwargs) -> IndexAnalysis
+    def recommend_indexes(self, analyze_queries: bool = True, analyze_usage: bool = True) -> list[IndexRecommendation]
+    def find_unused_indexes(self, min_scans: int = 0) -> list[UnusedIndex]
+    def find_redundant_indexes(self) -> list[RedundantIndex]
+    def estimate_index_size(self, definition: str) -> float
+    def create_index(self, definition: str, concurrently: bool = True) -> CreateResult
+    def drop_index(self, name: str, concurrently: bool = True) -> DropResult
+```
+
+### MemoryTuner
+
+```python
+class MemoryTuner:
+    def __init__(self, connection_string: str)
+    def analyze_memory(self, **kwargs) -> MemoryAnalysis
+    def recommend_memory_settings(self, total_ram_gb: int, dedicated_server: bool, workload_type: str) -> list[MemoryRecommendation]
+    def get_cache_statistics(self) -> CacheStatistics
+    def get_memory_usage(self) -> MemoryUsage
+    def resize_shared_buffers(self, size_gb: float) -> ResizeResult
+```
+
+### WorkloadAnalyzer
+
+```python
+class WorkloadAnalyzer:
+    def __init__(self, connection_string: str)
+    def analyze(self, time_range_hours: int = 168) -> WorkloadAnalysis
+    def get_peak_hours(self) -> list[PeakHour]
+    def get_read_write_ratio(self) -> float
+    def get_connection_profile(self) -> ConnectionProfile
+    def get_transaction_throughput(self) -> TransactionThroughput
+    def get_lock_contention(self) -> LockContention
+```
+
+## Data Models
+
+### Core Data Structures
+
+```python
+from dataclasses import dataclass, field
+from typing import Optional, List, Dict
+from enum import Enum
+from datetime import datetime
+
+class PerformanceIssue(Enum):
+    FULL_TABLE_SCAN = "full_table_scan"
+    MISSING_INDEX = "missing_index"
+    SLOW_QUERY = "slow_query"
+    LOCK_CONTENTION = "lock_contention"
+    MEMORY_PRESSURE = "memory_pressure"
+    IO_BOTTLENECK = "io_bottleneck"
+
+@dataclass
+class QueryPerformance:
+    fingerprint: str
+    query_text: str
+    calls: int
+    total_duration_ms: float
+    avg_duration_ms: float
+    min_duration_ms: float
+    max_duration_ms: float
+    cpu_time_ms: float
+    io_time_ms: float
+    total_rows: int
+    impact_score: float
+    issues: List[PerformanceIssue] = field(default_factory=list)
+
+@dataclass
+class IndexRecommendation:
+    definition: str
+    estimated_improvement: float
+    size_estimate_mb: float
+    queries_affected: List[str]
+    priority: str
+    reasoning: str
+
+@dataclass
+class MemoryRecommendation:
+    parameter: str
+    current_value: str
+    recommended_value: str
+    impact: str
+    reasoning: str
+```
+
+## Deployment Guide
+
+### Docker Deployment
+
+```yaml
+version: '3.8'
+services:
+  performance-tuner:
+    image: performance-tuner:latest
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    volumes:
+      - ./config:/config
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1'
+```
+
+## Monitoring & Observability
+
+### Metrics Collection
+
+```python
+from performance_tuning import MetricsCollector
+
+collector = MetricsCollector()
+
+# Collect performance metrics
+collector.histogram("db.query.duration.seconds", duration, tags={"fingerprint": fingerprint})
+collector.counter("db.query.calls.total", 1, tags={"fingerprint": fingerprint})
+collector.gauge("db.index.recommendations", count)
+collector.gauge("db.cache.hit.ratio", ratio)
+```
+
+### Alerting Rules
+
+```yaml
+groups:
+  - name: performance_alerts
+    rules:
+      - alert: SlowQueries
+        expr: rate(db_slow_query_total[5m]) > 10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High rate of slow queries"
+          
+      - alert: CacheHitRatioLow
+        expr: db_cache_hit_ratio < 0.95
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Cache hit ratio below 95%"
+```
+
+## Testing Strategy
+
+### Unit Tests
+
+```python
+import pytest
+from performance_tuning import QueryAnalyzer
+
+@pytest.fixture
+def analyzer():
+    return QueryAnalyzer(connection_string="postgresql://localhost/test")
+
+def test_analyze_slow_queries(analyzer):
+    report = analyzer.analyze_slow_queries(threshold_ms=100, top_n=10)
+    assert report.total_queries >= 0
+```
+
+## Versioning & Migration
+
+### Version Compatibility
+
+| Component | Minimum Version | Recommended |
+|-----------|-----------------|-------------|
+| PostgreSQL | 12 | 15+ |
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **QPS** | Queries Per Second |
+| **TPS** | Transactions Per Second |
+| **p95** | 95th percentile latency |
+| **p99** | 99th percentile latency |
+| **WAL** | Write-Ahead Log |
+
+## Changelog
+
+### Version 3.0.0 (2024-01-15)
+- Added advanced query analysis
+- New index recommendation engine
+- Improved memory tuning
+- Added workload analysis
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/awesome-grok/performance-tuning.git
+cd performance-tuning
+pip install -e ".[dev]"
+pytest
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills

@@ -257,3 +257,454 @@ docs = index.generate_docs()
 - **server-components** — Using shadcn/ui components in React Server Components
 - **edge-runtime** — CSS-in-JS considerations at the edge
 - **supabase-auth** — Auth form UI patterns with shadcn/ui components
+
+---
+
+## Advanced Configuration
+
+### Custom Theme Presets
+
+```python
+from tailwind_shadcn import ThemePreset
+
+presets = {
+    "ocean": ThemePreset(
+        primary="210 100% 50%",
+        accent="180 70% 45%",
+        background="210 20% 98%",
+    ),
+    "sunset": ThemePreset(
+        primary="15 85% 55%",
+        accent="45 90% 55%",
+        background="30 20% 98%",
+    ),
+}
+```
+
+### Tailwind Plugin Configuration
+
+```python
+from tailwind_shadcn import TailwindPlugin
+
+plugin = TailwindPlugin(
+    plugins=["@tailwindcss/typography", "@tailwindcss/forms", "tailwindcss-animate"],
+    safelist=["bg-red-500", "text-white"],
+    content=["./src/**/*.{ts,tsx}", "./components/**/*.tsx"],
+)
+```
+
+## Architecture Patterns
+
+### Component Composition Pattern
+
+```
+Radix UI Primitives
+        │
+        ▼
+┌──────────────┐
+│ shadcn/ui    │── Accessible, styled components
+│ Component    │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ CVA Variants │── Type-safe variant system
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Tailwind     │── Utility-first styling
+│ Classes      │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ CSS Custom   │── Theme tokens for runtime switching
+│ Properties   │
+└──────────────┘
+```
+
+## Integration Guide
+
+### Next.js Integration
+
+```python
+from tailwind_shadcn import NextIntegration
+
+integration = NextIntegration(
+    component_dir="src/components/ui",
+    aliases={"@": "./src", "@ui": "./src/components/ui"},
+)
+integration.setup()
+```
+
+### Storybook Integration
+
+```python
+from tailwind_shadcn import StorybookAddon
+
+addon = StorybookAddon()
+addon.configure("src/**/*.stories.{ts,tsx}")
+addon.add_theme_toolbar()
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| CSS variable theming | Zero JS for theme switching |
+| Tree-shaken Tailwind | Minimal CSS output |
+| Component lazy loading | Faster initial load |
+| Font optimization | No FOUT/FOIT |
+
+## Security Considerations
+
+- **XSS prevention**: React escapes by default
+- **CSP compatibility**: No inline styles with strict CSP
+- **Focus management**: Prevent focus trapping attacks
+- **Form validation**: Client + server validation
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Theme not switching | CSS variable not defined | Check :root and .dark selectors |
+| Component styles missing | Not copied to project | Run npx shadcn-ui@latest add |
+| Tailwind purge removes classes | Dynamic classes not detected | Add to safelist |
+| Dark mode flash | No initial class | Add script to prevent FOUC |
+
+## API Reference
+
+### cn() Helper
+
+```python
+def cn(*classes) -> str:
+    """Merge Tailwind classes with deduplication."""
+```
+
+### ComponentVariant (CVA)
+
+```python
+class ComponentVariant:
+    def __init__(self, base: str, variants: dict, default_variants: dict)
+    def __call__(self, **kwargs) -> str
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class CSSVariable:
+    value: str
+    description: str
+
+@dataclass
+class ThemeConfig:
+    css_variables: dict[str, dict[str, CSSVariable]]
+    tailwind_config: dict
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+npx shadcn-ui@latest init
+npx shadcn-ui@latest add button card dialog
+```
+
+## Monitoring & Observability
+
+```python
+from tailwind_shadcn import MetricsCollector
+
+collector = MetricsCollector()
+collector.gauge("css.bundle_size_bytes", size)
+collector.gauge("component.render_ms", duration, tags={"component": name})
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from tailwind_shadcn import ClassComposer
+
+def test_class_merging():
+    composer = ClassComposer()
+    result = composer.merge("p-4 p-8")
+    assert result == "p-8"
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 0.1.0 | Initial components | Run init |
+| 1.0.0 | Stable API | No breaking changes |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **CVA** | Class Variance Authority — variant system |
+| **cn()** | clsx + tailwind-merge helper |
+| **Radix UI** | Headless accessible component primitives |
+| **Design Token** | CSS custom property for theming |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with 40+ components
+- Dark mode support
+- CVA variant system
+- Tailwind CSS integration
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/tailwind-shadcn.git
+npm install
+npm run dev
+```
+
+## Advanced Patterns
+
+### Custom Theme with CSS Variables
+
+```css
+/* globals.css */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+```
+
+### Responsive Grid Patterns
+
+```tsx
+// Auto-fit grid that adapts to content
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+  {items.map(item => <Card key={item.id} data={item} />)}
+</div>
+
+// Masonry-style with varied heights
+<div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+  {items.map(item => (
+    <div key={item.id} className="break-inside-avoid">
+      <Card data={item} />
+    </div>
+  ))}
+</div>
+
+// Auto-fill with minmax
+<div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
+  {items.map(item => <Card key={item.id} data={item} />)}
+</div>
+```
+
+### Animated Component Patterns
+
+```tsx
+// Staggered list animation
+import { motion } from 'framer-motion'
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+}
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+}
+
+export function AnimatedList({ items }: { items: Item[] }) {
+  return (
+    <motion.ul variants={container} initial="hidden" animate="show">
+      {items.map(i => (
+        <motion.li key={i.id} variants={item}>
+          {i.name}
+        </motion.li>
+      ))}
+    </motion.ul>
+  )
+}
+```
+
+### Dark Mode Toggle Pattern
+
+```tsx
+'use client'
+
+import { useTheme } from 'next-themes'
+import { Moon, Sun } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+
+export function ThemeToggle() {
+  const { theme, setTheme } = useTheme()
+
+  return (
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+    >
+      <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <span className="sr-only">Toggle theme</span>
+    </Button>
+  )
+}
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills
+
+---
+
+## Extended Reference
+
+### shadcn/ui Component List
+
+| Component | Description | Radix Primitive |
+|-----------|-------------|-----------------|
+| Button | Clickable button | — |
+| Card | Content container | — |
+| Dialog | Modal dialog | Dialog |
+| Dropdown Menu | Context menu | DropdownMenu |
+| Select | Dropdown select | Select |
+| Tabs | Tabbed interface | Tabs |
+| Accordion | Collapsible sections | Collapsible |
+| Toast | Notification | Toast |
+| Tooltip | Hover info | Tooltip |
+| Form | Form with validation | — |
+| Table | Data table | — |
+| Sheet | Side panel | Dialog |
+| Popover | Floating content | Popover |
+| Command | Command palette | Cmdk |
+| Navigation Menu | Main navigation | NavigationMenu |
+
+### Tailwind Breakpoint Reference
+
+| Prefix | Min Width | Use Case |
+|--------|-----------|----------|
+| `sm` | 640px | Small tablets |
+| `md` | 768px | Tablets |
+| `lg` | 1024px | Small laptops |
+| `xl` | 1280px | Laptops |
+| `2xl` | 1536px | Desktops |
+
+### CSS Variable Theme Reference
+
+```css
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+  --radius: 0.5rem;
+}
+```
+
+### Common Utility Classes Reference
+
+| Category | Classes |
+|----------|---------|
+| Layout | `flex`, `grid`, `block`, `inline`, `hidden` |
+| Flex | `flex-row`, `flex-col`, `items-center`, `justify-between` |
+| Grid | `grid-cols-2`, `gap-4`, `col-span-2` |
+| Spacing | `p-4`, `m-2`, `px-6`, `py-3`, `space-y-4` |
+| Sizing | `w-full`, `h-screen`, `max-w-md`, `min-h-[200px]` |
+| Typography | `text-sm`, `font-bold`, `text-center`, `leading-relaxed` |
+| Colors | `bg-primary`, `text-foreground`, `border-border` |
+| Borders | `rounded-lg`, `border`, `ring-2`, `shadow-md` |
+| Effects | `transition`, `duration-200`, `hover:bg-accent` |
+| Responsive | `sm:text-lg`, `md:flex`, `lg:grid-cols-3` |
+
+### cn() Usage Patterns
+
+```tsx
+// Conditional classes
+cn("base-class", isActive && "active-class", isDisabled && "disabled-class")
+
+// Merge with className prop
+cn("p-4 rounded-lg", className)
+
+// Dynamic values
+cn("text-sm", size === "lg" ? "text-lg" : "text-sm")
+
+// Responsive
+cn("p-2 sm:p-4 md:p-6 lg:p-8")
+```
+
+### Design System Token Categories
+
+| Category | Examples | Usage |
+|----------|----------|-------|
+| Color | primary, secondary, muted | All color usage |
+| Typography | text-sm, text-lg, font-bold | Text styling |
+| Spacing | p-4, m-2, gap-4 | Layout spacing |
+| Border | rounded-lg, border | Visual borders |
+| Shadow | shadow-sm, shadow-lg | Elevation |
+| Motion | transition, duration-200 | Animations |

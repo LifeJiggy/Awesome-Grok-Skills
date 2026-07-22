@@ -222,3 +222,588 @@ uv = tracker.map_to_projection(480, 300, wall)
 - [stage-automation](../stage-automation/GROK.md) — Automated scenic movement tracking for dynamic projection surfaces
 - [sound-engineering](../sound-engineering/GROK.md) — Spatial audio alignment with projection-mapped environments
 - [audience-engagement](../audience-engagement/GROK.md) — Interactive audience-triggered projection content
+
+---
+
+## Advanced Configuration
+
+### Projector Lens Profile Calibration
+
+```python
+from projection_mapping import LensProfile, DistortionModel
+
+lens = LensProfile(
+    manufacturer="Panasonic",
+    model="PT-RQ50K",
+    throw_ratio=1.2,
+    shift_range_mm=(-50, 50),
+    distortion_model=DistortionModel.BROWN_CONRADY,
+    distortion_coefficients=[0.05, -0.02, 0.01, 0.0, 0.0],
+)
+```
+
+### Structured Light Scanner Configuration
+
+```python
+from projection_mapping import StructuredLightScanner
+
+scanner = StructuredLightScanner(
+    pattern_type="gray_code",
+    resolution_px=(1920, 1200),
+    exposure_ms=16,
+    num_patterns=24,
+    noise_threshold=0.02,
+)
+calibration = scanner.scan_surface(surface=wall)
+scanner.export_mesh(calibration, "surface_mesh.obj")
+```
+
+## Architecture Patterns
+
+### Multi-Projector Pipeline
+
+```
+Content Source (NDI/SDI)
+        │
+        ▼
+┌──────────────┐
+│ Color Match  │── Per-projector calibration
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Warp Engine  │── Mesh deformation per projector
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Blend Zone   │── Edge blending in overlap regions
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Output       │── Per-projector output
+└──────────────┘
+```
+
+### Calibration Workflow
+
+1. Surface definition (manual or 3D scan)
+2. Projector placement and alignment
+3. Structured light capture
+4. Homography/mesh computation
+5. Edge blend region identification
+6. Color calibration across projectors
+7. Verification projection and fine-tuning
+
+## Integration Guide
+
+### Media Server Bridge Protocol
+
+```python
+from projection_mapping import MediaServerBridge, Protocol
+
+# disguise integration
+disguise = MediaServerBridge(protocol=Protocol.DISGUISE, ip="192.168.1.70")
+disguise.connect()
+disguise.push_warp_data(mesh.export_warp_data())
+disguise.set_layer_transport(1, "transport_mode", "auto")
+```
+
+### Interactive Tracking Integration
+
+```python
+from projection_mapping import InteractiveTracker, TrackingSource
+
+tracker = InteractiveTracker()
+tracker.add_source(TrackingSource.AZURE_KINECT, device_id="k4a_001")
+tracker.add_source(TrackingSource.ARUCO_MARKER, camera_id="cam_001")
+tracker.start()
+```
+
+## Performance Optimization
+
+| Optimization | Impact |
+|-------------|--------|
+| GPU-accelerated warping | 60fps @ 4K per projector |
+| Precomputed blend LUTs | Zero-latency blend transitions |
+| Mesh LOD for curves | 50% fewer control points at distance |
+| Content pre-buffering | No playback stutter during cues |
+| Parallel projector calibration | 3x faster calibration |
+
+## Security Considerations
+
+- **Projector network isolation**: Dedicated VLAN for media servers and projectors
+- **Content protection**: DRM on licensed projection content
+- **Physical security**: Locked projector mounts with tamper detection
+- **Remote access**: VPN-only access to media server management interfaces
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Blend band visible | Gamma mismatch | Recalibrate blend gamma curves |
+| Warping distortion at edges | Insufficient control points | Increase mesh resolution |
+| Color shift across projectors | Different lamp hours | Match white points with colorimeter |
+| Content stutter | Network bandwidth | Use 10GbE for NDI, check switch capacity |
+| Calibration drift | Projector movement | Re-calibrate, check mounting stability |
+| Structured light noise | Ambient light | Ensure complete darkness during scan |
+
+## API Reference
+
+### ProjectionSurface
+
+```python
+class ProjectionSurface:
+    def __init__(self, name: str, surface_type: SurfaceType, width_m: float, height_m: float, **kwargs)
+    def get_dimensions(self) -> tuple
+    def set_control_points(self, rows: int, cols: int) -> None
+    def export_mesh(self, path: str) -> None
+```
+
+### Projector
+
+```python
+class Projector:
+    def __init__(self, name: str, resolution: tuple, brightness_lumens: int, throw_ratio: float, position: tuple)
+    def set_keystone(self, h: float, v: float) -> None
+    def set_barrel_distortion(self, k1: float) -> None
+    def pixel_to_ray(self, x: int, y: int) -> tuple
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+from enum import Enum
+
+class SurfaceType(Enum):
+    PLANAR = "planar"
+    CURVED = "curved"
+    CYLINDRICAL = "cylindrical"
+    SPHERICAL = "spherical"
+    CUSTOM_MESH = "custom_mesh"
+
+@dataclass
+class CalibrationPoint:
+    screen_x: float
+    screen_y: float
+    surface_x: float
+    surface_y: float
+    surface_z: float
+
+@dataclass
+class BlendRegion:
+    projector_a: str
+    projector_b: str
+    orientation: str
+    start_px: int
+    end_px: int
+    gamma: float
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+pip install projection-mapping
+```
+
+### Projector Setup
+
+1. Mount projectors according to plot
+2. Connect to media server network
+3. Run structured light calibration in dark
+4. Adjust mesh control points for surface fit
+5. Configure edge blend regions
+6. Match projector color temperatures
+7. Verify full-surface coverage
+
+## Monitoring & Observability
+
+```python
+from projection_mapping import MetricsCollector
+
+collector = MetricsCollector()
+collector.gauge("projection.fps", fps, tags={"projector": name})
+collector.gauge("projection.gpu_utilization", pct)
+collector.counter("projection.calibration.count", count)
+collector.histogram("projection.warp_latency_ms", latency)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from projection_mapping import ProjectionSurface, SurfaceType
+
+def test_surface_dimensions():
+    wall = ProjectionSurface(name="Test", surface_type=SurfaceType.CURVED, width_m=12.0, height_m=6.0)
+    dims = wall.get_dimensions()
+    assert dims == (12.0, 6.0)
+
+def test_mesh_export():
+    mesh = MeshDeformation(rows=8, cols=8)
+    mesh.export_mesh("test_warp.json")
+    import json
+    with open("test_warp.json") as f:
+        data = json.load(f)
+    assert "control_points" in data
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 1.0.0 | Initial release | N/A |
+| 1.1.0 | Azure Kinect support | Add Kinect SDK dependency |
+| 2.0.0 | New mesh format | Convert calibration files with migration tool |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **Homography** | 2D-to-2D projective transform for planar surfaces |
+| **Edge Blending** | Smooth transition between overlapping projector outputs |
+| **Structured Light** | 3D scanning using projected patterns |
+| **ArUco Marker** | Fiducial marker for camera tracking |
+| **NDI** | Network Device Interface for video over IP |
+| **Warping** | Deforming projected image to match surface geometry |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with homography and mesh warping
+- Multi-projector alignment and edge blending
+- Media server integration (disguise, Resolume)
+- Interactive tracking support
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/projection-mapping.git
+pip install -e ".[dev]"
+pytest tests/
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills
+
+---
+
+## Extended Reference
+
+### Projector Specification Reference
+
+| Parameter | Standard Throw | Short Throw | Ultra-Short Throw |
+|-----------|---------------|-------------|-------------------|
+| Throw Ratio | 1.5-2.5:1 | 0.8-1.5:1 | 0.2-0.8:1 |
+| Lens Shift | ±50% V | ±70% V | Fixed |
+| Resolution | 1920x1200 | 1920x1200 | 4K (3840x2400) |
+| Brightness | 10,000-20,000 lm | 5,000-15,000 lm | 3,000-10,000 lm |
+| Best For | Large venue, high ceiling | Mid-size venue | Tight spaces, floor projection |
+
+### Calibration Point Density Guide
+
+| Surface Size | Min Control Points | Recommended | High Quality |
+|-------------|-------------------|-------------|--------------|
+| < 2m | 4x4 | 8x8 | 16x16 |
+| 2-5m | 8x8 | 16x16 | 32x32 |
+| 5-10m | 16x16 | 32x32 | 48x48 |
+| 10-20m | 32x32 | 48x48 | 64x64 |
+| > 20m | 48x48 | 64x64 | 96x96 |
+
+### Edge Blending Reference
+
+| Blend Width (px) | Projector Resolution | Coverage |
+|------------------|---------------------|----------|
+| 100 | 1920x1200 | 5% overlap |
+| 200 | 1920x1200 | 10% overlap |
+| 300 | 1920x1200 | 15% overlap |
+| 400 | 1920x1200 | 20% overlap |
+| 200 | 3840x2400 | 5% overlap |
+| 400 | 3840x2400 | 10% overlap |
+
+### Surface Material Reference
+
+| Material | Reflectance | Gain | Best For |
+|----------|------------|------|----------|
+| Matte white | 90% | 1.0 | General purpose |
+| High gain | 95% | 1.5-2.0 | Bright ambient |
+| Silver | 85% | 1.2-1.5 | 3D, high contrast |
+| Grey | 70% | 0.8 | Improved blacks |
+| Beaded | 80% | 1.3 | Wide viewing angle |
+| Perforated | 75% | 0.9 | Sound transparency |
+
+### Color Calibration Workflow
+
+1. Warm up projectors for 30 minutes
+2. Set all projectors to same white point (D65)
+3. Project color patches (RGBWCMY)
+4. Measure with colorimeter at multiple points
+5. Generate per-projector correction LUT
+6. Apply LUT to all projectors
+7. Verify match at blend boundaries
+8. Document calibration settings
+
+### Media Server Comparison
+
+| Server | Protocol | Max Layers | Warping | Blending |
+|--------|----------|-----------|---------|----------|
+| disguise | Custom API | 8+ | Mesh | Multi-zone |
+| Resolume | ND SMPTE | 6 | Grid | Per-output |
+| MadMapper | Custom | 4 | Quad | Multi-zone |
+| Green Hippo | Custom | 8+ | Mesh | Advanced |
+| TouchDesigner | SOP | Unlimited | SOP-based | Custom |
+
+### Troubleshooting Decision Tree
+
+```
+Projection alignment off
+    │
+    ├── Verify projector position → Check mounting stability
+    ├── Check lens shift → Adjust mechanical lens shift
+    ├── Recalibrate → Run structured light scan
+    ├── Check surface flatness → Verify no warping
+    └── Check keystone → Adjust digital keystone correction
+
+Blend band visible
+    │
+    ├── Check gamma matching → Recalibrate blend curves
+    ├── Check projector brightness → Match output levels
+    ├── Check blend width → Increase if too narrow
+    ├── Check surface uniformity → Ensure consistent reflectance
+    └── Check ambient light → Eliminate competing light sources
+
+Content stutter on media server
+    │
+    ├── Check video codec → Use ProRes or DNxHR
+    ├── Check storage speed → Use SSD or RAID
+    ├── Check network bandwidth → Use 10GbE for NDI
+    ├── Check GPU utilization → Reduce layer count
+    └── Check content resolution → Match projector output
+```
+
+### Performance Metrics
+
+| Metric | Target | Warning | Critical |
+|--------|--------|---------|----------|
+| Calibration accuracy | < 2mm error | 2-5mm | > 5mm |
+| Blend smoothness | ΔE < 1 | ΔE 1-3 | ΔE > 3 |
+| Frame rate | 60 fps | 30-60 fps | < 30 fps |
+| Input latency | < 1 frame | 1-2 frames | > 2 frames |
+| Color match (projectors) | ΔE < 2 | ΔE 2-5 | ΔE > 5 |
+| Content load time | < 5s | 5-15s | > 15s |
+| Interactive tracking latency | < 50ms | 50-100ms | > 100ms |
+
+### Projection Throw Distance Calculator
+
+```
+Throw Distance = Throw Ratio × Image Width
+
+Example:
+  Projector: Throw Ratio 1.5:1
+  Image Width: 6m
+  Throw Distance: 1.5 × 6 = 9m
+
+For angled projection:
+  Horizontal Offset = tan(angle) × Throw Distance
+  Vertical Offset = tan(angle) × Throw Distance
+```
+
+### Common Projection Scenarios
+
+| Scenario | Projectors | Surface | Resolution | Complexity |
+|----------|-----------|---------|-----------|------------|
+| Single flat wall | 1 | Flat | 1920x1200 | Low |
+| Multi-projector wall | 2-4 | Flat | 3840x2400 | Medium |
+| Curved cyclorama | 2-6 | Curved | 3840x2400+ | High |
+| 360° cylinder | 4-8 | Cylindrical | 7680x2400+ | Very high |
+| Object mapping | 1-4 | 3D object | Variable | Very high |
+| Floor projection | 1-2 | Floor | 1920x1200 | Medium |
+
+### Complete Warping Mesh Reference
+
+| Grid Size | Control Points | Use Case | Accuracy |
+|-----------|---------------|----------|----------|
+| 2x2 | 4 | Simple planar | Low |
+| 4x4 | 16 | Basic curved surface | Medium |
+| 8x8 | 64 | Standard curved surface | Good |
+| 16x16 | 256 | Complex organic shapes | High |
+| 32x32 | 1024 | Very complex surfaces | Very high |
+
+### Interactive Tracking System Comparison
+
+| System | Latency | Accuracy | Range | Cost |
+|--------|---------|----------|-------|------|
+| ArUco Markers | 33ms | ±5mm | Camera FOV | Low |
+| Intel RealSense | 33ms | ±2mm | 0.2-10m | Medium |
+| Azure Kinect | 33ms | ±1mm | 0.5-5m | Medium |
+| OptiTrack | 8ms | ±0.1mm | 1-15m | High |
+| Vicon | 8ms | ±0.05mm | 1-30m | Very High |
+| IR Markers | 16ms | ±10mm | 5-50m | Medium |
+
+### Content Format Reference
+
+| Format | Codec | Best For | Notes |
+|--------|-------|----------|-------|
+| ProRes 422 | Apple ProRes | General | Wide compatibility |
+| ProRes 4444 | Apple ProRes | Alpha channel | Transparency support |
+| DNxHR | Avid | Post-production | Cross-platform |
+| H.264 | MPEG-4 | Streaming | Compression artifacts |
+| H.265/HEVC | MPEG-4 | 4K content | Better compression |
+| Animation | RLE | Graphics | Lossless, large files |
+
+### Projector Maintenance Schedule
+
+| Task | Frequency | Duration |
+|------|-----------|----------|
+| Clean air filter | Weekly | 10 min |
+| Check lamp hours | Weekly | 5 min |
+| Clean lens | Monthly | 15 min |
+| Check ventilation | Monthly | 10 min |
+| Calibrate color | Per production | 30 min |
+| Replace lamp | As needed | 30 min |
+| Full service | Annually | 2 hours |
+
+### 3D Surface Scanning Workflow
+
+```
+1. Prepare Surface
+    ├── Ensure surface is clean and dry
+    ├── Apply matte white coating if needed
+    ├── Mark reference points with tape
+    └── Darken room completely
+
+2. Position Scanner
+    ├── Place structured light projector
+    ├── Position cameras at known offsets
+    ├── Calibrate camera-projector system
+    └── Set exposure and focus
+
+3. Capture Patterns
+    ├── Project gray code sequence (24 patterns)
+    ├── Capture each pattern with camera
+    ├── Verify pattern visibility
+    └── Capture reference color patches
+
+4. Process Point Cloud
+    ├── Generate depth map from patterns
+    ├── Convert to 3D point cloud
+    ├── Remove noise and outliers
+    └── Export as OBJ/PLY mesh
+
+5. Generate Warping Mesh
+    ├── Import surface mesh
+    ├── Generate control point grid
+    ├── Map projector pixels to surface
+    ├── Test with alignment pattern
+    └── Export warping data for media server
+
+### Complete Projector Settings Reference
+
+| Parameter | Standard | Short Throw | Rear Projection |
+|-----------|---------|-------------|-----------------|
+| Brightness | 10,000+ lm | 5,000+ lm | 10,000+ lm |
+| Contrast | > 10,000:1 | > 5,000:1 | > 10,000:1 |
+| Resolution | 1920x1200 | 1920x1200 | 1920x1200+ |
+| Lens shift | ±50% V | Fixed | ±50% V |
+| Throw ratio | 1.5-2.5:1 | 0.8-1.5:1 | 1.0-2.0:1 |
+| Lamp hours | 2,000-4,000 | 2,000-4,000 | 2,000-4,000 |
+
+### Color Space Reference
+
+| Color Space | Use Case | Gamut |
+|------------|----------|-------|
+| sRGB | Web content | Smallest |
+| Rec. 709 | HD video | Standard |
+| Rec. 2020 | 4K/HDR video | Wide |
+| DCI-P3 | Cinema | Wide |
+| Adobe RGB | Print | Wide |
+
+### Projection Surface Preparation Guide
+
+```
+SURFACE PREPARATION CHECKLIST
+    □ Clean surface thoroughly (no dust, fingerprints)
+    □ Fill any holes or cracks with appropriate filler
+    □ Sand smooth any rough spots
+    □ Apply matte white projection paint (if needed)
+    □ Allow 24 hours drying time
+    □ Verify uniform reflectance with light meter
+    □ Mark reference points for calibration
+    □ Photograph surface from audience perspective
+    □ Document surface dimensions and curvature
+```
+
+### Multi-Projector Alignment Procedure
+
+```
+1. PHYSICAL ALIGNMENT
+    ├── Mount projectors securely
+    ├── Aim at center of respective surface areas
+    ├── Adjust lens shift for vertical alignment
+    ├── Verify overlap zones are sufficient
+    └── Check for keystone distortion
+
+2. DIGITAL ALIGNMENT
+    ├── Project alignment grid
+    ├── Adjust keystone correction
+    ├── Fine-tune zoom and focus
+    ├── Verify pixel-level alignment
+    └── Document final positions
+
+3. COLOR MATCHING
+    ├── Warm up projectors 30 minutes
+    ├── Project white field
+    ├── Measure with colorimeter
+    ├── Adjust RGB gains to match
+    ├── Verify at blend boundaries
+    └── Generate correction LUT
+
+4. EDGE BLENDING
+    ├── Identify overlap zones
+    ├── Set blend width (10%+ of resolution)
+    ├── Adjust blend gamma curves
+    ├── Verify smooth transition
+    ├── Check for banding artifacts
+    └── Fine-tune at multiple brightness levels
+
+5. VERIFICATION
+    ├── Project test patterns
+    ├── Check color uniformity
+    ├── Verify blend smoothness
+    ├── Test with actual content
+    ├── Get designer approval
+    └── Document final settings
+```
+
+### Content Resolution Recommendations
+
+| Output Resolution | Content Resolution | Frame Rate | Bitrate |
+|-------------------|-------------------|-----------|---------|
+| 1920x1200 | 1920x1200 | 30 fps | 50 Mbps |
+| 1920x1200 | 1920x1200 | 60 fps | 100 Mbps |
+| 3840x2400 | 3840x2400 | 30 fps | 150 Mbps |
+| 3840x2400 | 3840x2400 | 60 fps | 300 Mbps |
+
+### Interactive Tracking Calibration
+
+```
+TRACKING CALIBRATION WORKFLOW
+    □ Position camera(s) for full stage view
+    □ Calibrate camera intrinsic parameters
+    □ Calibrate camera-projector homography
+    □ Place ArUco markers on tracking targets
+    □ Verify marker detection at all positions
+    □ Map camera coordinates to projection UV
+    □ Test tracking latency (< 50ms target)
+    □ Verify tracking across full stage area
+    □ Document camera positions and settings
+    □ Test with performers on stage
+```
+```

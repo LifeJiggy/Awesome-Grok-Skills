@@ -228,3 +228,514 @@ app/
 - **tailwind-shadcn** — UI component patterns for Next.js applications
 - **supabase-auth** — Authentication integration with Next.js middleware and server actions
 - **edge-runtime** — Edge function deployment for Next.js middleware and API routes
+
+---
+
+## Advanced Configuration
+
+### Custom Server Configuration
+
+```python
+from nextjs_fullstack import CustomServerConfig
+
+config = CustomServerConfig(
+    port=3000,
+    hostname="0.0.0.0",
+    compress=True,
+    http2=True,
+    keep_alive_timeout=65000,
+    headers_timeout=60000,
+    experimental=["turbopack", "reactCompiler"],
+)
+```
+
+### Next.config.js Advanced
+
+```python
+from nextjs_fullstack import NextConfig
+
+next_config = NextConfig(
+    react_strict_mode=True,
+    images={
+        "remote_patterns": [{"protocol": "https", "hostname": "**.example.com"}],
+        "formats": ["image/avif", "image/webp"],
+    },
+    rewrites={"beforeFiles": [("/api/legacy/:path*", "/api/v1/:path*")]},
+    headers=[{"source": "/api/:path*", "headers": [{"key": "X-Content-Type-Options", "value": "nosniff"}]}],
+)
+```
+
+## Architecture Patterns
+
+### App Router Data Flow
+
+```
+Browser Request
+    │
+    ▼
+┌──────────────┐
+│ Edge         │── Middleware (auth, geo, redirects)
+│ Middleware   │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Route        │── Layout + Page + Loading + Error
+│ Resolution   │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Server       │── Data fetching, rendering
+│ Components   │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Streaming    │── Progressive HTML delivery
+│ SSR          │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Client       │── Hydration, interactivity
+│ Hydration    │
+└──────────────┘
+```
+
+### Server Action Flow
+
+```
+Form Submit (Client)
+    │
+    ▼
+┌──────────────┐
+│ Server Action │── Validates input, executes mutation
+│ (RPC)        │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Database     │── Direct query or ORM
+│ Mutation     │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Revalidation │── Revalidate tags or paths
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ UI Update    │── Server sends updated HTML
+└──────────────┘
+```
+
+## Integration Guide
+
+### Supabase Integration
+
+```python
+from nextjs_fullstack import SupabaseIntegration
+
+supabase = SupabaseIntegration(
+    url="https://your-project.supabase.co",
+    anon_key="your-anon-key",
+)
+
+# In Server Component
+async def get_user_data():
+    client = supabase.create_client()
+    user = await client.auth.get_user()
+    data = await client.from_("profiles").select("*").eq("id", user.id).execute()
+    return data
+```
+
+### Vercel Deployment
+
+```yaml
+# vercel.json
+{
+  "framework": "nextjs",
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "regions": ["iad1", "sfo1", "cdg1"]
+}
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| Turbopack dev server | 10x faster HMR |
+| React Compiler | Automatic memoization |
+| Image priority hints | Preload above-fold images |
+| Dynamic imports | Code-split by route |
+| ISR with tags | On-demand revalidation |
+
+## Security Considerations
+
+- **Server Actions**: Always validate input server-side
+- **Middleware auth**: Never trust client-side auth alone
+- **CSP headers**: Set Content-Security-Policy in middleware
+- **Rate limiting**: Protect API routes and Server Actions
+- **Environment variables**: Use NEXT_PUBLIC_ prefix carefully
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Hydration mismatch | Server/client render difference | Use useEffect for client-only state |
+| Slow page load | Missing loading.js | Add loading.js per route segment |
+| 404 on dynamic routes | Missing generateStaticParams | Export generateStaticParams |
+| Middleware too slow | Heavy computation at edge | Move logic to API route |
+| Image optimization error | Remote image not configured | Add hostname to images.remote_patterns |
+
+## API Reference
+
+### AppRouter
+
+```python
+class AppRouter:
+    def page(self, path: str) -> decorator
+    def layout(self, path: str) -> decorator
+    def error(self, path: str) -> decorator
+```
+
+### ServerAction
+
+```python
+class ServerAction:
+    async def execute(self, form_data: dict, user: AuthenticatedUser) -> dict
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class PageConfig:
+    dynamic: str
+    revalidate: int
+    fetchCache: str
+    runtime: str
+
+@dataclass
+class RouteParams:
+    params: dict
+    search_params: dict
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+npx create-next-app@latest my-app
+cd my-app
+npm install
+npm run dev
+```
+
+### Production Deployment
+
+```bash
+npm run build
+npm run start
+# Or deploy to Vercel
+vercel --prod
+```
+
+## Monitoring & Observability
+
+```python
+from nextjs_fullstack import MetricsCollector
+
+collector = MetricsCollector()
+collector.histogram("nextjs.render.duration_ms", duration, tags={"route": route})
+collector.counter("nextjs.server_action.total", count, tags={"action": action})
+collector.gauge("nextjs.isr.revalidation_count", count)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from nextjs_fullstack import AppRouter
+
+def test_page_render():
+    router = AppRouter()
+    # Test server component rendering
+    result = router.render("/dashboard")
+    assert "dashboard" in result
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 13.0 | App Router introduced | Migrate from Pages Router |
+| 14.0 | Server Actions stable | Replace API routes for mutations |
+| 15.0 | React Compiler | Remove manual memoization |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **ISR** | Incremental Static Regeneration |
+| **RSC** | React Server Components |
+| **SSR** | Server-Side Rendering |
+| **SSG** | Static Site Generation |
+| **Streaming** | Progressive HTML delivery via Suspense |
+
+## Changelog
+
+### Version 14.0.0 (2024-01-15)
+- Server Actions stable
+- Improved streaming SSR
+- Parallel routes for modals
+- Enhanced metadata API
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/nextjs-fullstack.git
+npm install
+npm run dev
+npm test
+```
+
+## Advanced Patterns
+
+### Streaming Suspense with Loading States
+
+```tsx
+// app/dashboard/loading.tsx
+export default function DashboardLoading() {
+  return (
+    <div className="animate-pulse space-y-4">
+      <div className="h-8 bg-muted rounded w-1/3" />
+      <div className="grid grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-32 bg-muted rounded-lg" />
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+### Server Action with Optimistic Updates
+
+```tsx
+'use client'
+
+import { useOptimistic } from 'react'
+
+export function TodoList({ todos }: { todos: Todo[] }) {
+  const [optimisticTodos, addOptimisticTodo] = useOptimistic(
+    todos,
+    (state, newTodo: string) => [
+      ...state,
+      { id: crypto.randomUUID(), text: newTodo, completed: false }
+    ]
+  )
+
+  async function handleSubmit(formData: FormData) {
+    const text = formData.get('text') as string
+    addOptimisticTodo(text)
+    await createTodo(formData)
+  }
+
+  return (
+    <form action={handleSubmit}>
+      <input name="text" />
+      <ul>
+        {optimisticTodos.map(todo => (
+          <li key={todo.id}>{todo.text}</li>
+        ))}
+      </ul>
+    </form>
+  )
+}
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills
+
+---
+
+## Extended Reference
+
+### Next.js File Convention Reference
+
+| File | Purpose | Scope |
+|------|---------|-------|
+| `layout.js` | Shared UI for segment | Persists across navigations |
+| `page.js` | Unique UI for segment | Renders at URL path |
+| `loading.js` | Loading UI | Instant streaming fallback |
+| `error.js` | Error boundary | Catches errors in segment |
+| `not-found.js` | 404 UI | Handles not-found |
+| `template.js` | Like layout, remounts | Animations per navigation |
+| `default.js` | Parallel routes fallback | Used with @slots |
+| `route.js` | API route handler | HTTP API endpoint |
+| `middleware.js` | Request interception | Runs before routing |
+
+### Rendering Strategy Decision Guide
+
+| Strategy | When to Use | Pros | Cons |
+|----------|------------|------|------|
+| SSR | User-specific data | Fresh data every request | Higher server load |
+| SSG | Static content | Fastest TTFB | Requires rebuild for updates |
+| ISR | Semi-static content | SSG speed + freshness | Background regeneration |
+| Streaming | Variable load times | Progressive loading | Complexity |
+| Client | Interactive UI | Full interactivity | More JS shipped |
+
+### Server Action Reference
+
+```typescript
+// Server Action with validation
+'use server'
+
+import { z } from 'zod'
+
+const CreatePostSchema = z.object({
+  title: z.string().min(3).max(100),
+  body: z.string().min(10),
+  tags: z.array(z.string()).optional(),
+})
+
+export async function createPost(formData: FormData) {
+  const parsed = CreatePostSchema.safeParse({
+    title: formData.get('title'),
+    body: formData.get('body'),
+    tags: formData.get('tags')?.split(','),
+  })
+
+  if (!parsed.success) {
+    return { error: parsed.error.flatten() }
+  }
+
+  const post = await db.posts.create({ data: parsed.data })
+  revalidateTag('posts')
+  return { success: true, post }
+}
+```
+
+### Middleware Reference
+
+```typescript
+// middleware.ts
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export function middleware(request: NextRequest) {
+  // Auth check
+  const token = request.cookies.get('session')
+  if (!token && request.nextUrl.pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Geo-based routing
+  const country = request.geo?.country || 'US'
+  const response = NextResponse.next()
+  response.headers.set('x-country', country)
+  return response
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/api/:path*'],
+}
+```
+
+### Image Optimization Reference
+
+| Component | Feature | Description |
+|-----------|---------|-------------|
+| `next/image` | Lazy loading | Load on viewport intersection |
+| `next/image` | Responsive | srcset for different sizes |
+| `next/image` | Format | Auto WebP/AVIF |
+| `next/image` | Blur placeholder | BlurHash preview |
+| `next/image` | Priority | Preload above-fold images |
+
+### Metadata API Reference
+
+```typescript
+// Static metadata
+export const metadata: Metadata = {
+  title: 'My Page',
+  description: 'Page description',
+  openGraph: {
+    title: 'My Page',
+    description: 'Page description',
+    images: ['/og-image.png'],
+  },
+}
+
+// Dynamic metadata
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const product = await getProduct(params.id)
+  return {
+    title: product.name,
+    description: product.description,
+  }
+}
+```
+
+### Caching Strategies
+
+| Strategy | Configuration | Use Case |
+|----------|--------------|----------|
+| Default fetch | Cached automatically | Static-ish data |
+| `cache: 'no-store'` | Never cached | Real-time data |
+| `next: { revalidate: N }` | Time-based | Semi-dynamic |
+| `tags: ['x']` | On-demand | Event-driven |
+| `cache: 'force-cache'` | Always cached | Truly static |
+
+### File Structure Reference
+
+```
+app/
+├── layout.js              # Root layout
+├── page.js                # Home page
+├── loading.js             # Root loading
+├── error.js               # Root error
+├── not-found.js           # 404 page
+├── globals.css            # Global styles
+├── dashboard/
+│   ├── layout.js          # Dashboard layout
+│   ├── page.js            # /dashboard
+│   ├── loading.js         # Dashboard loading
+│   ├── error.js           # Dashboard error
+│   └── settings/
+│       └── page.js        # /dashboard/settings
+├── api/
+│   └── users/
+│       ├── route.js       # GET/POST /api/users
+│       └── [id]/
+│           └── route.js   # GET/PUT/DELETE /api/users/:id
+├── @modal/
+│   └── (..)photo/
+│       └── [id]/
+│           └── page.js    # Intercepting route
+└── (marketing)/
+    ├── layout.js          # Marketing layout group
+    └── about/
+        └── page.js        # /about
+```
+
+### Common Patterns Reference
+
+| Pattern | Implementation | Use Case |
+|---------|---------------|----------|
+| Parallel routes | `@slot` folders | Modals, dashboards |
+| Intercepting routes | `(..)` prefix | Photo viewers, drawers |
+| Route groups | `(name)` folders | Layout variations |
+| Dynamic routes | `[param]` folders | User profiles, products |
+| Catch-all routes | `[...slug]` | CMS pages |
+| Optional catch-all | `[[...slug]]` | Marketing + docs |
+| Intercepting catch-all | `(..)[...slug]` | Modal + direct URL |

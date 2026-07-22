@@ -388,3 +388,781 @@ The threat modeling module follows a four-phase iterative architecture:
 - Threat Modeling: Designing for Security (Adam Shostack): https://threatmodelingbook.com/
 - DREAD Risk Rating: https://en.wikipedia.org/wiki/DREAD_(rating_system)
 - CVSS v3.1 Specification: https://www.first.org/cvss/v3.1/specification-document
+
+---
+
+## STRIDE Threat Classification Deep Dive
+
+### Spoofing Threat Analysis
+
+```python
+from threat_modeling import SpoofingAnalyzer, AuthenticationFlow
+
+analyzer = SpoofingAnalyzer()
+
+# Analyze authentication flow for spoofing vectors
+auth_flow = AuthenticationFlow(
+    components=["Client", "LoadBalancer", "AuthService", "SessionStore", "Database"],
+    protocols=["HTTPS", "JWT", "Redis"],
+    authentication_methods=["password", "mfa", "sso"],
+)
+
+spoofing_vectors = analyzer.analyze(auth_flow)
+
+for vector in spoofing_vectors:
+    print(f"[Spoofing] {vector.description}")
+    print(f"  Target: {vector.target_component}")
+    print(f"  Method: {vector.attack_method}")
+    print(f"  Likelihood: {vector.likelihood}/10")
+    print(f"  Impact: {vector.impact}/10")
+    print(f"  Mitigation: {vector.mitigation}")
+    print()
+
+# Example spoofing threats identified
+example_threats = [
+    {
+        "description": "JWT token forgery using weak signing key",
+        "target": "AuthService",
+        "method": "Attacker forges JWT with admin claims using known weak HMAC key",
+        "likelihood": 6,
+        "impact": 10,
+        "mitigation": "Use RS256 asymmetric signing, rotate keys regularly, validate all claims",
+        "test_case": "Attempt JWT forgery with common weak secrets",
+    },
+    {
+        "description": "Session fixation via cookie manipulation",
+        "target": "SessionStore",
+        "method": "Attacker sets victim's session cookie before authentication",
+        "likelihood": 5,
+        "impact": 8,
+        "mitigation": "Regenerate session ID on authentication, use Secure/HttpOnly/SameSite flags",
+        "test_case": "Attempt to set session cookie before login and verify regeneration",
+    },
+    {
+        "description": "DNS spoofing to redirect API calls",
+        "target": "Client",
+        "method": "Attacker poisons DNS cache to redirect API calls to malicious server",
+        "likelihood": 3,
+        "impact": 9,
+        "mitigation": "Certificate pinning, DNSSEC, validate server certificate in client",
+        "test_case": "Test certificate validation in client applications",
+    },
+]
+```
+
+### Tampering Threat Analysis
+
+```python
+from threat_modeling import TamperingAnalyzer, DataFlow
+
+analyzer = TamperingAnalyzer()
+
+# Analyze data flow for tampering vectors
+data_flows = [
+    DataFlow(
+        name="User Profile Update",
+        source="Client",
+        destination="Database",
+        intermediate=["APIGateway", "AuthService", "Application"],
+        data_class="pii",
+        protocol="HTTPS",
+        storage_encryption="AES-256-GCM",
+    ),
+    DataFlow(
+        name="Payment Processing",
+        source="Client",
+        destination="PaymentGateway",
+        intermediate=["APIGateway", "PaymentService"],
+        data_class="pci",
+        protocol="TLS 1.3",
+        storage_encryption="AES-256-GCM",
+    ),
+    DataFlow(
+        name="Log Shipping",
+        source="Application",
+        destination="ELK",
+        intermediate=["LogAgent", "Kafka"],
+        data_class="internal",
+        protocol="mTLS",
+        storage_encryption=None,
+    ),
+]
+
+for flow in data_flows:
+    tampering_vectors = analyzer.analyze_flow(flow)
+    
+    print(f"=== Tampering Analysis: {flow.name} ===")
+    for vector in tampering_vectors:
+        print(f"  [{vector.category}] {vector.description}")
+        print(f"    Target: {vector.target}")
+        print(f"    Method: {vector.method}")
+        print(f"    Mitigation: {vector.mitigation}")
+    print()
+```
+
+### Information Disclosure Threat Analysis
+
+```python
+from threat_modeling import InfoDisclosureAnalyzer, SensitiveDataMap
+
+analyzer = InfoDisclosureAnalyzer()
+
+# Map sensitive data flows
+data_map = SensitiveDataMap(
+    data_types=[
+        {"name": "password_hash", "classification": "secret", "regulation": "SOC2,PCI-DSS"},
+        {"name": "email", "classification": "pii", "regulation": "GDPR,CCPA"},
+        {"name": "ssn", "classification": "pii", "regulation": "HIPAA,GDPR"},
+        {"name": "api_key", "classification": "secret", "regulation": "SOC2"},
+        {"name": "session_token", "classification": "secret", "regulation": "SOC2"},
+        {"name": "error_message", "classification": "internal", "regulation": "SOC2"},
+        {"name": "stack_trace", "classification": "internal", "regulation": "SOC2"},
+    ]
+)
+
+disclosure_vectors = analyzer.analyze(data_map)
+
+for vector in disclosure_vectors:
+    print(f"[Info Disclosure] {vector.description}")
+    print(f"  Data at Risk: {vector.data_type}")
+    print(f"  Exposure Point: {vector.exposure_point}")
+    print(f"  Disclosure Method: {vector.method}")
+    print(f"  Risk Level: {vector.risk_level}")
+    print(f"  Mitigation: {vector.mitigation}")
+    print()
+```
+
+## DREAD Risk Scoring with Calibrated Examples
+
+### DREAD Score Interpretation
+
+```python
+from threat_modeling import DREADScorer, DREADFactor
+
+scorer = DREADScorer()
+
+# DREAD factor definitions and scoring guidance
+factor_guide = {
+    DREADFactor.DAMAGE: {
+        "1": "Minimal impact, no data loss",
+        "3": "Minor impact, limited data exposure",
+        "5": "Moderate impact, some sensitive data exposed",
+        "7": "Significant impact, major data breach possible",
+        "9": "Severe impact, full system compromise",
+        "10": "Catastrophic impact, complete business disruption",
+    },
+    DREADFactor.REPRODUCIBILITY: {
+        "1": "Nearly impossible to reproduce",
+        "3": "Difficult to reproduce, race condition",
+        "5": "Moderate difficulty, requires specific configuration",
+        "7": "Easy to reproduce, common misconfiguration",
+        "9": "Very easy, single request exploitation",
+        "10": "Trivial, automated exploitation",
+    },
+    DREADFactor.EXPLOITABILITY: {
+        "1": "Extremely difficult, requires advanced skills",
+        "3": "Difficult, requires custom exploit development",
+        "5": "Moderate, requires some technical skill",
+        "7": "Easy, public exploit available",
+        "9": "Very easy, point-and-click tools available",
+        "10": "Trivial, no tools required",
+    },
+    DREADFactor.AFFECTED_USERS: {
+        "1": "Single user affected",
+        "3": "Small group of users (<100)",
+        "5": "Moderate number of users (100-1000)",
+        "7": "Large number of users (1000-10000)",
+        "9": "Most users affected (10000+)",
+        "10": "All users affected",
+    },
+    DREADFactor.DISCOVERABILITY: {
+        "1": "Extremely difficult to discover",
+        "3": "Difficult, requires source code access",
+        "5": "Moderate, requires some reconnaissance",
+        "7": "Easy, publicly visible in normal usage",
+        "9": "Very easy, obvious in error messages",
+        "10": "Trivial, first thing an attacker finds",
+    },
+}
+
+# Score a threat with calibrated factors
+threat_scores = [
+    {
+        "threat": "SQL Injection in login form",
+        "factors": {"damage": 9, "reproducibility": 8, "exploitability": 7, "affected_users": 10, "discoverability": 8},
+        "expected_risk": "critical",
+    },
+    {
+        "threat": "XSS in user profile bio",
+        "factors": {"damage": 5, "reproducibility": 9, "exploitability": 8, "affected_users": 6, "discoverability": 7},
+        "expected_risk": "high",
+    },
+    {
+        "threat": "Information disclosure in debug endpoint",
+        "factors": {"damage": 4, "reproducibility": 10, "exploitability": 9, "affected_users": 3, "discoverability": 5},
+        "expected_risk": "medium",
+    },
+    {
+        "threat": "Race condition in payment processing",
+        "factors": {"damage": 8, "reproducibility": 3, "exploitability": 2, "affected_users": 1, "discoverability": 2},
+        "expected_risk": "medium",
+    },
+]
+
+for item in threat_scores:
+    result = scorer.score(item["threat"], item["factors"])
+    match = "PASS" if result.risk_level == item["expected_risk"] else "MISMATCH"
+    print(f"[{match}] {item['threat']}")
+    print(f"  DREAD: {result.average:.1f} | Risk: {result.risk_level} | Expected: {item['expected_risk']}")
+    print()
+```
+
+## Attack Tree Analysis with Quantitative Methods
+
+### Risk Quantification Using Attack Trees
+
+```python
+from threat_modeling import AttackTreeQuantifier, RiskMetric
+
+quantifier = AttackTreeQuantifier()
+
+# Define attack tree for data exfiltration
+tree_data = {
+    "goal": "Exfiltrate customer database",
+    "children": [
+        {
+            "method": "SQL Injection",
+            "type": "OR",
+            "cost_usd": 0,
+            "time_hours": 1,
+            "success_probability": 0.6,
+            "detection_probability": 0.3,
+            "children": [
+                {
+                    "method": "Union-based extraction",
+                    "cost_usd": 0,
+                    "time_hours": 2,
+                    "success_probability": 0.8,
+                    "detection_probability": 0.2,
+                    "children": [],
+                },
+                {
+                    "method": "Time-based blind extraction",
+                    "cost_usd": 0,
+                    "time_hours": 8,
+                    "success_probability": 0.5,
+                    "detection_probability": 0.1,
+                    "children": [],
+                },
+            ]
+        },
+        {
+            "method": "Credential compromise",
+            "type": "OR",
+            "cost_usd": 500,
+            "time_hours": 24,
+            "success_probability": 0.3,
+            "detection_probability": 0.5,
+            "children": [
+                {
+                    "method": "Phishing admin credentials",
+                    "cost_usd": 200,
+                    "time_hours": 48,
+                    "success_probability": 0.4,
+                    "detection_probability": 0.6,
+                    "children": [],
+                },
+                {
+                    "method": "Credential stuffing",
+                    "cost_usd": 100,
+                    "time_hours": 4,
+                    "success_probability": 0.3,
+                    "detection_probability": 0.4,
+                    "children": [],
+                },
+            ]
+        },
+        {
+            "method": "SSRF via webhook",
+            "type": "AND",
+            "cost_usd": 0,
+            "time_hours": 4,
+            "success_probability": 0.7,
+            "detection_probability": 0.2,
+            "children": [
+                {
+                    "method": "Find SSRF vulnerability",
+                    "cost_usd": 0,
+                    "time_hours": 2,
+                    "success_probability": 0.8,
+                    "detection_probability": 0.1,
+                    "children": [],
+                },
+                {
+                    "method": "Access cloud metadata for credentials",
+                    "cost_usd": 0,
+                    "time_hours": 1,
+                    "success_probability": 0.9,
+                    "detection_probability": 0.1,
+                    "children": [],
+                },
+            ]
+        },
+    ]
+}
+
+# Compute quantitative risk metrics
+metrics = quantifier.analyze(tree_data)
+
+print(f"=== Attack Tree Risk Analysis ===")
+print(f"Goal: {metrics.goal}")
+print(f"\nCheapest Path:")
+print(f"  Method: {metrics.cheapest_path.method}")
+print(f"  Cost: ${metrics.cheapest_path.total_cost}")
+print(f"  Time: {metrics.cheapest_path.total_hours}h")
+print(f"  Success: {metrics.cheapest_path.success_probability:.1%}")
+print(f"  Detection: {metrics.cheapest_path.detection_probability:.1%}")
+print(f"  Risk Score: {metrics.cheapest_path.risk_score:.2f}")
+
+print(f"\nMost Likely Path:")
+print(f"  Method: {metrics.most_likely_path.method}")
+print(f"  Success: {metrics.most_likely_path.success_probability:.1%}")
+print(f"  Risk Score: {metrics.most_likely_path.risk_score:.2f}")
+
+print(f"\nStealthiest Path:")
+print(f"  Method: {metrics.stealthiest_path.method}")
+print(f"  Detection: {metrics.stealthiest_path.detection_probability:.1%}")
+print(f"  Risk Score: {metrics.stealthiest_path.risk_score:.2f}")
+
+print(f"\nOverall Risk:")
+print(f"  Composite Score: {metrics.composite_risk_score:.2f}")
+print(f"  Risk Level: {metrics.risk_level}")
+print(f"  Recommended Priority: {metrics.recommended_priority}")
+```
+
+## MITRE ATT&CK Mapping
+
+### Mapping Threats to ATT&CK Techniques
+
+```python
+from threat_modeling import ATTCKMapper, ThreatIntelCorrelation
+
+mapper = ATTCKMapper()
+
+# Map STRIDE threats to ATT&CK techniques
+threats_with_attack = [
+    {
+        "stride_category": "Spoofing",
+        "description": "Attacker impersonates legitimate user via stolen session token",
+        "attck_techniques": [
+            {"id": "T1078", "name": "Valid Accounts", "tactic": "Initial Access"},
+            {"id": "T1539", "name": "Steal Web Session Cookie", "tactic": "Credential Access"},
+        ],
+        "likelihood": 7,
+        "impact": 8,
+    },
+    {
+        "stride_category": "Elevation of Privilege",
+        "description": "Attacker exploits deserialization vulnerability to execute arbitrary code",
+        "attck_techniques": [
+            {"id": "T1059", "name": "Command and Scripting Interpreter", "tactic": "Execution"},
+            {"id": "T1203", "name": "Exploitation for Client Execution", "tactic": "Execution"},
+        ],
+        "likelihood": 5,
+        "impact": 10,
+    },
+    {
+        "stride_category": "Information Disclosure",
+        "description": "Attacker exfiltrates data via DNS tunneling",
+        "attck_techniques": [
+            {"id": "T1048", "name": "Exfiltration Over Alternative Protocol", "tactic": "Exfiltration"},
+            {"id": "T1071", "name": "Application Layer Protocol", "tactic": "Command and Control"},
+        ],
+        "likelihood": 3,
+        "impact": 9,
+    },
+    {
+        "stride_category": "Denial of Service",
+        "description": "Attacker performs resource exhaustion via API abuse",
+        "attck_techniques": [
+            {"id": "T1499", "name": "Endpoint Denial of Service", "tactic": "Impact"},
+            {"id": "T1498", "name": "Network Denial of Service", "tactic": "Impact"},
+        ],
+        "likelihood": 6,
+        "impact": 6,
+    },
+]
+
+# Correlate with threat intelligence
+correlation = ATTCKMapper.correlate_threats(threats_with_attack)
+
+for threat in correlation:
+    print(f"[{threat['stride_category']}] {threat['description']}")
+    for technique in threat['attck_techniques']:
+        print(f"  ATT&CK: {technique['id']} - {technique['name']}")
+        print(f"  Tactic: {technique['tactic']}")
+        print(f"  Detection: {technique.get('detection_rules', 'Configure detection rule')}")
+    print()
+```
+
+## PASTA Seven-Stage Analysis
+
+### Full PASTA Implementation
+
+```python
+from threat_modeling import PASTAAnalyzer, BusinessContext, TechnicalModel, AttackModel
+
+# Stage 1: Business Objectives
+business = BusinessContext(
+    application="Healthcare Patient Portal",
+    business_objectives=[
+        "Enable patients to access medical records",
+        "Schedule appointments with providers",
+        "Process prescription refill requests",
+        "Maintain HIPAA compliance",
+    ],
+    data_sensitivity={
+        "medical_records": "critical",
+        "patient_pii": "critical",
+        "insurance_info": "high",
+        "appointment_data": "medium",
+    },
+    regulatory_requirements=["HIPAA", "HITECH", "State Privacy Laws"],
+    financial_impact_per_breach=5000000,
+    reputation_impact="severe",
+)
+
+# Stage 2: Define Technical Scope
+tech_model = TechnicalModel(
+    components=[
+        "PatientWebApp", "MobileApp", "APIGateway", "AuthService",
+        "PatientService", "AppointmentService", "PrescriptionService",
+        "Database", "MessageQueue", "EmailService", "CDN"
+    ],
+    protocols=["HTTPS", "gRPC", "PostgreSQL", "Redis", "SMTP"],
+    trust_boundaries=[
+        "Internet/DMZ", "DMZ/Application", "Application/Data",
+        "Application/ThirdParty", "Internal/VPN"
+    ],
+    external_dependencies=[
+        {"name": "Insurance Provider API", "trust": "low", "data_shared": ["patient_id", "insurance_info"]},
+        {"name": "Pharmacy System", "trust": "medium", "data_shared": ["prescription_id", "medication"]},
+        {"name": "Email Provider", "trust": "low", "data_shared": ["email", "appointment_reminder"]},
+    ],
+)
+
+# Stages 3-7: Run PASTA
+analyzer = PASTAAnalyzer(business, tech_model)
+results = analyzer.run_full_analysis()
+
+# Stage 3: Application decomposition
+print("=== Stage 3: Application Decomposition ===")
+for component in results.decomposition.components:
+    print(f"  {component.name}: {component.type} (trust: {component.trust_level})")
+    for flow in component.data_flows:
+        print(f"    Flow: {flow.source} -> {flow.destination} ({flow.protocol})")
+
+# Stage 4: Threat analysis
+print("\n=== Stage 4: Threat Analysis ===")
+for threat in results.threats:
+    print(f"  [{threat.category}] {threat.description}")
+    print(f"    STRIDE: {threat.stride_category}")
+    print(f"    ATT&CK: {threat.attck_technique}")
+
+# Stage 5: Vulnerability analysis
+print("\n=== Stage 5: Vulnerability Analysis ===")
+for vuln in results.vulnerabilities:
+    print(f"  {vuln.cve or vuln CWE}: {vuln.description}")
+    print(f"    Component: {vuln.component}")
+    print(f"    Exploitability: {vuln.exploitability}")
+
+# Stage 6: Attack modeling
+print("\n=== Stage 6: Attack Modeling ===")
+for attack in results.attack_models:
+    print(f"  Attack: {attack.name}")
+    print(f"    Pre-conditions: {attack.preconditions}")
+    print(f"    Attack steps: {len(attack.steps)}")
+    print(f"    Post-conditions: {attack.postconditions}")
+
+# Stage 7: Risk & impact analysis
+print("\n=== Stage 7: Risk & Impact Analysis ===")
+for risk in results.risk_analysis:
+    print(f"  Risk: {risk.description}")
+    print(f"    Business Impact: ${risk.financial_impact:,.0f}")
+    print(f"    Likelihood: {risk.likelihood}")
+    print(f"    Mitigation: {risk.mitigation}")
+```
+
+## Privacy Threat Modeling with LINDDUN
+
+### LINDDUN Privacy Analysis
+
+```python
+from threat_modeling import LINDDUNAnalyzer, PrivacyThreat, PersonalData
+
+analyzer = LINDDUNAnalyzer()
+
+# Define personal data flows
+personal_data = [
+    PersonalData(
+        data_type="email",
+        sensitivity="medium",
+        purpose="account_communication",
+        retention="account_lifetime",
+        processors=["auth_service", "email_service"],
+        cross_border=False,
+    ),
+    PersonalData(
+        data_type="medical_records",
+        sensitivity="critical",
+        purpose="patient_care",
+        retention="10_years",
+        providers=["patient_service", "database"],
+        cross_border=False,
+    ),
+    PersonalData(
+        data_type="location_data",
+        sensitivity="high",
+        purpose="facility_finder",
+        retention="30_days",
+        providers=["mobile_app", "api_gateway"],
+        cross_border=False,
+    ),
+]
+
+# Run LINDDUN analysis
+linddun_threats = analyzer.analyze(personal_data)
+
+# L: Linkability
+print("=== Linkability Threats ===")
+for threat in linddun_threats.linkability:
+    print(f"  {threat.description}")
+    print(f"    Data: {threat.data_involved}")
+    print(f"    Mitigation: {threat.mitigation}")
+
+# I: Identifiability
+print("\n=== Identifiability Threats ===")
+for threat in linddun_threats.identifiability:
+    print(f"  {threat.description}")
+    print(f"    Data: {threat.data_involved}")
+    print(f"    Mitigation: {threat.mitigation}")
+
+# N: Non-repudiation
+print("\n=== Non-repudiation Threats ===")
+for threat in linddun_threats.non_repudiation:
+    print(f"  {threat.description}")
+    print(f"    Data: {threat.data_involved}")
+    print(f"    Mitigation: {threat.mitigation}")
+
+# D: Detectability
+print("\n=== Detectability Threats ===")
+for threat in linddun_threats.detectability:
+    print(f"  {threat.description}")
+    print(f"    Data: {threat.data_involved}")
+    print(f"    Mitigation: {threat.mitigation}")
+
+# D: Disclosure of information
+print("\n=== Disclosure Threats ===")
+for threat in linddun_threats.disclosure:
+    print(f"  {threat.description}")
+    print(f"    Data: {threat.data_involved}")
+    print(f"    Mitigation: {threat.mitigation}")
+
+# U: Unawareness
+print("\n=== Unawareness Threats ===")
+for threat in linddun_threats.unawareness:
+    print(f"  {threat.description}")
+    print(f"    Mitigation: {threat.mitigation}")
+
+# N: Non-compliance
+print("\n=== Non-compliance Threats ===")
+for threat in linddun_threats.non_compliance:
+    print(f"  {threat.description}")
+    print(f"    Regulation: {threat.regulation}")
+    print(f"    Mitigation: {threat.mitigation}")
+```
+
+## Threat Model Lifecycle Management
+
+### Living Threat Model with Version Control
+
+```python
+from threat_modeling import LivingThreatModel, ThreatLifecycle, ReevaluationTrigger
+
+# Create version-controlled threat model
+model = LivingThreatModel(
+    system_name="E-Commerce Platform",
+    version="2.1.0",
+    owner="security-team",
+    review_cycle="quarterly",
+    storage="git",  # Store in git for version history
+    repo_path="security/threat-models/ecommerce",
+)
+
+# Track threat lifecycle
+lifecycle = ThreatLifecycle(model)
+
+# Add new threat
+threat = lifecycle.add_threat(
+    title="SSRF via webhook callback URL",
+    category="Information Disclosure",
+    component="WebhookService",
+    stride="Information Disclosure",
+    severity="high",
+    description="Attacker can provide internal URLs as webhook callback, causing server to make requests to internal services",
+    attacker_profile="External, low skill, financial motivation",
+    preconditions=["Valid account", "Ability to create webhooks"],
+    attack_vector="HTTP POST to /api/webhooks with internal URL as callback",
+    impact=["Access to internal metadata service", "Pivot to internal services", "Potential RCE"],
+    mitigations=[
+        "URL allowlist for webhook callbacks",
+        "Network segmentation to prevent SSRF",
+        "Disable IMDSv1 on cloud instances",
+    ],
+    risk_acceptance=None,
+    status="open",
+)
+
+# Track reevaluation triggers
+triggers = [
+    ReevaluationTrigger(
+        trigger="architecture_change",
+        description="WebhookService moved to new network segment",
+        date="2024-03-15",
+        changed_by="platform-team",
+    ),
+    ReevaluationTrigger(
+        trigger="new_threat_intel",
+        description="New SSRF bypass technique published for similar framework",
+        date="2024-04-01",
+        changed_by="threat-intel-team",
+    ),
+]
+
+for trigger in triggers:
+    lifecycle.handle_trigger(trigger)
+    print(f"Trigger: {trigger.description}")
+    print(f"  Action: Reevaluation completed")
+    print(f"  New threats: {trigger.new_threats_found}")
+    print(f"  Mitigations updated: {trigger.mitigations_updated}")
+```
+
+## Threat Modeling Automation in CI/CD
+
+### Automated Threat Model Generation
+
+```python
+from threat_modeling import ThreatModelGenerator, InfrastructureParser
+
+# Generate threat model from infrastructure-as-code
+parser = InfrastructureParser(
+    sources=[
+        {"type": "terraform", "path": "./infrastructure/"},
+        {"type": "kubernetes", "path": "./k8s/manifests/"},
+        {"type": "docker_compose", "path": "./docker-compose.yml"},
+    ]
+)
+
+# Parse infrastructure
+infra_model = parser.parse()
+print(f"Components discovered: {len(infra_model.components)}")
+print(f"Data flows discovered: {len(infra_model.data_flows)}")
+print(f"Trust boundaries discovered: {len(infra_model.trust_boundaries)}")
+
+# Generate threat model automatically
+generator = ThreatModelGenerator()
+auto_model = generator.generate_from_infrastructure(
+    infrastructure=infra_model,
+    business_context={
+        "application": "E-Commerce Platform",
+        "data_classification": {"customer_data": "high", "product_catalog": "low"},
+        "regulatory_requirements": ["PCI-DSS", "GDPR"],
+    }
+)
+
+# Generate STRIDE threats for each component
+for component in auto_model.components:
+    threats = generator.generate_stride_threats(component)
+    if threats:
+        print(f"\n{component.name}: {len(threats)} threats identified")
+        for threat in threats:
+            print(f"  [{threat.category}] {threat.description}")
+            print(f"    Severity: {threat.severity}")
+            print(f"    Mitigation: {threat.mitigation}")
+
+# Export for review
+auto_model.export(
+    format="markdown",
+    output_path="./threat-models/auto-generated.md",
+    include_diagrams=True,
+    include_mitigations=True,
+    include_risk_scores=True,
+)
+```
+
+## Risk Assessment Frameworks
+
+### FAIR (Factor Analysis of Information Risk)
+
+```python
+from threat_modeling import FAIRAssessment, RiskScenario
+
+fair = FAIRAssessment()
+
+# Define risk scenario
+scenario = RiskScenario(
+    threat_event="Data breach via SQL injection",
+    loss_event_type="confidentiality",
+    assets=["customer_database"],
+    threat_agent="external_attacker",
+    vulnerability="sql_injection_in_search",
+)
+
+# FAIR quantification factors
+factors = {
+    "threat_event_frequency": {
+        "min": 1,
+        "mode": 3,
+        "max": 10,
+        "confidence": "medium",
+    },
+    "vulnerability": {
+        "min": 0.3,
+        "mode": 0.6,
+        "max": 0.9,
+        "confidence": "high",
+    },
+    "loss_magnitude": {
+        "primary": {
+            "replacement_costs": {"min": 100000, "mode": 500000, "max": 2000000},
+            "response_costs": {"min": 50000, "mode": 150000, "max": 500000},
+            "fines_judgments": {"min": 0, "mode": 200000, "max": 1000000},
+        },
+        "secondary": {
+            "competitive_advantage": {"min": 0, "mode": 100000, "max": 500000},
+            "reputation": {"min": 100000, "mode": 500000, "max": 2000000},
+        },
+    },
+}
+
+# Run Monte Carlo simulation
+result = fair.analyze(
+    scenario=scenario,
+    factors=factors,
+    iterations=10000,
+)
+
+print(f"=== FAIR Risk Analysis ===")
+print(f"Scenario: {scenario.threat_event}")
+print(f"\nLoss Event Frequency:")
+print(f"  Mean: {result.lef.mean:.1f}/year")
+print(f"  95th percentile: {result.lef.percentile_95:.1f}/year")
+print(f"\nLoss Magnitude:")
+print(f"  Mean: ${result.lm.mean:,.0f}")
+print(f"  95th percentile: ${result.lm.percentile_95:,.0f}")
+print(f"\nAnnual Loss Expectancy:")
+print(f"  Mean: ${result.ale.mean:,.0f}")
+print(f"  95th percentile: ${result.ale.percentile_95:,.0f}")
+print(f"\nRisk Level: {result.risk_level}")
+print(f"Recommended investment in mitigation: ${result.recommended_mitigation_investment:,.0f}")
+```

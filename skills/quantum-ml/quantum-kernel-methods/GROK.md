@@ -261,3 +261,647 @@ The quantum kernel pipeline transforms classical data into quantum states, compu
 - Jerbi, S., et al. (2021). Quantum kernel methods: A survey. arXiv:2104.10066.
 - Qiskit QSVM tutorial: https://qiskit.org/ecosystem/machine-learning/
 - PennyLane kernel module: https://pennylane.ai/qml/glossary/quantum_kernel/
+
+## Advanced Configuration
+
+### Feature Map Parameter Tuning
+
+```python
+from quantum_kernel_methods import FeatureMapConfig, TuningStrategy
+
+# Auto-tune feature map parameters
+config = FeatureMapConfig(
+    n_qubits=4,
+    feature_map_type="zzfeaturemap",
+    depth=2,
+    entanglement="full",
+    data_reuploading=True,
+    tuning=TuningStrategy.GRID_SEARCH,
+    param_ranges={
+        "rotation_scale": [0.5, 1.0, 1.5, 2.0],
+        "entanglement_strength": [0.1, 0.5, 1.0],
+        "reupload_layers": [1, 2, 3],
+    },
+)
+
+fm = QuantumFeatureMap(config)
+fm.tune(X_train, y_train, metric="alignment")
+print(f"Best parameters: {fm.best_params}")
+print(f"Best alignment: {fm.best_score:.4f}")
+```
+
+### Advanced Kernel Configuration
+
+```python
+from quantum_kernel_methods import KernelConfig, KernelMethod
+
+config = KernelConfig(
+    n_qubits=6,
+    feature_map="zzfeaturemap",
+    feature_map_depth=3,
+    estimator="swap_test",
+    shots=4096,
+    regularization=0.01,
+    kernel_method=KernelMethod.GRAM_MATRIX,
+    psd_correction="eigenvalue_clipping",
+    eigenvalue_threshold=1e-6,
+)
+
+kernel = QuantumKernel(config)
+K = kernel.compute_kernel_matrix(X_train)
+print(f"Kernel condition number: {np.linalg.cond(K):.2f}")
+print(f"PSD eigenvalues: {np.sum(np.linalg.eigvalsh(K) > 0)}/{len(K)}")
+```
+
+### Multiple Kernel Learning Configuration
+
+```python
+from quantum_kernel_methods import MultipleKernelLearning, KernelCombination
+
+mkl = MultipleKernelLearning(
+    kernels=[
+        {"type": "quantum", "config": quantum_config_1},
+        {"type": "quantum", "config": quantum_config_2},
+        {"type": "classical", "kernel": "rbf", "gamma": 0.1},
+        {"type": "classical", "kernel": "poly", "degree": 3},
+    ],
+    combination=KernelCombination.WEIGHTED_SUM,
+    optimization="alignment",
+)
+
+mkl.fit(X_train, y_train)
+print(f"Kernel weights: {mkl.weights}")
+print(f"Combined alignment: {mkl.alignment_score:.4f}")
+```
+
+### Advanced SVM Configuration
+
+```python
+from quantum_kernel_methods import QuantumSVM, SVMConfig
+
+svm_config = SVMConfig(
+    kernel="precomputed",
+    C=1.0,
+    gamma="scale",
+    class_weight="balanced",
+    probability=True,
+    decision_function_shape="ovr",
+    cache_size=1000,
+    max_iter=10000,
+)
+
+qsvm = QuantumSVM(config=svm_config)
+qsvm.fit(X_train, y_train, precomputed_kernel=True)
+
+# Get probability estimates
+probabilities = qsvm.predict_proba(X_test)
+print(f"Probability estimates shape: {probabilities.shape}")
+print(f"Prediction confidence: {probabilities.max(axis=1).mean():.3f}")
+```
+
+## Architecture Patterns
+
+### Kernel Pipeline Pattern
+
+```python
+from quantum_kernel_methods import KernelPipeline, PipelineStage
+
+pipeline = KernelPipeline(stages=[
+    PipelineStage(
+        name="data_preprocessing",
+        type="classical",
+        processor=lambda x: StandardScaler().fit_transform(x),
+    ),
+    PipelineStage(
+        name="feature_selection",
+        type="classical",
+        processor=lambda x: SelectKBest(k=4).fit_transform(x, y),
+    ),
+    PipelineStage(
+        name="quantum_encoding",
+        type="quantum",
+        processor=lambda x: encode_amplitude(x),
+    ),
+    PipelineStage(
+        name="kernel_computation",
+        type="quantum",
+        processor=lambda x: compute_swap_test(x),
+    ),
+    PipelineStage(
+        name="svm_training",
+        type="classical",
+        processor=lambda x: train_svm(x),
+    ),
+])
+
+result = pipeline.execute(X_train, y_train)
+```
+
+### Kernel Cache Strategy Pattern
+
+```python
+from quantum_kernel_methods import KernelCache, CacheStrategy
+
+# Multi-level caching
+cache = KernelCache(
+    strategy=CacheStrategy.MULTI_LEVEL,
+    memory_limit_mb=512,
+    disk_path="/fast_ssd/kernel_cache",
+    ttl_hours=24,
+    eviction_policy="lru",
+)
+
+kernel = QuantumKernel(config, cache=cache)
+
+# Cache-aware computation
+K = kernel.compute_kernel_matrix(
+    X_train,
+    cache_key="train_100_features",
+    force_recompute=False,
+)
+
+# Cache statistics
+stats = cache.get_stats()
+print(f"Hit rate: {stats.hit_rate:.2%}")
+print(f"Memory usage: {stats.memory_usage_mb:.1f} MB")
+print(f"Disk usage: {stats.disk_usage_mb:.1f} MB")
+```
+
+### Kernel Evaluation Strategy Pattern
+
+```python
+from quantum_kernel_methods import KernelEvaluator, EvaluationStrategy
+
+evaluator = KernelEvaluator(
+    strategy=EvaluationStrategy.CROSS_VALIDATION,
+    n_folds=5,
+    metrics=["accuracy", "f1", "auc"],
+    confidence_level=0.95,
+)
+
+# Evaluate kernel quality
+results = evaluator.evaluate(
+    kernel=kernel,
+    X=X_train,
+    y=y_train,
+)
+
+print(f"Mean accuracy: {results.mean_accuracy:.3f} +/- {results.std_accuracy:.3f}")
+print(f"Mean F1: {results.mean_f1:.3f} +/- {results.std_f1:.3f}")
+print(f"95% CI for accuracy: [{results.ci_lower:.3f}, {results.ci_upper:.3f}]")
+```
+
+## Integration Guide
+
+### Scikit-learn Integration
+
+```python
+from quantum_kernel_methods import QuantumKernel, QuantumSVM
+from sklearn.svm import SVC
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+# QKSVM as sklearn estimator
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('qsvm', QuantumSVM(config)),
+])
+
+# Hyperparameter search
+from sklearn.model_selection import GridSearchCV
+param_grid = {
+    'qsvm__config__feature_map_depth': [1, 2, 3],
+    'qsvm__config__regularization': [0.01, 0.1, 1.0],
+}
+
+search = GridSearchCV(pipeline, param_grid, cv=3)
+search.fit(X_train, y_train)
+print(f"Best params: {search.best_params_}")
+```
+
+### PyTorch Integration
+
+```python
+import torch
+from quantum_kernel_methods import QuantumKernel, KernelConfig
+
+class QuantumKernelLayer(torch.nn.Module):
+    def __init__(self, config, X_support):
+        super().__init__()
+        self.kernel = QuantumKernel(config)
+        self.X_support = torch.tensor(X_support, dtype=torch.float32)
+    
+    def forward(self, x):
+        K = self.kernel.compute_kernel_matrix(x.numpy(), self.X_support.numpy())
+        return torch.tensor(K, dtype=torch.float32)
+
+# Build hybrid model
+kernel_layer = QuantumKernelLayer(config, X_support)
+model = torch.nn.Sequential(
+    torch.nn.Linear(10, 4),
+    kernel_layer,
+    torch.nn.Linear(len(X_support), 1),
+)
+```
+
+## Performance Optimization
+
+### Kernel Matrix Optimization
+
+```python
+from quantum_kernel_methods import KernelOptimizer
+
+optimizer = KernelOptimizer(
+    strategy="batch_computation",
+    batch_size=100,
+    n_workers=4,
+    use_gpu=True,
+)
+
+# Optimized kernel computation
+K = optimizer.compute_kernel_matrix(
+    kernel=kernel,
+    X=X_large,
+    parallel=True,
+)
+print(f"Computation time: {optimizer.elapsed_time:.1f}s")
+print(f"Throughput: {optimizer.throughput:.1f} samples/s")
+```
+
+### Feature Map Optimization
+
+```python
+from quantum_kernel_methods import FeatureMapOptimizer
+
+fm_optimizer = FeatureMapOptimizer(
+    target_depth=50,
+    optimization_level=3,
+    coupling_map="ibmq_mumbai",
+)
+
+optimized_fm = fm_optimizer.optimize(feature_map)
+print(f"Original depth: {feature_map.circuit_depth}")
+print(f"Optimized depth: {optimized_fm.circuit_depth}")
+print(f"Gate reduction: {(1 - optimized_fm.circuit_depth/feature_map.circuit_depth)*100:.1f}%")
+```
+
+## Troubleshooting Guide
+
+### Common Issues and Solutions
+
+#### 1. Kernel Matrix Not Positive Semi-Definite
+
+**Symptom**: SVM training fails or gives poor results
+
+**Solution**:
+```python
+from quantum_kernel_methods import correct_psd
+
+# Correct non-PSD kernel matrix
+K_corrected = correct_psd(K, method="eigenvalue_clipping", threshold=1e-6)
+print(f"Corrected eigenvalues: {np.sum(np.linalg.eigvalsh(K_corrected) > 0)}/{len(K)}")
+```
+
+#### 2. Low Kernel Alignment Score
+
+**Symptom**: Alignment score < 0.3, poor classification accuracy
+
+**Solution**:
+```python
+# Try different feature map
+config.feature_map_type = "pauli_z_z"
+config.depth = 3
+config.data_reuploading = True
+
+# Or use multiple kernel learning
+mkl = MultipleKernelLearning(kernels=[...])
+```
+
+#### 3. Kernel Computation Too Slow
+
+**Symptom**: Kernel matrix computation takes too long
+
+**Solution**:
+```python
+# Use batch computation
+kernel.compute_kernel_matrix(X, batch_size=100, n_workers=4)
+
+# Or use approximate kernel
+config.estimator = "classical_simulation"  # For n <= 20 qubits
+```
+
+#### 4. SVM Overfitting
+
+**Symptom**: High training accuracy, low test accuracy
+
+**Solution**:
+```python
+config.regularization = 0.01  # Increase regularization
+svm_config.C = 0.1  # Reduce C parameter
+
+# Or use cross-validation for parameter selection
+cv_scores = qsvm.cross_validate(X, y, k=5)
+```
+
+## API Reference
+
+### Core Classes
+
+#### `QuantumKernel`
+```python
+class QuantumKernel:
+    def __init__(self, config: KernelConfig) -> None: ...
+    def compute_kernel_matrix(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray: ...
+    def is_psd(self, K: np.ndarray) -> bool: ...
+    def alignment_score(self, K: np.ndarray, y: np.ndarray) -> float: ...
+```
+
+#### `QuantumSVM`
+```python
+class QuantumSVM:
+    def __init__(self, config: KernelConfig) -> None: ...
+    def fit(self, X: np.ndarray, y: np.ndarray, precomputed_kernel: bool = False) -> None: ...
+    def predict(self, X: np.ndarray) -> np.ndarray: ...
+    def score(self, X: np.ndarray, y: np.ndarray) -> float: ...
+    def decision_function(self, X: np.ndarray) -> np.ndarray: ...
+    def cross_validate(self, X: np.ndarray, y: np.ndarray, k: int = 5) -> CVResult: ...
+```
+
+## Data Models
+
+### Kernel Configuration Schema
+
+```json
+{
+  "name": "quantum_kernel_v1",
+  "n_qubits": 4,
+  "feature_map": {
+    "type": "zzfeaturemap",
+    "depth": 2,
+    "entanglement": "full",
+    "data_reuploading": true
+  },
+  "estimation": {
+    "method": "swap_test",
+    "shots": 1024
+  },
+  "svm": {
+    "kernel": "precomputed",
+    "C": 1.0,
+    "regularization": 0.1
+  }
+}
+```
+
+## Deployment Guide
+
+### Docker Deployment
+
+```dockerfile
+FROM python:3.11-slim
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY quantum_kernel_methods/ /app/quantum_kernel_methods/
+WORKDIR /app
+
+ENV KERNEL_BACKEND=default.qubit
+ENV KERNEL_SHOTS=1024
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "from quantum_kernel_methods import health_check; health_check()"
+
+CMD ["python", "-m", "quantum_kernel_methods.server"]
+```
+
+## Monitoring & Observability
+
+### Metrics Collection
+
+```python
+from quantum_kernel_methods import MetricsCollector
+
+collector = MetricsCollector(backend="prometheus")
+
+collector.register_metric("kernel_computation_time", type="histogram")
+collector.register_metric("kernel_condition_number", type="gauge")
+collector.register_metric("svm_accuracy", type="gauge")
+
+collector.observe("kernel_computation_time", computation_ms)
+collector.set("kernel_condition_number", np.linalg.cond(K))
+collector.set("svm_accuracy", accuracy)
+```
+
+## Testing Strategy
+
+### Unit Tests
+
+```python
+import pytest
+from quantum_kernel_methods import QuantumKernel, KernelConfig
+
+class TestQuantumKernel:
+    def setup_method(self):
+        self.config = KernelConfig(n_qubits=4, feature_map="zzfeaturemap")
+        self.kernel = QuantumKernel(self.config)
+    
+    def test_kernel_matrix_shape(self):
+        X = np.random.randn(20, 4)
+        K = self.kernel.compute_kernel_matrix(X)
+        assert K.shape == (20, 20)
+    
+    def test_kernel_matrix_symmetric(self):
+        X = np.random.randn(20, 4)
+        K = self.kernel.compute_kernel_matrix(X)
+        assert np.allclose(K, K.T)
+    
+    def test_kernel_diagonal_positive(self):
+        X = np.random.randn(20, 4)
+        K = self.kernel.compute_kernel_matrix(X)
+        assert np.all(np.diag(K) >= 0)
+```
+
+## Versioning & Migration
+
+### Changelog
+
+#### v2.0.0 (2024-01-15)
+- **Breaking**: New `KernelConfig` API
+- **Added**: Multiple kernel learning support
+- **Added**: Kernel alignment scoring
+- **Improved**: 3x faster kernel computation
+- **Fixed**: PSD correction for noisy hardware
+
+#### v1.1.0 (2023-09-01)
+- **Added**: ZZFeatureMap support
+- **Added**: Kernel caching
+- **Improved**: SVM training stability
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **Feature Map** | Quantum circuit that embeds classical data into Hilbert space |
+| **Gram Matrix** | Matrix of pairwise kernel evaluations |
+| **Kernel Alignment** | Measure of kernel-target compatibility |
+| **PSD** | Positive Semi-Definite; required for valid kernels |
+| **QSVM** | Quantum Support Vector Machine |
+| **SWAP Test** | Quantum circuit for state overlap estimation |
+
+## Contributing Guidelines
+
+### Development Setup
+
+```bash
+git clone https://github.com/example/quantum-kernels.git
+cd quantum-kernels
+python -m venv venv
+source venv/bin/activate
+pip install -e ".[dev]"
+pytest tests/ -v
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Quantum Kernel Methods Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+*Last updated: 2024-01-15*
+*Version: 2.0.0*
+
+## Advanced Patterns
+
+### Feature Map Design Patterns
+
+```python
+from quantum_kernel_methods import FeatureMapDesigner, DesignStrategy
+
+designer = FeatureMapDesigner(
+    strategy=DesignStrategy.DATA_ADAPTIVE,
+    depth=3,
+    entanglement="full",
+    data_reuploading=True,
+)
+
+# Design feature map
+feature_map = designer.design(X_train, y_train)
+print(f"Feature map depth: {feature_map.circuit_depth}")
+print(f"Number of parameters: {feature_map.n_parameters}")
+print(f"Expressivity score: {feature_map.expressivity:.4f}")
+```
+
+### Kernel Optimization Patterns
+
+```python
+from quantum_kernel_methods import KernelOptimizer, OptimizationStrategy
+
+optimizer = KernelOptimizer(
+    strategy=OptimizationStrategy.ALIGNMENT_MAXIMIZATION,
+    learning_rate=0.01,
+    max_iterations=100,
+    convergence_threshold=1e-6,
+)
+
+# Optimize kernel parameters
+optimized_kernel = optimizer.optimize(
+    kernel=quantum_kernel,
+    X=X_train,
+    y=y_train,
+)
+
+print(f"Original alignment: {kernel.alignment_score:.4f}")
+print(f"Optimized alignment: {optimized_kernel.alignment_score:.4f}")
+```
+
+### Multiple Kernel Learning Patterns
+
+```python
+from quantum_kernel_methods import MultipleKernelLearner, MKLStrategy
+
+mkl = MultipleKernelLearner(
+    strategy=MKLStrategy.WEIGHTED_SUM,
+    kernels=[
+        {"type": "quantum", "config": kernel_config_1},
+        {"type": "quantum", "config": kernel_config_2},
+        {"type": "classical", "kernel": "rbf", "gamma": 0.1},
+        {"type": "classical", "kernel": "poly", "degree": 3},
+    ],
+    optimization="alignment",
+)
+
+# Learn kernel combination
+mkl.fit(X_train, y_train)
+print(f"Kernel weights: {mkl.weights}")
+print(f"Combined alignment: {mkl.alignment_score:.4f}")
+```
+
+### Kernel Evaluation Patterns
+
+```python
+from quantum_kernel_methods import KernelEvaluator, EvaluationStrategy
+
+evaluator = KernelEvaluator(
+    strategy=EvaluationStrategy.CROSS_VALIDATION,
+    n_folds=5,
+    metrics=["accuracy", "f1", "auc"],
+    confidence_level=0.95,
+)
+
+# Evaluate kernel quality
+results = evaluator.evaluate(
+    kernel=kernel,
+    X=X_train,
+    y=y_train,
+)
+
+print(f"Mean accuracy: {results.mean_accuracy:.3f} +/- {results.std_accuracy:.3f}")
+print(f"Mean F1: {results.mean_f1:.3f} +/- {results.std_f1:.3f}")
+print(f"95% CI for accuracy: [{results.ci_lower:.3f}, {results.ci_upper:.3f}]")
+```
+
+### Quantum Advantage Testing Patterns
+
+```python
+from quantum_kernel_methods import QuantumAdvantageTester, AdvantageStrategy
+
+advantage_tester = QuantumAdvantageTester(
+    strategy=AdvantageStrategy.STATISTICAL_SIGNIFICANCE,
+    n_trials=100,
+    significance_level=0.05,
+    test_distributions=["hidden_parity", "clustered_data"],
+)
+
+# Test quantum advantage
+results = advantage_tester.test(
+    quantum_kernel=quantum_kernel,
+    classical_kernels=["rbf", "poly", "linear"],
+    X=X_train,
+    y=y_train,
+)
+
+print(f"Quantum advantage: {results.advantage_detected}")
+print(f"p-value: {results.p_value:.4f}")
+print(f"Effect size: {results.effect_size:.4f}")
+```

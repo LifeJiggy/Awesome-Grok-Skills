@@ -226,3 +226,591 @@ Voice cloning adapters are small (<1MB) parameter sets that condition the base T
 - [speech-recognition](../speech-recognition/) — Round-trip evaluation (TTS -> ASR accuracy)
 - [voice-assistants](../voice-assistants/) — Response generation that drives TTS output
 - [voice-analytics](../voice-analytics/) — Perceptual quality metrics and naturalness scoring
+
+---
+
+## Advanced Configuration
+
+### Voice Cloning Advanced Settings
+
+```python
+from text_to_speech import VoiceCloneConfig
+
+config = VoiceCloneConfig(
+    adapter_type="low_rank",
+    adapter_rank=16,
+    training_steps=1000,
+    learning_rate=1e-4,
+    loss_function="multi_task",
+    speaker_similarity_threshold=0.85,
+    overfitting_protection=True,
+    reference_audio_min_seconds=10,
+)
+```
+
+### SSML Advanced Processing
+
+```python
+from text_to_speech import SSMLConfig
+
+ssml_config = SSMLConfig(
+    supported_elements=["prosody", "break", "emphasis", "say-as", "sub", "voice", "lang"],
+    default_speech_rate=1.0,
+    default_pitch=0,
+    default_volume=0,
+    break_time_range_ms=(100, 5000),
+    emphasis_levels=["reduced", "none", "moderate", "strong"],
+)
+```
+
+## Architecture Patterns
+
+### TTS Pipeline Architecture
+
+```
+Input Text
+    │
+    ▼
+┌──────────────┐
+│ Text         │── Number expansion, abbreviation expansion
+│ Normalization│
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Grapheme-to- │── Text to phoneme sequence
+│ Phoneme      │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Acoustic     │── Phoneme sequence to mel spectrogram
+│ Model        │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Vocoder      │── Mel spectrogram to waveform
+│ (HiFi-GAN)   │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Post-Process │── Normalization, format conversion
+└──────────────┘
+```
+
+### Streaming TTS Architecture
+
+```
+Text Stream
+    │
+    ▼
+┌──────────────┐
+│ Sentence     │── Split at punctuation boundaries
+│ Segmenter    │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Look-ahead   │── Buffer 2-3 sentences for prosody planning
+│ Buffer       │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Incremental  │── Generate mel frames per segment
+│ Synthesis    │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Streaming    │── Convert overlapping windows to audio
+│ Vocoder      │
+└──────────────┘
+```
+
+## Integration Guide
+
+### Voice Assistant Integration
+
+```python
+from text_to_speech import TTSEngine, StreamingTTS
+
+engine = TTSEngine(model="vits2_vctk_v1")
+streamer = StreamingTTS(engine=engine, chunk_size_ms=100)
+
+# Stream response to audio device
+for chunk in streamer.stream(response_text):
+    audio_device.play(chunk)
+```
+
+### Batch Content Generation
+
+```python
+from text_to_speech import BatchSynthesizer
+
+batch = BatchSynthesizer(engine=engine, max_concurrent=8)
+results = batch.synthesize_batch(
+    texts=["Welcome", "Goodbye", "Thank you"],
+    voice="p225",
+    output_dir="audio_assets/",
+)
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| Model warm-up | Eliminates cold-start latency |
+| Audio caching | Zero-latency for repeated phrases |
+| Dynamic batching | 4x throughput improvement |
+| ONNX runtime | 2x faster inference |
+| Sentence-level streaming | Sub-200ms first-chunk latency |
+
+## Security Considerations
+
+- **Voice consent**: Only clone voices with explicit permission
+- **Deepfake prevention**: Watermark synthesized audio
+- **Access control**: API key authentication for TTS endpoints
+- **Content filtering**: Block harmful or fraudulent content
+- **Audit logging**: Track all synthesis requests and voice usage
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Robotic output | Insufficient training data | Use more reference audio |
+| Prosody breaks at boundaries | No look-ahead buffering | Enable sentence buffering |
+| High latency on first request | Model not warmed up | Pre-synthesize warm-up sentence |
+| Clone similarity low | Reference audio too short | Use 30+ seconds of clean audio |
+| Pronunciation wrong | Missing dictionary entry | Add to pronunciation dictionary |
+
+## API Reference
+
+### TTSEngine
+
+```python
+class TTSEngine:
+    def __init__(self, model: str, vocoder: str, device: str, sample_rate: int)
+    def synthesize(self, text: str, voice: str, speed: float = 1.0, pitch: float = 1.0) -> AudioOutput
+    def synthesize_ssml(self, ssml: SSMLDocument, voice: str) -> AudioOutput
+    def synthesize_with_prosody(self, text: str, prosody: ProsodyParams) -> AudioOutput
+```
+
+### VoiceCloner
+
+```python
+class VoiceCloner:
+    def __init__(self, embedding_model: str, cloning_model: str, device: str)
+    def create_adapter(self, reference_audio: str, adapter_rank: int, training_steps: int) -> VoiceAdapter
+    def validate_quality(self, adapter: VoiceAdapter, reference_audio: str) -> QualityScore
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class AudioOutput:
+    samples: ndarray
+    sample_rate: int
+    duration_s: float
+    format: str
+
+@dataclass
+class ProsodyParams:
+    pitch_range: float
+    speech_rate: float
+    volume: float
+    emphasis_words: list
+
+@dataclass
+class VoiceAdapter:
+    adapter_id: str
+    speaker_embedding: ndarray
+    similarity_score: float
+    file_size_bytes: int
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+pip install text-to-speech
+# With GPU
+pip install text-to-speech[gpu]
+```
+
+### Model Setup
+
+```python
+from text_to_speech import ModelManager
+
+manager = ModelManager()
+manager.download("vits2_vctk_v1")
+manager.download("hifigan_v1")
+manager.warm_up("vits2_vctk_v1", warmup_text="Hello world.")
+```
+
+## Monitoring & Observability
+
+```python
+from text_to_speech import MetricsCollector
+
+collector = MetricsCollector()
+collector.histogram("tts.synthesis.duration_ms", duration)
+collector.gauge("tts.mos.score", mos)
+collector.counter("tts.requests.total", count, tags={"voice": voice})
+collector.histogram("tts.first_chunk_latency_ms", latency)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from text_to_speech import TTSEngine
+
+def test_synthesis():
+    engine = TTSEngine(model="vits2_vctk_v1", vocoder="hifigan_v1", device="cpu", sample_rate=22050)
+    audio = engine.synthesize("Hello world.", voice="p225")
+    assert audio.duration_s > 0
+    assert audio.sample_rate == 22050
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 1.0.0 | Initial release | N/A |
+| 1.1.0 | Added streaming TTS | Use StreamingTTS class |
+| 2.0.0 | New model format | Re-download models |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **VITS** | Variational Inference with adversarial learning for end-to-end TTS |
+| **HiFi-GAN** | High-fidelity generative adversarial network vocoder |
+| **SSML** | Speech Synthesis Markup Language |
+| **MOS** | Mean Opinion Score — perceptual quality metric |
+| **Prosody** | Rhythm, stress, and intonation of speech |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with VITS and HiFi-GAN
+- SSML processing and prosody control
+- Voice cloning from reference audio
+- Streaming TTS with sub-200ms latency
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/text-to-speech.git
+pip install -e ".[dev]"
+pytest tests/
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills
+
+---
+
+## Extended Reference
+
+### TTS Model Comparison
+
+| Model | Architecture | Quality | Speed | Streaming |
+|-------|-------------|---------|-------|-----------|
+| VITS2 | VAE+Flow+GAN | Very high | Fast | Yes |
+| Tacotron 2 | Attention | High | Medium | Yes |
+| FastSpeech 2 | Non-autoregressive | High | Very fast | Yes |
+| Bark | Transformer | Very high | Slow | Yes |
+| Tortoise | Transformer+VQ | Highest | Very slow | No |
+
+### SSML Element Reference
+
+| Element | Attributes | Description |
+|---------|-----------|-------------|
+| `<prosody>` | rate, pitch, volume | Speech characteristics |
+| `<break>` | time | Pause duration |
+| `<emphasis>` | level | Word emphasis |
+| `<say-as>` | interpret-as | Number/date pronunciation |
+| `<sub>` | alias | Pronunciation substitution |
+| `<voice>` | name, gender, age | Voice selection |
+| `<lang>` | xml:lang | Language selection |
+| `<amazon:effect>` | name | Amazon-specific effects |
+
+### Voice Quality Reference
+
+| MOS Range | Quality | Description |
+|-----------|---------|-------------|
+| 4.0-5.0 | Excellent | Near-human quality |
+| 3.5-4.0 | Good | Minor artifacts |
+| 3.0-3.5 | Fair | Noticeable artifacts |
+| 2.5-3.0 | Poor | Significant artifacts |
+| 1.0-2.5 | Bad | Unintelligible |
+
+### Pronunciation Dictionary Format
+
+```
+// CMU-style phoneme notation
+OpenAI    OH-pen-ay-eye
+NVIDIA    en-VID-ee-uh
+GPT       gee-pee-tee
+API       ay-pee-eye
+JSON      jay-sawn
+SQL       sequel
+```
+
+### Text Normalization Examples
+
+| Input | Normalized |
+|-------|-----------|
+| $1,234.56 | twelve hundred thirty-four dollars and fifty-six cents |
+| 42 | forty-two |
+| 03/15/2024 | March fifteenth, twenty twenty-four |
+| 3:30 PM | three thirty P M |
+| Dr. Smith | Doctor Smith |
+| etc. | etcetera |
+| 1st | first |
+| 10km | ten kilometers |
+
+### Streaming Latency Reference
+
+| Chunk Size | First-Audio Latency | Quality | Use Case |
+|-----------|-------------------|---------|----------|
+| 20ms | 50-80ms | Lower | Ultra-low latency |
+| 50ms | 80-120ms | Good | Real-time interaction |
+| 100ms | 120-180ms | Very good | Voice assistants |
+| 200ms | 180-250ms | Excellent | Audiobook narration |
+| 500ms | 250-400ms | Highest | Pre-recorded content |
+
+### Voice Cloning Quality Metrics
+
+| Metric | Target | Description |
+|--------|--------|-------------|
+| Speaker similarity | > 0.85 | Cosine similarity of embeddings |
+| MOS | > 3.5 | Perceptual quality score |
+| Intelligibility | > 0.95 | STOI against reference |
+| Naturalness | > 3.5 | PESQ-like naturalness score |
+
+### Multi-Language Support
+
+| Language | Phoneme Set | G2P Model | Notes |
+|----------|------------|-----------|-------|
+| English | ARPAbet/IPA | Grapheme-to-Phoneme | Most supported |
+| Mandarin | Pinyin | Custom | Tonal language |
+| Japanese | Kana | MeCab-based | Mixed scripts |
+| Spanish | IPA | Letter-to-Sound | Romance language |
+| French | IPA | Letter-to-Sound | Liaison handling |
+| German | IPA | Grapheme-to-Phoneme | Compound words |
+| Korean | Hangul | Custom | Syllable blocks |
+| Arabic | IPA | Custom | RTL, diacritics |
+
+## Synthesis Models Deep Dive
+
+### VITS2 Model Architecture
+
+```python
+from text_to_speech import VITS2Model, VITS2Config
+
+config = VITS2Config(
+    hidden_channels=192,
+    hidden_channels_ffn=768,
+    num_heads=2,
+    num_layers=6,
+    kernel_size=3,
+    p_dropout=0.1,
+    resblock="1",
+    resblock_kernel_sizes=[3, 7, 11],
+    resblock_dilation_sizes=[[1, 3, 5], [1, 3, 5], [1, 3, 5]],
+    upsample_rates=[8, 8, 2, 2],
+    upsample_initial_channel=192,
+    upsample_kernel_sizes=[16, 16, 4, 4],
+    n_speakers=109,
+    speaker_embedding_dim=192,
+    gin_channels=256,
+)
+
+model = VITS2Model(config)
+model.load_weights("vits2_vctk_v1.ckpt")
+
+# Generate mel spectrogram from text
+text = "Hello, this is a test of the VITS2 model."
+phonemes = model.text_to_phonemes(text)
+mel = model.encode(phonemes, speaker_id=0)
+```
+
+### HiFi-GAN Vocoder Configuration
+
+```python
+from text_to_speech import HiFiGAN, HiFiGANConfig
+
+hifigan_config = HiFiGANConfig(
+    upsample_rates=[8, 8, 2, 2],
+    upsample_kernel_sizes=[16, 16, 4, 4],
+    upsample_initial_channel=192,
+    resblock_kernel_sizes=[3, 7, 11],
+    resblock_dilation_sizes=[[1, 3, 5], [1, 3, 5], [1, 3, 5]],
+    sample_rate=22050,
+    n_fft=1024,
+    hop_length=256,
+    win_length=1024,
+)
+
+vocoder = HiFiGAN(hifigan_config)
+vocoder.load_weights("hifigan_v1.ckpt")
+
+# Convert mel spectrogram to waveform
+waveform = vocoder.infer(mel)
+# waveform shape: (1, T) where T = mel_frames * hop_length
+```
+
+### Prosody Modeling with Control Tokens
+
+```python
+from text_to_speech import ProsodyModel, ControlToken
+
+# Define prosody control tokens
+prosody_model = ProsodyModel(
+    model="fastspeech2_prosody",
+    control_tokens=[
+        ControlToken("pitch_high", embedding=[1.2, 0.0, 0.0]),
+        ControlToken("pitch_low", embedding=[0.8, 0.0, 0.0]),
+        ControlToken("speed_fast", embedding=[0.0, 1.3, 0.0]),
+        ControlToken("speed_slow", embedding=[0.0, 0.7, 0.0]),
+        ControlToken("energy_high", embedding=[0.0, 0.0, 1.2]),
+        ControlToken("energy_low", embedding=[0.0, 0.0, 0.8]),
+    ]
+)
+
+# Apply prosody tags in text
+text_with_prosody = "[pitch_high] Exciting news! [/pitch_high] [speed_slow] Take your time. [/speed_slow]"
+mel = prosody_model.synthesize(text_with_prosody, speaker="p225")
+```
+
+### Grapheme-to-Phoneme Conversion
+
+```python
+from text_to_speech import GraphemeToPhoneme
+
+g2p = GraphemeToPhoneme(
+    language="en",
+    model="g2p_en_v2",
+    use_lexicon=True,
+    lexicon_path="lexicon.txt",
+    espeak_phonemes=False
+)
+
+# Convert text to phonemes
+text = "The quick brown fox jumps over the lazy dog."
+phonemes = g2p.convert(text)
+print(phonemes)
+# "DH AH K W IH K B R AW N F AA KS J AH M P S OW V ER DH AH L EY ZIY D AO G"
+
+# Handle special cases
+pronunciation = g2p.get_pronunciation("COVID-19", context="medical")
+print(pronunciation)
+# Uses custom lexicon entry: "K OW V IH D N AY N T IY N"
+```
+
+### Multilingual Cross-Voice Synthesis
+
+```python
+from text_to_speech import CrossLingualSynthesizer
+
+# Synthesize speech in multiple languages with the same voice
+cross_lingual = CrossLingualSynthesizer(
+    base_model="vits2_multilingual_v3",
+    speaker_encoder="resemblyzer_v2",
+    device="cuda"
+)
+
+# Clone voice and synthesize across languages
+reference_embedding = cross_lingual.extract_speaker_embedding("reference.wav")
+
+# Synthesize in English
+en_audio = cross_lingual.synthesize(
+    text="Hello, this is a multilingual synthesis test.",
+    speaker_embedding=reference_embedding,
+    language="en"
+)
+
+# Same voice, different language
+zh_audio = cross_lingual.synthesize(
+    text="你好，这是一个多语言合成测试。",
+    speaker_embedding=reference_embedding,
+    language="zh"
+)
+
+# Japanese with the same voice
+ja_audio = cross_lingual.synthesize(
+    text="こんにちは、これはマルチリンガル合成テストです。",
+    speaker_embedding=reference_embedding,
+    language="ja"
+)
+```
+
+### Voice Quality Enhancement
+
+```python
+from text_to_speech import VoiceEnhancer, PostProcessor
+
+# Post-process synthesized audio for quality improvement
+enhancer = VoiceEnhancer(
+    sample_rate=22050,
+    noise_reduction=False,  # Already clean from vocoder
+    dynamic_range_compression=True,
+    target_lufs=-20.0,
+    true_peak_dbtp=-1.0,
+    de_essing=True,
+    de_essing_freq=5000,
+    de_essing_threshold=0.5
+)
+
+enhanced = enhancer.process(synthesized_audio)
+
+# Add natural breathing sounds between sentences
+post_processor = PostProcessor()
+final_audio = post_processor.add_breaths(
+    enhanced,
+    breath_duration_ms=(200, 500),
+    breath_volume_db=-20,
+    insertion_points="auto"  # auto-detect sentence boundaries
+)
+```
+
+### Model Quantization for Edge Deployment
+
+```python
+from text_to_speech import ModelQuantizer, TTSQuantizedEngine
+
+# Quantize model for mobile/edge deployment
+quantizer = ModelQuantizer(
+    model_path="vits2_vctk_v1.onnx",
+    quantization_method="dynamic",  # dynamic | static | qat
+    dtype="int8",                    # int8 | fp16 | int4
+    calibration_data="calibration_samples/",
+    accuracy_threshold=0.95  # Max acceptable accuracy loss
+)
+
+quantized_model = quantizer.quantize()
+quantizer.save(quantized_model, "vits2_vctk_v1_int8.onnx")
+
+# Use quantized model
+engine = TTSQuantizedEngine(
+    model_path="vits2_vctk_v1_int8.onnx",
+    vocoder_path="hifigan_v1_int8.onnx",
+    device="cpu"
+)
+
+# Quantized model runs on CPU with minimal quality loss
+audio = engine.synthesize("Hello from the edge.", voice="p225")
+```

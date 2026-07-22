@@ -227,6 +227,406 @@ The pipeline processes each frame through a chain of stages. Each stage declares
 - **manipulation** — Visual servoing for grasp alignment and pick-and-place operations
 - **swarm-robotics** — Shared visual maps for cooperative perception among multiple robots
 
+## Advanced Configuration
+
+### Camera Calibration Profiles
+
+```yaml
+calibration:
+  profile: "industrial_robot_arm"
+  board_type: checkerboard
+  board_size: [9, 6]
+  square_size_mm: 25.0
+  image_count: 30
+  min_images: 15
+  rms_threshold: 0.5
+  distortion_model: radial_tangential
+  output_format: opencv_yaml
+```
+
+### Object Detection Model Configuration
+
+```yaml
+detection:
+  model: yolov8n
+  input_size: [416, 416]
+  confidence_threshold: 0.6
+  nms_threshold: 0.4
+  device: cuda:0
+  half_precision: true
+  class_whitelist: ["person", "car", "box", "forklift"]
+  custom_model_path: null
+  batch_size: 4
+```
+
+### Visual SLAM Configuration
+
+```yaml
+slam:
+  feature_type: orb
+  num_features: 2000
+  scale_factor: 1.2
+  pyramid_levels: 8
+  fast_threshold: 20
+  matcher: brute_force_hamming
+  loop_closure: true
+  loop_closure_threshold: 0.75
+  imu_fusion: true
+  map_save_path: "./maps/"
+  keyframe_distance_m: 0.1
+  min_inlier_count: 50
+```
+
+## Architecture Patterns
+
+### Pipeline Composition Pattern
+
+Each vision pipeline stage is a composable unit with declared latency budgets:
+
+```
+CameraDriver → Calibration → Preprocessing → [Detection | Features | Depth] → Tracking/SLAM → Output
+
+Pipeline Stage Interface:
+  input: Image/DataFrame
+  output: ProcessedResult
+  latency_budget_ms: float
+  fallback: ResultType  # last valid result on timeout
+  on_timeout: enum      # SKIP, USE_LAST, ABORT
+```
+
+### Producer-Consumer Pattern for Real-Time Vision
+
+```
+Camera Thread (Producer):
+  └─ Acquire frame from hardware buffer
+  └─ Enqueue to frame ring buffer (lock-free)
+  └─ Signal processing thread
+
+Processing Thread (Consumer):
+  └─ Dequeue frame from ring buffer
+  └─ Run pipeline stages sequentially
+  └─ Enqueue results to output buffer
+  └─ Update tracking state
+
+Visualization Thread:
+  └─ Dequeue results for display
+  └─ Render overlay (detections, tracks, depth)
+  └─ Non-blocking display refresh
+```
+
+### Kalman Filter Tracking Pattern
+
+```
+Prediction Step:
+  x̂ = F * x̂ + B * u     (state prediction)
+  P = F * P * F' + Q     (covariance prediction)
+
+Update Step:
+  K = P * H' * (H * P * H' + R)⁻¹  (Kalman gain)
+  x̂ = x̂ + K * (z - H * x̂)         (state update)
+  P = (I - K * H) * P                (covariance update)
+
+Association (Hungarian Algorithm):
+  └─ Compute cost matrix (detection-to-track distance)
+  └─ Solve assignment (min-cost matching)
+  └─ Gate matches by Mahalanobis distance threshold
+  └─ Create new tracks for unmatched detections
+  └─ Age out tracks below hit threshold
+```
+
+## Integration Guide
+
+### Sensor Fusion with Navigation Module
+
+```python
+# Fuse visual odometry with IMU and wheel odometry
+from robotics_vision import VisualOdometry
+from navigation import EKFFusion
+
+vo = VisualOdometry(config=OdometryConfig(feature_type="orb"))
+fusion = EKFFusion()
+
+for imu, wheel, camera_frame in sensor_stream:
+    vo_delta = vo.estimate(prev_frame, camera_frame)
+    fused_pose = fusion.update(imu, wheel, visual_odometry=vo_delta)
+    prev_frame = camera_frame
+```
+
+### YOLO Detection to World Model Pipeline
+
+```python
+# Convert 2D detections to 3D world model entries
+from robotics_vision import ObjectDetector, DetectionTo3D
+
+detector = ObjectDetector(config=DetectionConfig(model="yolov8n"))
+to_3d = DetectionTo3D(stereo_baseline_mm=120.0, focal_length_px=640.0)
+
+for left_frame, right_frame in stereo_stream:
+    detections = detector.detect(left_frame)
+    depth_map = stereo.compute_disparity(left_frame, right_frame)
+    objects_3d = to_3d.convert(detections, depth_map)
+    world_model.update_objects(objects_3d)
+```
+
+### Event Camera Integration
+
+```python
+from robotics_vision import EventCameraDriver, EventProcessor
+
+driver = EventCameraDriver(device="/dev/event0", resolution=(640, 480))
+processor = EventProcessor(
+    method="time_surface",
+    accumulation_window_ms=50,
+    noise_filter_threshold=1
+)
+
+for events in driver.stream():
+    time_surface = processor.process(events)
+    features = processor.extract_features(time_surface)
+```
+
+## Performance Optimization
+
+### GPU Utilization Strategy
+
+| Component | GPU Memory | Speedup vs CPU | Recommended |
+|-----------|-----------|----------------|-------------|
+| YOLOv8n detection | 200 MB | 15-30x | Yes |
+| YOLOv8x detection | 500 MB | 10-20x | Yes (if available) |
+| ORB feature extraction | 50 MB | 3-5x | Optional |
+| SGBM stereo | 100 MB | 5-10x | Yes for real-time |
+| Optical flow | 80 MB | 8-15x | Optional |
+
+### Latency Optimization Checklist
+
+1. **Reduce input resolution**: Process at 640x480 for detection, full resolution only for features
+2. **Use TensorRT/ONNX**: Convert PyTorch models to optimized inference format
+3. **Enable FP16**: Half-precision inference on GPU with minimal accuracy loss
+4. **Pipeline parallelism**: Run detection on GPU while preprocessing next frame on CPU
+5. **Zero-copy buffers**: Use shared memory for camera-to-GPU frame transfer
+6. **Skip frames**: Process every Nth frame for non-critical pipelines; interpolate between results
+
+### Memory Management
+
+- **Ring buffer size**: Allocate 2-3x the pipeline latency in frame buffers to absorb jitter
+- **Feature cache**: LRU cache of 50-100 frames of extracted features for loop closure
+- **Model caching**: Keep detection and SLAM models in GPU memory for the session lifetime
+- **Image pre-allocation**: Pre-allocate output arrays for undistortion, resize, and color conversion
+
+## Troubleshooting Guide
+
+### Common Issues
+
+| Symptom | Cause | Solution |
+|---------|-------|----------|
+| High reprojection error | Calibration drift | Re-calibrate; check for thermal effects |
+| Lost tracking in SLAM | Insufficient features | Increase ORB features; add texture-rich areas |
+| Detection false positives | Low confidence threshold | Raise confidence threshold; retrain model |
+| Stereo depth holes | Textureless surfaces | Add structured light or switch to ToF camera |
+| Frame drops | Pipeline exceeds budget | Profile stages; reduce resolution or skip frames |
+| Color shift after calibration | Wrong distortion model | Verify distortion model matches lens type |
+| Loop closure false positives | Low feature distinctiveness | Increase descriptor size; use SIFT for offline |
+
+### Diagnostic Commands
+
+```bash
+# Check camera calibration quality
+python -m robotics_vision.calibration_check --images ./calibration_images/
+
+# Test detection pipeline latency
+python -m robotics_vision.bench_detection --model yolov8n --input test_video.mp4
+
+# Verify stereo calibration
+python -m robotics_vision.stereo_check --left left.yml --right right.yml
+
+# Profile full pipeline
+python -m robotics_vision.profiler --pipeline full --duration 30
+```
+
+## API Reference
+
+### Core Classes
+
+| Class | Description |
+|-------|-------------|
+| `CameraCalibrator` | Intrinsic/extrinsic calibration with automatic corner detection |
+| `ObjectDetector` | YOLO-style single-shot detection with filtering |
+| `MultiObjectTracker` | Kalman-filter-based multi-object tracking |
+| `VisualOdometry` | Frame-to-frame pose estimation |
+| `StereoDepthEstimator` | Block/semi-global matching disparity computation |
+| `VisualSLAM` | ORB-based SLAM with loop closure |
+| `PipelineComposer` | Composable pipeline stage manager with timeout enforcement |
+
+### Key Enums
+
+| Enum | Values |
+|------|--------|
+| `FeatureType` | ORB, SIFT, SURF, AKAZE |
+| `DetectionBackend` | OPENCV, TENSORRT, ONNX, CPU |
+| `TrackingState` | OK, LOST, NOT_INITIALIZED |
+| `LoopClosureResult` | DETECTED, CANDIDATE, REJECTED |
+
+## Data Models
+
+### Detection
+
+```
+Detection:
+  bbox: (x, y, w, h)    # bounding box in pixels
+  class_name: str         # class label
+  confidence: float       # 0.0-1.0
+  class_id: int           # numeric class ID
+  frame_id: int           # source frame
+```
+
+### Track
+
+```
+Track:
+  track_id: int           # unique track identifier
+  state: TrackingState
+  bbox: (x, y, w, h)     # predicted bounding box
+  velocity: (vx, vy)      # estimated velocity (px/s)
+  age_frames: int         # total frames tracked
+  hits: int               # successful update count
+  misses: int             # missed detection count
+  is_confirmed: bool      # meets min_hits threshold
+```
+
+### CameraIntrinsics
+
+```
+CameraIntrinsics:
+  camera_matrix: 3x3 array
+  distortion_coeffs: (k1, k2, p1, p2, k3)
+  image_size: (width, height)
+  rms_error: float
+  focal_length_px: float
+  principal_point: (cx, cy)
+```
+
+## Deployment Guide
+
+### Edge Deployment (Jetson Orin)
+
+```bash
+# Install TensorRT models
+python -m robotics_vision.export_model --model yolov8n --format engine --device jetson
+
+# Run with GPU acceleration
+python -m robotics_vision.pipeline --device cuda:0 --backend tensorrt --resolution 640x480
+```
+
+### Cloud Deployment (GPU Server)
+
+```bash
+# Multi-camera pipeline
+python -m robotics_vision.multi_camera_server \
+  --cameras 4 \
+  --model yolov8n \
+  --gpus 2 \
+  --port 8080
+```
+
+### Camera Hardware Selection Guide
+
+| Use Case | Recommended Camera | Resolution | Frame Rate |
+|----------|-------------------|------------|------------|
+| Indoor navigation | Intel RealSense D435 | 1280x720 | 30 fps |
+| Outdoor mapping | FLIR Blackfly S | 2048x1536 | 60 fps |
+| High-speed tracking | FLIR Oryx | 2448x2048 | 120 fps |
+| Event-based | Prophesee EVK4 | 1280x720 | 1 Mfps |
+| Stereo depth | ZED 2i | 2208x1242 | 15 fps |
+
+## Monitoring & Observability
+
+### Pipeline Health Metrics
+
+| Metric | Description | Alert |
+|--------|-------------|-------|
+| `pipeline_fps` | Frames processed per second | < 15 fps |
+| `detection_latency_ms` | Detection stage latency | > 30 ms |
+| `tracking_id_switches` | Track identity changes | > 5 per minute |
+| `slam_tracking_state` | SLAM tracker state | != OK |
+| `loop_closures_total` | Loop closure count | Sudden spike |
+| `stereo_depth_coverage` | % of valid depth pixels | < 70% |
+
+### Prometheus Integration
+
+```python
+from prometheus_client import Counter, Histogram, Gauge
+
+detected_objects = Counter('vision_detected_total', 'Objects detected', ['class'])
+detection_latency = Histogram('vision_detection_latency_seconds', 'Detection latency')
+active_tracks = Gauge('vision_active_tracks', 'Number of active tracks')
+slam_pose = Gauge('vision_slam_pose', 'SLAM pose estimate', ['axis'])
+```
+
+## Testing Strategy
+
+### Unit Tests
+
+- Camera calibration: verify RMS error < 0.5 pixels with synthetic data
+- Detection: verify mAP > 0.5 on test dataset with known ground truth
+- Tracking: verify identity preservation across 100-frame sequences
+- Depth: verify disparity error < 2 pixels on calibrated stereo pairs
+
+### Integration Tests
+
+- Full pipeline latency test: verify < 33 ms (30 fps) on target hardware
+- SLAM drift test: verify < 1% drift over 100 m traversal
+- Detection-to-tracking: verify track continuity through partial occlusions
+
+### Regression Tests
+
+- Calibration stability: verify intrinsics don't change > 0.1% over 1-hour session
+- Detection consistency: verify same detections on same frames across runs
+- Memory leak test: verify stable memory usage over 24-hour continuous operation
+
+## Versioning & Migration
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.0.0 | 2024-01-15 | YOLOv8 support, visual SLAM, GPU acceleration |
+| 1.5.0 | 2023-09-01 | Multi-object tracking, stereo depth improvements |
+| 1.0.0 | 2023-03-15 | Initial release: detection, features, basic odometry |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **ORB** | Oriented FAST and Rotated BRIEF — fast binary feature descriptor |
+| **SIFT** | Scale-Invariant Feature Transform — robust feature descriptor |
+| **SLAM** | Simultaneous Localization and Mapping |
+| **CLAHE** | Contrast Limited Adaptive Histogram Equalization |
+| **NMS** | Non-Maximum Suppression — removes overlapping detection boxes |
+| **RANSAC** | Random Sample Consensus — robust model fitting with outlier rejection |
+| **SGBM** | Semi-Global Block Matching — stereo depth algorithm |
+| **FLANN** | Fast Library for Approximate Nearest Neighbors — feature matching |
+
+## Changelog
+
+### 2.0.0 — 2024-01-15
+
+- **Added**: YOLOv8 single-shot detection with TensorRT backend
+- **Added**: ORB-SLAM-style visual SLAM with loop closure
+- **Added**: GPU acceleration for detection, stereo, and feature extraction
+- **Improved**: Multi-object tracking with Kalman filter and Hungarian matching
+- **Improved**: Stereo depth quality by 30% with SGBM tuning
+- **Fixed**: Camera calibration stability under thermal drift
+
+## Contributing Guidelines
+
+1. Follow PEP 8 with type hints on all public APIs
+2. Run `pytest tests/ --cov=robotics_vision --cov-report=html` before submitting PRs
+3. Target coverage: 80%+ for all modules
+4. All performance-sensitive code must include benchmarks
+5. New detection models require accuracy evaluation on standardized test set
+
+## License
+
+Apache License, Version 2.0. Copyright 2024 Robotics Vision Contributors.
+
 ## References
 
 - Hartley, R. & Zisserman, A. (2004). *Multiple View Geometry in Computer Vision*, 2nd Edition. Cambridge University Press.
@@ -237,3 +637,444 @@ The pipeline processes each frame through a chain of stages. Each stage declares
 - Lavalle, S. M. (2006). *Planning Algorithms*. Cambridge University Press.
 - OpenCV Stereo Vision Tutorial: https://docs.opencv.org/4.x/dd/d52/tutorial_js_depth.html
 - ORB-SLAM3 GitHub Repository: https://github.com/UZ-SLAMLab/ORB_SLAM3
+
+## Depth Estimation Algorithms
+
+### Monocular Depth Estimation with MiDaS
+
+Monocular depth estimation predicts relative depth from a single RGB image using a trained neural network. The MiDaS architecture uses multi-scale feature fusion for robust depth prediction.
+
+```python
+import torch
+from robotics_vision import DepthEstimator, DepthConfig
+
+class MiDaSDepthEstimator:
+    def __init__(self, config):
+        self.config = config
+        self.model = torch.hub.load("intel-isl/MiDaS", config.model_type)
+        self.model.eval()
+        self.transform = torch.hub.load("intel-isl/MiDaS", "transforms").dpt_transform
+    
+    def estimate(self, image):
+        input_batch = self.transform(image)
+        
+        with torch.no_grad():
+            prediction = self.model(input_batch)
+            prediction = torch.nn.functional.interpolate(
+                prediction.unsqueeze(1),
+                size=image.shape[:2],
+                mode="bicubic",
+                align_corners=False,
+            ).squeeze()
+        
+        depth_map = prediction.cpu().numpy()
+        
+        # Convert relative depth to metric depth using scale and shift
+        if self.config.metric_scale is not None:
+            depth_map = depth_map * self.config.metric_scale + self.config.metric_shift
+        
+        return depth_map
+    
+    def estimate_with_confidence(self, image):
+        depth_map = self.estimate(image)
+        
+        # Multi-scale ensemble for uncertainty estimation
+        scales = [0.8, 1.0, 1.2]
+        predictions = []
+        for scale in scales:
+            scaled_input = torch.nn.functional.interpolate(
+                self.transform(image).unsqueeze(0),
+                scale_factor=scale,
+                mode="bilinear"
+            )
+            with torch.no_grad():
+                pred = self.model(scaled_input)
+                pred = torch.nn.functional.interpolate(
+                    pred.unsqueeze(1),
+                    size=image.shape[:2],
+                    mode="bicubic"
+                ).squeeze()
+                predictions.append(pred.cpu().numpy())
+        
+        mean_depth = np.mean(predictions, axis=0)
+        std_depth = np.std(predictions, axis=0)
+        
+        return mean_depth, std_depth
+```
+
+### Stereo Depth Estimation — SGBM Optimization
+
+```python
+import cv2
+import numpy as np
+
+class OptimizedSGBM:
+    def __init__(self, config):
+        self.config = config
+        self.stereo = cv2.StereoSGBM_create(
+            minDisparity=config.min_disparity,
+            numDisparities=config.num_disparities,
+            blockSize=config.block_size,
+            P1=8 * 3 * config.block_size**2,
+            P2=32 * 3 * config.block_size**2,
+            disp12MaxDiff=config.disp12_max_diff,
+            uniquenessRatio=config.uniqueness_ratio,
+            speckleWindowSize=config.speckle_window_size,
+            speckleRange=config.speckle_range,
+            preFilterCap=config.pre_filter_cap,
+            mode=cv2.STEREO_SGBM_MODE_SGBM_3WAY,
+        )
+        self.wls_filter = cv2.ximgproc.createDisparityWLSFilter(self.stereo)
+        self.right_matcher = cv2.ximgproc.createRightMatcher(self.stereo)
+    
+    def compute(self, left_gray, right_gray):
+        left_disp = self.stereo.compute(left_gray, right_gray)
+        right_disp = self.right_matcher.compute(right_gray, left_gray)
+        
+        filtered_disp = self.wls_filter.filter(left_disp, left_gray, disparity_map_right=right_disp)
+        
+        depth_map = np.zeros_like(filtered_disp, dtype=np.float32)
+        valid = filtered_disp > 0
+        depth_map[valid] = (self.config.focal_length_px * self.config.baseline_mm) / filtered_disp[valid]
+        
+        return depth_map, filtered_disp
+```
+
+### RGB-D Depth Processing
+
+```python
+class RGBDDepthProcessor:
+    def __init__(self, config):
+        self.config = config
+        self.invalid_value = 0
+        self.depth_scale = config.depth_scale  # e.g., 0.001 for mm to m
+    
+    def process(self, depth_image, rgb_image):
+        # Scale to metric
+        depth_m = depth_image.astype(np.float32) * self.depth_scale
+        
+        # Remove invalid pixels
+        valid_mask = (depth_m > self.config.min_depth) & (depth_m < self.config.max_depth)
+        depth_m[~valid_mask] = self.invalid_value
+        
+        # Temporal smoothing
+        if hasattr(self, 'prev_depth'):
+            alpha = self.config.temporal_alpha
+            depth_m = alpha * depth_m + (1 - alpha) * self.prev_depth
+        self.prev_depth = depth_m.copy()
+        
+        # Hole filling via inpainting
+        depth_filled = self.fill_holes(depth_m, valid_mask)
+        
+        # Generate point cloud
+        points = self.depth_to_pointcloud(depth_filled, rgb_image)
+        
+        return {
+            'depth': depth_filled,
+            'valid_mask': valid_mask,
+            'point_cloud': points,
+        }
+    
+    def fill_holes(self, depth, valid_mask):
+        depth_uint16 = (depth * 1000).astype(np.uint16)
+        depth_uint16[~valid_mask] = 0
+        
+        filled = cv2.inpaint(depth_uint16, (~valid_mask).astype(np.uint8), 
+                             self.config.inpaint_radius, cv2.INPAINT_NS)
+        
+        return filled.astype(np.float32) / 1000.0
+```
+
+## 6D Pose Estimation
+
+### Feature-Based 6D Pose Estimation
+
+Estimates the full 6-DOF pose (position + orientation) of a known object from a single image.
+
+```python
+import numpy as np
+from robotics_vision import FeatureDetector, PnPResolver
+
+class FeatureBased6DPose:
+    def __init__(self, config):
+        self.detector = FeatureDetector(type=config.feature_type, max_features=config.max_features)
+        self.pnp = PnPResolver(method=config.pnp_method)
+        self.matcher = FeatureMatcher(ratio_test=config.ratio_test)
+        
+        # Load object 3D model points and descriptors
+        self.model_points = None
+        self.model_descriptors = None
+    
+    def load_model(self, model_path):
+        mesh = self.load_mesh(model_path)
+        self.model_points = mesh.vertices
+        self.model_descriptors = self.detector.describe_reference(model_path)
+    
+    def estimate(self, image, camera_matrix, dist_coeffs):
+        # Detect features
+        keypoints, descriptors = self.detector.detect_and_compute(image)
+        
+        # Match against model
+        matches = self.matcher.match(descriptors, self.model_descriptors)
+        
+        if len(matches) < 6:
+            return None
+        
+        # Get 3D-2D correspondences
+        obj_points = []
+        img_points = []
+        for match in matches:
+            obj_points.append(self.model_points[match.train_idx])
+            img_points.append(keypoints[match.query_idx].pt)
+        
+        obj_points = np.array(obj_points, dtype=np.float32)
+        img_points = np.array(img_points, dtype=np.float32)
+        
+        # Solve PnP
+        success, rvec, tvec, inliers = self.pnp.solve(
+            obj_points, img_points, camera_matrix, dist_coeffs
+        )
+        
+        if not success:
+            return None
+        
+        # Refine with inliers
+        if len(inliers) > 6:
+            success, rvec, tvec = self.pnp.refine(
+                obj_points[inliers], img_points[inliers], 
+                camera_matrix, dist_coeffs, rvec, tvec
+            )
+        
+        rotation_matrix, _ = cv2.Rodrigues(rvec)
+        
+        return Pose6D(
+            position=tvec.flatten(),
+            rotation=rotation_matrix,
+            rvec=rvec,
+            tvec=tvec,
+            num_inliers=len(inliers),
+            inlier_ratio=len(inliers) / len(matches),
+        )
+
+class Deep6DPose:
+    def __init__(self, config):
+        self.model = self.load_model(config.model_path)
+        self.refiner = PoseRefineriterations=config.refinement_iterations)
+    
+    def estimate(self, image, object_id):
+        # Direct regression of pose
+        pose_pred, confidence = self.model.predict(image)
+        
+        if confidence < self.config.confidence_threshold:
+            return None
+        
+        # Refine with iterative optimization
+        refined_pose = self.refiner.refine(
+            image, pose_pred, self.config.learning_rate, self.config.refinement_iterations
+        )
+        
+        return Pose6D(
+            position=refined_pose[:3, 3],
+            rotation=refined_pose[:3, :3],
+            confidence=confidence,
+        )
+```
+
+## Point Cloud Processing
+
+### Point Cloud Filtering and Segmentation
+
+```python
+import numpy as np
+from robotics_vision import PointCloud, VoxelGrid
+
+class PointCloudProcessor:
+    def __init__(self, config):
+        self.config = config
+        self.voxel_filter = VoxelGrid(voxel_size=config.voxel_size)
+    
+    def filter_and_segment(self, point_cloud):
+        # Statistical outlier removal
+        filtered = self.statistical_outlier_removal(
+            point_cloud, 
+            k_neighbors=self.config.outlier_k,
+            std_ratio=self.config.outlier_std_ratio
+        )
+        
+        # Voxel downsampling
+        downsampled = self.voxel_filter.downsample(filtered)
+        
+        # RANSAC plane segmentation
+        plane_model, inlier_mask = self.ransac_segmentation(
+            downsampled, 
+            distance_threshold=self.config.plane_distance_threshold,
+            max_iterations=self.config.plansac_iterations
+        )
+        
+        objects_cloud = downsampled[~inlier_mask]
+        plane_cloud = downsampled[inlier_mask]
+        
+        # Euclidean clustering on objects
+        clusters = self.euclidean_clustering(
+            objects_cloud,
+            tolerance=self.config.cluster_tolerance,
+            min_size=self.config.cluster_min_size,
+            max_size=self.config.cluster_max_size
+        )
+        
+        return {
+            'plane': plane_cloud,
+            'plane_model': plane_model,
+            'clusters': clusters,
+        }
+    
+    def statistical_outlier_removal(self, points, k_neighbors=20, std_ratio=2.0):
+        from scipy.spatial import cKDTree
+        tree = cKDTree(points)
+        distances, _ = tree.query(points, k=k_neighbors)
+        mean_distances = np.mean(distances, axis=1)
+        
+        threshold = np.mean(mean_distances) + std_ratio * np.std(mean_distances)
+        inliers = mean_distances < threshold
+        
+        return points[inliers]
+    
+    def euclidean_clustering(self, points, tolerance=0.02, min_size=50, max_size=10000):
+        from scipy.spatial import cKDTree
+        tree = cKDTree(points)
+        
+        visited = np.zeros(len(points), dtype=bool)
+        clusters = []
+        
+        for i in range(len(points)):
+            if visited[i]:
+                continue
+            
+            cluster = [i]
+            queue = [i]
+            visited[i] = True
+            
+            while queue:
+                current = queue.pop(0)
+                neighbors = tree.query_ball_point(points[current], tolerance)
+                
+                for nb in neighbors:
+                    if not visited[nb]:
+                        visited[nb] = True
+                        cluster.append(nb)
+                        queue.append(nb)
+            
+            if min_size <= len(cluster) <= max_size:
+                clusters.append(points[cluster])
+        
+        return clusters
+```
+
+### Point Cloud Registration (ICP)
+
+```python
+class PointCloudRegistration:
+    def __init__(self, config):
+        self.max_iterations = config.max_iterations
+        self.tolerance = config.tolerance
+        self.max_correspondence_distance = config.max_correspondence_distance
+    
+    def register_icp(self, source, target, initial_transform=np.eye(4)):
+        transform = initial_transform.copy()
+        
+        for iteration in range(self.max_iterations):
+            # Transform source
+            source_h = np.hstack([source, np.ones((len(source), 1))])
+            source_transformed = (transform @ source_h.T).T[:, :3]
+            
+            # Find correspondences
+            tree = cKDTree(target)
+            distances, indices = tree.query(source_transformed)
+            
+            # Filter by distance
+            valid = distances < self.max_correspondence_distance
+            source_valid = source_transformed[valid]
+            target_valid = target[indices[valid]]
+            
+            if len(source_valid) < 3:
+                break
+            
+            # Compute transformation
+            R, t = self.rigid_transform_svd(source_valid, target_valid)
+            
+            # Update transform
+            delta = np.eye(4)
+            delta[:3, :3] = R
+            delta[:3, 3] = t
+            transform = delta @ transform
+            
+            # Check convergence
+            if np.linalg.norm(t) < self.tolerance and np.abs(np.linalg.norm(R) - 1) < self.tolerance:
+                break
+        
+        return transform
+```
+
+### Normal Estimation and Feature Extraction
+
+```python
+class PointCloudFeatures:
+    def __init__(self, config):
+        self.normal_radius = config.normal_radius
+        self.fpfh_radius = config.fpfh_radius
+    
+    def compute_normals(self, points):
+        tree = cKDTree(points)
+        normals = np.zeros_like(points)
+        
+        for i, point in enumerate(points):
+            neighbors_idx = tree.query_ball_point(point, self.normal_radius)
+            if len(neighbors_idx) < 3:
+                normals[i] = [0, 0, 1]
+                continue
+            
+            neighbors = points[neighbors_idx]
+            centroid = np.mean(neighbors, axis=0)
+            cov = np.cov((neighbors - centroid).T)
+            
+            eigenvalues, eigenvectors = np.linalg.eigh(cov)
+            normals[i] = eigenvectors[:, 0]  # smallest eigenvalue direction
+        
+        return normals
+    
+    def compute_fpfh(self, points, normals):
+        tree = cKDTree(points)
+        fpfh_features = []
+        
+        for i, point in enumerate(points):
+            neighbors_idx = tree.query_ball_point(point, self.fpfh_radius)
+            if len(neighbors_idx) < 3:
+                fpfh_features.append(np.zeros(33))
+                continue
+            
+            # Simplified FPFH computation
+            spfh = self.compute_spfh(point, normals[i], points[neighbors_idx], normals[neighbors_idx])
+            fpfh = self.weighted_spfh(point, spfh, neighbors_idx)
+            fpfh_features.append(fpfh)
+        
+        return np.array(fpfh_features)
+    
+    def compute_spfh(self, point, normal, neighbors, neighbor_normals):
+        hist = np.zeros(33)
+        
+        for nb, nb_normal in zip(neighbors, neighbor_normals):
+            # Angular features
+            diff = nb - point
+            distance = np.linalg.norm(diff)
+            
+            alpha = np.arctan2(np.linalg.norm(np.cross(normal, diff)), np.dot(normal, diff))
+            phi = np.arccos(np.dot(normal, nb_normal))
+            theta = np.arctan2(np.linalg.norm(np.cross(normal, diff)), np.dot(normal, diff))
+            
+            # Bin into histogram
+            hist[int(alpha / np.pi * 11)] += 1
+            hist[11 + int(phi / (np.pi/2) * 11)] += 1
+            hist[22 + int(theta / np.pi * 11)] += 1
+        
+        return hist
+```

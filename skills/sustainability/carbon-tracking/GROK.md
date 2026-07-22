@@ -198,3 +198,600 @@ config = {
 - [green-it](../green-it/GROK.md) — IT infrastructure sustainability and PUE optimization. Supplies electricity consumption data and embodied carbon figures for IT assets.
 - [renewable-energy](../renewable-energy/GROK.md) — Renewable energy procurement and certificate tracking. Enables market-based Scope 2 calculations using RECs and PPAs.
 - [circular-economy](../circular-economy/GROK.md) — Material flow analysis and lifecycle emissions. Provides embodied carbon and end-of-life emissions data for Scope 3 Category 1 (Purchased Goods).
+
+---
+
+## Advanced Configuration
+
+The carbon tracking module supports advanced configuration for emission factor sources, calculation methodologies, and reporting granularity. These options are available through the `AdvancedConfig` class or via environment variables.
+
+```python
+from carbon_tracking import AdvancedConfig
+
+config = AdvancedConfig(
+    # Emission factor database
+    factor_source="epa",  # epa, defra, iea, custom
+    factor_vintage="latest",
+    factor_update_auto=True,
+    factor_custom_db_path="/data/custom_factors.db",
+
+    # Calculation precision
+    calculation_precision_decimal_places=6,
+    uncertainty_propagation="monte_carlo",  # monte_carlo, analytical, none
+    monte_carlo_iterations=10000,
+
+    # Scope 2 methodology
+    scope2_method="market_based",  # location_based, market_based, dual
+    market_based_data_quality_threshold=0.7,
+
+    # Scope 3 estimation
+    scope3_estimation_method="activity_based",  # activity_based, spend_based, average
+    scope3_data_quality_matrix=True,
+    scope3_materiality_threshold_percent=5,
+
+    # Reporting
+    reporting_standard="ghg_protocol",  # ghg_protocol, cdp, tcfd, custom
+    currency_inflation_adjusted=True,
+    base_year_currency="usd_2020",
+
+    # Audit trail
+    audit_trail_enabled=True,
+    audit_trail_retention_years=7,
+    audit_trail_hash_algorithm="sha256"
+)
+```
+
+### Emission Factor Configuration
+
+```python
+from carbon_tracking import EmissionFactorConfig
+
+ef_config = EmissionFactorConfig(
+    # Primary sources
+    primary_source="epa_egrid",
+    fallback_sources=["defra_2024", "iea_2023"],
+
+    # Regional granularity
+    regional_granularity="state",  # country, state, subregion, utility
+    custom_factors={
+        ("US-CA", "electricity"): 0.21,  # kgCO2e/kWh
+        ("DE", "electricity"): 0.35,
+        ("CN", "electricity"): 0.58
+    },
+
+    # Update schedule
+    auto_update=True,
+    update_check_interval_days=30,
+    notification_email="sustainability@company.com"
+)
+```
+
+## Architecture Patterns
+
+### Event Sourcing for Emissions Tracking
+
+Every emission calculation is stored as an immutable event, enabling full audit trails:
+
+```python
+from carbon_tracking import EmissionEventStore, EmissionEvent
+
+store = EmissionEventStore(database="postgresql://localhost/carbon")
+
+# Record an emission event
+event = EmissionEvent(
+    entity="Acme Corp",
+    scope="scope_1",
+    category="stationary_combustion",
+    source="Natural gas boilers",
+    activity_data=50000,
+    unit="therms",
+    emission_factor=5.301,
+    factor_source="EPA",
+    emissions_kgCO2=265050,
+    calculation_method="activity_based",
+    timestamp="2025-01-15T10:00:00Z"
+)
+store.append(event)
+
+# Replay events for audit
+events = store.get_events(
+    entity="Acme Corp",
+    fiscal_year=2025,
+    scope="scope_1"
+)
+```
+
+### CQRS for Reporting vs. Calculation
+
+Separate read and write models for emissions data:
+
+```python
+from carbon_tracking import EmissionWriteModel, EmissionReadModel
+
+write_model = EmissionWriteModel()
+read_model = EmissionReadModel()
+
+# Write: add new emissions
+write_model.add_emission(scope="scope_2", kwh=8500000, factor=0.417)
+
+# Read: query aggregated data
+total = read_model.get_scope_total(
+    entity="Acme Corp",
+    scope="scope_2",
+    method="location_based"
+)
+```
+
+### Saga Pattern for Multi-Entity Reporting
+
+```python
+from carbon_tracking import ReportingSaga
+
+saga = ReportingSaga(
+    entity="Global Corp",
+    subsidiaries=["subsidiary_a", "subsidiary_b", "subsidiary_c"]
+)
+
+# Execute cross-entity reporting
+report = saga.execute(
+    fiscal_year=2025,
+    boundary_method="operational_control",
+    consolidation_method="controlled_entity"
+)
+```
+
+## Integration Guide
+
+### ERP Integration
+
+```python
+from carbon_tracking import ERPConnector
+
+# SAP integration
+sap = ERPConnector(
+    platform="sap",
+    api_url="https://erp.internal/api",
+    credentials_file="/etc/carbon-tracking/erp-credentials.json"
+)
+
+# Import fuel purchase data
+fuel_data = sap.get_fuel_purchases(fiscal_year=2025)
+for purchase in fuel_data:
+    calc.add_scope1(
+        category="stationary_combustion",
+        source=purchase.fuel_type,
+        activity_data=purchase.quantity,
+        unit=purchase.unit
+    )
+
+# Import electricity meter data
+electricity = sap.get_electricity_readings(fiscal_year=2025)
+for reading in electricity:
+    calc.add_scope2(
+        category="purchased_electricity",
+        source=reading.facility,
+        activity_data=reading.kwh,
+        unit="kWh"
+    )
+```
+
+### CDP Integration
+
+```python
+from carbon_tracking import CDPReporter
+
+reporter = CDPReporter(company_id="C-12345")
+
+# Generate CDP questionnaire responses
+cdp_response = reporter.generate_response(
+    fiscal_year=2025,
+    emissions_data=calc.generate_report(),
+    reduction_targets=tracker.get_targets()
+)
+
+# Submit to CDP portal
+reporter.submit(cdp_response)
+```
+
+### Watershed/Climatiq Integration
+
+```python
+from carbon_tracking import ClimatiqClient, WatershedClient
+
+# Climatiq emission factor lookup
+climatiq = ClimatiqClient(api_key="your-key")
+factor = climatiq.get_emission_factor(
+    activity="electricity",
+    region="US-CA",
+    unit="kWh"
+)
+
+# Watershed carbon accounting
+watershed = WatershedClient(api_key="your-key")
+watershed.import_emissions(
+    entity="Acme Corp",
+    emissions=calc.generate_report()
+)
+```
+
+## Performance Optimization
+
+### Batch Calculation
+
+For organizations with millions of emission records, batch processing is essential:
+
+```python
+from carbon_tracking import BatchCalculator
+
+calculator = BatchCalculator(
+    batch_size=10000,
+    parallel_workers=4,
+    use_multiprocessing=True
+)
+
+# Process large datasets efficiently
+results = calculator.calculate_batch(
+    records=large_emission_records,
+    scope="scope_3",
+    method="spend_based"
+)
+print(f"Processed {results.record_count} records in {results.elapsed_seconds:.1f}s")
+```
+
+### Cached Emission Factors
+
+```python
+from carbon_tracking import CachedFactorLookup
+
+lookup = CachedFactorLookup(
+    cache_backend="redis",
+    cache_ttl_seconds=86400,  # 24 hours
+    precompute_common=True
+)
+
+# Fast lookup for frequently used factors
+factor = lookup.get(
+    activity="electricity",
+    region="US-CA",
+    year=2025
+)
+```
+
+## Security Considerations
+
+### Data Encryption
+
+Emissions data may contain sensitive business information. Encrypt at rest and in transit:
+
+```python
+from carbon_tracking import EncryptedEmissionStore
+
+store = EncryptedEmissionStore(
+    database="postgresql://localhost/carbon",
+    encryption_key_ref="aws_kms:carbon-data-key",
+    column_level_encryption=["activity_data", "emission_factor"],
+    audit_logging=True
+)
+```
+
+### Access Control
+
+```python
+from carbon_tracking import RBACManager
+
+rbac = RBACManager()
+
+# Define roles
+rbac.define_role("sustainability_analyst", permissions=["read", "calculate"])
+rbac.define_role("cso", permissions=["read", "calculate", "report", "audit"])
+rbac.define_role("auditor", permissions=["read", "audit"])
+
+# Assign users
+rbac.assign_role("analyst@company.com", "sustainability_analyst")
+rbac.assign_role("cso@company.com", "cso")
+```
+
+## Troubleshooting Guide
+
+| Issue | Possible Cause | Resolution |
+|-------|---------------|------------|
+| Scope 2 market-based higher than location-based | Supplier emission factor above grid average | Verify supplier factor accuracy, check for errors |
+| Scope 3 totals seem too high | Spend-based factor too aggressive | Switch to activity-based where data available |
+| Carbon credit retirement not matching | Credits purchased but not retired | Execute retirement in CarbonCreditRegistry |
+| SBTi progress off-track | Emissions not declining fast enough | Review reduction targets, identify high-emission sources |
+| Emission factors outdated | Using previous year's factors | Update factor database, enable auto-update |
+
+```python
+# Diagnostic script
+from carbon_tracking import DiagnosticRunner
+
+diag = DiagnosticRunner(entity="Acme Corp", fiscal_year=2025)
+results = diag.run_all()
+for check in results:
+    status = "PASS" if check.passed else "FAIL"
+    print(f"[{status}] {check.name}: {check.message}")
+```
+
+## API Reference
+
+### GHGCalculator
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `add_scope1(...)` | category, source, data, unit, factor | `None` | Add Scope 1 emission source |
+| `add_scope2(...)` | category, source, data, unit, factor, method | `None` | Add Scope 2 emission source |
+| `add_scope3(...)` | category, source, data/factor, quality | `None` | Add Scope 3 emission source |
+| `generate_report()` | - | `EmissionsReport` | Generate consolidated report |
+
+### CarbonCreditRegistry
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `purchase(...)` | credits, standard, project, vintage, price | `Purchase` | Purchase carbon credits |
+| `retire(...)` | credits, standard, reason | `Retirement` | Retire credits against emissions |
+| `balance(standard)` | standard: str | `int` | Get current credit balance |
+
+### ReductionTracker
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `calculate_progress(...)` | year, emissions | `ProgressReport` | Calculate reduction progress |
+| `project_trajectory(...)` | years | `Trajectory` | Project future emissions path |
+| `get_annual_targets()` | - | `List[Target]` | Get yearly reduction targets |
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional, List
+
+@dataclass
+class EmissionsReport:
+    entity: str
+    fiscal_year: int
+    scope1_total_tonnes: float
+    scope2_total_tonnes: float
+    scope3_total_tonnes: float
+    grand_total_tonnes: float
+    scope1_sources: List[dict]
+    scope2_sources: List[dict]
+    scope3_sources: List[dict]
+    generation_timestamp: datetime
+
+@dataclass
+class CarbonCredit:
+    credits: int
+    standard: str
+    project: str
+    vintage: int
+    registry_id: str
+    price_per_tonne: float
+    purchase_date: str
+    status: str  # active, retired, transferred
+
+@dataclass
+class ReductionProgress:
+    base_year: int
+    base_emissions: float
+    current_year: int
+    current_emissions: float
+    percent_reduced: float
+    on_track: bool
+    annual_reduction_needed_tonnes: float
+```
+
+## Deployment Guide
+
+### Docker Deployment
+
+```dockerfile
+FROM python:3.11-slim
+
+RUN pip install carbon-tracking[all]
+
+COPY config.yaml /etc/carbon-tracking/config.yaml
+
+HEALTHCHECK --interval=30s --timeout=5s \
+  CMD python -c "from carbon_tracking import health_check; health_check()"
+
+ENTRYPOINT ["carbon-tracking"]
+CMD ["serve", "--config", "/etc/carbon-tracking/config.yaml"]
+```
+
+### Kubernetes Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: carbon-tracking
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: carbon-tracking
+  template:
+    spec:
+      containers:
+      - name: carbon-tracking
+        image: carbon-tracking:1.0.0
+        env:
+        - name: CARBON_TRACKING_DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: carbon-db
+              key: url
+```
+
+## Monitoring & Observability
+
+### Metrics Collection
+
+```python
+from carbon_tracking import MetricsCollector
+
+collector = MetricsCollector()
+
+# Register custom metrics
+collector.register_gauge("total_emissions_tonnes", "Total emissions by scope")
+collector.register_counter("calculations_total", "Total emission calculations")
+collector.register_histogram("calculation_duration_seconds", "Calculation time")
+```
+
+### Audit Trail
+
+```python
+from carbon_tracking import AuditTrail
+
+audit = AuditTrail(retention_years=7)
+
+# Every calculation is automatically logged
+audit.log(
+    operation="scope2_calculation",
+    entity="Acme Corp",
+    user="analyst@company.com",
+    details={"kwh": 8500000, "factor": 0.417}
+)
+
+# Query audit trail
+logs = audit.query(
+    entity="Acme Corp",
+    start_date="2025-01-01",
+    end_date="2025-12-31"
+)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from carbon_tracking import GHGCalculator, CarbonCreditRegistry
+
+class TestGHGCalculator:
+    def test_scope1_calculation(self):
+        calc = GHGCalculator(fiscal_year=2025)
+        calc.add_scope1(
+            category="stationary_combustion",
+            source="Natural gas",
+            activity_data=50000,
+            unit="therms",
+            emission_factor=5.301
+        )
+        report = calc.generate_report()
+        assert report.scope1_total_tonnes == pytest.approx(265.05, rel=0.01)
+
+    def test_scope2_dual_report(self):
+        calc = GHGCalculator(fiscal_year=2025)
+        calc.add_scope2(
+            category="purchased_electricity",
+            source="US operations",
+            activity_data=8500000,
+            unit="kWh",
+            grid_emission_factor=0.417,
+            method="location_based"
+        )
+        report = calc.generate_report()
+        assert report.scope2_total_tonnes > 0
+
+class TestCarbonCreditRegistry:
+    def test_purchase_and_retire(self):
+        registry = CarbonCreditRegistry()
+        registry.purchase(
+            credits=1000,
+            standard="verra_vcs",
+            project="wind_farm",
+            vintage=2024,
+            price_per_tonne=12.50
+        )
+        assert registry.balance("verra_vcs") == 1000
+        registry.retire(credits=500, standard="verra_vcs", reason="offset")
+        assert registry.balance("verra_vcs") == 500
+```
+
+## Versioning & Migration
+
+### Semantic Versioning
+
+- **MAJOR**: Breaking changes to API, calculation methodology changes
+- **MINOR**: New emission factor sources, new reporting standards
+- **PATCH**: Bug fixes, performance improvements
+
+### Migration Guide
+
+```python
+# v1.x to v2.x migration
+# Old API
+calc = GHGCalculator(year=2025)
+
+# New API
+calc = GHGCalculator(fiscal_year=2025, reporting_entity="Acme Corp")
+```
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **GHG Protocol** | Global standard for corporate greenhouse gas accounting |
+| **Scope 1** | Direct emissions from owned or controlled sources |
+| **Scope 2** | Indirect emissions from purchased electricity, steam, heating, cooling |
+| **Scope 3** | All other indirect emissions across 15 value chain categories |
+| **SBTi** | Science-Based Targets initiative — validates corporate climate targets |
+| **CDP** | Carbon Disclosure Project — environmental disclosure platform |
+| **TCFD** | Task Force on Climate-related Financial Disclosures |
+| **REC** | Renewable Energy Certificate — proof of renewable electricity generation |
+| **tCO2e** | Tonnes of CO2 equivalent — standard unit for GHG emissions |
+| **Emission Factor** | Coefficient converting activity data to emissions (kgCO2e/unit) |
+
+## Changelog
+
+### v1.0.0 (2025-01-15)
+- Initial release with GHG Protocol implementation
+- Scope 1/2/3 emissions calculation
+- Carbon credit management
+- SBTi target tracking
+
+### v1.1.0 (2025-02-01)
+- Added CDP reporting integration
+- Improved Scope 3 data quality scoring
+- Added multi-entity consolidation
+
+### v1.2.0 (2025-03-01)
+- Added Climatiq and Watershed integration
+- Performance improvements for large datasets
+- Added audit trail functionality
+
+## Contributing Guidelines
+
+1. **Fork the repository** and create a feature branch from `main`
+2. **Write tests** for all new functionality with >80% coverage
+3. **Follow PEP 8** style guidelines with type hints
+4. **Update documentation** for any API changes
+5. **Add changelog entries** under `[Unreleased]` section
+6. **Submit a pull request** with a clear description of changes
+
+### Code Review Checklist
+
+- [ ] Tests pass and coverage meets threshold
+- [ ] Calculation methodology follows GHG Protocol
+- [ ] Emission factors are sourced and versioned
+- [ ] Audit trail captures all calculations
+- [ ] No hardcoded emission factors (use database)
+
+## License
+
+This module is licensed under the Apache License, Version 2.0. See the LICENSE file for full terms.
+
+Copyright 2025 Carbon Tracking Contributors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

@@ -225,3 +225,1134 @@ print(f"Seasonal Pattern Similarity: {seasonal_results['score']:.4f}")
 *   [privacy-preservation](../privacy-preservation/GROK.md): Tools to improve privacy, which will impact the metrics in this module.
 *   [augmentation](../augmentation/GROK.md): Techniques that produce augmented data to be validated.
 *   [domain-specific](../domain-specific/GROK.md): Domain-specific validation rules (e.g., ensuring medical codes are valid).
+
+---
+
+## Advanced Configuration
+
+The `quality-validation` module supports detailed configuration of every validation metric through YAML files or programmatic APIs.
+
+### Configuration File Format
+
+```yaml
+# validation_config.yaml
+validation:
+  default_metrics:
+    - "ks_test"
+    - "wasserstein"
+    - "correlation_preservation"
+    - "ml_utility"
+
+ks_test:
+  significance_level: 0.05
+  alternative: "two-sided"
+  method: "auto"  # "auto", "exact", "approx"
+
+wasserstein:
+  normalize: true
+  max_samples: 10000
+
+correlation:
+  methods: ["pearson", "spearman"]
+  threshold: 0.1
+
+ml_utility:
+  model_type: "xgboost"
+  test_size: 0.2
+  cross_validation: 5
+  metrics: ["auc", "accuracy", "f1"]
+
+detector:
+  model_type: "random_forest"
+  n_estimators: 100
+  threshold: 0.5
+
+report:
+  format: "html"
+  include_visualizations: true
+  output_path: "./reports/"
+```
+
+### Programmatic Configuration
+
+```python
+from quality_validation import ValidationConfig, ValidationSuite
+
+config = ValidationConfig(
+    metrics=["ks_test", "wasserstein", "correlation_preservation", "ml_utility"],
+    ks_significance=0.05,
+    wasserstein_normalize=True,
+    correlation_methods=["pearson", "spearman"],
+    ml_model_type="xgboost",
+    ml_cv_folds=5,
+    report_format="html",
+    output_path="./reports/"
+)
+
+suite = ValidationSuite(config=config)
+```
+
+### Environment-Specific Overrides
+
+```bash
+# Override validation settings via environment
+export VALIDATION_METRICS="ks_test,wasserstein,ml_utility"
+export VALIDATION_KS_SIGNIFICANCE=0.01
+export VALIDATION_ML_MODEL="random_forest"
+export VALIDATION_REPORT_FORMAT="pdf"
+export VALIDATION_OUTPUT_PATH="/var/reports/"
+```
+
+### Dynamic Configuration Updates
+
+```python
+from quality_validation import DynamicConfigManager
+
+config_manager = DynamicConfigManager(config_path="validation_config.yaml")
+
+# Register callbacks for configuration changes
+@config_manager.on_change("ml_utility.model_type")
+def update_model(new_value):
+    print(f"ML model updated to {new_value}")
+    suite.update_config(ml_model_type=new_value)
+
+# Hot-reload configuration
+config_manager.reload()
+```
+
+---
+
+## Architecture Patterns
+
+### Strategy Pattern for Metrics
+
+The module uses a strategy pattern where each metric is implemented as a separate strategy class.
+
+```python
+from quality_validation import MetricStrategy, ValidationSuite
+
+class CustomMetricStrategy(MetricStrategy):
+    def __init__(self, config):
+        self.config = config
+
+    def compute(self, real_data, synthetic_data):
+        # Custom metric computation
+        return {"score": 0.85, "details": {}}
+
+# Register custom metric
+ValidationSuite.register_metric("custom_metric", CustomMetricStrategy)
+
+# Use in validation
+suite = ValidationSuite(
+    real_data=real_data,
+    synthetic_data=synthetic_data,
+    metrics=["ks_test", "custom_metric"]
+)
+```
+
+### Composite Pattern for Reports
+
+```python
+from quality_validation import ReportComposite, ReportSection
+
+# Build a composite report
+report = ReportComposite()
+report.add(ReportSection("Statistical Fidelity", ks_results))
+report.add(ReportSection("Correlation Preservation", corr_results))
+report.add(ReportSection("ML Utility", ml_results))
+
+# Generate output
+report.generate(format="html", output_path="validation_report.html")
+```
+
+### Observer Pattern for Progress
+
+```python
+from quality_validation import ValidationSuite, ValidationObserver
+
+class ValidationProgressMonitor(ValidationObserver):
+    def on_metric_start(self, metric_name):
+        print(f"Starting {metric_name}...")
+
+    def on_metric_complete(self, metric_name, result):
+        print(f"Completed {metric_name}: {result['score']:.4f}")
+
+    def on_validation_complete(self, report):
+        print(f"Validation complete: {report['overall_score']:.4f}")
+
+suite = ValidationSuite(
+    real_data=real_data,
+    synthetic_data=synthetic_data
+)
+suite.add_observer(ValidationProgressMonitor())
+suite.run()
+```
+
+### Plugin Architecture
+
+```python
+from quality_validation import PluginRegistry
+
+@PluginRegistry.register("custom_validator")
+class CustomValidator:
+    def __init__(self, config):
+        self.config = config
+
+    def validate(self, real_data, synthetic_data):
+        # Custom validation logic
+        return {"passed": True, "score": 0.9, "details": {}}
+```
+
+---
+
+## Integration Guide
+
+### Integration with Data Generation
+
+```python
+from data_generation import TabularGenerator
+from quality_validation import ValidationSuite
+
+# Generate synthetic data
+generator = TabularGenerator(model_type="ctgan")
+generator.fit(real_data)
+synthetic_data = generator.generate(n_samples=10000)
+
+# Validate immediately
+suite = ValidationSuite(
+    real_data=real_data,
+    synthetic_data=synthetic_data
+)
+report = suite.generate_report()
+
+# Check if quality is acceptable
+if report["overall_score"] < 0.8:
+    print("Quality below threshold, retraining...")
+    generator.fit(real_data, epochs=500)
+```
+
+### Integration with Privacy Preservation
+
+```python
+from privacy_preservation import Anonymizer
+from quality_validation import PrivacyUtilityAnalyzer
+
+# Anonymize data
+anonymizer = Anonymizer(method="k-anonymity", k=5)
+anonymized = anonymizer.fit_transform(raw_data)
+
+# Analyze privacy-utility tradeoff
+analyzer = PrivacyUtilityAnalyzer()
+metrics = analyzer.evaluate(
+    real_data=raw_data,
+    synthetic_data=anonymized,
+    quasi_identifiers=["age", "zip"]
+)
+
+print(f"Utility retention: {metrics['utility_ratio']:.2%}")
+print(f"Privacy risk: {metrics['reidentification_risk']:.2%}")
+```
+
+### Integration with ML Pipelines
+
+```python
+from sklearn.pipeline import Pipeline
+from quality_validation import ValidationCallback
+
+# Add validation as a pipeline step
+validation_callback = ValidationCallback(
+    real_data=real_data,
+    metrics=["ml_utility"],
+    threshold=0.85
+)
+
+pipeline = Pipeline([
+    ("generate", TabularGenerator(model_type="ctgan")),
+    ("validate", validation_callback),
+    ("train", RandomForestClassifier())
+])
+
+# Validation runs automatically after generation
+pipeline.fit(X_train, y_train)
+```
+
+### Integration with CI/CD
+
+```yaml
+# .github/workflows/validate.yml
+name: Validate Synthetic Data
+on:
+  push:
+    paths:
+      - 'synthetic_data/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Validation
+        run: |
+          python -m quality_validation.cli \
+            --real-data data/real.csv \
+            --synthetic-data data/synthetic.csv \
+            --config validation_config.yaml \
+            --output reports/validation.json
+      - name: Check Quality Threshold
+        run: |
+          python -c "
+          import json
+          report = json.load(open('reports/validation.json'))
+          assert report['overall_score'] >= 0.8, 'Quality below threshold'
+          "
+```
+
+---
+
+## Performance Optimization
+
+### Parallel Metric Computation
+
+```python
+from quality_validation import ParallelValidator
+
+# Compute metrics in parallel
+parallel_validator = ParallelValidator(
+    n_workers=8,
+    metrics=["ks_test", "wasserstein", "correlation_preservation"]
+)
+
+results = parallel_validator.validate(
+    real_data=real_data,
+    synthetic_data=synthetic_data
+)
+```
+
+### Sampling Strategies
+
+```python
+from quality_validation import SamplingValidator
+
+# Use sampling for large datasets
+sampling_validator = SamplingValidator(
+    max_samples=10000,
+    sampling_method="stratified",
+    random_seed=42
+)
+
+results = sampling_validator.validate(
+    real_data=large_real_data,
+    synthetic_data=large_synthetic_data
+)
+```
+
+### Caching Results
+
+```python
+from quality_validation import CacheConfig, ValidationSuite
+
+cache_config = CacheConfig(
+    enabled=True,
+    cache_dir="/tmp/validation_cache",
+    max_size_gb=5,
+    ttl_hours=24
+)
+
+suite = ValidationSuite(
+    real_data=real_data,
+    synthetic_data=synthetic_data,
+    cache_config=cache_config
+)
+
+# Repeated validations use cached results
+report = suite.generate_report()  # Computes and caches
+report = suite.generate_report()  # Uses cache
+```
+
+### GPU Acceleration
+
+```python
+from quality_validation import GPUValidator
+
+gpu_validator = GPUValidator(
+    device="cuda:0",
+    metrics=["ks_test", "wasserstein"]
+)
+
+results = gpu_validator.validate(
+    real_data=real_data,
+    synthetic_data=synthetic_data
+)
+```
+
+---
+
+## Security Considerations
+
+### Data Integrity
+
+```python
+from quality_validation import IntegrityVerifier
+
+verifier = IntegrityVerifier(
+    algorithm="sha256",
+    store_path="/var/lib/validation_hashes"
+)
+
+# Store hash before validation
+original_hash = verifier.store_hash(real_data, identifier="real_data_v1")
+
+# Verify integrity after validation
+is_valid = verifier.verify_hash(
+    real_data,
+    identifier="real_data_v1",
+    original_hash=original_hash
+)
+```
+
+### Access Control
+
+```python
+from quality_validation import AccessControl
+
+acl = AccessControl()
+acl.add_policy(
+    resource="validation_reports",
+    allowed_roles=["data_scientist", "analyst"],
+    conditions={
+        "max_reports_per_day": 10,
+        "require_approval": False
+    }
+)
+
+# Check access before validation
+if acl.authorize(user="data_scientist_1", resource="validation_reports"):
+    report = suite.generate_report()
+```
+
+### Audit Logging
+
+```python
+from quality_validation import AuditLogger
+
+audit_logger = AuditLogger(
+    log_path="/var/log/validation_audit/",
+    log_format="json",
+    capture_inputs_hash=True,
+    retention_days=365
+)
+
+suite = ValidationSuite(
+    real_data=real_data,
+    synthetic_data=synthetic_data,
+    audit_logger=audit_logger
+)
+```
+
+### Secure Report Storage
+
+```python
+from quality_validation import SecureReportStorage
+
+storage = SecureReportStorage(
+    encryption_key="path/to/key.pem",
+    storage_path="/var/lib/reports/"
+)
+
+# Store report securely
+storage.store(report, identifier="validation_2024_01")
+
+# Retrieve with integrity check
+report = storage.retrieve("validation_2024_01")
+```
+
+---
+
+## Troubleshooting Guide
+
+### Common Error Messages
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `KS test failed` | Distributions significantly different | Check generation parameters, increase epochs |
+| `Correlation preserved poorly` | Relationships between variables lost | Use metadata-aware generation |
+| `ML utility low` | Synthetic data not useful for training | Try different generation model, increase data quality |
+| `Memory exhausted` | Dataset too large for validation | Use sampling or parallel validation |
+| `Report generation failed` | Invalid configuration | Check report format and output path |
+
+### Debug Mode
+
+```python
+from quality_validation import ValidationSuite, DebugConfig
+
+debug_config = DebugConfig(
+    verbose=True,
+    log_level="DEBUG",
+    save_intermediate=True,
+    intermediate_path="/tmp/debug/",
+    profile_operations=True
+)
+
+suite = ValidationSuite(
+    real_data=real_data,
+    synthetic_data=synthetic_data,
+    debug_config=debug_config
+)
+```
+
+### Validation Diagnostics
+
+```python
+from quality_validation import DiagnosticTools
+
+# Run diagnostic checks
+diagnostics = DiagnosticTools.run(
+    real_data=real_data,
+    synthetic_data=synthetic_data,
+    checks=["data_quality", "metric_consistency", "report_integrity"]
+)
+
+for check in diagnostics:
+    if not check.passed:
+        print(f"FAILED: {check.name} - {check.message}")
+        print(f"  Recommendation: {check.suggestion}")
+```
+
+### Performance Profiling
+
+```python
+from quality_validation import Profiler
+
+profiler = Profiler()
+
+with profiler:
+    report = suite.generate_report()
+
+profiler.print_report()
+# Output includes:
+# - Per-metric timing
+# - Memory usage
+# - Throughput statistics
+```
+
+---
+
+## API Reference
+
+### ValidationSuite
+
+```python
+class ValidationSuite:
+    """Run a comprehensive validation suite on synthetic data."""
+
+    def __init__(
+        self,
+        real_data: pd.DataFrame,
+        synthetic_data: pd.DataFrame,
+        metrics: list[str] = None,
+        config: ValidationConfig = None,
+        metadata: dict = None
+    ):
+        """Initialize the validation suite.
+
+        Args:
+            real_data: Real dataset
+            synthetic_data: Synthetic dataset
+            metrics: List of metrics to compute
+            config: ValidationConfig object
+            metadata: Optional metadata
+        """
+        pass
+
+    def run(self) -> dict:
+        """Run all configured metrics.
+
+        Returns:
+            Dict with metric results
+        """
+        pass
+
+    def generate_report(
+        self,
+        output_format: str = "html",
+        output_path: str = None
+    ) -> str:
+        """Generate a validation report.
+
+        Args:
+            output_format: "html", "pdf", "json"
+            output_path: Optional output path
+
+        Returns:
+            Path to generated report
+        """
+        pass
+
+    def get_metric(self, metric_name: str) -> dict:
+        """Get result for a specific metric.
+
+        Args:
+            metric_name: Name of the metric
+
+        Returns:
+            Metric result dict
+        """
+        pass
+```
+
+### FidelityEvaluator
+
+```python
+class FidelityEvaluator:
+    """Evaluate distributional fidelity of synthetic data."""
+
+    def __init__(
+        self,
+        metrics: list[str] = None,
+        significance_level: float = 0.05
+    ):
+        """Initialize fidelity evaluator.
+
+        Args:
+            metrics: List of fidelity metrics
+            significance_level: Significance level for statistical tests
+        """
+        pass
+
+    def ks_test(
+        self,
+        real_data: pd.DataFrame,
+        synthetic_data: pd.DataFrame
+    ) -> dict:
+        """Run Kolmogorov-Smirnov tests.
+
+        Args:
+            real_data: Real dataset
+            synthetic_data: Synthetic dataset
+
+        Returns:
+            Dict mapping column names to p-values
+        """
+        pass
+
+    def wasserstein_distance(
+        self,
+        real_data: pd.DataFrame,
+        synthetic_data: pd.DataFrame
+    ) -> dict:
+        """Compute Wasserstein distances.
+
+        Args:
+            real_data: Real dataset
+            synthetic_data: Synthetic dataset
+
+        Returns:
+            Dict mapping column names to distances
+        """
+        pass
+```
+
+### UtilityEvaluator
+
+```python
+class UtilityEvaluator:
+    """Evaluate ML utility of synthetic data."""
+
+    def __init__(
+        self,
+        target: str,
+        model_type: str = "xgboost",
+        test_size: float = 0.2,
+        cv_folds: int = 5
+    ):
+        """Initialize utility evaluator.
+
+        Args:
+            target: Target column name
+            model_type: ML model type
+            test_size: Test set proportion
+            cv_folds: Cross-validation folds
+        """
+        pass
+
+    def compare(
+        self,
+        real_train: pd.DataFrame,
+        synthetic_train: pd.DataFrame,
+        real_test: pd.DataFrame
+    ) -> dict:
+        """Compare model performance on real vs synthetic data.
+
+        Args:
+            real_train: Real training data
+            synthetic_train: Synthetic training data
+            real_test: Real test data
+
+        Returns:
+            Dict with comparison metrics
+        """
+        pass
+```
+
+---
+
+## Data Models
+
+### ValidationConfig Schema
+
+```python
+@dataclass
+class ValidationConfig:
+    """Configuration for validation suite."""
+
+    metrics: list[str] = field(default_factory=lambda: [
+        "ks_test", "wasserstein", "correlation_preservation", "ml_utility"
+    ])
+    ks_significance: float = 0.05
+    wasserstein_normalize: bool = True
+    correlation_methods: list[str] = field(default_factory=lambda: ["pearson", "spearman"])
+    correlation_threshold: float = 0.1
+    ml_model_type: str = "xgboost"
+    ml_cv_folds: int = 5
+    ml_test_size: float = 0.2
+    report_format: str = "html"
+    output_path: str = "./reports/"
+    random_seed: int = None
+```
+
+### ValidationReport Schema
+
+```python
+@dataclass
+class ValidationReport:
+    """Comprehensive validation report."""
+
+    report_id: str
+    timestamp: datetime
+    real_data_hash: str
+    synthetic_data_hash: str
+    overall_score: float
+    metrics: dict[str, dict]
+    recommendations: list[str]
+    metadata: dict
+```
+
+### MetricResult Schema
+
+```python
+@dataclass
+class MetricResult:
+    """Result of a single metric computation."""
+
+    metric_name: str
+    score: float
+    details: dict
+    passed: bool
+    threshold: float
+    computation_time: float
+```
+
+---
+
+## Deployment Guide
+
+### Docker Deployment
+
+```dockerfile
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src/ /app/src/
+COPY config/ /app/config/
+
+WORKDIR /app
+
+EXPOSE 8083
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s \
+    CMD curl -f http://localhost:8083/health || exit 1
+
+CMD ["python", "-m", "quality_validation.server", "--port", "8083"]
+```
+
+### Kubernetes Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: validation-service
+  namespace: synthetic-data
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: validation
+  template:
+    metadata:
+      labels:
+        app: validation
+    spec:
+      containers:
+      - name: validator
+        image: synthetic-data/validation:latest
+        ports:
+        - containerPort: 8083
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
+        env:
+        - name: VALIDATION_OUTPUT_PATH
+          value: "/var/reports/"
+```
+
+### REST API Server
+
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from quality_validation import ValidationSuite
+
+app = FastAPI(title="Validation API")
+
+class ValidateRequest(BaseModel):
+    real_data: list[dict]
+    synthetic_data: list[dict]
+    metrics: list[str] = ["ks_test", "wasserstein"]
+
+@app.post("/validate")
+async def validate_data(request: ValidateRequest):
+    try:
+        import pandas as pd
+        real_df = pd.DataFrame(request.real_data)
+        synth_df = pd.DataFrame(request.synthetic_data)
+
+        suite = ValidationSuite(
+            real_data=real_df,
+            synthetic_data=synth_df,
+            metrics=request.metrics
+        )
+
+        report = suite.generate_report(output_format="json")
+        return {"report": report}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+```
+
+---
+
+## Monitoring & Observability
+
+### Metrics Collection
+
+```python
+from quality_validation import MetricsCollector
+
+metrics = MetricsCollector(
+    backend="prometheus",
+    port=9093,
+    metrics=[
+        "validation_duration_seconds",
+        "validations_completed_total",
+        "overall_score",
+        "metric_computation_time"
+    ]
+)
+
+suite = ValidationSuite(
+    real_data=real_data,
+    synthetic_data=synthetic_data,
+    metrics_collector=metrics
+)
+```
+
+### Audit Logging
+
+```python
+from quality_validation import AuditLogger
+
+audit_logger = AuditLogger(
+    log_path="/var/log/validation_audit/",
+    log_format="json",
+    capture_inputs_hash=True,
+    retention_days=365
+)
+
+suite = ValidationSuite(
+    real_data=real_data,
+    synthetic_data=synthetic_data,
+    audit_logger=audit_logger
+)
+```
+
+### Alerting Rules
+
+```python
+from quality_validation import AlertManager
+
+alert_manager = AlertManager(
+    rules=[
+        {"metric": "overall_score", "threshold": 0.8, "severity": "warning", "operator": "lt"},
+        {"metric": "validation_duration_seconds", "threshold": 300, "severity": "warning"},
+        {"metric": "validations_completed_total", "threshold": 0, "severity": "critical"}
+    ],
+    notification_channels=["slack", "email"]
+)
+```
+
+### Dashboard Integration
+
+```python
+from quality_validation import DashboardExporter
+
+exporter = DashboardExporter(
+    format="grafana",
+    output_path="/var/lib/grafana/dashboards/validation.json"
+)
+
+exporter.generate_dashboard(
+    metrics=["validation_throughput", "quality_scores", "metric_trends"],
+    time_range="7d"
+)
+```
+
+---
+
+## Testing Strategy
+
+### Unit Tests
+
+```python
+import pytest
+import pandas as pd
+import numpy as np
+from quality_validation import FidelityEvaluator, UtilityEvaluator
+
+@pytest.fixture
+def sample_data():
+    np.random.seed(42)
+    real = pd.DataFrame({
+        "age": np.random.randint(18, 80, 1000),
+        "income": np.random.lognormal(10, 1, 1000),
+        "target": np.random.choice([0, 1], 1000)
+    })
+    synthetic = pd.DataFrame({
+        "age": np.random.randint(18, 80, 1000),
+        "income": np.random.lognormal(10, 1, 1000),
+        "target": np.random.choice([0, 1], 1000)
+    })
+    return real, synthetic
+
+class TestFidelityEvaluator:
+    def test_ks_test_returns_pvalues(self, sample_data):
+        real, synthetic = sample_data
+        evaluator = FidelityEvaluator()
+        results = evaluator.ks_test(real, synthetic)
+        assert "age" in results
+        assert 0 <= results["age"] <= 1
+
+    def test_wasserstein_returns_distances(self, sample_data):
+        real, synthetic = sample_data
+        evaluator = FidelityEvaluator()
+        results = evaluator.wasserstein_distance(real, synthetic)
+        assert "income" in results
+        assert results["income"] >= 0
+
+class TestUtilityEvaluator:
+    def test_compare_returns_metrics(self, sample_data):
+        real, synthetic = sample_data
+        evaluator = UtilityEvaluator(target="target")
+        results = evaluator.compare(
+            real_train=real,
+            synthetic_train=synthetic,
+            real_test=real
+        )
+        assert "real_auc" in results
+        assert "synthetic_auc" in results
+        assert "utility_ratio" in results
+```
+
+### Integration Tests
+
+```python
+class TestValidationSuite:
+    def test_full_validation(self, sample_data):
+        real, synthetic = sample_data
+        suite = ValidationSuite(
+            real_data=real,
+            synthetic_data=synthetic
+        )
+        report = suite.generate_report()
+        assert report["overall_score"] > 0
+        assert len(report["metrics"]) > 0
+```
+
+---
+
+## Versioning & Migration
+
+### Semantic Versioning
+
+- **MAJOR**: Breaking API changes, incompatible report formats
+- **MINOR**: New metrics, backward-compatible
+- **PATCH**: Bug fixes, performance improvements
+
+### Report Format Migration
+
+```python
+from quality_validation import ReportMigrator
+
+migrator = ReportMigrator(
+    source_version="1.2.0",
+    target_version="2.0.0"
+)
+
+migrator.migrate_report(
+    source="old_report.json",
+    target="new_report.json",
+    schema_mappings={
+        "old_metric_name": "new_metric_name"
+    }
+)
+```
+
+### Configuration Migration
+
+```python
+from quality_validation import ConfigMigrator
+
+config_migrator = ConfigMigrator()
+config_migrator.migrate(
+    source="old_validation_config.yaml",
+    target="new_validation_config.yaml"
+)
+```
+
+---
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **KS Test** | Kolmogorov-Smirnov test - nonparametric test for distribution equality |
+| **Wasserstein Distance** | "Earth mover's distance" - measures the work needed to transform one distribution into another |
+| **Jensen-Shannon Divergence** | Symmetric measure of similarity between two probability distributions |
+| **Correlation Preservation** | Maintaining the statistical relationships between variables in synthetic data |
+| **ML Utility** | How well machine learning models trained on synthetic data perform on real data |
+| **Synthetic Data Detector** | A classifier that attempts to distinguish real from synthetic records |
+| **Fidelity** | How closely synthetic data matches the statistical properties of real data |
+| **Utility Ratio** | Ratio of model performance on synthetic data vs real data |
+| **Population Stability Index** | Measures distribution shift between two datasets |
+| **Shadow Model** | A model trained to detect whether data is real or synthetic |
+
+---
+
+## Changelog
+
+### v1.0.0 (2024-01-15)
+- Initial release with KS test, Wasserstein distance, correlation preservation
+- ML utility evaluation with XGBoost
+- Synthetic data detection
+- HTML report generation
+
+### v1.1.0 (2024-03-01)
+- Added Jensen-Shannon divergence
+- Temporal consistency validation for time series
+- Benchmarking framework for multiple generators
+- PDF report generation
+
+### v1.2.0 (2024-05-15)
+- Privacy-utility tradeoff analysis
+- Edge case coverage metrics
+- Drift detection with PSI
+- REST API for validation-as-a-service
+
+### v1.3.0 (2024-08-01)
+- Kubernetes deployment templates
+- Dashboard integration
+- Enhanced audit logging
+- Parallel metric computation
+
+---
+
+## Contributing Guidelines
+
+### Development Setup
+
+```bash
+git clone https://github.com/example/quality-validation.git
+cd quality-validation
+python -m venv venv
+source venv/bin/activate
+pip install -e ".[dev]"
+pytest tests/
+ruff check src/
+ruff format src/
+```
+
+### Code Style
+
+- Follow PEP 8 for Python code
+- Use type hints for all public functions
+- Write docstrings for all public classes and methods
+- Keep functions under 50 lines
+- Use meaningful variable names
+
+### Pull Request Process
+
+1. Create a feature branch from `main`
+2. Write tests for new functionality
+3. Ensure all tests pass
+4. Update documentation if needed
+5. Submit PR with clear description of changes
+
+### Commit Message Format
+
+```
+type(scope): description
+
+[optional body]
+
+[optional footer]
+```
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+
+---
+
+## License
+
+Copyright (c) 2024 Synthetic Data Toolkit Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

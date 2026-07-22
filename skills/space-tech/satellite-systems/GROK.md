@@ -211,3 +211,492 @@ print(f"  Battery cycles (LEO):   {budget['daily_cycles']:.1f} /day")
 - [mission-planning](../mission-planning/GROK.md) — Timeline scheduling, launch windows, contingency planning
 - [ground-stations](../ground-stations/GROK.md) — Antenna tracking, signal processing, telemetry decoding
 - [space-data](../space-data/GROK.md) — Ephemeris processing, telemetry analysis, space weather
+
+## Advanced Configuration
+
+### Constellation Optimization Parameters
+```python
+from satellite_systems import ConstellationOptimizer
+
+optimizer = ConstellationOptimizer(
+    optimization_method="genetic_algorithm",
+    population_size=100,
+    generations=500,
+    mutation_rate=0.1,
+    crossover_rate=0.8,
+    fitness_function="coverage_uniformity",
+)
+```
+
+### Kalman Filter Tuning
+```python
+from satellite_systems import KalmanFilterConfig
+
+kf_config = KalmanFilterConfig(
+    process_noise_covariance=1e-6,
+    measurement_noise_covariance=1e-3,
+    initial_covariance_scale=1e4,
+    time_update_interval_s=60.0,
+    state_vector_format="cartesian_eci",
+)
+```
+
+### Thermal Model Configuration
+```python
+from satellite_systems import ThermalConfig
+
+thermal_config = ThermalConfig(
+    solar_absorptivity=0.25,
+    infrared_emissivity=0.85,
+    mli_effectiveness=0.95,
+    thermal_mass_kg_per_m2=50.0,
+    heater_power_margin=1.2,
+)
+```
+
+## Architecture Patterns
+
+### Event-Driven Architecture
+```python
+from satellite_systems import EventBus
+
+event_bus = EventBus()
+event_bus.subscribe("orbit_updated", handle_orbit_update)
+event_bus.subscribe("eclipse_entry", handle_eclipse_entry)
+event_bus.publish("orbit_updated", data=new_state)
+```
+
+### Microservices Pattern
+```python
+from satellite_systems import ServiceMesh
+
+mesh = ServiceMesh()
+mesh.register_service("orbit_determination", OrbitDeterminationService())
+mesh.register_service("attitude_control", AttitudeControlService())
+mesh.register_service("power_management", PowerManagementService())
+```
+
+### Digital Twin Pattern
+```python
+from satellite_systems import DigitalTwin
+
+twin = DigitalTwin(satellite_id="SAT-001")
+twin.sync_with_telemetry(telemetry_stream)
+twin.predict_next_state(prediction_horizon_s=3600)
+```
+
+## Integration Guide
+
+### Ground Segment Integration
+```python
+from satellite_systems import GroundSegmentInterface
+
+gsi = GroundSegmentInterface(
+    station_id="GS-001",
+    protocol="CCSDS",
+    encryption="AES-256",
+)
+gsi.connect()
+gsi.send_command(command_packet)
+```
+
+### Mission Control System
+```python
+from satellite_systems import MissionControl
+
+mc = MissionControl(
+    mission_id="MARS-2028",
+    satellite_count=3,
+    autonomous_mode=False,
+)
+mc.start_monitoring()
+```
+
+### Data Storage Integration
+```python
+from satellite_systems import DataStorage
+
+storage = DataStorage(
+    backend="postgresql",
+    connection_string="postgresql://localhost/satellites",
+    retention_days=365,
+)
+storage.store_telemetry(satellite_id="SAT-001", data=telemetry)
+```
+
+## Performance Optimization
+
+### GPU Acceleration
+```python
+from satellite_systems import GPUConfig
+
+gpu_config = GPUConfig(
+    enabled=True,
+    device_id=0,
+    batch_size=1000,
+    precision="float32",
+)
+```
+
+### Distributed Computing
+```python
+from satellite_systems import DistributedConfig
+
+dist_config = DistributedConfig(
+    backend="spark",
+    cluster_url="spark://master:7077",
+    num_workers=8,
+    memory_per_worker="4g",
+)
+```
+
+### Caching Strategy
+```python
+from satellite_systems import CacheConfig
+
+cache_config = CacheConfig(
+    backend="redis",
+    host="localhost",
+    port=6379,
+    ttl_seconds=300,
+    max_size_mb=1024,
+)
+```
+
+## Security Considerations
+
+### Command Authentication
+```python
+from satellite_systems import CommandAuth
+
+auth = CommandAuth(
+    method="hmac_sha256",
+    secret_key="your-secret-key",
+    timestamp_window_s=30,
+    replay_protection=True,
+)
+```
+
+### Data Encryption
+```python
+from satellite_systems import EncryptionConfig
+
+encryption = EncryptionConfig(
+    algorithm="AES-256-GCM",
+    key_management="hardware_security_module",
+    encrypt_at_rest=True,
+    encrypt_in_transit=True,
+)
+```
+
+### Access Control
+```python
+from satellite_systems import RBAC
+
+rbac = RBAC()
+rbac.add_role("operator", permissions=["command", "telemetry", "planning"])
+rbac.add_role("viewer", permissions=["telemetry"])
+rbac.add_user("operator1", roles=["operator"])
+```
+
+## Troubleshooting Guide
+
+### Common Issues
+
+1. **Orbit Determination Divergence**: Check initial state estimate quality and measurement noise assumptions
+2. **Reaction Wheel Saturation**: Implement momentum dumping using magnetic torquers
+3. **Thermal Control Instability**: Verify heater setpoints and thermal model parameters
+4. **Link Budget Margin Shortfall**: Recheck antenna gains and atmospheric loss assumptions
+
+### Diagnostic Tools
+```python
+from satellite_systems import Diagnostics
+
+diag = Diagnostics(satellite_id="SAT-001")
+diag.run_system_check()
+diag.generate_report()
+diag.export_to_pdf("satellite_report.pdf")
+```
+
+### Log Analysis
+```python
+from satellite_systems import LogAnalyzer
+
+analyzer = LogAnalyzer(log_path="/var/log/satellites/")
+analyzer.analyze_errors()
+analyzer.find_anomalies()
+analyzer.generate_summary()
+```
+
+## API Reference
+
+### Core Classes
+- `ConstellationManager` - Constellation design and analysis
+- `OrbitDetermination` - Orbit determination algorithms
+- `AttitudeController` - ADCS simulation and control
+- `LinkBudget` - Communication link budget analysis
+- `PowerSubsystem` - Power subsystem modeling
+- `ThermalControl` - Thermal analysis and control
+
+### Core Functions
+- `walker_delta()` - Design Walker delta constellation
+- `batch_least_squares()` - Batch least-squares orbit determination
+- `kalman_filter_od()` - Sequential Kalman filter orbit determination
+- `size_reaction_wheels()` - Size reaction wheels for given requirements
+- `compute_link_budget()` - Compute communication link budget
+- `analyze_coverage()` - Analyze constellation coverage
+
+## Data Models
+
+### Satellite State
+```python
+class SatelliteState:
+    position: np.ndarray  # ECI position [m]
+    velocity: np.ndarray  # ECI velocity [m/s]
+    attitude: np.ndarray  # Quaternion [w, x, y, z]
+    angular_velocity: np.ndarray  # Body rates [rad/s]
+    timestamp: float  # Julian date
+    satellite_id: str
+```
+
+### Constellation Configuration
+```python
+class ConstellationConfig:
+    name: str
+    total_satellites: int
+    orbital_planes: int
+    inclination_deg: float
+    altitude_km: float
+    phasing_offset: int
+    walker_type: str  # "delta" or "star"
+```
+
+### Telemetry Packet
+```python
+class TelemetryPacket:
+    packet_id: int
+    satellite_id: str
+    timestamp: float
+    subsystem: str
+    parameters: Dict[str, float]
+    quality_flag: str
+```
+
+## Deployment Guide
+
+### Container Deployment
+```dockerfile
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 8080
+CMD ["python", "-m", "satellite_systems.server"]
+```
+
+### Kubernetes Configuration
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: satellite-systems
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: satellite-systems
+  template:
+    spec:
+      containers:
+      - name: satellite-systems
+        image: satellite-systems:latest
+        ports:
+        - containerPort: 8080
+```
+
+### Helm Chart Values
+```yaml
+replicaCount: 2
+image:
+  repository: satellite-systems
+  tag: latest
+resources:
+  limits:
+    cpu: 2
+    memory: 4Gi
+  requests:
+    cpu: 1
+    memory: 2Gi
+```
+
+## Monitoring & Observability
+
+### Prometheus Metrics
+```python
+from satellite_systems import Metrics
+
+metrics = Metrics(
+    backend="prometheus",
+    endpoint="/metrics",
+    labels={"service": "satellite-systems"},
+)
+metrics.gauge("satellites_online", value=66)
+metrics.counter("commands_sent", value=1)
+metrics.histogram("latency_seconds", value=0.1)
+```
+
+### Distributed Tracing
+```python
+from satellite_systems import Tracing
+
+tracing = Tracing(
+    backend="jaeger",
+    service_name="satellite-systems",
+    sample_rate=0.1,
+)
+with tracing.start_span("orbit_determination") as span:
+    result = od.batch_least_squares(observations)
+```
+
+### Alerting
+```python
+from satellite_systems import AlertManager
+
+alert_mgr = AlertManager()
+alert_mgr.add_rule(
+    name="low_battery",
+    condition="battery_soc < 0.2",
+    severity="critical",
+    notification="pagerduty",
+)
+```
+
+## Testing Strategy
+
+### Unit Tests
+```python
+import unittest
+from satellite_systems import ConstellationManager
+
+class TestConstellationManager(unittest.TestCase):
+    def test_walker_delta(self):
+        mgr = ConstellationManager()
+        result = mgr.walker_delta(66, 6, 53.0, 550, 1)
+        self.assertEqual(result['total_sats'], 66)
+```
+
+### Integration Tests
+```python
+def test_orbit_determination_workflow():
+    od = OrbitDetermination(body="earth")
+    observations = generate_test_observations()
+    result = od.batch_least_squares(observations)
+    assert result['converged'] == True
+```
+
+### Performance Tests
+```python
+import time
+
+def test_performance():
+    start = time.time()
+    for _ in range(1000):
+        compute_orbit_state()
+    elapsed = time.time() - start
+    assert elapsed < 10.0  # Should complete in <10 seconds
+```
+
+## Versioning & Migration
+
+### Semantic Versioning
+- Major: Breaking changes to API or data formats
+- Minor: New features with backward compatibility
+- Patch: Bug fixes and performance improvements
+
+### Migration Scripts
+```python
+from satellite_systems import migrate_v1_to_v2
+
+migrate_v1_to_v2(
+    config_path="config.yaml",
+    data_path="/data/satellites",
+    backup=True,
+)
+```
+
+## Glossary
+
+- **ADCS**: Attitude Determination and Control System
+- **Walker Delta**: Constellation pattern with evenly spaced planes and satellites
+- **SGP4**: Simplified General Perturbations model 4 for TLE propagation
+- **EIRP**: Effective Isotropic Radiated Power
+- **G/T**: Figure of merit for receive systems (gain-to-noise temperature)
+- **C/N0**: Carrier-to-noise density ratio
+- **DoD**: Depth of Discharge for batteries
+- **MLI**: Multi-Layer Insulation for thermal control
+- **ISL**: Inter-Satellite Link
+- **TLE**: Two-Line Element set for satellite tracking
+
+## Changelog
+
+### v1.2.0 (2028-09-01)
+- Added GPU-accelerated constellation coverage analysis
+- Improved Kalman filter stability
+- New thermal control models
+
+### v1.1.0 (2028-06-15)
+- Added inter-satellite link geometry analysis
+- Enhanced power budget modeling
+- New deorbit planning tools
+
+### v1.0.0 (2028-03-01)
+- Initial release with core constellation management
+
+## Contributing Guidelines
+
+### Development Environment
+```bash
+git clone https://github.com/satellite-systems/satellite-systems.git
+cd satellite-systems
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Code Standards
+- Follow PEP 8 for Python code
+- Use type hints for all functions
+- Write docstrings for public APIs
+- Maintain >90% test coverage
+
+### Pull Request Process
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Write tests for new functionality
+4. Update documentation
+5. Submit pull request with detailed description
+
+## License
+
+MIT License
+
+Copyright (c) 2028 Satellite Systems Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

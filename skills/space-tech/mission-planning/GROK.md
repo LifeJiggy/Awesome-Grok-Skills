@@ -218,3 +218,518 @@ for name, info in budget.items():
 - [satellite-systems](../satellite-systems/GROK.md) — Constellation management, ADCS, link budgets
 - [ground-stations](../ground-stations/GROK.md) — Antenna tracking, signal processing, telemetry decoding
 - [space-data](../space-data/GROK.md) — Ephemeris processing, telemetry analysis, space weather
+
+## Advanced Configuration
+
+### Schedule Optimization Parameters
+```python
+from mission_planning import ScheduleOptimizer
+
+optimizer = ScheduleOptimizer(
+    algorithm="constraint_satisfaction",
+    max_iterations=10000,
+    timeout_seconds=300,
+    parallel_workers=4,
+    optimization_goal="minimize_makespan",
+)
+```
+
+### Launch Window Constraints
+```python
+from mission_planning import LaunchConstraints
+
+constraints = LaunchConstraints(
+    solar_exclusion_angle_deg=15.0,
+    moon_exclusion_angle_deg=10.0,
+    max_vehicle Loads=3.5,
+    range_safety_constraints=True,
+    weather_constraints=True,
+    orbital_debris_avoidance=True,
+)
+```
+
+### Risk Assessment Configuration
+```python
+from mission_planning import RiskConfig
+
+risk_config = RiskConfig(
+    methodology="nasa_std_882d",
+    probability_scale=(0.1, 0.3, 0.5, 0.7, 0.9),
+    impact_scale=(1, 2, 3, 4, 5),
+    risk_threshold=15.0,
+    monte_carlo_iterations=10000,
+)
+```
+
+## Architecture Patterns
+
+### Event-Driven Mission Planning
+```python
+from mission_planning import MissionEventBus
+
+event_bus = MissionEventBus()
+event_bus.subscribe("launch_window_detected", handle_launch_window)
+event_bus.subscribe("resource_conflict", handle_resource_conflict)
+event_bus.publish("mission_started", mission_id="MARS-2028")
+```
+
+### Workflow Orchestration
+```python
+from mission_planning import WorkflowEngine
+
+engine = WorkflowEngine()
+engine.add_step("launch_window_search", LaunchWindowSearch())
+engine.add_step("trajectory_design", TrajectoryDesign())
+engine.add_step("risk_assessment", RiskAssessment())
+engine.execute()
+```
+
+### State Machine Pattern
+```python
+from mission_planning import MissionStateMachine
+
+sm = MissionStateMachine(mission_id="LUNAR-001")
+sm.transition("planning", "launch_preparation")
+sm.transition("launch_preparation", "launch")
+sm.transition("launch", "cruise")
+```
+
+## Integration Guide
+
+### GMAT Integration
+```python
+from mission_planning import GMATInterface
+
+gmat = GMATInterface()
+gmat.load_script("mars_transfer.script")
+result = gmat.run()
+gmat.export_results("trajectory.csv")
+```
+
+### STK Integration
+```python
+from mission_planning import STKInterface
+
+stk = STKInterface()
+stk.connect()
+stk.create_scenario("earth_mars_transfer")
+stk.compute_coverage(satellite_id="SAT-001")
+stk.disconnect()
+```
+
+### JPL Horizons Integration
+```python
+from mission_planning import HorizonsInterface
+
+horizons = HorizonsInterface()
+ephemeris = horizons.get_ephemeris(
+    target="mars",
+    start_date="2028-01-01",
+    stop_date="2029-01-01",
+    step_size="1d",
+)
+```
+
+## Performance Optimization
+
+### Parallel Schedule Computation
+```python
+from mission_planning import ParallelScheduler
+
+scheduler = ParallelScheduler(
+    num_workers=8,
+    chunk_size=100,
+    use_multiprocessing=True,
+)
+schedule = scheduler.compute_parallel(missions)
+```
+
+### Caching Strategy
+```python
+from mission_planning import ScheduleCache
+
+cache = ScheduleCache(
+    backend="redis",
+    ttl_seconds=3600,
+    max_size_mb=1024,
+)
+```
+
+### Database Optimization
+```python
+from mission_planning import DatabaseOptimizer
+
+optimizer = DatabaseOptimizer(
+    connection_pool_size=20,
+    query_timeout=30,
+    index_strategy="composite",
+)
+```
+
+## Security Considerations
+
+### Mission Data Classification
+```python
+from mission_planning import DataClassifier
+
+classifier = DataClassifier(
+    classification_levels=["UNCLASSIFIED", "CONFIDENTIAL", "SECRET", "TOP_SECRET"],
+    default_level="CONFIDENTIAL",
+    encryption_required=True,
+)
+```
+
+### Access Control
+```python
+from mission_planning import MissionAccessControl
+
+acl = MissionAccessControl()
+acl.add_role("mission_designer", permissions=["read", "write", "execute"])
+acl.add_role("analyst", permissions=["read", "execute"])
+acl.add_role("viewer", permissions=["read"])
+```
+
+### Audit Logging
+```python
+from mission_planning import AuditLogger
+
+audit = AuditLogger(
+    log_path="/var/log/mission_planning/",
+    retention_days=365,
+    encryption=True,
+)
+audit.log_access(user="designer1", resource="trajectory_design", action="write")
+```
+
+## Troubleshooting Guide
+
+### Common Issues
+
+1. **Schedule Conflicts**: Check resource availability and priority settings
+2. **Launch Window Errors**: Verify ephemeris data validity and constraint definitions
+3. **Risk Assessment Inconsistencies**: Validate probability and impact scales
+4. **Performance Bottlenecks**: Enable parallel processing and caching
+
+### Debug Tools
+```python
+from mission_planning import DebugTools
+
+debug = DebugTools()
+debug.trace_schedule("MARS-2028")
+debug.analyze_conflicts()
+debug.generate_diagnostic_report()
+```
+
+### Log Analysis
+```python
+from mission_planning import LogAnalyzer
+
+analyzer = LogAnalyzer(log_path="/var/log/mission_planning/")
+analyzer.analyze_errors()
+analyzer.find_performance_issues()
+analyzer.generate_summary()
+```
+
+## API Reference
+
+### Core Classes
+- `MissionTimeline` - Mission event scheduling and management
+- `LaunchWindowCalculator` - Launch window analysis and optimization
+- `GroundStationPassPlanner` - Ground station pass planning
+- `RiskAssessment` - Risk assessment and management
+- `ResourceAllocator` - Resource allocation and budgeting
+
+### Core Functions
+- `optimize_schedule()` - Optimize mission schedule
+- `generate_porkchop_plot()` - Generate porkchop plot data
+- `compute_coverage_gaps()` - Analyze coverage gaps
+- `run_monte_carlo()` - Perform Monte Carlo analysis
+- `allocate_resource()` - Allocate resources with constraints
+
+## Data Models
+
+### Mission Event
+```python
+class MissionEvent:
+    event_id: str
+    name: str
+    start_time: datetime
+    end_time: datetime
+    duration_hours: float
+    priority: str
+    resources: List[str]
+    dependencies: List[str]
+    status: str
+```
+
+### Launch Window
+```python
+class LaunchWindow:
+    window_id: str
+    departure_date: datetime
+    arrival_date: datetime
+    c3_km2_s2: float
+    departure_dv_km_s: float
+    flight_days: int
+    score: float
+```
+
+### Risk Item
+```python
+class RiskItem:
+    risk_id: str
+    title: str
+    description: str
+    probability: float
+    impact: int
+    score: float
+    category: str
+    mitigation: str
+    owner: str
+    status: str
+```
+
+## Deployment Guide
+
+### Container Deployment
+```dockerfile
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 8080
+CMD ["python", "-m", "mission_planning.server"]
+```
+
+### Kubernetes Configuration
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mission-planning
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mission-planning
+```
+
+### Helm Chart
+```yaml
+replicaCount: 3
+image:
+  repository: mission-planning
+  tag: latest
+resources:
+  limits:
+    cpu: 2
+    memory: 4Gi
+```
+
+## Monitoring & Observability
+
+### Prometheus Metrics
+```python
+from mission_planning import Metrics
+
+metrics = Metrics(
+    backend="prometheus",
+    endpoint="/metrics",
+    labels={"service": "mission-planning"},
+)
+metrics.counter("schedules_computed", value=1)
+metrics.histogram("computation_time_seconds", value=12.5)
+metrics.gauge("active_missions", value=5)
+```
+
+### Alerting Rules
+```python
+from mission_planning import AlertManager
+
+alert_mgr = AlertManager()
+alert_mgr.add_rule(
+    name="high_schedule_conflict_rate",
+    condition="conflict_rate > 0.1",
+    severity="warning",
+    notification="email",
+)
+```
+
+### Dashboard Integration
+```python
+from mission_planning import Dashboard
+
+dashboard = Dashboard(
+    title="Mission Planning Dashboard",
+    refresh_interval=60,
+    panels=["schedule_status", "resource_usage", "risk_overview"],
+)
+dashboard.deploy()
+```
+
+## Testing Strategy
+
+### Unit Tests
+```python
+import unittest
+from mission_planning import MissionTimeline
+
+class TestMissionTimeline(unittest.TestCase):
+    def test_schedule_optimization(self):
+        timeline = MissionTimeline("TEST", datetime(2028,1,1), datetime(2028,12,31))
+        # Test schedule optimization
+        pass
+```
+
+### Integration Tests
+```python
+def test_launch_window_workflow():
+    lwc = LaunchWindowCalculator("earth", "mars")
+    porkchop = lwc.generate_porkchop_plot_data()
+    best = lwc.find_optimal_window(porkchop)
+    assert best['c3_km2_s2'] < 20.0
+```
+
+### Performance Tests
+```python
+import time
+
+def test_schedule_performance():
+    start = time.time()
+    for _ in range(100):
+        compute_complex_schedule()
+    elapsed = time.time() - start
+    assert elapsed < 60.0
+```
+
+## Versioning & Migration
+
+### Version History
+- v1.2.0 - Added Monte Carlo risk analysis
+- v1.1.0 - Enhanced launch window calculation
+- v1.0.0 - Initial release
+
+### Migration Guide
+```python
+from mission_planning import migrate_v1_to_v2
+
+migrate_v1_to_v2(
+    config_path="config.yaml",
+    data_path="/data/missions",
+    backup=True,
+)
+```
+
+## Glossary
+
+- **Porkchop Plot**: Contour plot showing C3 vs departure date and flight time
+- **C3**: Characteristic energy (km²/s²) for interplanetary trajectories
+- **TOF**: Time of flight for spacecraft transfers
+- **Delta-v**: Change in velocity required for orbital maneuvers
+- **Monte Carlo Analysis**: Statistical method using random sampling for risk assessment
+- **Critical Path**: Longest sequence of dependent tasks determining mission duration
+- **Resource Contention**: Conflict when multiple tasks require the same limited resource
+- **Ground Station Pass**: Period when satellite is visible to ground station
+
+## Changelog
+
+### v1.2.0 (2028-09-01)
+- Added Monte Carlo risk sensitivity analysis
+- Improved schedule optimization algorithms
+- New GMAT integration
+
+### v1.1.0 (2028-06-15)
+- Enhanced launch window calculation
+- Added multi-mission timeline coordination
+- New STK integration
+
+### v1.0.0 (2028-03-01)
+- Initial release with core mission planning
+
+## Contributing Guidelines
+
+### Development Setup
+```bash
+git clone https://github.com/mission-planning/mission-planning.git
+cd mission-planning
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Code Standards
+- Follow PEP 8 for Python code
+- Use type hints for all functions
+- Write docstrings for public APIs
+- Maintain >90% test coverage
+
+### Pull Request Process
+1. Fork the repository
+2. Create feature branch
+3. Write tests
+4. Update documentation
+5. Submit pull request
+
+## License
+
+MIT License
+
+Copyright (c) 2028 Mission Planning Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## Additional Reference Data
+
+### Mission Phase Definitions
+
+| Phase | Description | Typical Duration | Key Activities |
+|-------|-------------|------------------|----------------|
+| Phase A | Concept Study | 6-12 months | Feasibility, trade studies |
+| Phase B | Preliminary Design | 12-18 months | Requirements, PDR |
+| Phase C | Detailed Design | 12-24 months | CDR, test planning |
+| Phase D | Assembly & Test | 12-18 months | Integration, qual testing |
+| Phase E | Operations | 1-15+ years | Mission operations |
+| Phase F | Disposal | 1-6 months | Deorbit, passivation |
+
+### Launch Vehicle Performance Reference
+
+```python
+# Reference payload capacities by launch vehicle
+LV_PERFORMANCE = {
+    "falcon_9": {
+        "LEO_kg": 22800,
+        "GTO_kg": 8300,
+        "SSO_kg": 15400,
+        "cost_per_launch_usd": 67000000,
+    },
+    "atlas_v_541": {
+        "LEO_kg": 18850,
+        "GTO_kg": 8900,
+        "Mars_kg": 5500,
+        "cost_per_launch_usd": 150000000,
+    },
+    "ariane_6_4": {
+        "LEO_kg": 21650,
+        "GTO_kg": 11500,
+        "SSO_kg": 15500,
+        "cost_per_launch_usd": 115000000,
+    },
+}
+```

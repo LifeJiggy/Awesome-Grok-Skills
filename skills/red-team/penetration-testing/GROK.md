@@ -457,3 +457,406 @@ The **Reporting Layer** generates comprehensive reports tailored to different au
 - **Reverse Engineering**: Malware analysis, exploit development, and binary analysis
 - **Social Engineering**: Human-factor security testing and awareness training
 - **Physical Security**: Physical access control testing and security assessment
+
+## Testing Methodology Deep Dive
+
+### Network Penetration Testing Workflow
+
+A systematic approach to network penetration testing ensures comprehensive coverage and reproducible results across engagements.
+
+**Network Discovery and Enumeration**
+
+```python
+from penetration_testing import NetworkDiscovery, PortScanner, ServiceEnumerator
+
+# Initialize network discovery with multiple scan types
+discovery = NetworkDiscovery(
+    target_range="10.0.0.0/24",
+    scan_type="comprehensive"
+)
+
+# Perform host discovery
+hosts = discovery.discover_hosts(
+    methods=["icmp", "tcp_syn", "arp"],
+    timeout=300,
+    parallel_scan=True
+)
+
+print(f"Hosts discovered: {len(hosts)}")
+for host in hosts:
+    print(f"  IP: {host.ip}")
+    print(f"  Hostname: {host.hostname}")
+    print(f"  MAC: {host.mac_address}")
+    print(f"  OS: {host.os_fingerprint}")
+    print(f"  Status: {host.status}")
+
+# Detailed port scanning
+scanner = PortScanner()
+for host in hosts:
+    ports = scanner.scan(
+        target=host.ip,
+        port_range="1-65535",
+        scan_type="syn",
+        rate_limit=1000,
+        service_detection=True
+    )
+    
+    print(f"\nOpen ports on {host.ip}:")
+    for port in ports.open_ports:
+        print(f"  Port {port.port}/{port.protocol}: {port.service} {port.version}")
+        if port.vulnerabilities:
+            print(f"    Potential vulnerabilities: {len(port.vulnerabilities)}")
+
+# Enumerate services in detail
+enumerator = ServiceEnumerator()
+for host in hosts:
+    services = enumerator.enumerate(
+        target=host.ip,
+        services=["smb", "ssh", "ftp", "http", "snmp"],
+        deep_enumeration=True
+    )
+    
+    for service in services:
+        print(f"\nService: {service.name} on port {service.port}")
+        print(f"  Banner: {service.banner}")
+        print(f"  Version: {service.version}")
+        print(f"  Authentication: {service.auth_type}")
+        print(f"  Misconfigurations: {len(service.misconfigs)}")
+```
+
+**Vulnerability Assessment Integration**
+
+```python
+from penetration_testing import VulnerabilityAssessor, CVEAnalyzer, ExploitMapper
+
+# Initialize vulnerability assessor with multiple scanner integration
+assessor = VulnerabilityAssessor(
+    scanners=["nessus", "openvas", "custom_scripts"],
+    scan_profiles=["comprehensive", "cis_benchmark", "custom"]
+)
+
+# Execute vulnerability scan
+scan_results = assessor.scan(
+    targets=["10.0.0.0/24"],
+    credentials={
+        "ssh": {"username": "admin", "password": "password123"},
+        "smb": {"domain": "WORKGROUP", "username": "admin", "password": "password123"}
+    },
+    scan_depth="deep",
+    timeout=3600
+)
+
+# Analyze CVEs with exploitability assessment
+cve_analyzer = CVEAnalyzer()
+for vulnerability in scan_results.vulnerabilities:
+    cve_info = cve_analyzer.analyze(
+        cve_id=vulnerability.cve_id,
+        cvss_score=vulnerability.cvss_score,
+        exploit_available=True,
+        actively_exploited=True
+    )
+    
+    print(f"\nVulnerability: {vulnerability.title}")
+    print(f"  CVE: {vulnerability.cve_id}")
+    print(f"  CVSS Score: {vulnerability.cvss_score}")
+    print(f"  Exploitability: {cve_info.exploitability}")
+    print(f"  Public exploits: {cve_info.public_exploits}")
+    print(f"  Risk rating: {cve_info.risk_rating}")
+
+# Map vulnerabilities to potential exploits
+exploit_mapper = ExploitMapper()
+exploit_mappings = exploit_mapper.map(
+    vulnerabilities=scan_results.vulnerabilities,
+    framework="metasploit",
+    reliability_threshold=0.7
+)
+
+for mapping in exploit_mappings:
+    print(f"\nExploit mapping:")
+    print(f"  Vulnerability: {mapping.vulnerability}")
+    print(f"  Exploit module: {mapping.exploit_module}")
+    print(f"  Reliability: {mapping.reliability}")
+    print(f"  Payload options: {mapping.payload_options}")
+```
+
+### Web Application Testing Methodology
+
+Web application testing requires systematic coverage of application functionality, input validation, authentication mechanisms, and business logic.
+
+**Application Mapping and Crawling**
+
+```python
+from penetration_testing import WebAppMapper, SpiderEngine, APIDiscovery
+
+# Initialize web application mapper
+mapper = WebAppMapper(
+    target_url="https://target.example.com",
+    authentication_config={
+        "type": "form_based",
+        "login_url": "/login",
+        "credentials": {"username": "test", "password": "test"}
+    }
+)
+
+# Perform comprehensive application mapping
+mapping_results = mapper.map(
+    crawl_depth=10,
+    include_ajax=True,
+    include_api=True,
+    respect_robots=True,
+    scope_restriction=True
+)
+
+print("Application Structure:")
+print(f"  Pages discovered: {len(mapping_results.pages)}")
+print(f"  Forms discovered: {len(mapping_results.forms)}")
+print(f"  API endpoints: {len(mapping_results.api_endpoints)}")
+print(f"  Parameters: {len(mapping_results.parameters)}")
+print(f"  Technologies: {mapping_results.technologies}")
+
+# Discover hidden API endpoints
+api_discovery = APIDiscovery()
+api_endpoints = api_discovery.discover(
+    target_url="https://target.example.com",
+    methods=["swagger", "graphql", "custom"],
+    authentication=True
+)
+
+print("\nAPI Endpoints:")
+for endpoint in api_endpoints:
+    print(f"  {endpoint.method} {endpoint.path}")
+    print(f"    Authentication: {endpoint.auth_required}")
+    print(f"    Parameters: {len(endpoint.parameters)}")
+    print(f"    Rate limiting: {endpoint.rate_limited}")
+
+# Analyze application architecture
+architecture = mapper.analyze_architecture()
+print("\nApplication Architecture:")
+print(f"  Framework: {architecture.framework}")
+print(f"  Language: {architecture.language}")
+print(f"  Database: {architecture.database}")
+print(f"  Server: {architecture.server}")
+print(f"  CDN: {architecture.cdn}")
+print(f"  WAF detected: {architecture.waf_detected}")
+```
+
+**Input Validation Testing**
+
+```python
+from penetration_testing import InputValidatorTester, PayloadGenerator
+
+# Initialize input validation tester
+validator = InputValidatorTester(
+    target_url="https://target.example.com",
+    parameters=["search", "username", "password", "file_upload"]
+)
+
+# Generate test payloads for various vulnerability classes
+payload_gen = PayloadGenerator()
+
+# SQL Injection payloads
+sqli_payloads = payload_gen.generate(
+    payload_type="sqli",
+    variants=["union", "blind", "error", "time_based"],
+    encoding=["none", "url", "double", "unicode"]
+)
+
+# XSS payloads
+xss_payloads = payload_gen.generate(
+    payload_type="xss",
+    variants=["reflected", "stored", "dom"],
+    encoding=["none", "html", "javascript", "url"]
+)
+
+# Command injection payloads
+cmdi_payloads = payload_gen.generate(
+    payload_type="command_injection",
+    variants=["pipe", "semicolon", "backtick", "dollar"],
+    os_targets=["linux", "windows"]
+)
+
+# Test input validation
+results = validator.test_inputs(
+    sqli_payloads=sqli_payloads,
+    xss_payloads=xss_payloads,
+    cmdi_payloads=cmdi_payloads,
+    time_based_detection=True,
+    error_based_detection=True
+)
+
+print("Input Validation Results:")
+for parameter, result in results.items():
+    print(f"\nParameter: {parameter}")
+    print(f"  SQL Injection: {result.sqli_vulnerable}")
+    print(f"  XSS: {result.xss_vulnerable}")
+    print(f"  Command Injection: {result.cmdi_vulnerable}")
+    print(f"  Detection method: {result.detection_method}")
+    print(f"  WAF bypass required: {result.waf_bypass_needed}")
+```
+
+### Post-Exploitation Methodology
+
+Post-exploitation activities validate the impact of vulnerabilities and demonstrate the potential for further compromise.
+
+**Privilege Escalation Assessment**
+
+```python
+from penetration_testing import PrivilegeEscalationTester, SystemAnalyzer
+
+# Initialize privilege escalation tester
+privesc_tester = PrivilegeEscalationTester(
+    target_host="compromised-host.local",
+    current_user="low_priv_user"
+)
+
+# Analyze system for escalation opportunities
+analyzer = SystemAnalyzer()
+system_analysis = analyzer.analyze(
+    enumeration_depth="comprehensive",
+    check_suid=True,
+    check_sudo=True,
+    check_kernel=True,
+    check_services=True,
+    check_cron=True,
+    check_writable_paths=True
+)
+
+print("System Analysis:")
+print(f"  OS: {system_analysis.os_info}")
+print(f"  Kernel: {system_analysis.kernel_version}")
+print(f"  Current user: {system_analysis.current_user}")
+print(f"  User groups: {system_analysis.user_groups}")
+print(f"  SUID binaries: {len(system_analysis.suid_binaries)}")
+print(f"  Sudo permissions: {len(system_analysis.sudo_permissions)}")
+
+# Identify escalation paths
+escalation_paths = privesc_tester.find_paths(
+    system_analysis=system_analysis,
+    techniques=["suid", "sudo", "kernel", "service", "cron", "writable_path"],
+    auto_exploitable_only=False
+)
+
+for path in escalation_paths:
+    print(f"\nEscalation Path:")
+    print(f"  Technique: {path.technique}")
+    print(f"  Description: {path.description}")
+    print(f"  Required privileges: {path.required_privileges}")
+    print(f"  Reliability: {path.reliability_score}")
+    print(f"  Impact: {path.impact}")
+    
+    # Attempt escalation if auto-exploitable
+    if path.auto_exploitable:
+        result = privesc_tester.exploit_path(path)
+        if result.success:
+            print(f"  Escalation successful!")
+            print(f"  New user: {result.new_user}")
+            print(f"  New privileges: {result.new_privileges}")
+```
+
+**Lateral Movement Assessment**
+
+```python
+from penetration_testing import LateralMovementTester, NetworkPivot
+
+# Initialize lateral movement tester
+lateral_tester = LateralMovementTester(
+    compromised_hosts=["10.0.0.15"],
+    target_network="10.0.0.0/24"
+)
+
+# Enumerate network for lateral movement opportunities
+network_enum = lateral_tester.enumerate_network(
+    methods=["smb_enum", "ssh_enum", "rdp_enum", "winrm_enum"],
+    credential_harvest=True,
+    service_discovery=True
+)
+
+print("Network Enumeration:")
+for host in network_enum.hosts:
+    print(f"\nHost: {host.ip}")
+    print(f"  Hostname: {host.hostname}")
+    print(f"  Services: {host.services}")
+    print(f"  Shared folders: {host.shared_folders}")
+    print(f"  Users: {host.users}")
+    print(f"  Groups: {host.groups}")
+
+# Identify lateral movement paths
+movement_paths = lateral_tester.find_paths(
+    techniques=["pass_the_hash", "pass_the_ticket", "rdp", "ssh", "smb"],
+    credential_types=["ntlm", "kerberos", "plaintext"],
+    trust_relationships=True
+)
+
+for path in movement_paths:
+    print(f"\nLateral Movement Path:")
+    print(f"  Source: {path.source_host}")
+    print(f"  Destination: {path.destination_host}")
+    print(f"  Technique: {path.technique}")
+    print(f"  Credential type: {path.credential_type}")
+    print(f"  Reliability: {path.reliability}")
+    print(f"  Stealth: {path.stealth}")
+```
+
+### Report Generation and Metrics
+
+Comprehensive reporting is essential for communicating findings to stakeholders and driving remediation efforts.
+
+**Automated Report Generation**
+
+```python
+from penetration_testing import ReportGenerator, FindingAggregator
+
+# Initialize report generator
+report_gen = ReportGenerator(
+    engagement_type="penetration_test",
+    report_format=["pdf", "html", "json"],
+    template="enterprise_assessment"
+)
+
+# Aggregate findings from all testing phases
+aggregator = FindingAggregator()
+findings = aggregator.aggregate(
+    scan_results=scan_results,
+    exploitation_results=exploitation_results,
+    post_exploitation_results=post_exploitation_results
+)
+
+# Generate executive summary
+exec_summary = report_gen.generate_executive_summary(
+    findings=findings,
+    business_context=True,
+    risk_assessment=True,
+    roi_analysis=True
+)
+
+print("Executive Summary:")
+print(f"  Total findings: {exec_summary.total_findings}")
+print(f"  Critical: {exec_summary.critical_count}")
+print(f"  High: {exec_summary.high_count}")
+print(f"  Medium: {exec_summary.medium_count}")
+print(f"  Low: {exec_summary.low_count}")
+print(f"  Overall risk: {exec_summary.overall_risk}")
+print(f"  Business impact: {exec_summary.business_impact}")
+
+# Generate technical report
+technical_report = report_gen.generate_technical_report(
+    findings=findings,
+    include_poc=True,
+    include_remediation=True,
+    include_mitre_mapping=True,
+    detailed_analysis=True
+)
+
+# Export reports
+report_gen.export(
+    executive_summary=exec_summary,
+    technical_report=technical_report,
+    formats=["pdf", "html"],
+    output_directory="./reports"
+)
+
+print(f"\nReports generated:")
+print(f"  Executive Summary: ./reports/executive_summary.pdf")
+print(f"  Technical Report: ./reports/technical_report.pdf")
+print(f"  Interactive Report: ./reports/interactive_report.html")
+```

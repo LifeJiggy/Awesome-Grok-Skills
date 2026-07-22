@@ -201,3 +201,543 @@ for cat, items in results['dendrogram'].items():
 ## When to Use This Module
 
 Use this module whenever structural decisions about content organization, navigation labeling, or findability metrics are needed. It is particularly valuable during early product planning (taxonomy and navigation design), after major content expansions (regression testing via tree tests), and when search analytics reveal persistent zero-result patterns indicating structural gaps.
+
+---
+
+## Advanced Configuration
+
+### Taxonomy Governance Rules
+
+```python
+from information_architecture import TaxonomyGovernance
+
+governance = TaxonomyGovernance(
+    max_depth=4,
+    max_children_per_node=8,
+    require_synonyms=True,
+    require_description=True,
+    allow_polyhierarchy=True,
+    duplicate_detection=True,
+)
+violations = governance.validate(taxonomy)
+```
+
+### Search Analytics Pipeline
+
+```python
+from information_architecture import SearchAnalyticsPipeline
+
+pipeline = SearchAnalyticsPipeline(
+    data_source="elasticsearch",
+    index="search_logs",
+    zero_result_threshold=0.15,
+    refinement_tracking=True,
+)
+pipeline.run_daily_analysis()
+```
+
+## Architecture Patterns
+
+### IA Lifecycle
+
+```
+Content Audit
+    │
+    ▼
+┌──────────────┐
+│ Taxonomy     │── Card sort, controlled vocabulary
+│ Design       │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Navigation   │── Tree test, first-click test
+│ Validation   │
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Implementation│── Breadcrumbs, sitemap, labels
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Monitoring   │── Findability metrics, search analytics
+└──────┬───────┘
+    │
+    ▼
+┌──────────────┐
+│ Iteration    │── Regression testing, optimization
+└──────────────┘
+```
+
+## Integration Guide
+
+### CMS Integration
+
+```python
+from information_architecture import CMSBridge
+
+bridge = CMSBridge(provider="contentful")
+bridge.sync_taxonomy(taxonomy)
+bridge.validate_url_structure()
+```
+
+### Analytics Integration
+
+```python
+from information_architecture import AnalyticsBridge
+
+analytics = AnalyticsBridge(provider="google_analytics")
+search_data = analytics.get_search_queries(time_range="30d")
+findability = analyzer.analyze_search_data(search_data)
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| Cached tree tests | Instant re-testing after changes |
+| Automated taxonomy validation | Catch structural issues early |
+| Search log aggregation | Real-time findability monitoring |
+| Dendrogram caching | Fast card sort re-analysis |
+
+## Security Considerations
+
+- **Content access controls**: IA must respect role-based content visibility
+- **URL security**: Prevent information leakage through URL patterns
+- **Search privacy**: Don't log PII in search queries
+- **Taxonomy versioning**: Audit trail for structural changes
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Low tree test success | Navigation labels unclear | Test alternative labels |
+| High zero-result rate | Missing content or poor labels | Add content or fix taxonomy |
+| Card sort low agreement | Cards too similar or ambiguous | Split or clarify card labels |
+| Deep navigation (>4 levels) | Over-categorization | Flatten with cross-links |
+| Search-to-navigate ratio high | Navigation fails for common tasks | Surface popular search topics in nav |
+
+## API Reference
+
+### ContentTaxonomy
+
+```python
+class ContentTaxonomy:
+    def __init__(self, name: str, root_label: str)
+    def add_node(self, label: str, parent_id: str, node_type: str, synonyms: list = None) -> TaxonomyNode
+    def depth_distribution(self) -> dict
+    def find_orphans(self) -> list
+    def validate(self, governance: TaxonomyGovernance = None) -> list
+```
+
+### TreeTest
+
+```python
+class TreeTest:
+    def __init__(self, name: str)
+    def add_category(self, name: str, children: list) -> None
+    def add_task(self, task: TreeTestTask) -> None
+    def record_result(self, participant_id: str, task_id: str, path: list, success: bool, time_seconds: float) -> None
+    def analyze(self) -> TreeTestReport
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class TaxonomyNode:
+    id: str
+    label: str
+    parent_id: str
+    node_type: str
+    synonyms: list
+    children: list
+
+@dataclass
+class TreeTestTask:
+    task_id: str
+    prompt: str
+    correct_path: list
+    direct_correct_path: bool
+
+@dataclass
+class FindabilityMetrics:
+    search_success_rate: float
+    zero_result_rate: float
+    time_to_find_avg_ms: float
+    search_to_navigate_ratio: float
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+pip install information-architecture
+```
+
+### IA Review Cadence
+
+1. Quarterly tree tests on navigation
+2. Monthly search analytics review
+3. Annual full taxonomy audit
+4. Continuous zero-result monitoring
+
+## Monitoring & Observability
+
+```python
+from information_architecture import MetricsCollector
+
+collector = MetricsCollector()
+collector.gauge("ia.findability.rate", rate)
+collector.counter("ia.search.zero_result", count, tags={"query": query})
+collector.histogram("ia.time_to_find_ms", duration)
+collector.gauge("ia.tree_test.success_rate", rate, tags={"task_id": tid})
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from information_architecture import ContentTaxonomy, TreeTest
+
+def test_taxonomy_depth():
+    tax = ContentTaxonomy(name="Test", root_label="Root")
+    tax.add_node("A", "root", "category")
+    tax.add_node("A1", "n1", "content")
+    dist = tax.depth_distribution()
+    assert dist["max_depth"] == 2
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 1.0.0 | Initial release | N/A |
+| 1.1.0 | Added search analytics | Connect search data source |
+| 2.0.0 | New taxonomy format | Run migration script |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **Tree Test** | Validates navigation by testing findability in a text-only hierarchy |
+| **Card Sort** | Participants group content items into categories |
+| **Dendrogram** | Tree diagram showing card sort clustering results |
+| **Findability** | Ease of locating specific content |
+| **Polyhierarchy** | Item belonging to multiple parent categories |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with taxonomy design and tree testing
+- Card sort analysis with dendrogram clustering
+- Findability metrics and search analytics
+- Site map generation
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/information-architecture.git
+pip install -e ".[dev]"
+pytest tests/
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills
+
+---
+
+## Extended Reference
+
+### Tree Test Metrics Reference
+
+| Metric | Calculation | Target |
+|--------|------------|--------|
+| Success rate | Correct path / total attempts | > 70% |
+| Directness | First click on correct path | > 60% |
+| Time to find | Seconds from start to find | < 30s |
+| Post-find confidence | Self-reported confidence | > 3.5/5 |
+| Path similarity | Similarity to ideal path | > 0.7 |
+
+### Card Sort Analysis Metrics
+
+| Metric | Description | Target |
+|--------|-------------|--------|
+| Agreement score | How much participants agree | > 60% |
+| Similarity matrix | Pairwise card grouping frequency | — |
+| Dendrogram clusters | Natural groupings found | — |
+| Variability score | How much agreement varies | < 0.3 |
+| Recommended categories | Optimal number of categories | 5-8 |
+
+### Navigation Depth Guidelines
+
+| Depth | User Expectation | Example |
+|-------|-----------------|---------|
+| 1 click | Most important tasks | Home → Dashboard |
+| 2 clicks | Common tasks | Home → Products → Laptops |
+| 3 clicks | Secondary tasks | Home → Support → Warranty → Status |
+| 4+ clicks | Deep content | Home → Resources → Technical → Specs → Model X |
+
+### Label Quality Criteria
+
+| Criterion | Good Example | Bad Example |
+|-----------|-------------|-------------|
+| Specific | "Pricing Plans" | "Info" |
+| Familiar | "Settings" | "Configuration Panel" |
+| Concise | "Contact Us" | "Get In Touch With Our Team" |
+| Consistent | "My Account" | "User Profile" (mixed) |
+| Action-oriented | "Write a Review" | "Reviews" |
+
+### Search Analytics Reference
+
+| Metric | Calculation | Target |
+|--------|------------|--------|
+| Search usage rate | Searches / sessions | < 30% |
+| Zero-result rate | Zero-result searches / total | < 5% |
+| Search success rate | Clicked result / searches | > 70% |
+| Search refinement rate | Refined searches / total | < 20% |
+| Time to first click | Time from search to click | < 5s |
+
+### IA Governance Checklist
+
+```
+QUARTERLY IA REVIEW
+    □ Run tree test on current navigation
+    □ Analyze search logs for zero-result queries
+    □ Review content inventory for orphans
+    □ Check taxonomy for new content
+    □ Validate label consistency
+    □ Test new navigation concepts
+    □ Update sitemap
+    □ Document changes
+
+CONTENT MIGRATION CHECKLIST
+    □ Audit all existing content
+    □ Map content to new taxonomy
+    □ Set up redirects for moved content
+    □ Test all internal links
+    □ Update search index
+    □ Train content editors
+    □ Monitor 404 errors post-launch
+```
+
+### IA Documentation Template
+
+```markdown
+# Information Architecture Document
+
+## Navigation Structure
+### Primary Navigation
+- [Item 1] → [URL]
+- [Item 2] → [URL]
+  - [Sub-item 2.1] → [URL]
+  - [Sub-item 2.2] → [URL]
+
+### Secondary Navigation
+- [Item] → [URL]
+
+## Taxonomy
+### Categories
+- [Category 1]
+  - [Subcategory 1.1]
+  - [Subcategory 1.2]
+- [Category 2]
+
+## Labels
+| Location | Current Label | User-tested Label | Status |
+|----------|--------------|-------------------|--------|
+| Nav item 1 | Products | Products | Approved |
+| Nav item 2 | Resources | Help Center | Needs update |
+
+## Sitemap
+[Visual sitemap or tree diagram]
+```
+
+### Complete Search Analytics Reference
+
+| Query Type | Example | Action |
+|-----------|---------|--------|
+| Zero-result | "xyz123" | Add content or synonyms |
+| High refinement | "pricing cost" → "plans" | Improve labels |
+| High exit | "contact" → leave | Make contact easier |
+| Low CTR | "help" → no clicks | Improve result snippets |
+| Brand + feature | "Acme pricing" | Ensure brand pages rank |
+
+### Complete Content Inventory Template
+
+| URL | Title | Type | Status | Owner | Last Updated | Views | Bounce Rate |
+|-----|-------|------|--------|-------|-------------|-------|-------------|
+| / | Home | Page | Live | Marketing | 2024-01 | 10,000 | 30% |
+| /products | Products | Page | Live | Product | 2024-01 | 5,000 | 25% |
+| /blog/post-1 | Blog Post | Article | Live | Content | 2024-01 | 2,000 | 45% |
+| /old-page | Old Page | Page | Redirect | — | 2023-06 | 100 | 90% |
+
+### Complete URL Structure Reference
+
+| Pattern | Example | Use Case |
+|---------|---------|----------|
+| /category | /products | Top-level category |
+| /category/item | /products/laptops | Item in category |
+| /category/item/detail | /products/laptops/model-x | Specific item |
+| /blog/year/month/slug | /blog/2024/01/post | Blog posts |
+| /support/topic | /support/billing | Support topic |
+| /support/topic/item | /support/billing/refund | Specific article |
+
+### Navigation System Design Reference
+
+| Navigation Type | Use Case | Depth Support | Examples |
+|----------------|----------|---------------|----------|
+| Primary navigation | Top-level sections | 1-2 levels | Header bar, sidebar |
+| Secondary navigation | Within a section | 2-3 levels | Section submenus |
+| Utility navigation | Account, settings | 1 level | Header right side |
+| Breadcrumbs | Current location path | Shows full path | Home > Products > Laptops |
+| Footer navigation | Supplemental links | 1-2 levels | Site map, legal links |
+| Contextual navigation | Related content | 1 level | "See also" links |
+| Faceted navigation | Filtered browsing | Variable | Category filters |
+| Tag-based navigation | Topic discovery | Flat | Tag clouds, tag pages |
+
+### Content Organization Patterns
+
+| Pattern | Description | Best For | Avoid When |
+|---------|-------------|----------|------------|
+| Hierarchical | Tree with parent-child | Large content sets | Content belongs in multiple places |
+| Faceted | Multiple orthogonal dimensions | E-commerce, catalogs | Simple sites with few items |
+| Chronological | Time-ordered | News, blogs, changelogs | Evergreen reference content |
+| Task-based | Organized by user goals | Support sites, tools | Content spans many tasks |
+| Audience-based | Segmented by user type | B2B with distinct personas | Overlapping audience needs |
+| Topic-based | Grouped by subject matter | Documentation, wikis | No clear topic boundaries |
+| Alphabetical | A-Z listing | Directories, glossaries | Large content sets (>500 items) |
+| Hybrid | Combination of above | Most real-world sites | Never (always recommended) |
+
+### Taxonomy Governance Template
+
+```markdown
+# Taxonomy Governance Policy
+
+## Naming Conventions
+- Labels: Title Case, max 40 characters
+- Synonyms: lowercase, pipe-delimited
+- Descriptions: max 100 characters
+
+## Structural Rules
+- Max depth: 4 levels
+- Max children per node: 8
+- Min children for branch: 2 (or flatten)
+- Polyhierarchy allowed: Yes (with cross-links)
+
+## Maintenance Schedule
+- Weekly: New content categorization
+- Monthly: Label consistency audit
+- Quarterly: Full taxonomy review
+- Annually: Structural redesign assessment
+
+## Change Management
+1. Propose change with rationale
+2. Test with 5+ users (first-click test)
+3. Document decision and evidence
+4. Implement with redirects
+5. Monitor findability metrics
+```
+
+### Search System Design Reference
+
+| Component | Purpose | Implementation |
+|-----------|---------|----------------|
+| Query processing | Parse and normalize user input | Tokenization, stemming, spell-check |
+| Ranking algorithm | Order results by relevance | BM25, TF-IDF, or ML-based |
+| Faceted search | Allow filtering by attributes | Category, date, type filters |
+| Auto-suggest | As-you-type recommendations | Prefix matching, popularity-weighted |
+| Zero-result handling | Help when nothing matches | Synonyms, "Did you mean?", related content |
+| Search analytics | Track what users search for | Query logging, click tracking |
+| Synonym management | Map alternate terms | User-tested synonym pairs |
+| Redirect rules | Direct known queries to content | High-volume queries to landing pages |
+
+### Findability Scorecard Template
+
+```markdown
+# Findability Scorecard: [Section]
+
+## Direct Navigation (Users find without searching)
+- Target: > 70% first-click success
+- Actual: [X]%
+- Status: Pass/Fail
+
+## Search Recovery (Users find via search when nav fails)
+- Target: > 60% search success rate
+- Actual: [X]%
+- Status: Pass/Fail
+
+## Time to Find
+- Target: < 30 seconds
+- Actual: [X] seconds
+- Status: Pass/Fail
+
+## Label Clarity
+- Target: > 80% agreement on meaning
+- Actual: [X]%
+- Status: Pass/Fail
+
+## Navigation Depth
+- Target: ≤ 3 clicks to any page
+- Actual: [X] clicks average
+- Status: Pass/Fail
+
+## Overall Findability Score: [X]/100
+```
+
+### Card Sort Best Practices Quick Reference
+
+| Aspect | Recommendation |
+|--------|---------------|
+| Participant count | 15-20 per user segment |
+| Card count | 30-50 items |
+| Session duration | 30-45 minutes |
+| Incentive | Comparable to interview rates |
+| Open sort | Use for discovering categories |
+| Closed sort | Use for validating proposed structure |
+| Hybrid sort | Use when you have partial structure |
+| Remote vs. in-person | Remote for scale, in-person for depth |
+| Analysis method | Dendrogram + similarity matrix |
+| Agreement threshold | > 60% considered good |
+
+### Tree Test Task Design Guide
+
+```markdown
+# Tree Test Task Design
+
+## Task Writing Rules
+1. Use realistic scenarios, not abstract navigation instructions
+2. Include context ("You want to...") not commands ("Find...")
+3. Avoid using words that appear in navigation labels
+4. Test both known-item and exploratory tasks
+5. Include 5-10 tasks per test
+
+## Good vs. Bad Tasks
+
+GOOD: "You just bought a laptop and want to check if it's covered 
+       under warranty."
+BAD:  "Click on 'Support' then 'Warranty'."
+
+GOOD: "You want to compare the features of two different tablets 
+       before making a purchase."
+BAD:  "Go to the products page and find tablets."
+
+GOOD: "A friend recommended a software tool. You want to find out 
+       what it does and if it would work for your team."
+BAD:  "Navigate to the software section."
+
+## Task Types
+- Known-item: User knows what they're looking for
+- Exploratory: User is browsing or researching
+- Recovery: User is lost and trying to find their way back
+- Discrete: Single correct answer
+- Ambiguous: Multiple valid paths
+```

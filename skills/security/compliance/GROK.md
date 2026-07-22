@@ -295,3 +295,951 @@ The compliance module follows a control-centric architecture:
 - CIS Controls v8: https://www.cisecurity.org/controls
 - OWASP ASVS (Application Security Verification Standard): https://owasp.org/www-project-application-security-verification-standard/
 - Cloud Security Alliance (CSA) CCM: https://cloudsecurityalliance.org/research/cloud-controls-matrix/
+
+---
+
+## GDPR Compliance Implementation
+
+The General Data Protection Regulation (GDPR) imposes strict requirements on organizations that process personal data of EU residents. Non-compliance carries fines up to 4% of annual global revenue or EUR 20 million, whichever is higher. GDPR compliance requires technical and organizational measures that protect personal data throughout its lifecycle.
+
+### GDPR Data Processing Principles
+
+```python
+from compliance import GDPRCompliance, DataProcessingRecord, lawful_basis
+
+# Register a data processing activity (Article 30 record)
+processing = DataProcessingRecord(
+    activity_id="DPA-001",
+    purpose="Customer account management",
+    data_categories=["name", "email", "phone", "ip_address"],
+    data_subjects=["customers", "website_visitors"],
+    lawful_basis=lawful_basis.CONTRACT,  # Art. 6(1)(b)
+    retention_period="7 years after account closure",
+    recipients=["payment_processor", "email_service"],
+    transfers=["US (SCCs in place)"],
+    technical_measures=["encryption_at_rest", "access_controls", "pseudonymization"],
+    dpo_contact="dpo@company.com",
+    last_review="2024-01-15"
+)
+
+# Data Protection Impact Assessment (DPIA) for high-risk processing
+dpia = gdpr.dpia(
+    processing=processing,
+    necessity_and_proportionality=True,
+    risk_to_data_subjects=["unauthorized_access", "data_breach", "discrimination"],
+    mitigation_measures=["encryption", "access_logging", "anonymization"],
+    dpo_sign_off=True,
+    review_date="2024-07-15"
+)
+print(f"DPIA Status: {dpia.status}")
+print(f"Risk Level: {dpia.risk_level}")
+print(f"DPO Approval: {dpia.dpo_approved}")
+```
+
+### Data Subject Rights Implementation
+
+```python
+from compliance import GDPRDataRights, SubjectRequest, RequestType
+
+rights_handler = GDPRDataRights(storage_backend="postgresql")
+
+# Handle right of access (Article 15)
+request = SubjectRequest(
+    subject_id="user-12345",
+    request_type=RequestType.ACCESS,
+    identity_verified=True,
+    verification_method="email_plus_id",
+    deadline_days=30
+)
+
+response = rights_handler.process(request)
+print(f"Request ID: {response.request_id}")
+print(f"Data found: {response.data_categories}")
+print(f"Third parties notified: {response.third_parties_notified}")
+print(f"Response due: {response.deadline}")
+
+# Handle right to erasure (Article 17 - Right to be forgotten)
+erasure_request = SubjectRequest(
+    subject_id="user-67890",
+    request_type=RequestType.ERASURE,
+    identity_verified=True,
+    verification_method="email_plus_id",
+    exemptions=["legal_obligation", "active_contract"]
+)
+
+erasure_response = rights_handler.process_erasure(erasure_request)
+print(f"Records deleted: {erasure_response.records_deleted}")
+print(f"Records retained (exemptions): {erasure_response.records_retained}")
+print(f"Third parties notified: {erasure_response.third_parties_notified}")
+print(f"Backup purged: {erasure_response.backup_purge_scheduled}")
+
+# Handle right to portability (Article 20)
+portability = rights_handler.export_data(
+    subject_id="user-12345",
+    format="json",  # machine-readable format
+    include_metadata=True
+)
+print(f"Export size: {portability.size_bytes} bytes")
+print(f"Format: {portability.format}")
+print(f"Encryption: {portability.export_encrypted}")
+```
+
+### GDPR Breach Notification
+
+```python
+from compliance import GDPRBreachNotification, BreachSeverity
+
+# Record a data breach
+breach = GDPRBreachNotification(
+    breach_id="BREACH-2024-001",
+    detected_date="2024-03-15T10:30:00Z",
+    breach_type="confidentiality",  # confidentiality, integrity, or availability
+    data_categories=["email", "password_hashes"],
+    estimated_subjects=5000,
+    severity=BreachSeverity.HIGH,  # risk to rights and freedoms
+    cause="compromised API key",
+    containment_date="2024-03-15T11:00:00Z",
+    forensic_status="investigating"
+)
+
+# GDPR 72-hour notification to supervisory authority
+notification = breach.prepare_authority_notification(
+    authority="Commission Nationale de l'Informatique et des Libert\u00e9s (CNIL)",
+    include_containment_measures=True,
+    include_dpo_contact=True,
+    include_likely_consequences=True,
+    include_mitigation_measures=True
+)
+print(f"Notification deadline: {notification.deadline_72h}")
+print(f"Deadline status: {notification.status}")
+
+# Prepare data subject notification (Article 34)
+# Required when high risk to rights and freedoms
+subject_notification = breach.prepare_subject_notification(
+    template="breach_notification_v3",
+    include_contact_dpo=True,
+    include_measures_taken=True,
+    include_recommendations=True
+)
+print(f"Subject notification required: {subject_notification.required}")
+print(f"Notification channels: {subject_notification.channels}")
+```
+
+## HIPAA Compliance Implementation
+
+The Health Insurance Portability and Accountability Act (HIPAA) requires covered entities and business associates to implement administrative, physical, and technical safeguards for Protected Health Information (PHI). Penalties range from $100 to $50,000 per violation, with an annual maximum of $1.5 million per violation category.
+
+### HIPAA Security Rule Implementation
+
+```python
+from compliance import HIPAACompliance, SecuritySafeguard, safeguard_type
+
+# Map technical safeguards (§164.312)
+technical_safeguards = [
+    SecuritySafeguard(
+        ref="§164.312(a)(1)",
+        title="Access Control",
+        requirement="Implement technical policies to allow access only to authorized persons",
+        implementation_status="implemented",
+        controls=[
+            "RBAC with role-based access to EHR systems",
+            "Unique user identification (no shared accounts)",
+            "Automatic session timeout (15 minutes)",
+            "Emergency access procedure documented and tested",
+            "Encryption of PHI at rest (AES-256) and in transit (TLS 1.3)",
+        ],
+        evidence=["rbac_policy.pdf", "session_timeout_config.png", "encryption_audit.json"],
+        last_tested="2024-01-15"
+    ),
+    SecuritySafeguard(
+        ref="§164.312(b)",
+        title="Audit Controls",
+        requirement="Implement hardware, software, and/or procedural mechanisms to record and examine access",
+        implementation_status="implemented",
+        controls=[
+            "Centralized audit logging (ELK stack)",
+            "Access logs retained for 6 years",
+            "Automated alerting on anomalous access patterns",
+            "Monthly access review by compliance team",
+        ],
+        evidence=["audit_log_config.json", "monthly_review_report.pdf"],
+        last_tested="2024-01-15"
+    ),
+    SecuritySafeguard(
+        ref="§164.312(c)(1)",
+        title="Integrity",
+        requirement="Implement policies to protect PHI from improper alteration or destruction",
+        implementation_status="implemented",
+        controls=[
+            "Database write-ahead logging (WAL)",
+            "Cryptographic integrity verification (SHA-256)",
+            "Immutable audit trail for PHI modifications",
+            "Automated backup integrity checks",
+        ],
+        evidence=["integrity_check_config.json", "backup_verification_log.csv"],
+        last_tested="2024-01-15"
+    ),
+    SecuritySafeguard(
+        ref="§164.312(d)",
+        title="Person or Entity Authentication",
+        requirement="Implement procedures to verify identity of persons seeking access to PHI",
+        implementation_status="implemented",
+        controls=[
+            "Multi-factor authentication (MFA) for all PHI access",
+            "Certificate-based authentication for service accounts",
+            "Biometric authentication for physical access to data centers",
+            "Annual credential review and rotation",
+        ],
+        evidence=["mfa_policy.pdf", "auth_config.json", "credential_review_2024.pdf"],
+        last_tested="2024-01-15"
+    ),
+    SecuritySafeguard(
+        ref="§164.312(e)(1)",
+        title="Transmission Security",
+        requirement="Implement technical security measures to guard against unauthorized access during transmission",
+        implementation_status="implemented",
+        controls=[
+            "TLS 1.3 for all PHI transmissions",
+            "mTLS for system-to-system communication",
+            "VPN for remote access to PHI systems",
+            "Encryption key rotation every 90 days",
+        ],
+        evidence=["tls_config.json", "mtls_config.json", "vpn_config.json"],
+        last_tested="2024-01-15"
+    ),
+]
+
+# Map administrative safeguards (§164.308)
+administrative_safeguards = [
+    SecuritySafeguard(
+        ref="§164.308(a)(1)",
+        title="Security Management Process",
+        requirement="Implement policies and procedures to prevent, detect, contain, and correct security violations",
+        implementation_status="implemented",
+        controls=[
+            "Risk analysis conducted annually",
+            "Risk management plan with assigned responsibilities",
+            "Sanction policy for workforce members",
+            "Information system activity review procedures",
+        ],
+        evidence=["risk_analysis_2024.pdf", "risk_management_plan.pdf", "sanction_policy.pdf"],
+        last_tested="2024-01-15"
+    ),
+    SecuritySafeguard(
+        ref="§164.308(a)(5)",
+        title="Security Awareness and Training",
+        requirement="Implement security awareness and training program for all workforce members",
+        implementation_status="implemented",
+        controls=[
+            "Annual HIPAA security training for all staff",
+            "Role-based training for new hires",
+            "Phishing simulation quarterly",
+            "Security awareness newsletter monthly",
+        ],
+        evidence=["training_completion_report.pdf", "phishing_simulation_results.csv"],
+        last_tested="2024-01-15"
+    ),
+]
+
+# Assess HIPAA compliance
+hipaa = HIPAACompliance()
+assessment = hipaa.assess(
+    technical_safeguards=technical_safeguards,
+    administrative_safeguards=administrative_safeguards,
+    physical_safeguards=[],  # Not shown for brevity
+)
+print(f"HIPAA Compliance Score: {assessment.score:.1%}")
+print(f"Technical Safeguards: {assessment.technical_score:.1%}")
+print(f"Administrative Safeguards: {assessment.administrative_score:.1%}")
+print(f"Findings: {assessment.findings_count}")
+```
+
+### Business Associate Agreement Tracking
+
+```python
+from compliance import BAATracker, BusinessAssociate
+
+tracker = BAATracker()
+
+# Register a business associate
+ba = tracker.register(
+    name="Cloud Health Systems",
+    service="EHR hosting",
+    data_access=["PHI", "ePHI"],
+    baa_signed_date="2023-06-15",
+    baa_expiry_date="2025-06-14",
+    security_assessment_date="2023-06-01",
+    last_audit_date="2024-01-15",
+    breach_notification_required=True,
+    subcontractors=["AWS", "CloudFlare"],
+    compliance_requirements=["HIPAA", "SOC2"]
+)
+
+# Check BAA status
+status = tracker.check_status(ba)
+print(f"BAA Status: {status.status}")
+print(f"Days until expiry: {status.days_until_expiry}")
+print(f"Security assessment current: {status.assessment_current}")
+print(f"Audit current: {status.audit_current}")
+
+# Generate compliance report
+report = tracker.compliance_report(
+    include_expired=True,
+    include_expiring_90_days=True
+)
+print(f"\nTotal BAAs: {report.total}")
+print(f"Active: {report.active}")
+print(f"Expiring in 90 days: {report.expiring_90_days}")
+print(f"Expired: {report.expired}")
+```
+
+## PCI DSS 4.0 Implementation
+
+Payment Card Industry Data Security Standard (PCI DSS) version 4.0 introduces 12 requirements organized into 6 goals, with new requirements for enhanced authentication, encryption, and continuous monitoring. Non-compliance can result in fines of $5,000 to $100,000 per month and loss of card processing privileges.
+
+### PCI DSS Requirement Mapping
+
+```python
+from compliance import PCIDSSCompliance, Requirement, SAQType
+
+pci = PCIDSSCompliance(version="4.0")
+
+# Define requirement mappings for each of the 12 PCI DSS goals
+requirements = [
+    Requirement(
+        goal=1,
+        title="Install and Maintain Network Security Controls",
+        sub_requirements=[
+            "1.2.1 - Restrict inbound and outbound traffic",
+            "1.3.1 - Restrict inbound traffic to cardholder data environment (CDE)",
+            "1.3.2 - Restrict outbound traffic from CDE",
+            "1.4.1 - Install network security controls between CDE and untrusted networks",
+            "1.5.1 - Document roles and responsibilities for network security",
+        ],
+        implementation_status="implemented",
+        evidence=["network_diagram.pdf", "firewall_rules.json", "access_control_lists.csv"],
+        automated_check=True
+    ),
+    Requirement(
+        goal=2,
+        title="Apply Secure Configurations to All System Components",
+        sub_requirements=[
+            "2.2.1 - Develop configuration standards for all system components",
+            "2.2.2 - System configuration standards address all known vulnerabilities",
+            "2.2.3 - Configuration standards are reviewed at least annually",
+            "2.2.4 - Changes to system components managed securely",
+        ],
+        implementation_status="implemented",
+        evidence=["config_standards.pdf", "baseline_configs.json", "review_schedule.csv"],
+        automated_check=True
+    ),
+    Requirement(
+        goal=6,
+        title="Develop and Maintain Secure Systems and Software",
+        sub_requirements=[
+            "6.2.1 - Bespoke and custom software are developed securely",
+            "6.2.2 - Bespoke software is protected against common vulnerabilities",
+            "6.3.1 - Identify and manage security vulnerabilities",
+            "6.4.1 - Public-facing web applications protected against attacks",
+            "6.4.2 - Automated technical solutions for web-based attacks on public systems",
+        ],
+        implementation_status="partially_implemented",
+        evidence=["secure_coding_policy.pdf", "sast_config.json", "dast_results.csv"],
+        automated_check=True
+    ),
+    Requirement(
+        goal=8,
+        title="Identify Users and Authenticate Access",
+        sub_requirements=[
+            "8.2.1 - Identify and authenticate users accessing system components",
+            "8.3.1 - MFA for all non-console access to CDE",
+            "8.3.2 - MFA implemented via hardware or software mechanisms",
+            "8.3.6 - Password/passphrase complexity requirements",
+            "8.3.7 - Password/passphrase history requirements",
+        ],
+        implementation_status="implemented",
+        evidence=["mfa_policy.pdf", "auth_config.json", "password_policy.json"],
+        automated_check=True
+    ),
+    Requirement(
+        goal=10,
+        title="Log and Monitor All Access",
+        sub_requirements=[
+            "10.2.1 - Audit logs capture specified events",
+            "10.2.2 - Audit logs record all individual access to cardholder data",
+            "10.3.1 - Audit logs are protected from modifications",
+            "10.4.1 - Audit logs reviewed at least daily",
+            "10.4.2 - Anomalies and exceptions identified and addressed",
+        ],
+        implementation_status="implemented",
+        evidence=["logging_config.json", "siem_alerts.json", "review_schedule.csv"],
+        automated_check=True
+    ),
+]
+
+# Generate SAQ (Self-Assessment Questionnaire)
+saq = pci.generate_saq(
+    saq_type=SAQType.A,  # SAQ A for merchants who outsource all card processing
+    requirements=requirements,
+    signed_by="CISO",
+    sign_date="2024-03-15",
+    attestation_period="2024-Q1"
+)
+print(f"SAQ Type: {saq.saq_type}")
+print(f"Requirements Met: {saq.requirements_met}/{saq.requirements_total}")
+print(f"Compliance Status: {saq.compliance_status}")
+print(f"Next Assessment Due: {saq.next_assessment_date}")
+```
+
+### Continuous Compliance Monitoring for PCI
+
+```python
+from compliance import PCIContinuousMonitor, ComplianceCheck
+
+monitor = PCIContinuousMonitor()
+
+# Define continuous checks
+checks = [
+    ComplianceCheck(
+        check_id="PCI-CONT-001",
+        requirement="1.2.1",
+        title="Network segmentation verification",
+        check_type="automated",
+        frequency="daily",
+        script="verify_network_segmentation.py",
+        pass_criteria="No direct traffic from internet to CDE",
+        alert_on_failure=True
+    ),
+    ComplianceCheck(
+        check_id="PCI-CONT-002",
+        requirement="8.3.1",
+        title="MFA enforcement verification",
+        check_type="automated",
+        frequency="daily",
+        script="verify_mfa_enforcement.py",
+        pass_criteria="100% of CDE access requires MFA",
+        alert_on_failure=True
+    ),
+    ComplianceCheck(
+        check_id="PCI-CONT-003",
+        requirement="10.4.1",
+        title="Daily log review completion",
+        check_type="manual",
+        frequency="daily",
+        script="check_log_review.py",
+        pass_criteria="Log review completed by 09:00 UTC",
+        alert_on_failure=True
+    ),
+    ComplianceCheck(
+        check_id="PCI-CONT-004",
+        requirement="6.4.1",
+        title="WAF rule effectiveness",
+        check_type="automated",
+        frequency="weekly",
+        script="verify_waf_rules.py",
+        pass_criteria="All OWASP Top 10 rules active, no disabled critical rules",
+        alert_on_failure=True
+    ),
+]
+
+# Run compliance checks
+results = monitor.run_checks(checks)
+for result in results:
+    status = "PASS" if result.passed else "FAIL"
+    print(f"[{status}] {result.check_id}: {result.title}")
+    if not result.passed:
+        print(f"  Details: {result.failure_details}")
+        print(f"  Alert sent: {result.alert_sent}")
+
+# Generate compliance report
+report = monitor.compliance_report(period="last_30_days")
+print(f"\nPCI DSS 4.0 Continuous Compliance Report")
+print(f"Checks Run: {report.checks_run}")
+print(f"Pass Rate: {report.pass_rate:.1%}")
+print(f"Failures: {report.failures}")
+print(f"Alerts Sent: {report.alerts_sent}")
+```
+
+## SOC 2 Trust Services Criteria Implementation
+
+SOC 2 Type II examines the effectiveness of controls over a period (typically 6-12 months). The five Trust Services Criteria — Security, Availability, Processing Integrity, Confidentiality, and Privacy — form the framework for evaluating controls.
+
+### SOC 2 Control Implementation
+
+```python
+from compliance import SOC2Control, TrustServiceCriteria, ControlEffectiveness
+
+# Define controls mapped to Trust Services Criteria
+controls = [
+    SOC2Control(
+        control_id="CC6.1",
+        title="Logical Access Security",
+        criteria=TrustServiceCriteria.SECURITY,
+        description="Entity implements logical access security to protect against threats",
+        control_type="preventive",
+        implementation=[
+            "RBAC with least-privilege principles",
+            "Unique user identification (no shared accounts)",
+            "MFA for remote access",
+            "Quarterly access reviews",
+            "Automated deprovisioning on termination",
+        ],
+        evidence_sources=["iam_config.json", "access_reviews/", "offboarding_logs.csv"],
+        test_procedure="Verify access controls enforce least privilege and MFA",
+        expected_result="100% of access follows RBAC, MFA enforced for remote",
+        review_frequency="quarterly",
+        owner="platform-team"
+    ),
+    SOC2Control(
+        control_id="CC6.2",
+        title="User Registration and Authorization",
+        criteria=TrustServiceCriteria.SECURITY,
+        description="Entity registers new users through an authorization process",
+        control_type="preventive",
+        implementation=[
+            "New user request via ticketing system",
+            "Manager approval required",
+            "Security team verifies role appropriateness",
+            "Unique credentials issued per user",
+        ],
+        evidence_sources=["ticket_logs.csv", "approval_records.json"],
+        test_procedure="Verify all users have documented approval",
+        expected_result="100% of new users have manager and security approval",
+        review_frequency="quarterly",
+        owner="platform-team"
+    ),
+    SOC2Control(
+        control_id="CC7.1",
+        title="Detection of Unauthorized Activities",
+        criteria=TrustServiceCriteria.SECURITY,
+        description="Entity monitors system components for anomalies",
+        control_type="detective",
+        implementation=[
+            "SIEM integration (Splunk)",
+            "Anomaly detection rules for authentication",
+            "Failed login alerting (>5 attempts)",
+            "Privilege escalation alerting",
+            "Network traffic anomaly detection",
+        ],
+        evidence_sources=["siem_config.json", "alert_rules.json", "incident_logs.csv"],
+        test_procedure="Verify alerts fire on test anomalies",
+        expected_result="All anomaly detection rules functional, alerts delivered",
+        review_frequency="monthly",
+        owner="security-ops"
+    ),
+    SOC2Control(
+        control_id="CC8.1",
+        title="Change Management",
+        criteria=TrustServiceCriteria.SECURITY,
+        description="Entity manages changes to infrastructure and software",
+        control_type="preventive",
+        implementation=[
+            "All changes via pull request with review",
+            "Automated CI/CD with security gates",
+            "Change approval by designated approvers",
+            "Rollback procedures documented",
+            "Post-deployment verification",
+        ],
+        evidence_sources=["git_logs.json", "ci_results.json", "change_tickets.csv"],
+        test_procedure="Verify all production changes follow change management",
+        expected_result="100% of production changes have documented approval",
+        review_frequency="quarterly",
+        owner="engineering"
+    ),
+    SOC2Control(
+        control_id="CC9.1",
+        title="Risk Management",
+        criteria=TrustServiceCriteria.SECURITY,
+        description="Entity identifies, selects, and develops risk mitigation activities",
+        control_type="preventive",
+        implementation=[
+            "Annual risk assessment",
+            "Risk register maintained and reviewed quarterly",
+            "Risk acceptance documented by management",
+            "Vendor risk assessments for critical vendors",
+        ],
+        evidence_sources=["risk_assessment.pdf", "risk_register.xlsx", "vendor_assessments/"],
+        test_procedure="Verify risk register is current and reviewed",
+        expected_result="Risk register updated quarterly, all risks have owners",
+        review_frequency="quarterly",
+        owner="risk-management"
+    ),
+]
+
+# Test control effectiveness
+for control in controls:
+    effectiveness = control.test_effectiveness()
+    print(f"{control.control_id}: {control.title}")
+    print(f"  Status: {effectiveness.status}")
+    print(f"  Operating Effectively: {effectiveness.operating_effectively}")
+    print(f"  Evidence Gap: {effectiveness.evidence_gap}")
+    print(f"  Findings: {effectiveness.findings}")
+    print()
+```
+
+## Audit Preparation and Evidence Generation
+
+### Automated Audit Evidence Collection
+
+```python
+from compliance import AuditEvidenceCollector, EvidenceCategory
+
+collector = AuditEvidenceCollector(
+    storage_path="./audit-evidence/2024",
+    encryption_key="vault://audit-evidence-key"
+)
+
+# Collect evidence from multiple sources automatically
+evidence_items = collector.collect_batch([
+    # Access control evidence
+    {
+        "category": EvidenceCategory.ACCESS_CONTROL,
+        "source": "aws_iam",
+        "collection_script": "collect_iam_access.py",
+        "output_format": "json",
+        "include_timestamps": True,
+    },
+    # Configuration evidence
+    {
+        "category": EvidenceCategory.CONFIGURATION,
+        "source": "terraform_state",
+        "collection_script": "collect_infra_config.py",
+        "output_format": "json",
+        "include_diff": True,
+    },
+    # Vulnerability scan evidence
+    {
+        "category": EvidenceCategory.VULNERABILITY_SCAN,
+        "source": "trivy_scanner",
+        "collection_script": "collect_scan_results.py",
+        "output_format": "json",
+        "include_summary": True,
+    },
+    # Change management evidence
+    {
+        "category": EvidenceCategory.CHANGE_MANAGEMENT,
+        "source": "github",
+        "collection_script": "collect_change_logs.py",
+        "output_format": "json",
+        "include_approvals": True,
+    },
+    # Incident response evidence
+    {
+        "category": EvidenceCategory.INCIDENT_RESPONSE,
+        "source": "pagerduty",
+        "collection_script": "collect_incidents.py",
+        "output_format": "json",
+        "include_resolution": True,
+    },
+])
+
+# Generate audit-ready bundle
+bundle = collector.create_bundle(
+    evidence_items=evidence_items,
+    framework=Framework.SOC2,
+    period="2024-Q1",
+    auditor="PwC",
+    include_index=True,
+    include_executive_summary=True
+)
+
+print(f"Audit bundle ready: {bundle.path}")
+print(f"Total evidence items: {len(bundle.evidence_items)}")
+print(f"Categories covered: {bundle.categories_covered}")
+print(f"Bundle integrity hash: {bundle.integrity_hash}")
+```
+
+## Regulatory Change Tracking
+
+```python
+from compliance import RegulatoryChangeTracker, FrameworkUpdate
+
+tracker = RegulatoryChangeTracker()
+
+# Track changes across multiple frameworks
+tracker.track_framework(
+    framework=Framework.PCI_DSS,
+    version="4.0",
+    change_feed="https://www.pcisecuritystandards.org/rss/updates",
+    alert_channels=["slack-security", "email-compliance"],
+)
+
+tracker.track_framework(
+    framework=Framework.HIPAA,
+    version="current",
+    change_feed="hhs.gov/hipaa/rules",
+    alert_channels=["email-compliance"],
+)
+
+tracker.track_framework(
+    framework=Framework.SOC2,
+    version="2024",
+    change_feed="aicpa.org/soc2-updates",
+    alert_channels=["slack-security", "email-compliance"],
+)
+
+# Check for recent changes
+changes = tracker.get_recent_changes(days=30)
+for change in changes:
+    print(f"Change: {change.title}")
+    print(f"  Framework: {change.framework}")
+    print(f"  Effective Date: {change.effective_date}")
+    print(f"  Impact: {change.impact_assessment}")
+    print(f"  Controls Affected: {change.controls_affected}")
+    print(f"  Action Required: {change.action_required}")
+    print(f"  Status: {change.status}")
+    print()
+```
+
+## Compliance Policy Templates
+
+### Acceptable Use Policy Template
+
+```python
+from compliance import PolicyTemplate, PolicyType
+
+template = PolicyTemplate(
+    policy_type=PolicyType.ACCEPTABLE_USE,
+    version="4.0",
+    effective_date="2024-01-01",
+    review_cycle="annual",
+    approver="CISO",
+    applicable_frameworks=["SOC2:CC6.1", "ISO27001:A.7.1.2", "NIST:AC-11"]
+)
+
+# Generate policy document
+policy = template.generate(
+    company_name="Acme Corp",
+    data_classification_levels=["Public", "Internal", "Confidential", "Restricted"],
+    prohibited_activities=[
+        "Unauthorized access to systems or data",
+        "Sharing credentials with others",
+        "Using company resources for personal financial gain",
+        "Installing unauthorized software",
+        "Bypassing security controls",
+    ],
+    acceptable_activities=[
+        "Using company resources for authorized work tasks",
+        "Reporting security incidents immediately",
+        "Following data handling procedures",
+        "Participating in security awareness training",
+    ],
+    enforcement_actions=[
+        "Verbal warning for first offense",
+        "Written warning for repeated offenses",
+        "Suspension of access pending investigation",
+        "Termination for willful violations",
+    ],
+    acknowledgment_required=True,
+    acknowledgment_deadline_days=30,
+    format="docx"
+)
+print(f"Policy generated: {policy.path}")
+print(f"Acknowledgment required: {policy.acknowledgment_required}")
+print(f"Deadline: {policy.acknowledgment_deadline}")
+```
+
+### Incident Response Policy Template
+
+```python
+from compliance import PolicyTemplate, PolicyType
+
+template = PolicyTemplate(
+    policy_type=PolicyType.INCIDENT_RESPONSE,
+    version="3.0",
+    effective_date="2024-01-01",
+    review_cycle="annual",
+    approver="CISO",
+    applicable_frameworks=[
+        "SOC2:CC7.3", "SOC2:CC7.4",
+        "ISO27001:A.16.1", "ISO27001:A.16.1.1",
+        "PCI_DSS:12.10",
+        "NIST:IR-1", "NIST:IR-2"
+    ]
+)
+
+policy = template.generate(
+    company_name="Acme Corp",
+    incident_severity_levels=[
+        {"level": 1, "name": "Critical", "response_time": "15 minutes", "escalation": "CISO, CTO, Legal"},
+        {"level": 2, "name": "High", "response_time": "1 hour", "escalation": "Security Manager, Engineering VP"},
+        {"level": 3, "name": "Medium", "response_time": "4 hours", "escalation": "Security Team Lead"},
+        {"level": 4, "name": "Low", "response_time": "24 hours", "escalation": "Security Team"},
+    ],
+    response_phases=[
+        {"phase": "Preparation", "description": "Pre-incident planning and readiness"},
+        {"phase": "Detection & Analysis", "description": "Identify and assess the incident"},
+        {"phase": "Containment", "description": "Limit the impact of the incident"},
+        {"phase": "Eradication", "description": "Remove the threat and restore systems"},
+        {"phase": "Recovery", "description": "Return to normal operations"},
+        {"phase": "Post-Incident", "description": "Lessons learned and improvements"},
+    ],
+    notification_requirements={
+        "internal": {"timeline": "immediately", "channels": ["pagerduty", "slack-security"]},
+        "customers": {"timeline": "within 72 hours", "channels": ["email", "status_page"]},
+        "regulators": {"timeline": "within 72 hours (GDPR)", "channels": ["regulatory_portal"]},
+        "law_enforcement": {"timeline": "as needed", "channels": ["direct_contact"]},
+    },
+    format="docx"
+)
+print(f"IR Policy generated: {policy.path}")
+```
+
+## Multi-Framework Compliance Matrix
+
+```python
+from compliance import ComplianceMatrix, FrameworkControl
+
+# Generate a compliance matrix showing cross-framework coverage
+matrix = ComplianceMatrix(registry)
+
+# Get detailed mapping for a specific control family
+access_controls = matrix.get_family(
+    family="access_control",
+    frameworks=[Framework.SOC2, Framework.ISO27001, Framework.PCI_DSS, Framework.NIST_800_53]
+)
+
+print("=== Cross-Framework Access Control Mapping ===")
+for control in access_controls:
+    print(f"\nControl: {control.id} - {control.title}")
+    for fw, mappings in control.framework_mappings.items():
+        print(f"  {fw.value}: {', '.join(mappings)}")
+    print(f"  Implementation: {control.implementation_status}")
+    print(f"  Evidence: {control.evidence_count} items")
+    print(f"  Last Tested: {control.last_tested}")
+
+# Export matrix for auditor
+export = matrix.export_for_auditor(
+    format="xlsx",
+    include_evidence_links=True,
+    include_test_results=True,
+    include_owner_contact=True
+)
+print(f"\nExport: {export.path}")
+```
+
+## Compliance Automation in CI/CD
+
+```yaml
+# .github/workflows/compliance-check.yml
+name: Compliance Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  compliance-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install compliance tools
+        run: |
+          pip install bandit semgrep safety pip-audit
+
+      - name: Security linting (bandit)
+        run: bandit -r src/ -f json -o bandit-results.json
+
+      - name: SAST scanning (semgrep)
+        run: semgrep scan --config auto --json -o semgrep-results.json src/
+
+      - name: Dependency audit
+        run: |
+          pip-audit --format json --output pip-audit-results.json
+          npm audit --json > npm-audit-results.json
+
+      - name: Configuration compliance
+        run: |
+          python -m compliance check --framework SOC2 --config ./
+          python -m compliance check --framework PCI_DSS --config ./
+
+      - name: Policy compliance
+        run: |
+          python -m compliance verify-policies --acknowledgment-check
+
+      - name: Upload compliance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-results
+          path: |
+            bandit-results.json
+            semgrep-results.json
+            pip-audit-results.json
+            npm-audit-results.json
+
+      - name: Compliance gate
+        run: |
+          python -m compliance gate --max-critical 0 --max-high 0 --fail-on-violation
+```
+
+## Compliance Risk Assessment Framework
+
+```python
+from compliance import ComplianceRiskAssessment, RiskFactor, ComplianceRisk
+
+# Define risk factors for compliance assessment
+risk_factors = [
+    RiskFactor(
+        name="Regulatory Exposure",
+        weight=0.3,
+        scoring={
+            "critical_regulation": 10,  # GDPR, HIPAA
+            "major_regulation": 7,      # PCI DSS
+            "industry_standard": 4,     # SOC 2, ISO 27001
+            "internal_policy": 1,
+        }
+    ),
+    RiskFactor(
+        name="Financial Impact",
+        weight=0.25,
+        scoring={
+            "revenue_loss": 10,
+            "regulatory_fine": 9,
+            "litigation_cost": 8,
+            "remediation_cost": 5,
+        }
+    ),
+    RiskFactor(
+        name="Data Sensitivity",
+        weight=0.25,
+        scoring={
+            "pii": 8,
+            "phi": 10,
+            "pci_data": 9,
+            "internal_data": 3,
+            "public_data": 1,
+        }
+    ),
+    RiskFactor(
+        name="Breach Likelihood",
+        weight=0.2,
+        scoring={
+            "actively_exploited": 10,
+            "known_vulnerability": 7,
+            "theoretical_vulnerability": 4,
+            "no_known_vulnerability": 1,
+        }
+    ),
+]
+
+assessment = ComplianceRiskAssessment(risk_factors)
+
+# Assess compliance risk for a specific control gap
+risk = assessment.assess(
+    gap="Missing encryption at rest for customer database",
+    regulatory_context="GDPR Article 32, HIPAA §164.312(a)(2)(iv)",
+    financial_context="Customer database contains PII for 100K users",
+    breach_context="No known exploit, but encryption is baseline control"
+)
+
+print(f"Compliance Risk Score: {risk.score:.1f}/10")
+print(f"Risk Level: {risk.risk_level}")
+print(f"Priority: {risk.priority}")
+print(f"Remediation Timeline: {risk.remediation_timeline}")
+print(f"Risk Factors:")
+for factor in risk.factor_breakdown:
+    print(f"  {factor.name}: {factor.score:.1f} (weight: {factor.weight})")
+```

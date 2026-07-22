@@ -246,3 +246,487 @@ print(f"Deputy velocity (LVLH): {relative['velocity_lvlh_mps']}")
 - [mission-planning](../mission-planning/GROK.md) — Timeline scheduling, launch window calculation, contingency planning
 - [ground-stations](../ground-stations/GROK.md) — Antenna tracking, signal processing, Doppler compensation
 - [space-data](../space-data/GROK.md) — Ephemeris processing, space weather, telemetry analysis
+
+## Advanced Configuration
+
+### Reference Frame Configuration
+```python
+from aerospace_engineering import ReferenceFrameConfig
+
+config = ReferenceFrameConfig(
+    primary_frame="ECI",
+    secondary_frame="ECEF",
+    precession_model="IAU2000",
+    nutation_model="IAU2000",
+    earth_rotation_model="IERS2010",
+)
+```
+
+### Numerical Integrator Settings
+```python
+from aerospace_engineering import IntegratorConfig
+
+integrator_config = IntegratorConfig(
+    method="Dormand-Prince",
+    order=5,
+    step_size=10.0,  # seconds
+    tolerance=1e-12,
+    max_steps=100000,
+    adaptive_step=True,
+)
+```
+
+### Atmospheric Model Configuration
+```python
+from aerospace_engineering import AtmosphericConfig
+
+atmo_config = AtmosphericConfig(
+    model="NRLMSISE-00",
+    solar_flux_f107=150.0,
+    geomagnetic_index=30,
+    date="2028-09-01T12:00:00Z",
+    latitude=28.5,
+    longitude=-80.6,
+)
+```
+
+## Architecture Patterns
+
+### Plugin System
+The module uses a plugin architecture for extensibility:
+```python
+from aerospace_engineering import PluginManager
+
+pm = PluginManager()
+pm.register("custom_propulsion", CustomPropulsionPlugin())
+pm.register("custom_gravity", CustomGravityPlugin())
+```
+
+### Observer Pattern for Live Trajectory Updates
+```python
+from aerospace_engineering import TrajectoryObserver
+
+class MyObserver(TrajectoryObserver):
+    def on_update(self, state):
+        print(f"Position: {state.position}")
+        print(f"Velocity: {state.velocity}")
+
+observer = MyObserver()
+trajectory.add_observer(observer)
+```
+
+### Factory Pattern for Vehicle Definitions
+```python
+from aerospace_engineering import VehicleFactory
+
+factory = VehicleFactory()
+vehicle = factory.create("falcon_heavy")
+vehicle.configure_mission("mars_transfer")
+```
+
+## Integration Guide
+
+### NumPy/SciPy Backend
+```python
+from aerospace_engineering import NumericalBackend
+
+backend = NumericalBackend(
+    use_numpy=True,
+    use_scipy=True,
+    parallel=False,
+    precision="double",
+)
+```
+
+### MATLAB Integration
+```python
+from aerospace_engineering import MATLABBridge
+
+bridge = MATLABBridge()
+bridge.connect()
+result = bridge.run_matlab_function("ode45", args=[...])
+bridge.disconnect()
+```
+
+### API Server Integration
+```python
+from aerospace_engineering import APIClient
+
+client = APIClient(base_url="https://api.aerospace-engineering.io/v1")
+result = client.compute_trajectory(mission_params)
+```
+
+## Performance Optimization
+
+### Parallel Computation
+```python
+from aerospace_engineering import ParallelConfig
+
+config = ParallelConfig(
+    enabled=True,
+    workers=8,
+    chunk_size=1000,
+    use_gpu=False,
+)
+```
+
+### Caching Strategy
+```python
+from aerospace_engineering import CacheManager
+
+cache = CacheManager(
+    strategy="lru",
+    max_size=1000,
+    ttl=3600,
+)
+```
+
+### Memory Management
+```python
+from aerospace_engineering import MemoryOptimizer
+
+optimizer = MemoryOptimizer(
+    max_memory_mb=4096,
+    swap_threshold=0.8,
+    gc_interval=100,
+)
+```
+
+## Security Considerations
+
+### Data Encryption
+```python
+from aerospace_engineering import SecurityConfig
+
+security = SecurityConfig(
+    encrypt_data=True,
+    key_management="aws_kms",
+    audit_logging=True,
+)
+```
+
+### Access Control
+```python
+from aerospace_engineering import AccessControl
+
+acl = AccessControl()
+acl.add_role("mission_planner", permissions=["read", "execute"])
+acl.add_role("analyst", permissions=["read"])
+```
+
+## Troubleshooting Guide
+
+### Common Issues
+
+1. **NaN Results**: Check orbital element validity and reference frame consistency
+2. **Integration Errors**: Reduce step size or switch to implicit method
+3. **Memory Overflow**: Enable memory optimization or use chunked processing
+4. **Performance Issues**: Enable parallel computation or caching
+
+### Debug Mode
+```python
+from aerospace_engineering import enable_debug
+
+enable_debug(
+    log_level="DEBUG",
+    verbose_output=True,
+    save_intermediate=True,
+)
+```
+
+## API Reference
+
+### Core Classes
+- `OrbitalMechanics` - Core orbital mechanics calculations
+- `PropulsionSystem` - Propulsion system modeling
+- `ThermalProtectionSystem` - Thermal protection analysis
+- `LaunchVehicleAnalysis` - Launch vehicle analysis
+- `LambertSolver` - Lambert problem solver
+
+### Core Functions
+- `hohmann_transfer()` - Compute Hohmann transfer
+- `bi_elliptic_transfer()` - Compute bi-elliptic transfer
+- `lambert_solve()` - Solve Lambert problem
+- `propagate_orbit()` - Propagate orbit forward/backward
+- `compute_delta_v()` - Compute delta-v requirements
+
+## Data Models
+
+### Orbital State
+```python
+class OrbitalState:
+    position: np.ndarray  # [x, y, z] in meters
+    velocity: np.ndarray  # [vx, vy, vz] in m/s
+    timestamp: float      # Julian date
+    frame: str            # Reference frame identifier
+```
+
+### Mission Plan
+```python
+class MissionPlan:
+    name: str
+    objectives: List[str]
+    timeline: List[MissionEvent]
+    constraints: MissionConstraints
+    resources: MissionResources
+```
+
+### Vehicle Configuration
+```python
+class VehicleConfig:
+    name: str
+    dry_mass: float
+    propellant_mass: float
+    thrust: float
+    isp: float
+    dimensions: VehicleDimensions
+```
+
+## Deployment Guide
+
+### Container Deployment
+```dockerfile
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["python", "-m", "aerospace_engineering.server"]
+```
+
+### Kubernetes Configuration
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aerospace-engineering
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aerospace-engineering
+```
+
+## Monitoring & Observability
+
+### Metrics Collection
+```python
+from aerospace_engineering import MetricsCollector
+
+collector = MetricsCollector(
+    backend="prometheus",
+    endpoint="/metrics",
+    labels={"service": "aerospace-engineering"},
+)
+```
+
+### Logging Configuration
+```python
+from aerospace_engineering import Logger
+
+logger = Logger(
+    level="INFO",
+    format="json",
+    output="stdout",
+)
+```
+
+## Testing Strategy
+
+### Unit Tests
+```python
+import unittest
+from aerospace_engineering import OrbitalMechanics
+
+class TestOrbitalMechanics(unittest.TestCase):
+    def test_hohmann_transfer(self):
+        orbital = OrbitalMechanics(central_body="earth")
+        result = orbital.hohmann_transfer(6_571_000, 42_164_000)
+        self.assertGreater(result['dv_total'], 0)
+```
+
+### Integration Tests
+```python
+def test_full_mission_workflow():
+    # Test complete mission planning workflow
+    pass
+```
+
+## Versioning & Migration
+
+### Version History
+- v1.0.0 - Initial release
+- v1.1.0 - Added gravity assist trajectories
+- v1.2.0 - Performance optimizations
+
+### Migration Guide
+```python
+# v1.0 to v1.1 migration
+from aerospace_engineering import migrate_v1_to_v1_1
+migrate_v1_to_v1_1(config_file="old_config.yaml")
+```
+
+## Glossary
+
+- **Delta-v**: Change in velocity required for orbital maneuvers
+- **Specific Impulse (Isp)**: Measure of propulsion efficiency
+- **Lambert Problem**: Finding orbit connecting two points in given time
+- **Hohmann Transfer**: Minimum energy two-impulse transfer between circular orbits
+- **J2 Perturbation**: Earth's oblateness effect on orbits
+
+## Changelog
+
+### v1.2.0 (2028-09-01)
+- Added parallel computation support
+- Improved memory management
+- Fixed integration accuracy issues
+
+### v1.1.0 (2028-06-15)
+- Added gravity assist trajectory design
+- Enhanced atmospheric models
+- New API server integration
+
+### v1.0.0 (2028-03-01)
+- Initial release with core functionality
+
+## Contributing Guidelines
+
+### Development Setup
+```bash
+git clone https://github.com/aerospace-engineering/aerospace-engineering.git
+cd aerospace-engineering
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Code Style
+- Follow PEP 8 for Python code
+- Use type hints for all functions
+- Write docstrings for public APIs
+
+### Pull Request Process
+1. Fork the repository
+2. Create feature branch
+3. Write tests
+4. Update documentation
+5. Submit pull request
+
+## License
+
+MIT License
+
+Copyright (c) 2028 Aerospace Engineering Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## Additional Reference Data
+
+###常用 Orbital Parameters Reference
+
+| Parameter | LEO (400 km) | MEO (20,200 km) | GEO (35,786 km) | Lunar Transfer |
+|-----------|--------------|-----------------|-----------------|----------------|
+| Semi-major axis (km) | 6,771 | 26,571 | 42,164 | 200,000+ |
+| Orbital period (min) | 92.4 | 718 | 1,436 | Variable |
+| Velocity (km/s) | 7.67 | 3.89 | 3.07 | 10.8+ |
+| Delta-v from LEO (m/s) | 0 | 1,400 | 1,500 | 3,100+ |
+
+### Engine Performance Comparison
+
+| Engine | Thrust (kN) | Isp (vac) | Propellant | Application |
+|--------|-------------|-----------|------------|-------------|
+| RS-25 | 2,278 | 452 s | LOX/LH2 | SLS Core Stage |
+| Merlin 1D | 845 | 311 s | LOX/RP-1 | Falcon 9 First Stage |
+| Raptor | 2,300 | 380 s | LOX/CH4 | Starship |
+| RL10 | 110 | 465 s | LOX/LH2 | Upper Stages |
+| Hall Thruster | 0.001-0.01 | 1,500-3,000 s | Xenon | Station Keeping |
+
+### Common Mission Delta-v Budgets
+
+```python
+# Reference delta-v budgets for common mission profiles
+MISSION_BUDGETS = {
+    "ISS_resupply_LEO": {
+        "launch_to_LEO": 9400,      # m/s from surface
+        "LEO_phasing": 50,          # m/s to match ISS
+        "LEO_rendezvous": 100,      # m/s final approach
+        "deorbit": 100,             # m/s
+        "total_from_LEO": 250,      # m/s from LEO parking
+    },
+    "GEO_insertion": {
+        "LEO_to_GTO": 2500,         # m/s
+        "GTO_to_circularize": 1500, # m/s at apogee
+        "inclination_correction": 1500,  # m/s for 28.5 to 0 deg
+        "total_from_LEO": 5500,     # m/s
+    },
+    "mars_transfer": {
+        "LEO_to_HCO": 3200,         # m/s to hyperbolic orbit
+        "Mars_capture": 1400,       # m/s to Mars orbit
+        "Mars_landing": 1400,       # m/s (EDL)
+        "Mars_to_Earth": 5700,      # m/s total return
+        "total_mission": 11700,     # m/s
+    },
+}
+```
+
+### Atmospheric Entry Corridor Limits
+
+The entry corridor defines the acceptable range of entry flight-path angles for atmospheric capture. Too steep an angle leads to excessive heating and g-loads; too shallow an angle results in skip-out.
+
+```python
+# Entry corridor analysis for various vehicles
+entry_corridors = {
+    "capsule_steep_limit_deg": -7.5,   # Maximum steep entry angle
+    "capsule_shallow_limit_deg": -1.5,  # Minimum shallow angle
+    "capsule_nominal_deg": -5.5,        # Nominal entry angle
+    "shuttle_steep_limit_deg": -6.0,
+    "shuttle_shallow_limit_deg": -1.0,
+    "shuttle_nominal_deg": -4.0,
+}
+```
+
+### Propellant Properties Reference
+
+| Property | LOX | LH2 | RP-1 | CH4 | N2H4 | MMH |
+|----------|-----|-----|------|-----|------|-----|
+| Density (kg/m3) | 1,141 | 70.8 | 810 | 422 | 1,008 | 875 |
+| Boiling Point (K) | 90 | 20 | 373 | 112 | 387 | 360 |
+| Freeze Point (K) | 54 | 14 | 216 | 91 | 275 | 220 |
+
+### Structural Load Factors Summary
+
+```python
+# Typical structural load factors by flight phase
+load_factors = {
+    "max_q_phase": {
+        "axial_load_factor_g": 2.5,
+        "lateral_load_factor_g": 1.5,
+        "bending_moment_kNm": 5000,
+    },
+    "stage_separation": {
+        "axial_load_factor_g": 1.2,
+        "lateral_load_factor_g": 0.8,
+    },
+    "reentry": {
+        "axial_load_factor_g": 4.0,
+        "lateral_load_factor_g": 0.5,
+        "peak_heating_rate_w_cm2": 200,
+    },
+}
+```

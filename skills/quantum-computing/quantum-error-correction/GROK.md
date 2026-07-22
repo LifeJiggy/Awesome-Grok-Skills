@@ -296,3 +296,617 @@ quantum_error_correction/
 - Dennis, E. et al. (2002). Topological quantum memory. *Journal of Mathematical Physics*, 43(9), 4452-4505.
 - Horsman, C. et al. (2012). Surface code quantum computing by lattice surgery. *New Journal of Physics*, 14(12), 123011.
 - Campbell, E. T. & Howard, M. (2017). Unified framework for magic state distillation and multiqubit gate synthesis with reduced resource cost. *Physical Review A*, 95(2), 022316.
+
+## Advanced Configuration
+
+### Surface Code Configuration
+
+```python
+from quantum_error_correction import SurfaceCodeConfig, StabilizerSchedule
+
+# Advanced surface code configuration
+surface_config = SurfaceCodeConfig(
+    code_distance=5,
+    lattice_type="rotated",
+    stabilizer_schedule=StabilizerSchedule(
+        type="phenomenological",
+        rounds=10,
+        measurement_error=0.01,
+        reset_error=0.001,
+        hook_error_mitigation=True,
+    ),
+    decoder_config={
+        "method": "mwpm",
+        "matching_graph": "phenomenological",
+        "decoding_rounds": 10,
+        "real_time": True,
+        "max_latency_us": 1.0,
+    },
+    logical_gates={
+        "H": "transversal",
+        "S": "magic_state",
+        "T": "magic_state_distillation",
+        "CNOT": "lattice_surgery",
+    },
+)
+
+engine = QECEngine(
+    code=CodeType.SURFACE,
+    config=surface_config,
+    noise=NoiseModel(depolarizing_rate=0.005),
+)
+```
+
+### Decoder Configuration
+
+```python
+from quantum_error_correction import DecoderConfig, DecodingMethod
+
+decoder_config = DecoderConfig(
+    method=DecodingMethod.MWPM,
+    matching_graph="phenomenological",
+    edge_weights=" logarithmic",
+    syndrome_processing="batch",
+    batch_size=100,
+    parallel_decoding=True,
+    n_workers=4,
+    latency_target_us=1.0,
+    fallback_method=DecodingMethod.UNION_FIND,
+)
+
+decoder = engine.get_decoder(config=decoder_config)
+```
+
+### Magic State Distillation Configuration
+
+```python
+from quantum_error_correction import MagicStateConfig, DistillationProtocol
+
+magic_config = MagicStateConfig(
+    protocol=DistillationProtocol.REED_MULLER,
+    input_error_rate=0.01,
+    output_error_rate=1e-6,
+    rounds=2,
+    factory_size=16,
+    catalyzed=True,
+    resource_count={
+        "physical_qubits": 16,
+        "t_gates_per_distillation": 15,
+        "circuit_depth": 100,
+    },
+)
+
+distiller = engine.get_distiller(config=magic_config)
+```
+
+## Architecture Patterns
+
+### Fault-Tolerant Circuit Pattern
+
+```python
+from quantum_error_correction import FTCircuitBuilder, GateSet
+
+builder = FTCircuitBuilder(
+    code=CodeType.SURFACE,
+    code_distance=5,
+    gate_set=GateSet.CLIFFORD_T,
+)
+
+# Build fault-tolerant circuit
+circuit = builder.build(
+    logical_circuit=logical_circuit,
+    syndrome_extraction_rounds=10,
+    magic_state_factory_count=4,
+    lattice_surgery_operations=True,
+)
+
+print(f"Physical qubits: {circuit.physical_qubits}")
+print(f"Logical qubits: {circuit.logical_qubits}")
+print(f"Circuit depth: {circuit.depth}")
+print(f"T-gates: {circuit.t_gate_count}")
+```
+
+### Resource Estimation Pattern
+
+```python
+from quantum_error_correction import ResourceEstimator, AlgorithmType
+
+estimator = ResourceEstimator(code=CodeType.SURFACE)
+
+# Estimate resources for algorithm
+resources = estimator.estimate(
+    algorithm=AlgorithmType.SHOR,
+    input_size=2048,
+    target_logical_error_rate=1e-15,
+    physical_error_rate=0.001,
+    code_distance_range=(3, 7, 9, 11),
+)
+
+print(f"Recommended code distance: {resources.recommended_distance}")
+print(f"Physical qubits: {resources.physical_qubits}")
+print(f"Logical qubits: {resources.logical_qubits}")
+print(f"T-gates: {resources.t_gate_count}")
+print(f"Circuit depth: {resources.circuit_depth}")
+print(f"Overhead ratio: {resources.overhead_ratio:.0f}x")
+```
+
+### Threshold Analysis Pattern
+
+```python
+from quantum_error_correction import ThresholdAnalyzer, CodeFamily
+
+analyzer = ThresholdAnalyzer(
+    code_family=CodeFamily.SURFACE,
+    noise_models=["depolarizing", "circuit_level", "phenomenological"],
+    code_distances=[3, 5, 7, 9],
+    physical_error_rates=[0.001, 0.003, 0.005, 0.007, 0.01, 0.015],
+    num_trials=1000,
+)
+
+threshold = analyzer.find_threshold()
+print(f"Estimated threshold: {threshold.value:.4f}")
+print(f"Confidence interval: [{threshold.ci_lower:.4f}, {threshold.ci_upper:.4f}]")
+print(f"Finite-size scaling exponent: {threshold.scaling_exponent:.2f}")
+```
+
+## Integration Guide
+
+### Stim Integration
+
+```python
+from quantum_error_correction import StimAdapter
+
+adapter = StimAdapter()
+
+# Convert to Stim circuit
+stim_circuit = adapter.to_stim(
+    code=CodeType.SURFACE,
+    code_distance=5,
+    rounds=10,
+)
+
+# Run Stim simulation
+detectors, observable = adapter.run_simulation(stim_circuit, num_shots=10000)
+
+# Decode with PyMatching
+from pymatching import Matching
+matching = Matching.from_detector_error_model(adapter.get_detector_error_model())
+correction = matching.decode_batch(detectors)
+```
+
+### Qiskit Integration
+
+```python
+from quantum_error_correction import QiskitQECAdapter
+
+adapter = QiskitQECAdapter()
+
+# Convert to Qiskit circuit
+qiskit_circuit = adapter.to_qiskit(
+    code=CodeType.SURFACE,
+    code_distance=3,
+    syndrome_extraction_rounds=5,
+)
+
+# Execute on Qiskit backend
+from qiskit import execute
+from qiskit.providers.aer import AerSimulator
+
+simulator = AerSimulator()
+result = execute(qiskit_circuit, simulator, shots=1024).result()
+counts = result.get_counts()
+```
+
+## Performance Optimization
+
+### Decoder Optimization
+
+```python
+from quantum_error_correction import DecoderOptimizer
+
+optimizer = DecoderOptimizer(
+    target_latency_us=1.0,
+    parallel_decoding=True,
+    n_workers=8,
+    batch_processing=True,
+    batch_size=100,
+)
+
+optimized_decoder = optimizer.optimize(decoder)
+print(f"Original latency: {decoder.latency_us:.2f} us")
+print(f"Optimized latency: {optimized_decoder.latency_us:.2f} us")
+print(f"Speedup: {decoder.latency_us/optimized_decoder.latency_us:.1f}x")
+```
+
+### Syndrome Extraction Optimization
+
+```python
+from quantum_error_correction import SyndromeOptimizer
+
+syndrome_opt = SyndromeOptimizer(
+    schedule_optimization=True,
+    parallel_measurements=True,
+    measurement_grouping=True,
+    error_filtering=True,
+)
+
+optimized_circuit = syndrome_opt.optimize(syndrome_circuit)
+print(f"Original depth: {syndrome_circuit.depth()}")
+print(f"Optimized depth: {optimized_circuit.depth()}")
+```
+
+## Troubleshooting Guide
+
+### Common Issues and Solutions
+
+#### 1. Threshold Not Reached
+
+**Symptom**: Logical error rate doesn't decrease with code distance
+
+**Solution**:
+```python
+# Check physical error rate
+if physical_error_rate > 0.01:
+    print("Physical error rate above threshold")
+
+# Use better decoder
+decoder_config.method = DecodingMethod.MWPM
+
+# Increase syndrome rounds
+surface_config.stabilizer_schedule.rounds = 20
+```
+
+#### 2. High Decoding Latency
+
+**Symptom**: Decoder too slow for real-time decoding
+
+**Solution**:
+```python
+# Use Union-Find decoder
+decoder_config.method = DecodingMethod.UNION_FIND
+
+# Enable parallel decoding
+decoder_config.parallel_decoding = True
+decoder_config.n_workers = 8
+
+# Use batch processing
+decoder_config.batch_processing = True
+```
+
+#### 3. Magic State Distillation Too Slow
+
+**Symptom**: Distillation bottleneck
+
+**Solution**:
+```python
+# Use catalyzed distillation
+magic_config.catalyzed = True
+
+# Increase factory count
+magic_config.factory_size = 32
+
+# Use faster protocol
+magic_config.protocol = DistillationProtocol.REED_MULLER
+```
+
+## API Reference
+
+### Core Classes
+
+#### `QECEngine`
+```python
+class QECEngine:
+    def __init__(self, code: CodeType, code_distance: int, noise: NoiseModel) -> None: ...
+    def encode(self, logical_state: List[int]) -> np.ndarray: ...
+    def inject_errors(self, state: np.ndarray, error_rate: float) -> np.ndarray: ...
+    def measure_syndrome(self, state: np.ndarray) -> np.ndarray: ...
+    def correct(self, state: np.ndarray, syndrome: np.ndarray) -> np.ndarray: ...
+    def compute_fidelity(self, corrected: np.ndarray, original: np.ndarray) -> float: ...
+    def run_syndrome_rounds(self, num_rounds: int) -> List[np.ndarray]: ...
+    def find_threshold(self, code_distances: List[int], physical_error_rates: List[float], num_trials: int) -> ThresholdResult: ...
+```
+
+## Data Models
+
+### QEC Result Schema
+
+```json
+{
+  "code": "surface",
+  "code_distance": 5,
+  "physical_error_rate": 0.005,
+  "logical_error_rate": 1e-6,
+  "fidelity": 0.999999,
+  "syndrome_rounds": 10,
+  "decoder": "mwpm",
+  "decoding_latency_us": 0.8,
+  "physical_qubits": 50,
+  "logical_qubits": 1
+}
+```
+
+## Deployment Guide
+
+### Docker Deployment
+
+```dockerfile
+FROM python:3.11-slim
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY quantum_error_correction/ /app/quantum_error_correction/
+WORKDIR /app
+
+ENV QEC_CODE=surface
+ENV QEC_DISTANCE=5
+ENV QEC_DECODER=mwpm
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "from quantum_error_correction import health_check; health_check()"
+
+CMD ["python", "-m", "quantum_error_correction.server"]
+```
+
+## Monitoring & Observability
+
+### Metrics Collection
+
+```python
+from quantum_error_correction import MetricsCollector
+
+collector = MetricsCollector(backend="prometheus")
+
+collector.register_metric("qec_logical_error_rate", type="gauge")
+collector.register_metric("qec_fidelity", type="gauge")
+collector.register_metric("qec_decoding_latency", type="histogram")
+collector.register_metric("qec_syndrome_rate", type="gauge")
+
+collector.set("qec_logical_error_rate", result.logical_error_rate)
+collector.set("qec_fidelity", result.fidelity)
+collector.observe("qec_decoding_latency", result.decoding_latency_us)
+collector.set("qec_syndrome_rate", syndrome_rate)
+```
+
+## Testing Strategy
+
+### Unit Tests
+
+```python
+import pytest
+from quantum_error_correction import QECEngine, CodeType, NoiseModel
+
+class TestSurfaceCode:
+    def setup_method(self):
+        self.engine = QECEngine(
+            code=CodeType.SURFACE,
+            code_distance=3,
+            noise=NoiseModel(depolarizing_rate=0.005),
+        )
+    
+    def test_encode_decode(self):
+        encoded = self.engine.encode([1, 0])
+        noisy = self.engine.inject_errors(encoded, error_rate=0.01)
+        syndrome = self.engine.measure_syndrome(noisy)
+        corrected = self.engine.correct(noisy, syndrome)
+        fidelity = self.engine.compute_fidelity(corrected, encoded)
+        assert fidelity > 0.9
+    
+    def test_threshold(self):
+        threshold = self.engine.find_threshold(
+            code_distances=[3, 5],
+            physical_error_rates=[0.005, 0.01],
+            num_trials=100,
+        )
+        assert 0.005 < threshold.value < 0.02
+```
+
+## Versioning & Migration
+
+### Changelog
+
+#### v2.0.0 (2024-01-15)
+- **Breaking**: New config API
+- **Added**: Rotated surface code
+- **Added**: Magic state distillation
+- **Improved**: 2x faster decoding
+- **Fixed**: Threshold estimation
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **Surface Code** | Topological code with high threshold |
+| **Syndrome** | Error detection measurement |
+| **MWPM** | Minimum Weight Perfect Matching decoder |
+| **Magic State** | Resource state for non-Clifford gates |
+| **Threshold** | Maximum physical error rate for QEC |
+
+## Contributing Guidelines
+
+### Development Setup
+
+```bash
+git clone https://github.com/example/quantum-ecc.git
+cd quantum-ecc
+python -m venv venv
+source venv/bin/activate
+pip install -e ".[dev]"
+pytest tests/ -v
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Quantum Error Correction Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+*Last updated: 2024-01-15*
+*Version: 2.0.0*
+
+## Data Validation
+
+### Code Validation
+
+```python
+from quantum_error_correction import CodeValidator
+
+validator = CodeValidator()
+
+# Validate code properties
+validator.validate_code_distance(code, expected_distance=5)
+validator.validate_stabilizers(code)
+validator.validate_encoding(code)
+```
+
+### Syndrome Validation
+
+```python
+from quantum_error_correction import SyndromeValidator
+
+validator = SyndromeValidator()
+
+# Validate syndromes
+validator.validate_syndrome_history(syndrome_history)
+validator.validate_correction(correction, syndrome)
+```
+
+## Advanced Patterns
+
+### Decoder Optimization Patterns
+
+```python
+from quantum_error_correction import DecoderOptimizer, DecoderStrategy
+
+optimizer = DecoderOptimizer(
+    strategy=DecoderStrategy.MWPM,
+    parallel_decoding=True,
+    n_workers=8,
+    batch_processing=True,
+    batch_size=100,
+)
+
+# Optimize decoder
+optimized_decoder = optimizer.optimize(decoder)
+print(f"Original latency: {decoder.latency_us:.2f} us")
+print(f"Optimized latency: {optimized_decoder.latency_us:.2f} us")
+print(f"Speedup: {decoder.latency_us/optimized_decoder.latency_us:.1f}x")
+```
+
+### Syndrome Processing Patterns
+
+```python
+from quantum_error_correction import SyndromeProcessor, ProcessingStrategy
+
+processor = SyndromeProcessor(
+    strategy=ProcessingStrategy.REAL_TIME,
+    buffer_size=1000,
+    processing_latency_us=1.0,
+    error_filtering=True,
+)
+
+# Process syndromes
+corrections = processor.process(syndrome_history)
+print(f"Processed {len(corrections)} syndromes")
+print(f"Corrections applied: {sum(1 for c in corrections if c.applied)}")
+```
+
+### Logical Gate Implementation Patterns
+
+```python
+from quantum_error_correction import LogicalGateImpl, GateStrategy
+
+gate_impl = LogicalGateImpl(
+    strategy=GateStrategy.LATTICE_SURGERY,
+    code_distance=5,
+    merge_time_us=10.0,
+    split_time_us=10.0,
+)
+
+# Implement logical CNOT
+cnot_circuit = gate_impl.implement_cnot(
+    control_logical=logical_qubit_1,
+    target_logical=logical_qubit_2,
+)
+
+print(f"CNOT circuit depth: {cnot_circuit.depth()}")
+print(f"Physical qubits: {cnot_circuit.num_qubits}")
+```
+
+### Magic State Distillation Patterns
+
+```python
+from quantum_error_correction import MagicStateDistiller, DistillationStrategy
+
+distiller = MagicStateDistiller(
+    strategy=DistillationStrategy.REED_MULLER,
+    input_error_rate=0.01,
+    output_error_rate=1e-6,
+    rounds=2,
+    factory_size=16,
+)
+
+# Distill magic state
+magic_state = distiller.distill()
+print(f"Magic state fidelity: {magic_state.fidelity:.8f}")
+print(f"Distillation time: {magic_state.time_us:.2f} us")
+print(f"Resource overhead: {magic_state.overhead:.1f}x")
+```
+
+### Code Construction Patterns
+
+```python
+from quantum_error_correction import CodeConstructor, ConstructionStrategy
+
+constructor = CodeConstructor(
+    strategy=ConstructionStrategy.SURFACE_CODE,
+    distance=5,
+    lattice_type="rotated",
+)
+
+# Construct code
+code = constructor.construct()
+print(f"Code distance: {code.distance}")
+print(f"Number of qubits: {code.num_qubits}")
+print(f"Number of stabilizers: {code.num_stabilizers}")
+print(f"Encoding rate: {code.rate:.4f}")
+```
+
+### Fault-Tolerant Circuit Patterns
+
+```python
+from quantum_error_correction import FTCircuitBuilder, FTStrategy
+
+ft_builder = FTCircuitBuilder(
+    strategy=FTStrategy.TRANSVERSAL_GATES,
+    code_distance=5,
+    magic_state_factory_count=4,
+)
+
+# Build fault-tolerant circuit
+ft_circuit = ft_builder.build(logical_circuit)
+print(f"Physical qubits: {ft_circuit.physical_qubits}")
+print(f"Logical qubits: {ft_circuit.logical_qubits}")
+print(f"Circuit depth: {ft_circuit.depth}")
+print(f"T-gates: {ft_circuit.t_gate_count}")
+```

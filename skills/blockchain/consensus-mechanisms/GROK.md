@@ -133,3 +133,647 @@ print(f"Minimum profitable stake: ${economics.min_profitable_stake:,.0f}")
 - **defi**: Consensus guarantees for DeFi transactions
 - **nft-development**: Transaction finality for NFT transfers
 - **smart-contracts**: Consensus-dependent contract behavior
+
+## Advanced Configuration
+
+### PoW Simulation Parameters
+
+```python
+from consensus_mechanisms import PoWConfig
+
+pow_config = PoWConfig(
+    block_time_target=12,           # seconds
+    difficulty_adjustment_blocks=2016,  # Bitcoin-style
+    hash_algorithm="sha256",
+    block_reward=6.25,
+    halving_interval=210000,
+    max_supply=21_000_000,
+    propagation_delay_ms=500,
+    stale_block_threshold=6,
+)
+```
+
+### PoS Configuration
+
+```python
+from consensus_mechanisms import PoSConfig
+
+pos_config = PoSConfig(
+    min_stake=32,                    # ETH
+    max_validators=1_000_000,
+    epoch_length=32,                 # slots
+    slot_length=12,                  # seconds
+    finality_delay=2,                # epochs
+    slashing_penalty=1/32,           # 1 ETH for 32 ETH stake
+    ejection_balance=16,             # ETH
+    balance_increment=0.000016,      # ETH per slot
+)
+```
+
+### BFT Configuration
+
+```python
+from consensus_mechanisms import BFTConfig
+
+bft_config = BFTConfig(
+    validators=100,
+    max_faulty=33,                   # f = floor((n-1)/3)
+    view_change_timeout=5.0,         # seconds
+    block_size_limit=1_000_000,      # bytes
+    max_rounds=100,
+    message_batch_size=100,
+    signature_threshold="2/3+1",
+)
+```
+
+## Architecture Patterns
+
+### Consensus Protocol Comparison
+
+| Property | PoW | PoS | BFT | DPoS | DAG |
+|----------|-----|-----|-----|------|-----|
+| Throughput | 7 TPS | 30 TPS | 1000+ TPS | 1000+ TPS | 10000+ TPS |
+| Finality | Probabilistic | Epoch-based | Instant | Instant | Probabilistic |
+| Energy | High | Low | Low | Low | Low |
+| Decentralization | High | Medium | Low-Medium | Low | Medium |
+| Security Model | Hash power | Stake | 2/3 honest | Delegate election | Tangle weight |
+
+### Ethereum PoS Architecture
+
+```
+Beacon Chain:
+├── Epochs (32 slots each)
+│   ├── Slot: Single block proposal
+│   ├── Committees: Attestation groups
+│   └── Finality: 2/3+ attestations
+├── Validator Management
+│   ├── Activation queue
+│   ├── Active set
+│   ├── Exit queue
+│   └── Withdrawal
+├── Fork Choice
+│   ├── LMD-GHOST (latest message driven)
+│   └── FFG (Friendly Finality Gadget)
+└── Slashing Conditions
+    ├── Double voting
+    ├── Surround voting
+    └── Inactivity leak
+```
+
+### Tendermint BFT Architecture
+
+```
+Round Lifecycle:
+├── Propose
+│   └── Round-robin proposer selection
+├── Prevote
+│   └── Validators vote on proposal
+├── Precommit
+│   └── 2/3+ prevotes → precommit
+└── Commit
+    └── 2/3+ precommits → block committed
+
+View Change:
+├── Timeout triggers
+├── New proposer election
+└── State recovery
+```
+
+### Economic Security Model
+
+```
+Attack Cost vs Profit:
+├── 51% Attack (PoW)
+│   ├── Hardware cost: $X billion
+│   ├── Electricity: $X million/hour
+│   └── Profit from double spend: $Y
+├── Nothing-at-Stake (PoS)
+│   ├── Slashing penalty: 1/32 stake
+│   ├── Attestation delay: 2 epochs
+│   └── Cost exceeds profit
+└── Long-Range Attack (PoS)
+    ├── Checkpoint finality
+    ├── Social consensus recovery
+    └── Economic bond requirements
+```
+
+## Integration Guide
+
+### Ethereum Consensus Client Integration
+
+```python
+from consensus_mechanisms import BeaconChainClient
+
+client = BeaconChainClient(
+    beacon_node="http://localhost:5052",
+    network="mainnet",
+)
+
+# Get validator status
+validator = client.get_validator(validator_index=12345)
+print(f"Status: {validator.status}")
+print(f"Balance: {validator.balance} ETH")
+print(f"Activation epoch: {validator.activation_epoch}")
+
+# Get epoch info
+epoch = client.get_epoch(epoch=100000)
+print(f"Slots: {epoch.slots}")
+print(f"Finalized: {epoch.finalized_checkpoint}")
+print(f"Justified: {epoch.justified_checkpoint}")
+```
+
+### Tendermint Integration
+
+```python
+from consensus_mechanisms import TendermintClient
+
+tm = TendermintClient(
+    rpc_url="http://localhost:26657",
+)
+
+# Get consensus state
+status = tm.status()
+print(f"Latest height: {status.latest_block_height}")
+print(f"Latest hash: {status.latest_block_hash}")
+print(f"Catching up: {status.catching_up}")
+
+# Submit transaction
+tx = tm.broadcast_tx_sync(tx_bytes=signed_tx)
+print(f"Tx hash: {tx.hash}")
+print(f"Code: {tx.code}")
+```
+
+### Consensus Monitoring Integration
+
+```python
+from consensus_mechanisms import ConsensusMonitor
+
+monitor = ConsensusMonitor(
+    network="ethereum",
+    beacon_node="http://localhost:5052",
+    alert_conditions={
+        "finality_delay": 4,        # epochs
+        "validator_downtime": 100,  # slots
+        "slash_detected": True,
+        "missed_attestations_pct": 0.05,
+    },
+)
+monitor.start()
+```
+
+## Performance Optimization
+
+### Throughput Optimization
+
+| Technique | Throughput Gain | Trade-off |
+|-----------|----------------|-----------|
+| Sharding | 10-100x | Cross-shard complexity |
+| Parallel block production | 2-5x | Coordination overhead |
+| Block size increase | 2-10x | Decentralization |
+| Signature aggregation | 2-3x | BLS complexity |
+| Optimistic execution | 2-5x | Rollback complexity |
+
+### Latency Optimization
+
+```
+Block Propagation:
+├── Compact block relay (EIP-2976)
+├── Block propagation networks (FIBRE)
+├── Sub-second gossip protocols
+└── Parallel attestations
+
+Finality Optimization:
+├── Single-slot finality (SSF)
+├── Faster finality gadgets
+├── Aggregated attestations
+└── Reduced committee sizes
+```
+
+### Validator Performance
+
+```python
+from consensus_mechanisms import ValidatorOptimizer
+
+optimizer = ValidatorOptimizer()
+config = optimizer.optimize(
+    hardware="standard_server",
+    network_latency_ms=50,
+    attestation_aggregation=True,
+    block_proposal_optimization=True,
+)
+print(f"Expected uptime: {config.uptime_pct:.1%}")
+print(f"Expected APR: {config.expected_apr:.2%}")
+print(f"Missed attestations/month: {config.missed_attestations}")
+```
+
+## Security Considerations
+
+### Consensus Attack Vectors
+
+| Attack | Target | Mitigation |
+|--------|--------|------------|
+| 51% Attack | PoW chains | High hash rate, checkpointing |
+| Nothing-at-Stake | PoS chains | Slashing, finality gadgets |
+| Long-Range Attack | PoS chains | Checkpointing, social consensus |
+| Bribe Attack | Any | Stake/delegation diversification |
+| Selfish Mining | PoW | Uncle rewards, shorter intervals |
+| Grinding Attack | PoS | Verifiable randomness (VRF) |
+| Censorship | Any | Proposer-builder separation |
+
+### Security Thresholds
+
+```
+PoW Security:
+├── Hash rate required: >50% for attack
+├── Confirmation depth: 6 blocks (~72s) for high-value
+├── Reorg depth: typically <3 blocks
+└── Attack cost: billions USD
+
+PoS Security:
+├── Stake required: >33% for safety halt
+├── Stake required: >66% for finality manipulation
+├── Finality delay: 2 epochs (~12.8 minutes)
+└── Slashing penalty: 1/32 of stake
+```
+
+### Incentive Compatibility
+
+```
+Honest Behavior Rewards:
+├── Block proposal: block_reward + tx_fees
+├── Attestation: attestation_reward
+├── Sync committee: sync_reward
+└── Total: proportional to stake
+
+Dishonest Behavior Penalties:
+├── Double voting: full stake slash
+├── Surround voting: full stake slash
+├── Inactivity: gradual balance leak
+└── Downtime: missed rewards only
+```
+
+## Troubleshooting Guide
+
+### Common Consensus Issues
+
+| Issue | Symptom | Solution |
+|-------|---------|----------|
+| Finality Delay | Blocks not finalizing | Check validator participation |
+| Missed Attestations | Reduced rewards | Check network connectivity |
+| Slashing | Stake reduced | Investigate and fix double signing |
+| Reorg | Block replaced | Normal for short reorgs; investigate if deep |
+| Sync Delay | Node falling behind | Check disk I/O and network |
+
+### Debugging Consensus
+
+```bash
+# Check beacon chain status
+curl -s http://localhost:5052/eth/v1/beacon/states/head | jq
+
+# Check validator status
+curl -s http://localhost:5052/eth/v1/beacon/states/head/validators?status=active | jq
+
+# Check finality
+curl -s http://localhost:5052/eth/v1/beacon/blinded_blocks/head | jq '.data.message.slot'
+
+# Monitor attestation performance
+curl -s http://localhost:5052/eth/v1/beacon/states/head/validators/<index>/attestations | jq
+```
+
+### Validator Troubleshooting
+
+```
+Issue: Validator not attesting
+1. Check client logs for errors
+2. Verify validator is in active set
+3. Check network connectivity
+4. Verify time synchronization (NTP)
+5. Check for slashing conditions
+
+Issue: Block proposals failing
+1. Check validator balance > 32 ETH
+2. Verify validator index matches
+3. Check for conflicting proposals
+4. Review block building logic
+```
+
+## API Reference
+
+### PoWSimulator
+
+```python
+class PoWSimulator:
+    def __init__(
+        block_time_target: int = 12,
+        hash_rate: float = 1e18,
+        difficulty: float = 1e15,
+    ): ...
+    
+    def simulate(blocks: int = 100) -> PoWStats:
+        """Simulate PoW block production."""
+    
+    def estimate_attack_cost(
+        hardware_cost_per_th: float,
+        electricity_cost_kwh: float,
+    ) -> AttackCost:
+        """Estimate 51% attack cost."""
+
+class PoWStats:
+    avg_block_time: float
+    difficulty_change: float
+    energy_kwh: float
+    attack_cost_usd: float
+    blocks_produced: int
+```
+
+### PoSSimulator
+
+```python
+class PoSSimulator:
+    def __init__(
+        total_staked: float = 32_000_000,
+        validator_count: int = 1_000_000,
+        min_stake: float = 32,
+    ): ...
+    
+    def simulate_epoch() -> EpochStats:
+        """Simulate one PoS epoch."""
+    
+    def calculate_staking_economics(
+        eth_price: float,
+        network_reward_rate: float,
+    ) -> StakingEconomics:
+        """Calculate staking economics."""
+
+class EpochStats:
+    epoch: int
+    attestations: int
+    finalized: bool
+    rewards_distributed: float
+    slashing_events: int
+```
+
+### BFTSimulator
+
+```python
+class BFTSimulator:
+    def __init__(
+        validators: int = 100,
+        faulty_nodes: int = 33,
+    ): ...
+    
+    def simulate_consensus(
+        proposal: str,
+        view: int = 0,
+    ) -> BFTResult:
+        """Simulate BFT consensus round."""
+
+class BFTResult:
+    consensus_reached: bool
+    rounds: int
+    message_count: int
+    latency_ms: float
+    faulty_detected: bool
+```
+
+## Data Models
+
+### ConsensusState
+
+```
+ConsensusState:
+  network: str                # ethereum, cosmos, etc.
+  consensus_type: str         # pos, pow, bft
+  current_slot: int
+  current_epoch: int
+  finalized_checkpoint: Checkpoint
+  justified_checkpoint: Checkpoint
+  validator_count: int
+  active_validators: int
+  total_staked: float
+```
+
+### ValidatorInfo
+
+```
+ValidatorInfo:
+  index: int
+  pubkey: str
+  status: str                 # active, pending, exiting, exited
+  balance: float
+  effective_balance: float
+  activation_epoch: int
+  exit_epoch: int
+  slashed: bool
+  attestation_count: int
+  proposal_count: int
+```
+
+### BlockProduction
+
+```
+BlockProduction:
+  slot: int
+  proposer_index: int
+  block_root: str
+  parent_root: str
+  state_root: str
+  graffiti: str
+  attestations: int
+  deposits: int
+  voluntary_exits: int
+  gas_used: int
+  gas_limit: int
+```
+
+## Deployment Guide
+
+### Validator Setup
+
+```
+1. Hardware requirements:
+   - CPU: 4+ cores
+   - RAM: 16+ GB
+   - Storage: 2TB NVMe SSD
+   - Network: 25+ Mbps
+
+2. Software installation:
+   - Beacon client (Prysm, Lighthouse, Teku, Nimbus)
+   - Execution client (Geth, Nethermind, Besu)
+   - Time synchronization (NTP)
+   - Firewall configuration
+
+3. Validator activation:
+   - Generate validator keys
+   - Submit deposit (32 ETH)
+   - Wait in activation queue
+   - Begin validating
+
+4. Monitoring setup:
+   - Uptime monitoring
+   - Attestation performance
+   - Balance tracking
+   - Alert configuration
+```
+
+### Testnet Deployment
+
+```bash
+# Goerli testnet
+geth --goerli --datadir ./geth-data
+lighthouse bn --network goerli --datadir ./lighthouse-data
+
+# Sepolia testnet
+geth --sepolia --datadir ./geth-data
+lighthouse bn --network sepolia --datadir ./lighthouse-data
+```
+
+## Monitoring & Observability
+
+### Key Metrics
+
+| Metric | Description | Alert |
+|--------|-------------|-------|
+| Block Production Rate | Blocks per slot | <0.95 target |
+| Attestation Participation | % attestations included | <95% |
+| Finality Delay | Epochs without finality | >4 |
+| Validator Balance | Active validator balance | <31 ETH |
+| Slash Events | Slashing count | Any |
+| Network Participation | % validators active | <90% |
+
+### Prometheus Metrics
+
+```yaml
+# Consensus metrics
+beaconchain_slot_current          # Current slot number
+beaconchain_validator_balance     # Validator balance in ETH
+beaconchain_attestations_total    # Total attestations
+beaconchain_blocks_proposed       # Blocks proposed
+beaconchain_finality_delay        # Finality delay in epochs
+```
+
+## Testing Strategy
+
+### Simulation Tests
+
+```
+1. Unit Tests
+   ├── Block production logic
+   ├── Attestation aggregation
+   ├── Finality calculation
+   └── Slashing condition detection
+
+2. Integration Tests
+   ├── Multi-validator coordination
+   ├── Network partition recovery
+   ├── View change handling
+   └── Cross-shard communication
+
+3. Stress Tests
+   ├── High validator count (1M+)
+   ├── Network latency simulation
+   ├── Fault injection (Byzantine nodes)
+   └── Long-running stability (72h+)
+```
+
+## Versioning & Migration
+
+### Protocol Upgrades
+
+```
+Major: Consensus algorithm change
+├── Example: PoW → PoS (The Merge)
+├── Requires: All nodes upgrade simultaneously
+└── Risk: Chain split if not coordinated
+
+Minor: Parameter change
+├── Example: Slot time reduction
+├── Requires: Validator upgrade
+└── Risk: Fork if not unanimous
+
+Patch: Bug fixes
+├── Example: Attestation aggregation fix
+├── Requires: Client update
+└── Risk: Low if backward compatible
+```
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| Attestation | Validator vote on block validity |
+| Beacon Chain | Ethereum's consensus chain |
+| Block Proposal | Creating a new block |
+| Committee | Group of validators for attestation |
+| Epoch | 32 slots in Ethereum PoS |
+| Finality | Guarantee that block cannot be reverted |
+| Fork Choice | Algorithm for selecting canonical chain |
+| Slashing | Penalty for misbehaving validators |
+| Slot | 12-second window for block proposal |
+| Validator | Entity that participates in consensus |
+| BFT | Byzantine Fault Tolerance |
+| VRF | Verifiable Random Function |
+
+## Changelog
+
+### 2.0.0 (2024-12-01)
+- Added Ethereum PoS full simulation
+- Added Tendermint BFT simulation
+- Added validator economics modeling
+- Improved attack cost estimation
+
+### 1.2.0 (2024-08-15)
+- Added DPoS governance simulation
+- Added DAG consensus modeling
+- Added finality analysis tools
+
+### 1.1.0 (2024-05-20)
+- Added BFT protocol simulation
+- Added 51% attack cost calculator
+- Added staking economics calculator
+
+### 1.0.0 (2024-02-01)
+- Initial release with PoW simulation
+- Basic PoS modeling
+- Difficulty adjustment simulation
+
+## Contributing Guidelines
+
+### Adding New Consensus Mechanisms
+
+1. Define the protocol specification
+2. Implement simulation engine
+3. Add security analysis module
+4. Write performance benchmarks
+5. Document economic model
+
+### Code Quality
+
+- All simulations must be reproducible
+- Statistical tests for randomness
+- Benchmark results documented
+- Peer review for economic models
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Consensus Mechanisms Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

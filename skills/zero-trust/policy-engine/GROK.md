@@ -516,3 +516,374 @@ print(f"PDP {pdp.pdp_id} serving {len(pdp.registered_peps)} PEPs")
 - [continuous-auth](../continuous-auth/GROK.md) — Session risk assessment and behavioral signals
 - [data-classification](../data-classification/GROK.md) — Data sensitivity labeling and classification policies
 - [threat-intelligence](../threat-intelligence/GROK.md) — Real-time threat feeds for risk-based policy adjustments
+
+---
+
+## Advanced Configuration
+
+### Rego Policy Bundle Configuration
+
+```python
+from policy_engine import RegoBundleConfig
+
+bundle_config = RegoBundleConfig(
+    bundle_path="./policies/bundle.tar.gz",
+    signing_key="ed25519_key",
+    revision="v2024.01.15",
+    activation_threshold=0.9,
+    panic_threshold=0.5,
+)
+```
+
+### Evaluation Engine Tuning
+
+```python
+from policy_engine import EvalConfig
+
+eval_config = EvalConfig(
+    max_evaluation_depth=15,
+    evaluation_timeout_ms=50,
+    cache_ttl_seconds=30,
+    partial_evaluation=True,
+    instrument_traces=True,
+    parallel_policy_groups=True,
+)
+```
+
+## Architecture Patterns
+
+### Policy Decision Flow
+
+```
+Authorization Request → PDP → Policy Evaluation → Obligations → Audit Log → Response
+```
+
+### PEP Deployment Patterns
+
+```
+Sidecar (service mesh) → Inline (API gateway) → Library (middleware) → Remote (HTTP call)
+```
+
+## Integration Guide
+
+### OPA Sidecar Integration
+
+```python
+from policy_engine import OPASidecar
+
+sidecar = OPASidecar(
+    opa_endpoint="http://localhost:8181",
+    bundle_path="/policies",
+    decision_endpoint="/v1/data/authz/allow",
+)
+```
+
+### Envoy External Authorization
+
+```python
+from policy_engine import EnvoyExtAuthz
+
+ext_authz = EnvoyExtAuthz(
+    grpc_port=9000,
+    failure_mode="deny",
+    timeout_ms=50,
+)
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| Policy caching | 10x faster repeated evaluations |
+| Partial evaluation | Pre-compute policy subsets |
+| Parallel evaluation | Multi-core utilization |
+| Bundle compression | Faster policy distribution |
+
+## Security Considerations
+
+- **Policy integrity**: Sign bundles with Ed25519
+- **Fail-closed PEPs**: Deny when PDP unreachable
+- **Audit every decision**: Complete evaluation traces
+- **Policy version control**: Git-integrated with rollback
+- **Separation of duties**: Policy author != policy deployer
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Evaluation timeout | Too many policies | Enable partial evaluation |
+| Policy conflict | Overlapping rules | Run conflict detection |
+| Cache stale | TTL too long | Reduce cache TTL |
+| PEP deny when PDP up | Network issue | Check PEP-PDP connectivity |
+
+## API Reference
+
+### PolicyEngine
+
+```python
+class PolicyEngine:
+    def __init__(self, engine_id: str, default_effect: str, audit_logging: bool, conflict_resolution: str)
+    def load_policy_bundle(self, path: str) -> None
+    def create_policy(self, policy_id: str, effect: str, target: dict, conditions: list, obligations: list = None) -> Policy
+    def evaluate(self, subject: Attribute, resource: Attribute, action: str, environment: dict) -> EvaluationResult
+    def simulate(self, subject_attributes: dict, resource_attributes: dict, action: str, environment: dict) -> SimulationResult
+    def detect_conflicts(self) -> list[Conflict]
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+from enum import Enum
+
+class Effect(Enum):
+    PERMIT = "permit"
+    DENY = "deny"
+
+@dataclass
+class EvaluationResult:
+    decision: str
+    matched_policies: list
+    obligations: list
+    evaluation_time_ms: float
+    trace: list
+
+@dataclass
+class Conflict:
+    policy_a_id: str
+    policy_b_id: str
+    description: str
+    severity: str
+    suggested_resolution: str
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+pip install policy-engine
+```
+
+### PDP Deployment
+
+1. Load policy bundle from Git
+2. Start PDP with TLS
+3. Deploy PEPs at resource boundaries
+4. Configure PEP-PDP communication
+5. Enable audit logging
+6. Test with simulated requests
+
+## Monitoring & Observability
+
+```python
+from policy_engine import MetricsCollector
+
+collector = MetricsCollector()
+collector.counter("policy.evaluation.total", count, tags={"decision": decision})
+collector.histogram("policy.evaluation.duration_ms", duration)
+collector.counter("policy.conflicts.detected", count)
+collector.gauge("policy.count", count)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from policy_engine import PolicyEngine
+
+def test_default_deny():
+    engine = PolicyEngine(engine_id="test", default_effect="deny", audit_logging=False, conflict_resolution="most_specific")
+    result = engine.evaluate(
+        subject=Attribute(principal="user:anon", attributes={}),
+        resource=Attribute(principal="resource:test", attributes={}),
+        action="read",
+        environment={},
+    )
+    assert result.decision == "deny"
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 1.0.0 | Initial release | N/A |
+| 1.1.0 | Added OPA/Rego support | Install OPA |
+| 2.0.0 | New evaluation engine | Rebuild policy bundles |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **ABAC** | Attribute-Based Access Control |
+| **RBAC** | Role-Based Access Control |
+| **OPA** | Open Policy Agent |
+| **Rego** | Policy language for OPA |
+| **PDP** | Policy Decision Point |
+| **PEP** | Policy Enforcement Point |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with ABAC/RBAC
+- OPA/Rego policy authoring
+- Policy simulation and conflict detection
+- Compliance mapping (GDPR, HIPAA, PCI DSS)
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/policy-engine.git
+pip install -e ".[dev]"
+pytest tests/
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills
+
+---
+
+## Extended Reference
+
+### Policy Decision Reference
+
+| Decision | Description | Obligations |
+|----------|-------------|-------------|
+| Permit | Access granted | Audit log, rate limit |
+| Deny | Access rejected | Audit log, alert |
+| Indeterminate | Cannot evaluate | Audit log, fail-closed |
+| Not Applicable | Policy doesn't apply | Skip |
+
+### ABAC Attribute Dimensions
+
+| Dimension | Examples | Use Case |
+|-----------|----------|----------|
+| Subject | role, department, clearance | Who is requesting |
+| Resource | type, classification, owner | What is being accessed |
+| Action | read, write, delete, admin | How they want to access |
+| Environment | time, location, device, network | Under what conditions |
+
+### RBAC Role Hierarchy Example
+
+```
+employee
+  └── analyst
+        └── finance_analyst
+              └── finance_manager
+                    └── cfo
+        └── auditor (separation of duty with finance_manager)
+```
+
+### Rego Policy Patterns
+
+```rego
+# Allow with conditions
+allow {
+    input.subject.role == "admin"
+    input.resource.owner == input.subject.department
+    time.now_hour >= 8
+    time.now_hour <= 18
+}
+
+# Deny with override
+deny {
+    input.subject.status == "terminated"
+}
+
+# Obligations
+obligations[result] {
+    allow
+    result := {"type": "audit_log", "detail": "data_access"}
+}
+```
+
+### Conflict Resolution Strategies
+
+| Strategy | Description | When to Use |
+|----------|-------------|-------------|
+| Most specific | Narrowest matching policy wins | Default choice |
+| Most restrictive | Deny wins over permit | High-security |
+| Priority based | Highest priority policy wins | Complex environments |
+| First match | First matching policy decides | Simple setups |
+
+### Compliance Framework Mapping
+
+| Framework | Key Controls | Policy Tags |
+|-----------|-------------|-------------|
+| GDPR | Art. 25, 32, 35 | data-protection, privacy |
+| HIPAA | §164.312 | phi, healthcare |
+| PCI DSS | Req 7, 8, 10 | payment, cardholder |
+| SOX | §802, §404 | financial, audit |
+| NIST 800-53 | AC-2, AC-3, AC-6 | access-control |
+
+### Policy Version Control Reference
+
+| Aspect | Recommendation |
+|--------|---------------|
+| Storage | Git repository |
+| Branching | Feature branches for policy changes |
+| Review | PR review required |
+| Testing | CI/CD policy simulation |
+| Rollback | Git revert to previous version |
+| Audit | Git log for all changes |
+
+## Real-World Policy Examples
+
+### Multi-Cloud Access Policy
+
+```rego
+package authz.multicloud
+
+default allow = false
+
+# Allow cloud admins to manage resources in their assigned cloud provider
+allow {
+    input.subject.role == "cloud_admin"
+    input.subject.cloud_assignment == input.resource.cloud_provider
+    input.action in ["read", "write", "delete"]
+    input.environment.mfa_verified == true
+    input.environment.time_of_day >= "08:00"
+    input.environment.time_of_day <= "20:00"
+}
+
+# Deny cross-cloud resource access unless explicitly permitted
+deny {
+    input.subject.cloud_assignment != input.resource.cloud_provider
+    not has_cross_cloud_exception
+}
+
+has_cross_cloud_exception {
+    input.subject.cross_cloud_exceptions[_] == input.resource.cloud_provider
+}
+```
+
+### Emergency Access (Break-Glass) Policy
+
+```python
+# Break-glass access for emergency scenarios
+emergency_policy = engine.create_policy(
+    policy_id="break-glass-emergency-access",
+    description="Emergency access for authorized personnel during incidents",
+    effect="permit",
+    priority=1000,  # Highest priority
+    target={
+        "subject.role": "incident_responder",
+        "action": "admin",
+        "resource.classification": "restricted",
+    },
+    conditions=[
+        {"attribute": "auth.mfa_verified", "operator": "equals", "value": True},
+        {"attribute": "auth.biometric_verified", "operator": "equals", "value": True},
+        {"attribute": "emergency.declared", "operator": "equals", "value": True},
+    ],
+    obligations=[
+        {"type": "audit_log", "detail": "break_glass_access"},
+        {"type": "alert", "channel": "security-ops", "severity": "critical"},
+        {"type": "session_recording", "enabled": True},
+        {"type": "time_limit", "max_duration_seconds": 3600},
+    ],
+)
+```

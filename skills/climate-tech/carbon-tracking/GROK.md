@@ -113,3 +113,696 @@ reporter.export_json(report, "ghg_report_2024.json")
 - **climate-data**: Climate data for emissions projections
 - **renewable-energy**: Clean energy transition tracking
 - **emission-reduction**: Reduction strategy and pathway modeling
+
+## Advanced Configuration
+
+### Emissions Factor Database Configuration
+
+```yaml
+emissions_factors:
+  databases:
+    - name: "IPCC_2006"
+      source: "IPCC Guidelines"
+      version: "2006"
+      update_frequency: "manual"
+    - name: "DEFRA_2024"
+      source: "UK Government"
+      version: "2024"
+      update_frequency: "annual"
+    - name: "GHGP_2024"
+      source: "GHG Protocol"
+      version: "2024"
+      update_frequency: "annual"
+  default_database: "GHGP_2024"
+  unit_conversion: "auto"
+```
+
+### Reporting Configuration
+
+```yaml
+reporting:
+  frameworks:
+    - name: "GHG_Protocol"
+      enabled: true
+      scope_coverage: [1, 2, 3]
+    - name: "CDP"
+      enabled: true
+      questionnaire: "climate_change"
+    - name: "TCFD"
+      enabled: true
+      pillars: [governance, strategy, risk, metrics]
+    - name: "CSRD"
+      enabled: false
+      double_materiality: true
+  verification:
+    provider: "third_party"
+    standard: "ISO_14064"
+    frequency: "annual"
+```
+
+### Data Integration Configuration
+
+```yaml
+data_sources:
+  energy:
+    type: "api"
+    provider: "utility_api"
+    api_key: "${UTILITY_API_KEY}"
+    interval: "hourly"
+  transportation:
+    type: "csv"
+    provider: "fleet_management"
+    schedule: "daily"
+  supply_chain:
+    type: "erp"
+    provider: "sap"
+    schedule: "monthly"
+  waste:
+    type: "manual"
+    provider: "facility_managers"
+    schedule: "quarterly"
+```
+
+## Architecture Patterns
+
+### Carbon Accounting Architecture
+
+```
+Data Collection Layer:
+├── Direct Measurement
+│   ├── Energy meters (electricity, gas)
+│   ├── Fuel purchases
+│   ├── Process emissions
+│   └── Refrigerant leaks
+├── Activity Data
+│   ├── Distance traveled
+│   ├── Waste generated
+│   ├── Materials purchased
+│   └── Business travel
+├── Supplier Data
+│   ├── Tier 1 suppliers
+│   ├── Tier 2 suppliers
+│   └── Logistics providers
+└── Calculated Data
+    ├── Emission factors
+    ├── Grid factors
+    └── Industry averages
+
+Processing Layer:
+├── Data Validation
+│   ├── Range checks
+│   ├── Completeness checks
+│   ├── Consistency checks
+│   └── Outlier detection
+├── Emission Calculation
+│   ├── Scope 1 (direct)
+│   ├── Scope 2 (energy)
+│   ├── Scope 3 (value chain)
+│   └── Product footprints
+├── Allocation
+│   ├── Revenue-based
+│   ├── Mass-based
+│   └── Time-based
+└── Aggregation
+    ├── By facility
+    ├── By business unit
+    ├── By geography
+    └── By category
+
+Output Layer:
+├── Dashboards
+├── Reports (GHG Protocol, CDP, TCFD)
+├── Trend analysis
+├── Reduction tracking
+└── Regulatory submissions
+```
+
+### Scope 3 Categories
+
+| Category | Description | Data Sources |
+|----------|-------------|--------------|
+| 1. Purchased Goods | Raw materials, components | ERP, procurement |
+| 2. Capital Goods | Equipment, buildings | Procurement, facilities |
+| 3. Fuel/Energy | Upstream energy | Energy suppliers |
+| 4. Transportation | Inbound logistics | Logistics providers |
+| 5. Waste | Generated waste | Waste management |
+| 6. Business Travel | Employee travel | Travel booking |
+| 7. Commuting | Employee commuting | Surveys |
+| 8. Leased Assets | Leased vehicles, buildings | Lease agreements |
+| 9. Transportation | Outbound logistics | Logistics providers |
+| 10. Processing | Sold product processing | Customer data |
+| 11. Use of Products | Product use phase | Product specs |
+| 12. End of Life | Product disposal | Waste management |
+| 13. Investments | Financial investments | Portfolio data |
+| 14. Land Use | Land use change | Geospatial data |
+
+## Integration Guide
+
+### Utility API Integration
+
+```python
+from carbon_tracking import UtilityAPIConnector
+
+api = UtilityAPIConnector(
+    api_key="${UTILITY_API_KEY}",
+    utility_id="utility_123",
+)
+
+# Fetch electricity consumption
+data = api.get_consumption(
+    facility_id="facility_001",
+    start_date="2024-01-01",
+    end_date="2024-12-31",
+    interval="monthly",
+)
+for row in data:
+    print(f"{row.month}: {row.kwh:,.0f} kWh")
+```
+
+### ERP Integration
+
+```python
+from carbon_tracking import ERPConnector
+
+erp = ERPConnector(
+    system="sap",
+    endpoint="https://sap.company.com/api",
+    credentials_vault="hashicorp",
+)
+
+# Fetch procurement data
+materials = erp.get_procurement(
+    start_date="2024-01-01",
+    end_date="2024-12-31",
+    categories=["raw_materials", "packaging"],
+)
+print(f"Materials purchased: {len(materials)}")
+for mat in materials:
+    print(f"  {mat.description}: {mat.quantity} {mat.unit}")
+```
+
+### CDP Reporting Integration
+
+```python
+from carbon_tracking import CDPReporter
+
+cdp = CDPReporter(
+    account_id="CDP_12345",
+    api_key="${CDP_API_KEY}",
+)
+
+# Generate CDP response
+response = cdp.generate_response(
+    year=2024,
+    questionnaire="climate_change",
+    data=footprint_data,
+)
+print(f"Questions answered: {response.questions_answered}")
+print(f"Completion: {response.completion_pct:.0f}%")
+```
+
+## Performance Optimization
+
+### Calculation Performance
+
+| Technique | Description | Impact |
+|-----------|-------------|--------|
+| Parallel calculation | Multi-facility processing | Nx speedup |
+| Caching factors | Cache emission factors | 2-5x faster |
+| Incremental updates | Only recalculate changed | 10x faster |
+| Vectorized operations | NumPy/Pandas operations | 5-10x faster |
+| Database optimization | Indexed queries | 10-50x faster |
+
+### Data Processing Optimization
+
+```python
+from carbon_tracking import CalculationOptimizer
+
+optimizer = CalculationOptimizer()
+result = optimizer.optimize(
+    facilities=100,
+    categories=14,
+    techniques=[
+        "parallel_facilities",
+        "cached_factors",
+        "incremental_updates",
+        "vectorized_calculations",
+    ],
+)
+print(f"Original time: {result.original_hours:.1f}h")
+print(f"Optimized time: {result.optimized_hours:.1f}h")
+```
+
+### Report Generation Speed
+
+```python
+from carbon_tracking import ReportOptimizer
+
+report_opt = ReportOptimizer()
+report = report_opt.generate_fast(
+    framework="ghg_protocol",
+    year=2024,
+    techniques=[
+        "template_precompilation",
+        "data_preaggregation",
+        "parallel_section_generation",
+    ],
+)
+print(f"Report generated in: {report.generation_seconds:.1f}s")
+```
+
+## Security Considerations
+
+### Data Security
+
+| Control | Description | Implementation |
+|---------|-------------|----------------|
+| Encryption | Protect emissions data | AES-256 at rest |
+| Access Control | Restrict data access | RBAC |
+| Audit Logging | Track data access | SIEM integration |
+| Backup | Regular data backups | 3-2-1 rule |
+| Compliance | GDPR/CCPA requirements | Data minimization |
+
+### Sensitive Data Handling
+
+```
+Sensitive Emissions Data:
+├── Facility-level emissions
+├── Supplier-specific data
+├── Product footprints
+├── Reduction targets
+└── Financial implications
+```
+
+### Data Integrity
+
+```
+Integrity Controls:
+├── Input validation at entry
+├── Cross-source reconciliation
+├── Automated anomaly detection
+├── Manual review for outliers
+├── Version control for adjustments
+└── Audit trail for all changes
+```
+
+## Troubleshooting Guide
+
+### Common Calculation Issues
+
+| Issue | Symptoms | Solution |
+|-------|----------|----------|
+| Missing Data | Gaps in time series | Use estimation methods, flag as estimated |
+| Factor Mismatch | Inconsistent results | Verify factor database version |
+| Unit Errors | Incorrect totals | Validate unit conversions |
+| Scope Overlap | Double counting | Apply allocation rules |
+| Boundary Errors | Missing sources | Review organizational boundary |
+
+### Data Quality Issues
+
+```
+Issue: Utility data gaps
+1. Check meter installation dates
+2. Verify API connectivity
+3. Use manual billing data as fallback
+4. Estimate based on historical patterns
+5. Document estimation methodology
+
+Issue: Supplier data unavailable
+1. Use industry average factors
+2. Request data from supplier
+3. Apply spend-based estimation
+4. Document data source
+```
+
+### Report Generation Issues
+
+```python
+from carbon_tracking import ReportDebugger
+
+debugger = ReportDebugger()
+diagnostics = debugger.diagnose(
+    report_type="ghg_protocol",
+    year=2024,
+    check_completeness=True,
+    check_consistency=True,
+    check_accuracy=True,
+)
+for issue in diagnostics.issues:
+    print(f"[{issue.severity}] {issue.message}")
+    print(f"  Fix: {issue.suggestion}")
+```
+
+## API Reference
+
+### GHGCalculator
+
+```python
+class GHGCalculator:
+    def calculate_scope1(
+        fuel_type: str,
+        quantity: float,
+        unit: str,
+        region: str,
+    ) -> EmissionResult:
+        """Calculate Scope 1 emissions."""
+    
+    def calculate_scope2(
+        electricity_kwh: float,
+        grid_factor: float,
+        method: str = "location",
+    ) -> EmissionResult:
+        """Calculate Scope 2 emissions."""
+    
+    def calculate_scope3(
+        category: str,
+        activity_data: float,
+        emission_factor: float = None,
+        region: str = None,
+    ) -> EmissionResult:
+        """Calculate Scope 3 emissions."""
+
+class EmissionResult:
+    emissions_tonnes: float
+    emissions_unit: str
+    scope: int
+    category: str
+    source: str
+    uncertainty_pct: float
+    data_quality: str
+```
+
+### CarbonFootprint
+
+```python
+class CarbonFootprint:
+    def __init__(self, org_name: str): ...
+    
+    def add_scope(self, result: EmissionResult) -> None:
+        """Add emission result to footprint."""
+    
+    def total_emissions(self) -> float:
+        """Calculate total emissions in tCO2e."""
+    
+    def by_scope(self) -> dict:
+        """Breakdown by scope."""
+    
+    def by_facility(self) -> dict:
+        """Breakdown by facility."""
+    
+    def by_category(self) -> dict:
+        """Breakdown by category."""
+```
+
+### ReductionTracker
+
+```python
+class ReductionTracker:
+    def __init__(
+        baseline_year: int,
+        baseline_emissions: float,
+        target_reduction_pct: float = 100,
+        target_year: int = 2050,
+    ): ...
+    
+    def add_actual(year: int, emissions: float) -> None:
+        """Add actual emissions for year."""
+    
+    def progress(self) -> ReductionProgress:
+        """Calculate reduction progress."""
+    
+    def trajectory(self) -> Trajectory:
+        """Model reduction trajectory to target."""
+
+class ReductionProgress:
+    reduction_pct: float
+    annual_reduction_rate: float
+    on_track: bool
+    years_remaining: int
+    required_annual_rate: float
+```
+
+## Data Models
+
+### EmissionResult
+
+```
+EmissionResult:
+  emissions_tonnes: float
+  emissions_unit: str
+  scope: int
+  category: str
+  source: str
+  activity_data: float
+  activity_unit: str
+  emission_factor: float
+  factor_source: str
+  uncertainty_pct: float
+  data_quality: str
+  calculation_date: datetime
+```
+
+### CarbonFootprint
+
+```
+CarbonFootprint:
+  org_name: str
+  reporting_year: int
+  total_emissions: float
+  scope1_emissions: float
+  scope2_emissions: float
+  scope3_emissions: float
+  baseline_year: int
+  baseline_emissions: float
+  reduction_pct: float
+  facilities: list[FacilityEmissions]
+  categories: list[CategoryEmissions]
+```
+
+### EmissionsFactor
+
+```
+EmissionsFactor:
+  factor_id: str
+  activity: str
+  fuel_type: str
+  region: str
+  factor_value: float
+  factor_unit: str
+  source: str
+  year: int
+  uncertainty_pct: float
+  gwp_value: float
+```
+
+## Deployment Guide
+
+### Carbon Tracking System Setup
+
+```
+1. Data Infrastructure
+   ├── Database (PostgreSQL)
+   ├── API layer (FastAPI)
+   ├── Frontend (React)
+   └── Report generation
+
+2. Data Sources
+   ├── Utility API integration
+   ├── ERP connection
+   ├── Manual data entry forms
+   └── Supplier portal
+
+3. Configuration
+   ├── Organizational boundary
+   ├── Facility mapping
+   ├── Emission factor database
+   └── Reporting frameworks
+
+4. Validation
+   ├── Data quality checks
+    against industry benchmarks
+    against prior years
+   └── Third-party verification
+```
+
+### Database Setup
+
+```sql
+-- Core tables
+CREATE TABLE facilities (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    region VARCHAR(50),
+    type VARCHAR(50)
+);
+
+CREATE TABLE emissions (
+    id SERIAL PRIMARY KEY,
+    facility_id INT REFERENCES facilities(id),
+    year INT,
+    scope INT,
+    category INT,
+    emissions_tonnes DECIMAL(12,2),
+    data_quality VARCHAR(20)
+);
+
+CREATE TABLE emission_factors (
+    id SERIAL PRIMARY KEY,
+    activity VARCHAR(100),
+    region VARCHAR(50),
+    factor DECIMAL(10,6),
+    source VARCHAR(100),
+    year INT
+);
+```
+
+## Monitoring & Observability
+
+### Carbon Metrics
+
+| Metric | Target | Description |
+|--------|--------|-------------|
+| Data Completeness | >95% | Required data available |
+| Calculation Accuracy | <5% error | vs third-party verification |
+| Reporting Timeliness | On schedule | Framework deadlines |
+| Data Quality Score | >80% | Quality assessment |
+| Reduction Progress | On track | vs target trajectory |
+
+### Monitoring Dashboard
+
+```
+Carbon Dashboard:
+├── Total emissions trend
+├── Scope 1/2/3 breakdown
+├── Facility-level comparison
+├── Reduction progress
+├── Data quality score
+├── Reporting status
+└── Anomaly alerts
+```
+
+## Testing Strategy
+
+### Calculation Testing
+
+```
+1. Unit Tests
+   ├── Emission factor application
+   ├── Unit conversions
+   ├── Scope calculations
+   └── Aggregation logic
+
+2. Integration Tests
+   ├── Data pipeline end-to-end
+   ├── Report generation
+   ├── API endpoints
+   └── Database operations
+
+3. Validation Tests
+   ├── Known-answer calculations
+    against published results
+   ├── Edge cases (zero, negative)
+   └── Large dataset handling
+```
+
+## Versioning & Migration
+
+### Calculation Versioning
+
+```
+v3.0: Major methodology change
+├── New emission factors
+├── Updated scope boundaries
+├── New calculation methods
+└── Regulatory changes
+
+v2.x: Factor updates
+├── Annual factor refresh
+├── New activity categories
+├── Additional regions
+└── Improved accuracy
+
+v2.0.x: Bug fixes
+├── Calculation corrections
+├── Data type fixes
+└── Documentation updates
+```
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| CDP | Carbon Disclosure Project |
+| CSRD | Corporate Sustainability Reporting Directive |
+| GHG | Greenhouse Gas |
+| GWP | Global Warming Potential |
+| Scope 1 | Direct emissions from owned sources |
+| Scope 2 | Indirect emissions from purchased energy |
+| Scope 3 | Value chain emissions |
+| SBTi | Science Based Targets initiative |
+| TCFD | Task Force on Climate-related Financial Disclosures |
+| tCO2e | Tonnes of CO2 equivalent |
+
+## Changelog
+
+### 2.0.0 (2024-12-01)
+- Added Scope 3 full category support
+- Added CDP reporting integration
+- Added CSRD reporting
+- Improved data quality scoring
+
+### 1.2.0 (2024-08-15)
+- Added reduction tracking
+- Added offset management
+- Improved calculation accuracy
+
+### 1.1.0 (2024-05-20)
+- Added Scope 1 and 2 calculations
+- Added emission factor database
+- Improved reporting
+
+### 1.0.0 (2024-02-01)
+- Initial release with basic calculations
+- Simple footprint reporting
+- Basic emission factors
+
+## Contributing Guidelines
+
+### Adding New Emission Factors
+
+1. Source the factor (IPCC, DEFRA, etc.)
+2. Document the reference
+3. Add to factor database
+4. Validate against known values
+5. Submit PR with documentation
+
+### Code Quality
+
+- Type hints on all functions
+- Unit tests for calculations
+- Integration tests with data sources
+- Documentation for new factors
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Carbon Tracking Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

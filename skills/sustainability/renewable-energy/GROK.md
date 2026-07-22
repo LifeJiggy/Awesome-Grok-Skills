@@ -199,3 +199,564 @@ config = {
 - [carbon-tracking](../carbon-tracking/GROK.md) — Scope 2 emissions accounting for renewable procurement. Uses REC and PPA data for market-based emissions calculations.
 - [green-it](../green-it/GROK.md) — Data center renewable energy integration. Addresses the infrastructure side of renewable energy adoption in IT operations.
 - [circular-economy](../circular-economy/GROK.md) — End-of-life management for solar panels, wind blades, and batteries. Handles the circularity challenges unique to renewable energy equipment.
+
+---
+
+## Advanced Configuration
+
+The renewable energy module supports advanced configuration for forecasting accuracy, battery management, and market participation. These options are available through the `AdvancedConfig` class or via environment variables.
+
+```python
+from renewable_energy import AdvancedConfig
+
+config = AdvancedConfig(
+    # Solar forecasting
+    solar_forecast_model="ensemble",  # nwp, satellite, ml, ensemble
+    solar_horizon_hours=48,
+    solar_update_interval_minutes=15,
+    solar_temperature_coefficient=-0.004,
+    solar_soiling_model="linear",  # linear, exponential, none
+
+    # Wind forecasting
+    wind_forecast_model="physical",  # physical, statistical, ml, ensemble
+    wind_wake_model="jensen",  # jensen, gaussian, flow_model
+    wind_turbine_data_source="manufacturer",  # manufacturer, measured, iec
+    wind_air_density_correction=True,
+
+    # Battery management
+    battery_degradation_model="cycling",  # cycling, calendar, combined
+    battery_thermal_model="lumped",  # lumped, spatial, electrochemical
+    battery_soh_initial=1.0,
+    battery_replacement_cost_per_kwh=350,
+    battery_max_cycles=6000,
+
+    # Market participation
+    market_operator="PJM",
+    bid_lead_time_hours=12,
+    imbalance_penalty_cents=5.0,
+    reserve_margin_percent=10,
+
+    # Microgrid
+    microgrid_import_limit_kw=500,
+    microgrid_export_limit_kw=200,
+    microgrid_frequency_setpoint_hz=60.0,
+    microgrid_voltage_setpoint_v=480
+)
+```
+
+### Weather Data Source Configuration
+
+```python
+from renewable_energy import WeatherConfig
+
+weather_config = WeatherConfig(
+    primary_source="open_meteo",  # open_meteo, nwp, satellite
+    fallback_sources=["windy", "noaa_gfs"],
+
+    # NWP configuration
+    nwp_model="gfs",  # gfs, ecmwf, hrrr, nam
+    nwp_resolution_km=25,
+    nwp_update_interval_hours=6,
+
+    # Satellite configuration
+    satellite_source="goes",  # goes, msg, himawari
+    satellite_resolution_km=2,
+    satellite_update_interval_minutes=10,
+
+    # Site-specific data
+    pyranometer_enabled=True,
+    anemometer_enabled=True,
+    temperature_sensor_enabled=True
+)
+```
+
+## Architecture Patterns
+
+### Ensemble Forecasting
+
+Combine multiple forecast models for improved accuracy:
+
+```python
+from renewable_energy import EnsembleSolarForecaster
+
+ensemble = EnsembleSolarForecaster(
+    models={
+        "nwp": {"weight": 0.4, "model": "gfs"},
+        "satellite": {"weight": 0.3, "model": "goes"},
+        "persistence": {"weight": 0.15},
+        "ml": {"weight": 0.15, "model": "lstm"}
+    },
+    rebalance_interval_hours=6
+)
+
+forecast = ensemble.forecast_next_24h()
+print(f"Ensemble forecast: {forecast.total_kwh:.1f} kWh")
+print(f"Uncertainty: +/- {forecast.uncertainty_percent:.1f}%")
+```
+
+### Battery Dispatch Optimization
+
+```python
+from renewable_energy import BatteryDispatchOptimizer
+
+optimizer = BatteryDispatchOptimizer(
+    capacity_kwh=1000,
+    max_charge_kw=250,
+    max_discharge_kw=250,
+    degradation_cost_per_kwh=0.05
+)
+
+# Optimize for multiple objectives
+schedule = optimizer.optimize(
+    prices=hourly_prices,
+    solar_forecast=hourly_solar,
+    load_forecast=hourly_load,
+    objectives=["maximize_revenue", "minimize_degradation"],
+    constraints={"min_soc": 0.1, "max_soc": 0.95}
+)
+```
+
+### Virtual Power Plant Aggregation
+
+```python
+from renewable_energy import VirtualPowerPlant
+
+vpp = VirtualPowerPlant(name="Regional VPP")
+
+# Add distributed resources
+vpp.add_resource(type="solar", capacity_kw=500, location="Site A")
+vpp.add_resource(type="battery", capacity_kwh=200, max_power_kw=50, location="Site B")
+vpp.add_resource(type="flexible_load", max_shift_kw=100, location="Site C")
+
+# Optimize VPP dispatch
+dispatch = vpp.optimize_dispatch(
+    market_price_forecast=hourly_prices,
+    grid_services_needed=["frequency_regulation", "peak_shaving"]
+)
+print(f"VPP output: {dispatch.total_output_kw:.0f} kW")
+print(f"Revenue: ${dispatch.total_revenue_usd:.2f}")
+```
+
+## Integration Guide
+
+### OpenEI / OpenWeather Integration
+
+```python
+from renewable_energy import OpenMeteoClient, OpenEIClient
+
+# OpenMeteo weather data
+meteo = OpenMeteoClient()
+forecast = meteo.get_forecast(
+    latitude=37.77,
+    longitude=-122.42,
+    hourly=["solar_radiation", "wind_speed", "temperature"]
+)
+
+# OpenEI utility rate data
+openei = OpenEIClient()
+rates = openei.get_rates(
+    utility="PG&E",
+    sector="commercial",
+    state="CA"
+)
+```
+
+### ISO/RTO Market Integration
+
+```python
+from renewable_energy import ISOConnector
+
+# PJM market connector
+pjm = ISOConnector(market="PJM")
+pjm.configure(
+    account_id="your-account",
+    api_key="your-key",
+    node="WESTJ_1_NI"
+)
+
+# Get day-ahead prices
+prices = pjm.get_day_ahead_prices(date="2025-01-15")
+
+# Submit bids
+bid = pjm.submit_bid(
+    quantity_mwh=100,
+    price_per_mwh=45.00,
+    bid_type="supply"
+)
+```
+
+### REC Registry Integration
+
+```python
+from renewable_energy import MRETSConnector, NARConnector
+
+# M-RETS (Midwest Renewable Energy Tracking System)
+mrets = MRETSConnector(account_id="your-account")
+mrets.issue_certificate(
+    generator_id="SOLAR-001",
+    mwh=100,
+    vintage=2025,
+    fuel_type="solar"
+)
+
+# NAR (National Accounts Registry)
+nar = NARConnector()
+nar.retire_certificate(
+    certificate_id="REC-2025-12345",
+    retirement_reason="Scope 2 compliance",
+    retired_by="Acme Corp"
+)
+```
+
+## Performance Optimization
+
+### Forecast Caching
+
+```python
+from renewable_energy import ForecastCache
+
+cache = ForecastCache(
+    backend="redis",
+    redis_url="redis://localhost:6379",
+    solar_ttl_seconds=900,  # 15 minutes
+    wind_ttl_seconds=600    # 10 minutes
+)
+
+# Cached solar forecast
+solar = SolarForecaster(cache=cache)
+forecast = solar.forecast_next_24h()  # Uses cache if available
+```
+
+### Battery Optimization Solver
+
+```python
+from renewable_energy import BatterySolver
+
+solver = BatterySolver(
+    solver="gurobi",  # gurobi, cplex, coin-or, scip
+    time_limit_seconds=30,
+    mip_gap=0.01
+)
+
+# Solve large-scale battery scheduling problem
+schedule = solver.optimize(
+    battery_capacity_kwh=5000,
+    horizon_hours=168,  # 1 week
+    prices=weekly_prices,
+    solar_forecast=weekly_solar
+)
+```
+
+## Security Considerations
+
+### Market Communication Security
+
+```python
+from renewable_energy import SecureMarketConnector
+
+connector = SecureMarketConnector(
+    market="PJM",
+    tls_cert="/certs/client.pem",
+    tls_key="/certs/client.key",
+    ca_cert="/certs/ca.pem",
+    api_key_vault="aws_secrets_manager"
+)
+```
+
+### Microgrid Control Security
+
+```python
+from renewable_energy import SecureMicrogridController
+
+controller = SecureMicrogridController(
+    scada_endpoint="https://scada.internal:443",
+    auth_method="mutual_tls",
+    command_signing=True,
+    audit_logging=True
+)
+```
+
+## Troubleshooting Guide
+
+| Issue | Possible Cause | Resolution |
+|-------|---------------|------------|
+| Solar forecast too high | Soiling or shading not modeled | Calibrate with site measurements |
+| Wind forecast inaccurate | Wake effects underestimated | Use Gaussian wake model, add SCADA data |
+| Battery degradation faster than expected | Aggressive cycling or temperature | Review dispatch schedule, check thermal management |
+| REC retirement failed | Certificate already retired | Check certificate status before retirement |
+| Market bid rejected | Price outside allowed range | Verify market rules, check bid constraints |
+
+```python
+# Diagnostic script
+from renewable_energy import DiagnosticRunner
+
+diag = DiagnosticRunner(site="Solar Farm Alpha")
+results = diag.run_all()
+for check in results:
+    status = "PASS" if check.passed else "FAIL"
+    print(f"[{status}] {check.name}: {check.message}")
+```
+
+## API Reference
+
+### SolarForecaster
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `forecast_next_24h(temp_c)` | temperature: float | `List[HourForecast]` | 24-hour solar forecast |
+| `forecast_next_7d()` | - | `List[DayForecast]` | 7-day solar forecast |
+| `calibrate(measurements)` | measurements: List[float] | `None` | Calibrate with site data |
+
+### BatteryOptimizer
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `optimize_for_arbitrage(prices, soc)` | prices: List[float], soc: float | `List[Dispatch]` | Optimize for price arbitrage |
+| `optimize_for_self_consumption(solar, load)` | solar: List[float], load: List[float] | `List[Dispatch]` | Maximize self-consumption |
+| `get_degradation()` | - | `DegradationReport` | Current battery health status |
+
+### MicrogridManager
+
+| Method | Parameters | Returns | Description |
+|--------|-----------|---------|-------------|
+| `optimize_dispatch(solar, price, mode)` | parameters | `DispatchSchedule` | Optimize microgrid dispatch |
+| `simulate_island(critical_loads)` | loads: List[float] | `IslandResult` | Simulate islanded operation |
+| `get_black_start_sequence()` | - | `List[Command]` | Black start procedure |
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional, List
+
+@dataclass
+class SolarForecast:
+    time: datetime
+    power_kw: float
+    capacity_factor: float
+    irradiance_w_m2: float
+    temperature_c: float
+    confidence: float
+
+@dataclass
+class WindForecast:
+    time: datetime
+    power_kw: float
+    capacity_factor: float
+    wind_speed_ms: float
+    wind_direction_deg: float
+    air_density_kg_m3: float
+
+@dataclass
+class BatteryState:
+    soc: float
+    soh: float
+    temperature_c: float
+    charge_power_kw: float
+    discharge_power_kw: float
+    cycles_count: int
+    remaining_capacity_kwh: float
+
+@dataclass
+class DispatchSchedule:
+    timestamps: List[datetime]
+    solar_kwh: List[float]
+    battery_kwh: List[float]
+    grid_import_kwh: List[float]
+    grid_export_kwh: List[float]
+    total_revenue_usd: float
+```
+
+## Deployment Guide
+
+### Docker Deployment
+
+```dockerfile
+FROM python:3.11-slim
+
+RUN pip install renewable-energy[all]
+
+COPY config.yaml /etc/renewable-energy/config.yaml
+
+HEALTHCHECK --interval=30s --timeout=5s \
+  CMD python -c "from renewable_energy import health_check; health_check()"
+
+ENTRYPOINT ["renewable-energy"]
+CMD ["serve", "--config", "/etc/renewable-energy/config.yaml"]
+```
+
+### Kubernetes Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: renewable-energy-optimizer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: renewable-energy
+  template:
+    spec:
+      containers:
+      - name: optimizer
+        image: renewable-energy:1.0.0
+        env:
+        - name: WEATHER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: weather-keys
+              key: open-meteo
+```
+
+## Monitoring & Observability
+
+### Metrics Collection
+
+```python
+from renewable_energy import MetricsCollector
+
+collector = MetricsCollector()
+
+# Register custom metrics
+collector.register_gauge("solar_output_kw", "Current solar output")
+collector.register_gauge("battery_soc_percent", "Battery state of charge")
+collector.register_counter("energy_traded_mwh", "Total energy traded")
+collector.register_histogram("forecast_error_percent", "Forecast accuracy")
+```
+
+### Dashboard Integration
+
+```python
+from renewable_energy import DashboardExporter
+
+dashboard = DashboardExporter(
+    grafana_url="https://grafana.internal",
+    datasource="renewable_energy"
+)
+
+# Push real-time data
+dashboard.push_metrics({
+    "solar_output_kw": 450,
+    "battery_soc": 0.75,
+    "grid_frequency_hz": 60.02
+})
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from renewable_energy import SolarForecaster, BatteryOptimizer
+
+class TestSolarForecaster:
+    def test_forecast_accuracy(self):
+        solar = SolarForecaster(capacity_kw=500)
+        forecast = solar.forecast_next_24h(temperature_c=25.0)
+        assert len(forecast) == 24
+        assert all(f.power_kw >= 0 for f in forecast)
+        assert all(f.capacity_factor <= 1.0 for f in forecast)
+
+class TestBatteryOptimizer:
+    def test_arbitrage_profit(self):
+        battery = BatteryOptimizer(capacity_kwh=1000, max_charge_kw=250)
+        prices = [45, 42, 38, 35, 33, 30, 28, 32, 48, 65, 85, 95]
+        schedule = battery.optimize_for_arbitrage(prices=prices, current_soc=0.5)
+        profit = sum(s.revenue_usd for s in schedule)
+        assert profit > 0  # Should be profitable
+```
+
+## Versioning & Migration
+
+### Semantic Versioning
+
+- **MAJOR**: Breaking changes to API, forecast model changes
+- **MINOR**: New market integrations, new battery models
+- **PATCH**: Bug fixes, performance improvements
+
+### Migration Guide
+
+```python
+# v1.x to v2.x migration
+# Old API
+solar = SolarForecaster(capacity=500, lat=37.77, lon=-122.42)
+
+# New API
+solar = SolarForecaster(
+    capacity_kw=500,
+    latitude=37.77,
+    longitude=-122.42,
+    tilt_degrees=30
+)
+```
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **Capacity Factor** | Ratio of actual output to theoretical maximum output |
+| **POA Irradiance** | Plane-of-array irradiance — solar radiation on tilted panel surface |
+| **BESS** | Battery Energy Storage System |
+| **SOC** | State of Charge — current energy level as percentage of capacity |
+| **SOH** | State of Health — battery capacity relative to original capacity |
+| **PPA** | Power Purchase Agreement — long-term contract for electricity purchase |
+| **REC** | Renewable Energy Certificate — proof of renewable electricity generation |
+| **GO** | Guarantee of Origin — European equivalent of REC |
+| **VPP** | Virtual Power Plant — aggregation of distributed energy resources |
+| **DER** | Distributed Energy Resource — small-scale energy generation or storage |
+| **Ancillary Services** | Grid support services like frequency regulation and voltage support |
+| **Curtailment** | Reduction of renewable output due to grid congestion or oversupply |
+
+## Changelog
+
+### v1.0.0 (2025-01-15)
+- Initial release with solar and wind forecasting
+- Battery storage optimization
+- Basic market trading
+
+### v1.1.0 (2025-02-01)
+- Added microgrid management
+- Improved forecast accuracy with ensemble models
+- Added REC tracking
+
+### v1.2.0 (2025-03-01)
+- Added virtual power plant aggregation
+- Performance improvements in battery optimization
+- Added multi-market support
+
+## Contributing Guidelines
+
+1. **Fork the repository** and create a feature branch from `main`
+2. **Write tests** for all new functionality with >80% coverage
+3. **Follow PEP 8** style guidelines with type hints
+4. **Update documentation** for any API changes
+5. **Add changelog entries** under `[Unreleased]` section
+6. **Submit a pull request** with a clear description of changes
+
+### Code Review Checklist
+
+- [ ] Tests pass and coverage meets threshold
+- [ ] Forecast models are validated against historical data
+- [ ] Battery degradation is modeled accurately
+- [ ] Market integration follows ISO/RTO rules
+- [ ] No hardcoded market data or prices
+
+## License
+
+This module is licensed under the Apache License, Version 2.0. See the LICENSE file for full terms.
+
+Copyright 2025 Renewable Energy Contributors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

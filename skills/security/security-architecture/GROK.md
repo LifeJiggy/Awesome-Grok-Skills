@@ -379,3 +379,780 @@ The security architecture module follows a defense-in-depth layered model:
 - Microsoft Zero Trust Architecture: https://docs.microsoft.com/en-us/security/zero-trust/
 - OWASP Application Security Architecture: https://owasp.org/www-project-application-security-verification-standard/
 - NIST SP 800-123 (General Server Security): https://csrc.nist.gov/publications/detail/sp/800-123/final
+
+---
+
+## Zero Trust Architecture Implementation
+
+### Identity-Aware Proxy Pattern
+
+```python
+from security_architecture import IdentityAwareProxy, PolicyEngine, DeviceTrust
+
+# Deploy identity-aware proxy in front of internal services
+proxy = IdentityAwareProxy(
+    upstream_services=[
+        {"name": "dashboard", "url": "http://dashboard.internal:8080", "auth_required": True},
+        {"name": "api", "url": "http://api.internal:3000", "auth_required": True},
+        {"name": "admin", "url": "http://admin.internal:8443", "auth_required": True, "mfa_required": True},
+    ],
+    identity_provider="google_oauth2",
+    device_trust=True,
+    session_lifetime_hours=8,
+)
+
+# Define access policies
+policies = [
+    {
+        "name": "engineering-dashboard",
+        "effect": "allow",
+        "identity": {"group": "engineering@company.com"},
+        "device": {"trusted": True, "managed": True},
+        "resource": "dashboard",
+        "conditions": {"time_of_day": "08:00-20:00", "geo": "US,CA,GB"},
+    },
+    {
+        "name": "admin-mfa-required",
+        "effect": "allow",
+        "identity": {"group": "admins@company.com"},
+        "device": {"trusted": True},
+        "mfa": {"age_max_hours": 1},
+        "resource": "admin",
+        "conditions": {"jit_approval_required": True},
+    },
+    {
+        "name": "deny-all-default",
+        "effect": "deny",
+        "identity": {},
+        "resource": "*",
+    },
+]
+
+# Evaluate access request
+result = proxy.evaluate(
+    request={
+        "user": "alice@company.com",
+        "groups": ["engineering@company.com"],
+        "device_id": "dev-abc-123",
+        "device_managed": True,
+        "device_trusted": True,
+        "mfa_age_minutes": 30,
+        "source_ip": "203.0.113.42",
+        "geo": "US",
+        "time": "14:30",
+        "resource": "dashboard",
+    },
+    policies=policies
+)
+
+print(f"Access Decision: {result.decision}")
+print(f"Matched Policy: {result.matched_policy}")
+print(f"Session Lifetime: {result.session_lifetime_hours}h")
+```
+
+### Microsegmentation with Kubernetes NetworkPolicy
+
+```python
+from security_architecture import NetworkPolicyGenerator, SecurityTier
+
+generator = NetworkPolicyGenerator(namespace="production")
+
+# Generate tiered network policies
+policies = generator.generate_tiered_policies(
+    tiers=[
+        SecurityTier(
+            name="web",
+            tier_level=1,
+            allowed_egress=["api"],
+            allowed_ingress=["0.0.0.0/0"],  # Public
+            ports_ingress=[443],
+            ports_egress=[8080],
+        ),
+        SecurityTier(
+            name="api",
+            tier_level=2,
+            allowed_egress=["database", "cache"],
+            allowed_ingress=["web"],
+            ports_ingress=[8080],
+            ports_egress=[5432, 6379],
+        ),
+        SecurityTier(
+            name="database",
+            tier_level=3,
+            allowed_egress=[],
+            allowed_ingress=["api"],
+            ports_ingress=[5432],
+            ports_egress=[],
+        ),
+        SecurityTier(
+            name="cache",
+            tier_level=3,
+            allowed_egress=[],
+            allowed_ingress=["api"],
+            ports_ingress=[6379],
+            ports_egress=[],
+        ),
+    ],
+    default_deny_egress=True,
+    default_deny_ingress=True,
+    allow_dns=True,  # Always allow DNS
+)
+
+for policy in policies:
+    print(f"--- {policy['metadata']['name']} ---")
+    print(f"  Pod Selector: {policy['spec']['podSelector']}")
+    print(f"  Ingress Rules: {len(policy['spec'].get('ingress', []))}")
+    print(f"  Egress Rules: {len(policy['spec'].get('egress', []))}")
+    print()
+```
+
+## Cloud Security Architecture
+
+### AWS Security Hub Integration
+
+```python
+from security_architecture import AWSSecurityHub, SecurityFinding
+
+hub = AWSSecurityHub(
+    region="us-east-1",
+    standards=[
+        "aws-foundational-security-best-practices",
+        "cis-aws-foundations-benchmark",
+        "pci-dss-3.2.1",
+    ]
+)
+
+# Generate security findings from architecture review
+findings = [
+    SecurityFinding(
+        title="S3 bucket publicly accessible",
+        severity="critical",
+        compliance="CIS 2.1.5",
+        resource="arn:aws:s3:::customer-data-prod",
+        remediation="Enable S3 block public access and review bucket policy",
+        evidence=["s3_bucket_policy.json"],
+        auto_remediate=True,
+        remediation_script="block_s3_public_access.py"
+    ),
+    SecurityFinding(
+        title="Security group allows unrestricted ingress",
+        severity="high",
+        compliance="AWS-FSBP EC2.19",
+        resource="arn:aws:ec2:us-east-1:123456789:security-group/sg-abc123",
+        remediation="Restrict ingress to specific CIDR ranges",
+        evidence=["sg_ingress_rules.json"],
+        auto_remediate=False,
+    ),
+]
+
+# Auto-remediate findings
+for finding in findings:
+    if finding.auto_remediate:
+        result = hub.auto_remediate(finding)
+        print(f"Remediated: {finding.title}")
+        print(f"  Action: {result.action_taken}")
+        print(f"  Verified: {result.verified}")
+    else:
+        print(f"Manual action needed: {finding.title}")
+        print(f"  Remediation: {finding.remediation}")
+        print(f"  Compliance: {finding.compliance}")
+    print()
+```
+
+### Cloud Security Posture Management
+
+```python
+from security_architecture import CloudPostureManager, PostureCheck
+
+manager = CloudPostureManager(
+    providers=["aws", "gcp", "azure"],
+    checks=[
+        PostureCheck(
+            id="CSPM-001",
+            title="Encryption at rest enabled for all storage",
+            provider="aws",
+            service="s3",
+            query="aws.s3.buckets[?serverSideEncryptionConfiguration == null]",
+            severity="high",
+            compliance="PCI-DSS 3.4, SOC2 CC6.1"
+        ),
+        PostureCheck(
+            id="CSPM-002",
+            title="No public RDS instances",
+            provider="aws",
+            service="rds",
+            query="aws.rds.instances[?publiclyAccessible == `true`]",
+            severity="critical",
+            compliance="PCI-DSS 1.3.1"
+        ),
+        PostureCheck(
+            id="CSPM-003",
+            title="CloudTrail logging enabled in all regions",
+            provider="aws",
+            service="cloudtrail",
+            query="aws.cloudtrail.trails[?loggingStatus == `false`]",
+            severity="high",
+            compliance="PCI-DSS 10.1"
+        ),
+        PostureCheck(
+            id="CSPM-004",
+            title="No default VPC security groups with 0.0.0.0/0 ingress",
+            provider="aws",
+            service="ec2",
+            query="aws.ec2.security_groups[?groupName == `default` && ipPermissions[?ipRanges[?cidrIp == `0.0.0.0/0`]]]",
+            severity="critical",
+            compliance="AWS-FSBP EC2.19"
+        ),
+    ]
+)
+
+# Run posture assessment
+results = manager.assess()
+print(f"=== Cloud Security Posture Report ===")
+print(f"Total Checks: {results.total_checks}")
+print(f"Passed: {results.passed}")
+print(f"Failed: {results.failed}")
+print(f"Score: {results.score:.1%}")
+
+for finding in results.findings:
+    print(f"\n[{finding.severity.upper()}] {finding.title}")
+    print(f"  Resource: {finding.resource}")
+    print(f"  Compliance: {finding.compliance}")
+    print(f"  Remediation: {finding.remediation}")
+```
+
+## Container Security Architecture
+
+### Container Runtime Security
+
+```python
+from security_architecture import ContainerSecurityPolicy, RuntimeSecurity
+
+# Define container security baselines
+container_policy = ContainerSecurityPolicy(
+    image_scanning={
+        "enabled": True,
+        "block_on": ["critical", "high"],
+        "warn_on": ["medium"],
+        "scan_before_deploy": True,
+    },
+    runtime_security={
+        "read_only_rootfs": True,
+        "no_privilege_escalation": True,
+        "drop_all_capabilities": True,
+        "add_capabilities": [],  # No capabilities added
+        "seccomp_profile": "RuntimeDefault",
+        "apparmor_profile": "runtime-default",
+        "no_host_network": True,
+        "no_host_pid": True,
+        "no_host_ipc": True,
+    },
+    resource_limits={
+        "cpu": "2",
+        "memory": "2Gi",
+        "ephemeral_storage": "1Gi",
+    },
+    image_signing={
+        "enabled": True,
+        "verify_before_deploy": True,
+        "trusted_registries": ["gcr.io/my-project", "docker.io/library"],
+    },
+)
+
+# Generate Pod Security Standards manifest
+manifest = container_policy.generate_pss_manifest(
+    namespace="production",
+    level="restricted",
+    version="latest",
+)
+print(f"PSS Manifest: {json.dumps(manifest, indent=2)}")
+
+# Runtime security monitoring
+runtime = RuntimeSecurity(
+    falco_rules_path="/etc/falco/rules.d",
+    alert_channels=["slack-security", "pagerduty"],
+)
+
+# Define custom runtime rules
+custom_rules = [
+    {
+        "rule": "Unauthorized process execution",
+        "condition": " spawned_process and not proc.name in (allowed_processes)",
+        "output": "Unauthorized process started (user=%user.name process=%proc.name)",
+        "priority": "WARNING",
+    },
+    {
+        "rule": "Sensitive file access",
+        "condition": " open_read and fd.name in (/etc/shadow, /etc/passwd)",
+        "output": "Sensitive file accessed (user=%user.name file=%fd.name)",
+        "priority": "ERROR",
+    },
+    {
+        "rule": "Network connection to external",
+        "condition": " outbound and not dst.ip in (allowed_external_ips)",
+        "output": "Outbound connection to unauthorized IP (ip=%dst.ip)",
+        "priority": "WARNING",
+    },
+]
+```
+
+### Image Supply Chain Security
+
+```python
+from security_architecture import ImageSecurity, ProvenanceVerifier
+
+image_security = ImageSecurity(
+    registries=["gcr.io", "docker.io"],
+    scanning_engine="trivy",
+    signing_engine="cosign",
+)
+
+# Verify image before deployment
+verification = image_security.verify_image(
+    image="gcr.io/my-project/api-server:v1.2.3",
+    checks=[
+        "vulnerability_scan",     # No critical/high CVEs
+        "signature_verification",  # Signed by trusted key
+        "provenance_check",       # SBOM attestation present
+        "base_image_check",       # Base image from trusted registry
+        "malware_scan",           # No malware detected
+    ]
+)
+
+print(f"Image Verification: {verification.passed}")
+for check in verification.checks:
+    status = "PASS" if check.passed else "FAIL"
+    print(f"  [{status}] {check.name}: {check.detail}")
+
+# Generate provenance attestation
+provenance = image_security.generate_provenance(
+    image="gcr.io/my-project/api-server:v1.2.3",
+    build_config={
+        "builder": "github-actions",
+        "repo": "https://github.com/org/repo",
+        "commit": "abc123def456",
+        "workflow": "build-and-deploy.yml",
+    },
+    signing_key="vault://cosign-key",
+    include_sbom=True,
+    include_vulnerability_report=True,
+)
+print(f"Provenance attestation: {provenance.attestation_url}")
+```
+
+## Service Mesh Security
+
+### Istio Security Configuration
+
+```python
+from security_architecture import ServiceMeshSecurity, IstioConfig
+
+mesh_security = ServiceMeshSecurity(
+    mesh_type="istio",
+    namespace="production",
+)
+
+# Define mTLS policy
+mtls_policy = mesh_security.generate_mtls_policy(
+    strict_mode=True,  # Require mTLS, no plain text
+    cert_rotation_days=1,
+    min_tls_version="1.3",
+)
+
+# Define authorization policies
+authz_policies = mesh_security.generate_authz_policies(
+    rules=[
+        {
+            "name": "allow-frontend-to-api",
+            "source": {"app": "frontend"},
+            "destination": {"app": "api"},
+            "http_methods": ["GET", "POST"],
+            "paths": ["/api/v1/*"],
+        },
+        {
+            "name": "allow-api-to-database",
+            "source": {"app": "api"},
+            "destination": {"app": "database"},
+            "tcp_ports": [5432],
+        },
+        {
+            "name": "deny-all-default",
+            "source": {},
+            "destination": {},
+            "action": "DENY",
+        },
+    ]
+)
+
+# Generate Istio manifests
+for policy in [mtls_policy] + authz_policies:
+    print(f"--- {policy['kind']}: {policy['metadata']['name']} ---")
+    print(f"  Namespace: {policy['metadata']['namespace']}")
+    print()
+```
+
+## Infrastructure Hardening
+
+### CIS Benchmark Implementation
+
+```python
+from security_architecture import CISBenchmark, BenchmarkResult
+
+# Check CIS Ubuntu 22.04 benchmark compliance
+ubuntu_benchmark = CISBenchmark(
+    os="ubuntu",
+    version="22.04",
+    level="1",  # Level 1 = basic security, Level 2 = defense-in-depth
+)
+
+results = ubuntu_benchmark.check(host="web-prod-01")
+
+print(f"=== CIS Benchmark Results ===")
+print(f"Total Checks: {results.total}")
+print(f"Pass: {results.passed}")
+print(f"Fail: {results.failed}")
+print(f"Not Applicable: {results.not_applicable}")
+print(f"Score: {results.score:.1%}")
+
+for check in results.checks:
+    status = "PASS" if check.passed else "FAIL"
+    print(f"\n[{status}] {check.id}: {check.title}")
+    print(f"  Description: {check.description}")
+    print(f"  Severity: {check.severity}")
+    if not check.passed:
+        print(f"  Current: {check.current_value}")
+        print(f"  Expected: {check.expected_value}")
+        print(f"  Fix: {check.remediation_command}")
+```
+
+### Linux Server Hardening
+
+```python
+from security_architecture import LinuxHardening, HardeningProfile
+
+hardening = LinuxHardening(
+    profile=HardeningProfile.CIS_L1,
+    target_os="ubuntu",
+)
+
+# Generate hardening configuration
+config = hardening.generate_config(
+    ssh_config={
+        "permit_root_login": "no",
+        "password_authentication": "no",
+        "pubkey_authentication": "yes",
+        "protocol": 2,
+        "max_auth_tries": 3,
+        "client_alive_interval": 300,
+        "client_alive_count_max": 2,
+        "allow_groups": ["admin", "deploy"],
+        "ciphers": ["chacha20-poly1305@openssh.com", "aes256-gcm@openssh.com"],
+        "macs": ["hmac-sha2-512-etm@openssh.com", "hmac-sha2-256-etm@openssh.com"],
+        "kex_algorithms": ["curve25519-sha256", "diffie-hellman-group16-sha512"],
+    },
+    firewall_config={
+        "default_incoming": "deny",
+        "default_outgoing": "allow",
+        "allowed_incoming": [
+            {"port": 22, "source": "10.0.0.0/8", "comment": "SSH from management network"},
+            {"port": 443, "source": "0.0.0.0/0", "comment": "HTTPS from internet"},
+        ],
+    },
+    sysctl_config={
+        "net.ipv4.ip_forward": 0,
+        "net.ipv4.conf.all.send_redirects": 0,
+        "net.ipv4.conf.all.accept_redirects": 0,
+        "net.ipv4.conf.all.log_martians": 1,
+        "kernel.randomize_va_space": 2,
+        "fs.suid_dumpable": 0,
+    },
+    audit_config={
+        "audit_rules": [
+            "-w /etc/passwd -p wa -k identity",
+            "-w /etc/shadow -p wa -k identity",
+            "-w /etc/group -p wa -k identity",
+            "-w /etc/sudoers -p wa -k sudoers",
+            "-w /var/log/auth.log -p wa -k auth_log",
+        ],
+    }
+)
+
+print(f"Hardening config generated: {config.path}")
+print(f"SSH config: {config.ssh_config_path}")
+print(f"Firewall config: {config.firewall_config_path}")
+print(f"Audit rules: {config.audit_config_path}")
+```
+
+## Secure Deployment Architecture
+
+### Blue-Green Deployment with Security Gates
+
+```python
+from security_architecture import SecureDeployment, DeploymentGate
+
+deployment = SecureDeployment(
+    strategy="blue-green",
+    security_gates=[
+        DeploymentGate(
+            name="vulnerability_scan",
+            gate_type="automated",
+            tool="trivy",
+            pass_criteria={"critical": 0, "high": 0},
+            blocking=True,
+        ),
+        DeploymentGate(
+            name="secret_scan",
+            gate_type="automated",
+            tool="gitleaks",
+            pass_criteria={"secrets_found": 0},
+            blocking=True,
+        ),
+        DeploymentGate(
+            name="image_signature",
+            gate_type="automated",
+            tool="cosign",
+            pass_criteria={"signature_valid": True},
+            blocking=True,
+        ),
+        DeploymentGate(
+            name="security_review",
+            gate_type="manual",
+            approvers=["security-team"],
+            pass_criteria={"approved": True},
+            blocking=True,
+        ),
+    ],
+    rollback_triggers=[
+        {"metric": "error_rate", "threshold": 0.05, "window": "5m"},
+        {"metric": "p99_latency", "threshold": 1000, "window": "5m"},
+    ],
+)
+
+# Execute deployment
+result = deployment.deploy(
+    image="gcr.io/my-project/api-server:v1.2.3",
+    environment="production",
+    namespace="production",
+    replicas=3,
+)
+
+print(f"Deployment Status: {result.status}")
+print(f"Blue Environment: {result.blue_status}")
+print(f"Green Environment: {result.green_status}")
+print(f"Traffic Switch: {result.traffic_percentage}%")
+print(f"Gates Passed: {result.gates_passed}/{result.gates_total}")
+
+if not result.success:
+    print(f"Deployment failed at gate: {result.failed_gate}")
+    print(f"Rollback triggered: {result.rollback_triggered}")
+```
+
+## Disaster Recovery Architecture
+
+### Backup and Recovery Design
+
+```python
+from security_architecture import DisasterRecovery, RecoveryPlan
+
+dr_plan = DisasterRecovery(
+    rpo_hours=1,    # Recovery Point Objective: max 1 hour data loss
+    rto_hours=4,    # Recovery Time Objective: max 4 hours downtime
+    backup_encryption="AES-256-GCM",
+    backup_storage=["aws-s3", "gcp-gcs"],  # Cross-cloud backup
+)
+
+# Define recovery procedures
+recovery_procedures = RecoveryPlan(
+    procedures=[
+        {
+            "phase": "Assessment",
+            "steps": [
+                "Verify backup integrity",
+                "Assess data loss scope",
+                "Determine recovery scope",
+                "Notify stakeholders",
+            ],
+            "time_estimate_minutes": 30,
+            "responsible": "incident-commander",
+        },
+        {
+            "phase": "Infrastructure Recovery",
+            "steps": [
+                "Provision replacement infrastructure",
+                "Restore network configuration",
+                "Restore IAM policies",
+                "Verify network connectivity",
+            ],
+            "time_estimate_minutes": 60,
+            "responsible": "platform-team",
+        },
+        {
+            "phase": "Data Recovery",
+            "steps": [
+                "Restore database from backup",
+                "Apply WAL logs (point-in-time recovery)",
+                "Restore file storage",
+                "Verify data integrity",
+            ],
+            "time_estimate_minutes": 120,
+            "responsible": "database-team",
+        },
+        {
+            "phase": "Application Recovery",
+            "steps": [
+                "Deploy application to recovered infrastructure",
+                "Run smoke tests",
+                "Verify application health",
+                "Enable traffic routing",
+            ],
+            "time_estimate_minutes": 60,
+            "responsible": "engineering-team",
+        },
+        {
+            "phase": "Verification",
+            "steps": [
+                "Run full test suite",
+                "Verify monitoring and alerting",
+                "Confirm data integrity",
+                "Post-incident review",
+            ],
+            "time_estimate_minutes": 30,
+            "responsible": "qa-team",
+        },
+    ],
+    communication_plan={
+        "internal": "slack-incident",
+        "external": "status-page",
+        "customer_email": "incident@company.com",
+    }
+)
+
+# Generate DR runbook
+runbook = recovery_procedures.generate_runbook(
+    format="markdown",
+    include_checklists=True,
+    include_contact_info=True,
+    include_verification_steps=True,
+)
+print(f"DR Runbook: {runbook.path}")
+```
+
+## Security Monitoring Architecture
+
+### SIEM Integration and Alerting
+
+```python
+from security_architecture import SIEMIntegration, AlertRule, CorrelationRule
+
+siem = SIEMIntegration(
+    backend="splunk",
+    index="security",
+    retention_days=90,
+)
+
+# Define alert rules
+alert_rules = [
+    AlertRule(
+        name="Brute Force Detection",
+        query="index=security action=failure | stats count by src_ip user | where count > 10",
+        severity="high",
+        notification=["slack-security", "pagerduty"],
+        suppression_window_minutes=30,
+        run_frequency_minutes=5,
+    ),
+    AlertRule(
+        name="Privilege Escalation",
+        query="index=security action=escalation OR action=policy_change",
+        severity="critical",
+        notification=["slack-security", "pagerduty", "email-ciso"],
+        suppression_window_minutes=60,
+        run_frequency_minutes=1,
+    ),
+    AlertRule(
+        name="Data Exfiltration",
+        query="index=security action=download bytes_out > 100000000 | stats sum(bytes_out) by user | where sum > 100000000",
+        severity="critical",
+        notification=["slack-security", "pagerduty"],
+        suppression_window_minutes=120,
+        run_frequency_minutes=5,
+    ),
+]
+
+# Define correlation rules (multi-event detection)
+correlation_rules = [
+    CorrelationRule(
+        name="Compromised Account Chain",
+        events=[
+            {"query": "action=failure AND src_ip=*", "within": "1h", "count": 20},
+            {"query": "action=success AND src_ip=*", "within": "5m"},
+            {"query": "action=download OR action=export", "within": "30m"},
+        ],
+        severity="critical",
+        description="Failed logins followed by success and data access",
+        notification=["pagerduty"],
+    ),
+]
+
+# Deploy rules to SIEM
+for rule in alert_rules + correlation_rules:
+    siem.deploy_rule(rule)
+    print(f"Deployed: {rule.name} (severity: {rule.severity})")
+```
+
+## API Gateway Security
+
+### Rate Limiting and Throttling
+
+```python
+from security_architecture import APIGateway, RateLimitPolicy, ThrottlePolicy
+
+gateway = APIGateway(
+    backend="kong",
+    plugins=["rate-limiting", "ip-restriction", "jwt-validation", "cors"],
+)
+
+# Define rate limiting policies
+rate_limits = RateLimitPolicy(
+    tiers={
+        "anonymous": {"requests": 10, "window": 60, "burst": 5},
+        "authenticated": {"requests": 100, "window": 60, "burst": 20},
+        "premium": {"requests": 1000, "window": 60, "burst": 100},
+        "internal": {"requests": 10000, "window": 60, "burst": 500},
+    },
+    key_by="consumer",  # Rate limit by API consumer
+    fault_tolerant=True,  # Fail open if Redis is down
+)
+
+# Define throttling policies per endpoint
+throttle_policies = [
+    ThrottlePolicy(
+        endpoint="/api/v1/search",
+        rate_limit="100/minute",
+        burst_limit=20,
+        key_by="user",
+    ),
+    ThrottlePolicy(
+        endpoint="/api/v1/export",
+        rate_limit="5/minute",
+        burst_limit=1,
+        key_by="user",
+    ),
+    ThrottlePolicy(
+        endpoint="/api/v1/login",
+        rate_limit="5/minute",
+        burst_limit=3,
+        key_by="ip",
+    ),
+]
+
+# Deploy to gateway
+gateway.configure_rate_limiting(rate_limits)
+gateway.configure_throttling(throttle_policies)
+
+# Configure IP restrictions
+gateway.configure_ip_restriction(
+    admin_endpoints=["/admin/*"],
+    allowed_ips=["10.0.0.0/8", "192.168.0.0/16"],
+    block_message="Admin access restricted to internal network",
+)
+```

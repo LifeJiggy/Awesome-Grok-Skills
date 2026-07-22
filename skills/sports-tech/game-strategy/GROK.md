@@ -214,3 +214,850 @@ The module exposes tactical analysis results through several integration channel
 - [wearable-tech](../wearable-tech/GROK.md) — Supplies real-time positioning data for live tactical dashboards and pressing intensity metrics
 - [injury-prevention](../injury-prevention/GROK.md) — Uses tactical workload data (pressing intensity, sprint count) for load management
 - [fan-engagement](../fan-engagement/GROK.md) — Consumes tactical insights for real-time match commentary and fan-facing analytics
+
+## Advanced Configuration
+
+The game strategy module provides extensive configuration for tactical analysis engines, pattern mining algorithms, and real-time dashboard parameters.
+
+### Formation Detection Configuration
+
+```yaml
+# config/game_strategy.yaml
+formation_detection:
+  algorithm: "dbscan"
+  time_window_seconds: 60
+  min_samples: 30
+  eps_meters: 2.5
+
+  templates:
+    - name: "4-3-3"
+      lines:
+        defense: [4]
+        midfield: [3]
+        attack: [3]
+      positions:
+        goalkeeper: {x: 5, y: 50}
+        left_back: {x: 25, y: 15}
+        center_back_left: {x: 25, y: 40}
+        center_back_right: {x: 25, y: 60}
+        right_back: {x: 25, y: 85}
+        left_midfield: {x: 50, y: 25}
+        central_midfield: {x: 50, y: 50}
+        right_midfield: {x: 50, y: 75}
+        left_wing: {x: 75, y: 20}
+        striker: {x: 80, y: 50}
+        right_wing: {x: 75, y: 80}
+
+    - name: "4-4-2"
+      lines:
+        defense: [4]
+        midfield: [4]
+        attack: [2]
+
+    - name: "3-5-2"
+      lines:
+        defense: [3]
+        midfield: [5]
+        attack: [2]
+
+    - name: "4-2-3-1"
+      lines:
+        defense: [4]
+        midfield: [2, 3]
+        attack: [1]
+
+  transition_detection:
+    enabled: true
+    min_possession_seconds: 5
+    formation_change_threshold: 0.3
+```
+
+### Pattern Mining Configuration
+
+```yaml
+pattern_mining:
+  algorithm: "prefixspan"
+  min_support: 0.15
+  max_pattern_length: 8
+  min_confidence: 0.6
+
+  event_types:
+    - "pass"
+    - "carry"
+    - "dribble"
+    - "shot"
+    - "cross"
+    - "through_ball"
+    - "long_ball"
+    - "set_piece"
+
+  spatial_zones:
+    columns: 16
+    rows: 12
+    zone_labels: true
+
+  filters:
+    min_x_gain: 5.0
+    exclude_own_half_only: true
+    include_counter_attacks: true
+```
+
+### xT Model Configuration
+
+```yaml
+xt_model:
+  grid_cols: 16
+  grid_rows: 12
+  transition_matrix_path: "models/xt_markov_v2.pkl"
+  training_matches: 500
+  discount_factor: 0.95
+
+  value_computation:
+    method: "iterative"
+    max_iterations: 100
+    convergence_threshold: 1e-6
+
+  action_types:
+    pass:
+      weight: 1.0
+    carry:
+      weight: 0.8
+    cross:
+      weight: 1.2
+    shot:
+      weight: 1.5
+```
+
+## Architecture Patterns
+
+### Event-Driven Architecture for Real-Time Analysis
+
+The game strategy module uses an event-driven architecture to process live match data with minimal latency:
+
+```
+Live Tracking Feed
+      │
+      ▼
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│   Event     │───▶│   Stream    │───▶│  Dashboard  │
+│   Router    │    │  Processor  │    │   Emitter   │
+└──────┬──────┘    └──────┬──────┘    └─────────────┘
+       │                  │
+       ▼                  ▼
+┌─────────────┐    ┌─────────────┐
+│   Pattern   │    │  Formation  │
+│   Detector  │    │  Detector   │
+└─────────────┘    └─────────────┘
+```
+
+### CQRS for Tactical Data
+
+```python
+from dataclasses import dataclass
+from typing import List, Optional
+
+# Command side - writes tactical data
+@dataclass
+class TacticalCommand:
+    command_id: str
+    match_id: str
+    command_type: str  # "update_formation", "log_pattern", "record_xT"
+    payload: dict
+    timestamp: datetime
+
+# Query side - reads tactical data
+@dataclass
+class FormationQuery:
+    match_id: str
+    time_range: Optional[tuple] = None
+    team_id: Optional[str] = None
+
+class TacticalCommandHandler:
+    def __init__(self, event_store, projection_builder):
+        self.event_store = event_store
+        self.projections = projection_builder
+
+    def handle_update_formation(self, command: TacticalCommand):
+        event = FormationUpdatedEvent(
+            match_id=command.match_id,
+            formation=command.payload["formation"],
+            confidence=command.payload["confidence"],
+            timestamp=command.timestamp,
+        )
+        self.event_store.append(event)
+        self.projections.update(event)
+
+class TacticalQueryHandler:
+    def __init__(self, projection_store):
+        self.projections = projection_store
+
+    def handle_formation_query(self, query: FormationQuery) -> List[FormationSnapshot]:
+        return self.projections.get_formations(
+            match_id=query.match_id,
+            time_range=query.time_range,
+            team_id=query.team_id,
+        )
+```
+
+### Strategy Pattern for Play Calling
+
+```python
+from abc import ABC, abstractmethod
+
+class PlayCallingStrategy(ABC):
+    @abstractmethod
+    def recommend(self, match_state: MatchState) -> List[TacticalRecommendation]:
+        pass
+
+class CounterAttackStrategy(PlayCallingStrategy):
+    def __init__(self, opponent_vulnerabilities):
+        self.vulnerabilities = opponent_vulnerabilities
+
+    def recommend(self, match_state: MatchState) -> List[TacticalRecommendation]:
+        if match_state.transition_phase == "defensive_to_attack":
+            return self._generate_counter_recommendations(match_state)
+        return []
+
+class PossessionStrategy(PlayCallingStrategy):
+    def __init__(self, team_style: str):
+        self.style = team_style
+
+    def recommend(self, match_state: MatchState) -> List[TacticalRecommendation]:
+        if match_state.possession_percentage > 55:
+            return self._generate_possession_recommendations(match_state)
+        return []
+
+class PlayCallingOrchestrator:
+    def __init__(self, strategies: List[PlayCallingStrategy]):
+        self.strategies = strategies
+
+    def get_recommendations(self, match_state: MatchState) -> List[TacticalRecommendation]:
+        all_recommendations = []
+        for strategy in self.strategies:
+            recommendations = strategy.recommend(match_state)
+            all_recommendations.extend(recommendations)
+        return sorted(all_recommendations, key=lambda r: r.confidence, reverse=True)
+```
+
+### Graph-Based Formation Modeling
+
+```python
+import networkx as nx
+from typing import Dict, List
+
+class FormationGraph:
+    def __init__(self):
+        self.graph = nx.DiGraph()
+
+    def add_player(self, player_id: str, position: tuple, role: str):
+        self.graph.add_node(
+            player_id,
+            position=position,
+            role=role,
+        )
+
+    def add_passing_lane(self, from_player: str, to_player: str,
+                         frequency: float, success_rate: float):
+        self.graph.add_edge(
+            from_player, to_player,
+            frequency=frequency,
+            success_rate=success_rate,
+            weight=frequency * success_rate,
+        )
+
+    def find_key_connectors(self) -> List[str]:
+        betweenness = nx.betweenness_centrality(self.graph, weight="weight")
+        return sorted(betweenness.keys(), key=lambda x: betweenness[x], reverse=True)[:3]
+
+    def identify_pressing_network(self, pressing_threshold: float) -> List[List[str]]:
+        pressing_edges = [
+            (u, v) for u, v, d in self.graph.edges(data=True)
+            if d.get("pressing_intensity", 0) > pressing_threshold
+        ]
+        pressing_subgraph = self.graph.edge_subgraph(pressing_edges)
+        return list(nx.connected_components(pressing_subgraph))
+```
+
+## Integration Guide
+
+### Coaching Staff Integration
+
+```python
+class CoachingDashboardIntegration:
+    def __init__(self, tactical_api_url: str):
+        self.api_url = tactical_api_url
+
+    def push_pre_match_dossier(self, match_id: str, dossier: PreMatchDossier):
+        payload = {
+            "match_id": match_id,
+            "opponent_formation": dossier.opponent_formation,
+            "pressing_triggers": dossier.pressing_triggers,
+            "set_piece_vulnerabilities": dossier.set_piece_vulnerabilities,
+            "key_players": dossier.key_player_profiles,
+            "recommended_tactics": dossier.tactical_recommendations,
+        }
+        response = requests.post(
+            f"{self.api_url}/dossiers",
+            json=payload,
+            headers={"Authorization": f"Bearer {self.coach_token}"},
+        )
+        return response.json()
+
+    def stream_live_tactics(self, match_id: str):
+        ws = websocket.create_connection(
+            f"{self.api_url}/live/{match_id}",
+            header={"Authorization": f"Bearer {self.coach_token}"}
+        )
+        for message in ws:
+            tactical_update = json.loads(message)
+            yield tactical_update
+```
+
+### Broadcast Graphics Integration
+
+```python
+class BroadcastGraphicsBridge:
+    def __init__(self, graphics_api: str):
+        self.graphics_api = graphics_api
+
+    def update_formation_overlay(self, match_id: str, formation: Formation):
+        overlay_data = {
+            "type": "formation_overlay",
+            "match_id": match_id,
+            "team": formation.team_id,
+            "shape": formation.primary_shape,
+            "players": [
+                {
+                    "id": p.player_id,
+                    "name": p.display_name,
+                    "x": p.position_x,
+                    "y": p.position_y,
+                    "role": p.role,
+                }
+                for p in formation.players
+            ],
+            "confidence": formation.confidence,
+        }
+        requests.post(
+            f"{self.graphics_api}/overlays",
+            json=overlay_data,
+        )
+
+    def render_pass_network(self, network: PassNetwork, output_format: str = "svg"):
+        svg_data = network.to_svg(
+            width=1920,
+            height=1080,
+            pitch_color="green",
+            node_color="white",
+            edge_color="yellow",
+        )
+        return svg_data
+```
+
+## Performance Optimization
+
+### Spatial Indexing for Zone Queries
+
+```python
+from shapely.geometry import Point
+from shapely.strtree import STRtree
+
+class SpatialZoneIndex:
+    def __init__(self, pitch_zones: List[PitchZone]):
+        self.zones = pitch_zones
+        self.geometries = [zone.geometry for zone in pitch_zones]
+        self.tree = STRtree(self.geometries)
+
+    def get_zone(self, x: float, y: float) -> PitchZone:
+        point = Point(x, y)
+        idx = self.tree.query(point)
+        return self.zones[idx]
+
+    def get_zones_in_region(self, min_x: float, max_x: float,
+                            min_y: float, max_y: float) -> List[PitchZone]:
+        from shapely.geometry import box
+        region = box(min_x, min_y, max_x, max_y)
+        indices = self.tree.query(region)
+        return [self.zones[i] for i in indices]
+```
+
+### Cached Pattern Database
+
+```python
+from functools import lru_cache
+import hashlib
+
+class PatternCache:
+    def __init__(self, redis_client):
+        self.redis = redis_client
+
+    def _make_key(self, match_ids: tuple, team_id: str) -> str:
+        content = f"{match_ids}:{team_id}"
+        return f"patterns:{hashlib.md5(content.encode()).hexdigest()}"
+
+    def get_patterns(self, match_ids: tuple, team_id: str) -> Optional[List]:
+        key = self._make_key(match_ids, team_id)
+        cached = self.redis.get(key)
+        if cached:
+            return json.loads(cached)
+        return None
+
+    def set_patterns(self, match_ids: tuple, team_id: str, patterns: List, ttl: int = 3600):
+        key = self._make_key(match_ids, team_id)
+        self.redis.setex(key, ttl, json.dumps(patterns))
+```
+
+### Parallel Pattern Mining
+
+```python
+from concurrent.futures import ProcessPoolExecutor
+from typing import List
+
+class ParallelPatternMiner:
+    def __init__(self, num_workers: int = 8):
+        self.executor = ProcessPoolExecutor(max_workers=num_workers)
+
+    def mine_patterns_parallel(
+        self,
+        match_data_chunks: List[List[EventSequence]],
+        config: PatternMiningConfig,
+    ) -> List[Pattern]:
+        futures = []
+        for chunk in match_data_chunks:
+            future = self.executor.submit(
+                self._mine_chunk, chunk, config
+            )
+            futures.append(future)
+
+        all_patterns = []
+        for future in futures:
+            patterns = future.result(timeout=60)
+            all_patterns.extend(patterns)
+
+        return self._deduplicate_patterns(all_patterns)
+```
+
+## Security Considerations
+
+### API Authentication
+
+```python
+from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+class TacticalAPIAuth:
+    def __init__(self, secret_key: str):
+        self.secret_key = secret_key
+
+    async def verify_token(self, token: str = Depends(oauth2_scheme)) -> dict:
+        try:
+            payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])
+            if "tactical:read" not in payload.get("scopes", []):
+                raise HTTPException(status_code=403, detail="Insufficient permissions")
+            return payload
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=401, detail="Token expired")
+        except jwt.InvalidTokenError:
+            raise HTTPException(status_code=401, detail="Invalid token")
+```
+
+### Data Sanitization
+
+```python
+import re
+
+class TacticalDataSanitizer:
+    SENSITIVE_PATTERNS = [
+        r'\b\d{3}-\d{2}-\d{4}\b',  # SSN
+        r'\b\d{16}\b',              # Credit card
+        r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',  # Email
+    ]
+
+    def sanitize_match_data(self, data: dict) -> dict:
+        sanitized = json.dumps(data)
+        for pattern in self.SENSITIVE_PATTERNS:
+            sanitized = re.sub(pattern, "[REDACTED]", sanitized)
+        return json.loads(sanitized)
+
+    def sanitize_coaching_notes(self, notes: str) -> str:
+        return re.sub(r'\b\d{3}-\d{2}-\d{4}\b', "[REDACTED]", notes)
+```
+
+## Troubleshooting Guide
+
+### Common Issues and Solutions
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Formation detection shows wrong shape | Insufficient tracking data points | Increase time window; check tracking data quality |
+| Pattern mining returns no results | min_support threshold too high | Lower min_support; ensure sufficient match data |
+| xT values seem unrealistic | Markov model not converged | Increase max_iterations; verify training data quality |
+| Live dashboard has high latency | WebSocket connection pooling issue | Increase connection pool; check network bandwidth |
+| Pressing triggers not identified | Accelerometer threshold misconfigured | Adjust high_press_threshold; validate sensor calibration |
+| Pass network shows isolated nodes | min_passes threshold too high | Lower threshold; check event data completeness |
+
+### Debugging Formation Detection
+
+```python
+from game_strategy.diagnostics import FormationDebugger
+
+debugger = FormationDebugger(match_id="match_2024_01")
+
+# Inspect clustering quality
+cluster_report = debugger.analyze_clusters(time_window="45-60")
+print(f"Clusters found: {cluster_report.num_clusters}")
+print(f"Silhouette score: {cluster_report.silhouette_score:.3f}")
+print(f"Davies-Bouldin index: {cluster_report.davies_bouldin:.3f}")
+
+# Check position data quality
+quality = debugger.check_tracking_quality()
+print(f"Missing positions: {quality.missing_count}")
+print(f"Outlier positions: {quality.outlier_count}")
+print(f"Average position uncertainty: {quality.avg_uncertainty_m:.2f}m")
+```
+
+### xT Model Validation
+
+```python
+from game_strategy.validation import XTValidator
+
+validator = XTValidator(model_path="models/xt_v2_markov.pkl")
+
+# Validate against historical data
+validation = validator.validate(
+    test_matches=["match_2024_01", "match_2024_02", "match_2024_03"],
+    metric="calibration_error",
+)
+
+print(f"Calibration error: {validation.calibration_error:.4f}")
+print(f"Kendall tau correlation: {validation.kendall_tau:.3f}")
+print(f"Zone value range: [{validation.min_zone_value:.4f}, {validation.max_zone_value:.4f}]")
+```
+
+## API Reference
+
+### Core Classes
+
+| Class | Description | Key Methods |
+|-------|-------------|-------------|
+| `FormationDetector` | Unsupervised formation detection | `detect()`, `get_transitions()`, `confidence_score()` |
+| `PatternMiner` | Sequential pattern mining | `mine()`, `top_k()`, `filter_by_type()` |
+| `PressingAnalyzer` | Pressing trigger identification | `identify_triggers()`, `analyze_success_rate()` |
+| `XTModel` | Expected threat computation | `evaluate_action()`, `evaluate_chain()`, `season_summary()` |
+| `PlayCallingEngine` | Tactical recommendation engine | `get_recommendations()`, `rank_strategies()` |
+| `SetPieceDesigner` | Set-piece design tool | `design_routine()`, `evaluate_vs_opponent()` |
+
+### Data Classes
+
+| Class | Description | Key Fields |
+|-------|-------------|------------|
+| `Formation` | Detected formation snapshot | `team_id, primary_shape, confidence, players, time_range` |
+| `Pattern` | Discovered tactical pattern | `event_sequence, support, confidence, avg_xt_gain` |
+| `PressingTrigger` | Identified pressing condition | `condition, zone, frequency, success_rate` |
+| `XTValue` | Action value | `action_type, origin_zone, dest_zone, xt_gain` |
+| `TacticalRecommendation` | Play calling suggestion | `strategy, confidence, expected_impact, rationale` |
+
+## Data Models
+
+### Tactical Data Schema
+
+```
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│     Matches      │     │   Formations      │     │    Patterns     │
+├─────────────────┤     ├──────────────────┤     ├─────────────────┤
+│ match_id (PK)   │────<│ formation_id (PK)│────<│ pattern_id (PK) │
+│ home_team        │     │ match_id (FK)    │     │ match_ids       │
+│ away_team        │     │ team_id (FK)     │     │ team_id         │
+│ date             │     │ shape            │     │ event_sequence  │
+│ competition      │     │ confidence       │     │ support         │
+└─────────────────┘     │ time_start       │     │ confidence      │
+                        │ time_end         │     │ avg_xt_gain     │
+┌─────────────────┐     │ transition_from  │     │ created_at      │
+│   xT Grid       │     └──────────────────┘     └─────────────────┘
+├─────────────────┤
+│ zone_id (PK)    │     ┌──────────────────┐
+│ row             │     │  Pressing Triggers│
+│ col             │     ├──────────────────┤
+│ zone_value      │     │ trigger_id (PK)  │
+│ transition_probs│     │ team_id          │
+│ shot_probability│     │ condition        │
+│ goal_probability│     │ zone_id          │
+└─────────────────┘     │ frequency        │
+                        │ success_rate     │
+                        │ avg_recovery_sec │
+                        └──────────────────┘
+```
+
+## Deployment Guide
+
+### Kubernetes Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game-strategy-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: game-strategy
+  template:
+    metadata:
+      labels:
+        app: game-strategy
+    spec:
+      containers:
+      - name: api
+        image: game-strategy:1.0.0
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        env:
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: strategy-secrets
+              key: redis-url
+        - name: MODEL_PATH
+          value: "/models"
+        volumeMounts:
+        - name: model-volume
+          mountPath: /models
+      volumes:
+      - name: model-volume
+        persistentVolumeClaim:
+          claimName: strategy-models-pvc
+```
+
+## Monitoring & Observability
+
+### Tactical Metrics
+
+```python
+from prometheus_client import Counter, Histogram, Gauge
+
+FORMATION_DETECTIONS = Counter(
+    'formation_detections_total',
+    'Total formation detections',
+    ['team_id', 'formation_shape']
+)
+
+PATTERN_MINING_DURATION = Histogram(
+    'pattern_mining_duration_seconds',
+    'Time to mine patterns',
+    ['algorithm'],
+    buckets=[1, 5, 10, 30, 60, 120]
+)
+
+XT_COMPUTATIONS = Counter(
+    'xt_computations_total',
+    'Total xT computations',
+    ['action_type']
+)
+
+LIVE_DASHBOARD_LATENCY = Histogram(
+    'live_dashboard_latency_seconds',
+    'End-to-end dashboard update latency',
+    buckets=[0.1, 0.25, 0.5, 1.0, 2.0]
+)
+
+ACTIVE_MATCHES = Gauge(
+    'active_matches_analyzed',
+    'Number of matches with active tactical analysis'
+)
+```
+
+## Testing Strategy
+
+### Unit Tests
+
+```python
+import pytest
+from game_strategy import FormationDetector, XTModel
+
+class TestFormationDetector:
+    def setup_method(self):
+        self.detector = FormationDetector(
+            time_window_seconds=60,
+            cluster_method="dbscan",
+        )
+
+    def test_433_detection(self, sample_433_tracking):
+        formation = self.detector.detect_single_window(sample_433_tracking)
+        assert formation.shape == "4-3-3"
+        assert formation.confidence > 0.8
+
+    def test_transition_detection(self, sample_transition_data):
+        transitions = self.detector.detect_transitions(sample_transition_data)
+        assert len(transitions) > 0
+        assert all(t.confidence > 0.5 for t in transitions)
+
+class TestXTModel:
+    def setup_method(self):
+        self.model = XTModel(grid_cols=16, grid_rows=12)
+
+    def test_shot_xt_positive(self):
+        shot_action = {"type": "shot", "from": (85, 50), "xg": 0.3}
+        xt = self.model.evaluate_action(shot_action)
+        assert xt > 0
+
+    def test_own_half_xt_negative(self):
+        back_pass = {"type": "pass", "from": (50, 50), "to": (20, 50)}
+        xt = self.model.evaluate_action(back_pass)
+        assert xt <= 0
+```
+
+### Integration Tests
+
+```python
+class TestTacticalPipelineIntegration:
+    def test_full_analysis_pipeline(self, sample_match_data):
+        detector = FormationDetector()
+        miner = PatternMiner()
+        xt_model = XTModel()
+
+        formations = detector.detect(sample_match_data)
+        patterns = miner.mine_from_match(sample_match_data)
+        xt_values = xt_model.evaluate_match(sample_match_data)
+
+        assert len(formations) > 0
+        assert len(patterns) >= 0
+        assert len(xt_values) > 0
+```
+
+## Versioning & Migration
+
+### Model Versioning
+
+```python
+class TacticalModelRegistry:
+    def __init__(self, registry_path: str):
+        self.registry_path = registry_path
+
+    def register_xt_model(self, model, version: str, metadata: dict):
+        path = os.path.join(self.registry_path, f"xt_model_{version}.pkl")
+        joblib.dump(model, path)
+        self._update_manifest(version, metadata)
+
+    def load_xt_model(self, version: str = "latest"):
+        if version == "latest":
+            version = self._get_latest_version()
+        path = os.path.join(self.registry_path, f"xt_model_{version}.pkl")
+        return joblib.load(path)
+```
+
+### Data Migration
+
+```sql
+-- Add confidence columns to formation table
+ALTER TABLE formations
+ADD COLUMN confidence DECIMAL(5,4) DEFAULT 0.0,
+ADD COLUMN secondary_shape VARCHAR(10),
+ADD COLUMN secondary_confidence DECIMAL(5,4);
+
+-- Backfill confidence from existing data
+UPDATE formations
+SET confidence = 0.75
+WHERE confidence = 0.0 AND shape IS NOT NULL;
+```
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **xT (Expected Threat)** | Markov-chain model valuing on-ball actions by probability of scoring |
+| **Pressing Trigger** | Specific event or condition that activates a team's high-intensity press |
+| **Formation Shape** | Spatial arrangement of players in their primary tactical structure |
+| **Transition Phase** | Period between possession changes (attack to defense or vice versa) |
+| **Counter-Press** | Immediate pressing after losing possession to regain the ball quickly |
+| **Build-Up Pattern** | Recurring sequence of passes progressing from defensive to attacking zones |
+| **Set Piece** | Restart situations: corners, free kicks, throw-ins, goal kicks |
+| **Zonal Marking** | Defensive system where players guard specific pitch zones |
+| **Man Marking** | Defensive system where players are assigned to specific opponents |
+| **Possession Value Chain** | Sequential xT values across a single possession sequence |
+| **Defensive Line Height** | Average vertical position of the defensive line from own goal |
+| **Pressing Intensity** | Measure of acceleration/deceleration during pressing actions |
+| **Spatial Compactness** | Team's spread across the pitch (lower = more compact) |
+| **Progressive Action** | Action that moves the ball significantly toward the opponent's goal |
+| **Tactical Transition** | Formation shift between phases of play (e.g., 4-3-3 to 4-4-2) |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+
+- Initial release with formation detection and pattern mining
+- xT Markov chain model for action valuation
+- Real-time strategy dashboard with WebSocket streaming
+- Pre-match dossier generation
+
+### Version 1.1.0 (2024-04-01)
+
+- Added pressing trigger analysis
+- Enhanced pattern mining with PrefixSpan algorithm
+- Set-piece design system with zonal/man-marking evaluation
+- Counter-pressing metrics implementation
+
+### Version 1.2.0 (2024-07-15)
+
+- Improved formation detection with hybrid shape support
+- xT model v2 with defensive pressure features
+- Play calling recommendation engine
+- Enhanced real-time dashboard with configurable alerts
+
+## Contributing Guidelines
+
+### Development Setup
+
+```bash
+git clone https://github.com/sports-tech/game-strategy.git
+cd game-strategy
+python -m venv venv
+source venv/bin/activate
+pip install -e ".[dev]"
+
+# Run tests
+pytest tests/ -v --cov=game_strategy
+
+# Run pattern mining benchmarks
+python -m game_strategy.benchmarks.pattern_mining
+```
+
+### Code Standards
+
+- All tactical algorithms must include unit tests with synthetic data
+- xT model changes require validation against 100+ match test set
+- Formation detection changes require testing across 4+ formation types
+- Real-time components must maintain <500ms latency under load
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+Copyright (c) 2024 Sports Tech Analytics
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

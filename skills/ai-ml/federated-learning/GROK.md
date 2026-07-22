@@ -99,3 +99,612 @@ print(f"Update size: {update.update_size_mb:.2f} MB")
 - **ai-ml** → **neural-architecture-search** — Federated NAS for privacy-preserving architecture search
 - **api-security** — Secure communication channels for federated coordination
 - **zero-trust** → **security-framework** — Zero-trust principles for federated infrastructure
+
+## Advanced Configuration
+
+### YAML Configuration
+```yaml
+version: "2.0.0"
+settings:
+  mode: "production"
+  concurrency: 4
+  timeout_ms: 30000
+  compute:
+    gpus: 4
+    distributed: true
+    backend: "nccl"
+```
+
+### JSON Configuration
+```json
+{"version":"2.0.0","settings":{"mode":"production","compute":{"gpus":4,"distributed":true}}}
+```
+
+### Environment Variables
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SKILL_MODE` | Runtime mode | `production` |
+| `SKILL_GPUS` | Number of GPUs | `1` |
+| `SKILL_TIMEOUT` | Timeout (ms) | `30000` |
+| `CUDA_VISIBLE_DEVICES` | GPU device IDs | `all` |
+| `SKILL_MODEL_PATH` | Model storage path | `/models` |
+
+## Architecture Patterns
+
+### System Architecture
+```
++---------------------------------------------------+
+|                   Client Layer                     |
+|  +----------+  +----------+  +------------------+  |
+|  |  Web UI  |  | CLI Tool |  |  Python SDK      |  |
+|  +----+-----+  +----+-----+  +--------+---------+  |
++-------------------+-------------------------------+
+|              Compute Layer                         |
+|  +----------+  +----------+  +------------------+  |
+|  |  GPU     |  | Training |  |  Inference       |  |
+|  |  Manager |  | Scheduler|  |  Engine          |  |
+|  +----+-----+  +----+-----+  +--------+---------+  |
++-------------------+-------------------------------+
+|          Orchestration Layer                       |
+|  +----------+  +----------+  +------------------+  |
+|  | Job      |  | Resource |  |  Experiment      |  |
+|  | Queue    |  | Pool     |  |  Tracker         |  |
+|  +----+-----+  +----+-----+  +--------+---------+  |
++-------------------+-------------------------------+
+|                 Data Layer                          |
+|  +----------+  +----------+  +------------------+  |
+|  |  Model   |  | Dataset  |  |  Artifact        |  |
+|  |  Store   |  | Store    |  |  Registry        |  |
+|  +----------+  +----------+  +------------------+  |
++---------------------------------------------------+
+```
+
+### Training Pipeline
+```
+Data -> Preprocess -> Augment -> Batch -> Train -> Evaluate -> Deploy
+  |         |           |        |       |         |
+  |    [Normalize]  [Transform] [Loader] [Loop]  [Metrics]
+  +---------+-----------+--------+-------+---------+
+                   Experiment Tracking
+```
+
+## Integration Guide
+
+### ML Platforms
+```python
+import mlflow
+mlflow.set_experiment("skill-experiment")
+with mlflow.start_run():
+    mlflow.log_params(config)
+    result = skill.process(input_data)
+    mlflow.log_metrics(result.metrics)
+```
+
+### Kubeflow Pipeline
+```python
+from kfp import dsl
+
+@dsl.pipeline(name="skill-pipeline")
+def skill_pipeline():
+    preprocess = dsl.ContainerOp(name="preprocess", image="skill-preprocess:latest")
+    train = dsl.ContainerOp(name="train", image="skill-train:latest")
+    deploy = dsl.ContainerOp(name="deploy", image="skill-deploy:latest")
+    train.after(preprocess)
+    deploy.after(train)
+```
+
+## Performance Optimization
+
+### Benchmarks
+| Operation | Throughput | Latency (p50) | Latency (p99) |
+|-----------|-----------|---------------|---------------|
+| Training (batch) | 1000 samples/s | 10ms/batch | 50ms/batch |
+| Inference (GPU) | 10,000 inf/s | 0.1ms | 1ms |
+| Inference (CPU) | 1,000 inf/s | 1ms | 10ms |
+
+### Optimization Tips
+1. **Mixed Precision**: FP16/BF16 for 2x speedup
+2. **Gradient Accumulation**: Simulate large batches
+3. **Data Loading**: Multiple workers with pinned memory
+4. **Model Compilation**: torch.compile() for inference
+5. **Dynamic Batching**: Variable-size inputs
+
+## Security Considerations
+
+### Threat Model
+| Threat | Risk | Mitigation |
+|--------|------|------------|
+| Model poisoning | High | Data validation, provenance |
+| Adversarial inputs | High | Input sanitization |
+| Model theft | High | Access controls, watermarking |
+| Data leakage | High | Differential privacy |
+
+### Security Checklist
+- [ ] Training data validated
+- [ ] Model artifacts signed
+- [ ] Inference endpoints authenticated
+- [ ] Differential privacy applied
+- [ ] Dependencies scanned
+
+## Troubleshooting Guide
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| CUDA out of memory | Batch too large | Reduce batch, gradient accumulation |
+| Training divergence | LR too high | Lower LR, warmup schedule |
+| Low accuracy | Underfitting | Larger model, train longer |
+| Overfitting | Insufficient reg | Dropout, augmentation |
+| Slow inference | No optimization | Quantization, TensorRT |
+
+## API Reference
+
+### `init(config: Config) -> Instance`
+Initialize with configuration.
+
+### `train(data: Dataset, config: TrainConfig) -> TrainResult`
+Train model on dataset.
+
+### `predict(input: Input) -> Prediction`
+Run inference.
+
+### `evaluate(model: str, dataset: Dataset) -> EvalResult`
+Evaluate model performance.
+
+## Data Models
+
+### Model Schema
+```json
+{"type":"object","properties":{"model_id":{"type":"string"},"version":{"type":"string"},"framework":{"type":"string","enum":["pytorch","tensorflow","onnx"]},"metrics":{"type":"object"}}}
+```
+
+## Deployment Guide
+
+### Docker
+```dockerfile
+FROM nvidia/cuda:12.2-runtime-ubuntu22.04
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8000
+HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
+CMD ["python", "-m", "uvicorn", "main:app"]
+```
+
+### Kubernetes
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skill-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: skill
+  template:
+    spec:
+      containers:
+      - name: skill
+        image: skill:2.0.0
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+            nvidia.com/gpu: 1
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+            nvidia.com/gpu: 1
+```
+
+## Monitoring & Observability
+
+| Metric | Type | Description | Alert Threshold |
+|--------|------|-------------|-----------------|
+| `training_loss` | Gauge | Training loss | Divergence |
+| `inference_latency_ms` | Histogram | Inference latency | p99 > 100ms |
+| `gpu_utilization` | Gauge | GPU usage | < 50% |
+| `gpu_memory_used` | Gauge | GPU memory | > 90% |
+
+## Testing Strategy
+
+```python
+def test_train():
+    result = skill.train(train_data, config)
+    assert result.accuracy > 0.8
+
+def test_predict():
+    prediction = skill.predict(test_input)
+    assert prediction.confidence > 0.5
+```
+
+## Versioning & Migration
+
+- Major version for breaking changes
+- 6-month deprecation notice
+
+### Changelog
+- **[2.0.0]** -- New architecture
+- **[1.5.0]** -- Performance improvements
+- **[1.0.0]** -- Initial release
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **Epoch** | One pass through training data |
+| **Batch** | Group of samples processed together |
+| **LR** | Learning rate |
+| **Quantization** | Reducing model precision |
+| **Distillation** | Training smaller from larger model |
+| **Pruning** | Removing redundant weights |
+| **ONNX** | Open Neural Network Exchange |
+
+## Changelog
+
+### [2.0.0] -- 2024-12-01
+- Major release with new architecture
+
+### [1.5.0] -- 2024-06-15
+- Performance improvements
+
+### [1.0.0] -- 2024-01-01
+- Initial stable release
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/skill.git
+cd skill
+pip install -e ".[dev]"
+pytest
+```
+
+## License
+
+MIT License -- Copyright (c) 2024
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+## Advanced Federated Algorithms
+
+### FedProx Deep Dive
+
+| Parameter | Description | Typical Value |
+|-----------|-------------|---------------|
+| mu | Proximal coefficient | 0.01 - 1.0 |
+| Local LR | Client learning rate | 0.01 - 0.1 |
+| Local Epochs | Steps per round | 1 - 20 |
+| Batch Size | Client batch size | 32 - 128 |
+
+### SCAFFOLD Algorithm
+
+```python
+from federated_learning import SCAFFOLD, ControlVariates
+
+server = SCAFFOLD(
+    global_model="resnet50",
+    num_rounds=100,
+    clients_per_round=10,
+    variance_reduction=True,
+    control_variate_momentum=0.9,
+)
+
+# Server tracks global control variate
+server.init_control_variates()
+
+# Training with variance reduction
+result = server.train()
+print(f"Convergence speedup: {result.convergence_speedup:.1f}x vs FedAvg")
+```
+
+### FedNova (Normalized Averaging)
+
+| Feature | FedAvg | FedNova |
+|---------|--------|---------|
+| Local steps | Fixed | Variable |
+| Averaging | Weighted by data | Normalized by steps |
+| Heterogeneity | Poor | Good |
+| Convergence | Slower | Faster |
+
+## Differential Privacy Deep Dive
+
+### Privacy Accounting Methods
+
+| Method | Tightness | Speed | Memory |
+|--------|-----------|-------|--------|
+| Basic composition | Loose | Fast | Low |
+| Advanced composition | Better | Fast | Low |
+| RDP accountant | Tight | Medium | Medium |
+| zCDP | Tight | Fast | Low |
+
+### Privacy Budget Configuration
+
+```python
+from federated_learning import PrivacyBudget, PrivacyAccountant
+
+budget = PrivacyBudget(
+    epsilon=8.0,
+    delta=1e-5,
+    accounting_method="rdp",
+    rdp_orders=[1 + x / 10.0 for x in range(1, 100)],
+)
+
+accountant = PrivacyAccountant(budget)
+for round in range(num_rounds):
+    accountant.accumulate(
+        noise_multiplier=1.1,
+        sample_rate=0.1,
+        steps=local_epochs,
+    )
+    print(f"Round {round}: epsilon={accountant.epsilon:.2f}")
+```
+
+### Per-Round Privacy Loss
+
+| Round | Noise Multiplier | Sample Rate | Delta Epsilon |
+|-------|------------------|-------------|---------------|
+| 1 | 1.1 | 0.1 | 0.42 |
+| 5 | 1.1 | 0.1 | 0.38 |
+| 10 | 1.1 | 0.1 | 0.35 |
+| 50 | 1.1 | 0.1 | 0.28 |
+| 100 | 1.1 | 0.1 | 0.22 |
+
+## Secure Aggregation
+
+### Cryptographic Protocols
+
+| Protocol | Overhead | Security | Communication |
+|----------|----------|----------|---------------|
+| Secret Sharing | 2-3x | Perfect | 2x |
+| Homomorphic | 10-100x | Computational | 1x |
+| Trusted Execution | 1.2x | Hardware | 1x |
+| Hybrid | 3-5x | Mixed | 2x |
+
+### Secure Aggregation Setup
+
+```python
+from federated_learning import SecureAggregation
+
+secagg = SecureAggregation(
+    protocol="secret_sharing",
+    threshold=0.5,  # Minimum clients needed
+    timeout_seconds=300,
+    retry_count=3,
+)
+
+server = FederatedServer(
+    secure_aggregation=secagg,
+    min_clients=10,
+    clients_per_round=20,
+)
+```
+
+## Communication Compression
+
+### Gradient Compression Methods
+
+| Method | Compression | Accuracy Impact | Bandwidth |
+|--------|-------------|-----------------|-----------|
+| Top-K | k/100% | Low | K% of original |
+| Random-K | k/100% | Medium | K% of original |
+| Quantization | 32x (INT1) | Low | 1/32 of original |
+| Error Feedback | Maintains | None | Combined with others |
+
+### Compression Configuration
+
+```python
+from federated_learning import GradientCompression
+
+compression = GradientCompression(
+    method="topk",
+    k_ratio=0.01,  # Keep top 1% of gradients
+    error_feedback=True,
+    warmup_rounds=5,
+    quantization_bits=8,
+)
+
+# Apply to client updates
+client = FederatedClient(
+    gradient_compression=compression,
+    upload_bandwidth_mbps=10,
+    download_bandwidth_mbps=50,
+)
+```
+
+## Byzantine Robustness
+
+### Robust Aggregation Rules
+
+| Rule | Fault Tolerance | Complexity | Overhead |
+|------|-----------------|------------|----------|
+| Krum | f < (n-2)/2 | O(n^2 * d) | Low |
+| Trimmed Mean | f < n/4 | O(n * d) | Low |
+| Median | f < n/2 | O(n * d) | Low |
+| Bulyan | f < n/4 | O(n^2 * d) | Medium |
+
+### Byzantine Client Detection
+
+```python
+from federated_learning import ByzantineDetector
+
+detector = ByzantineDetector(
+    method="krum",
+    num_byzantine=5,
+    distance_metric="cosine",
+    threshold_percentile=90,
+)
+
+# Detect malicious clients
+suspicious = detector.detect(client_updates)
+for client_id, score in suspicious:
+    print(f"Client {client_id}: anomaly score {score:.4f}")
+```
+
+## Personalization Methods
+
+### Personalization Strategies
+
+| Method | Communication | Personalization | Complexity |
+|--------|---------------|-----------------|------------|
+| Per-Client Fine-tuning | Low | High | Low |
+| Meta-Learning (MAML) | Medium | High | High |
+| Mixture-of-Experts | High | Medium | Medium |
+| Clustered FL | Medium | Medium | Medium |
+| FedBN | Low | Medium | Low |
+
+### Personalization Configuration
+
+```python
+from federated_learning import PersonalizationConfig
+
+personalization = PersonalizationConfig(
+    strategy="maml",
+    inner_lr=0.01,
+    inner_steps=5,
+    meta_lr=0.001,
+    personalization_layers=["layer3", "layer4", "fc"],
+    mixture_experts=4,
+)
+
+server = FederatedServer(
+    global_model="resnet50",
+    personalization=personalization,
+)
+```
+
+## Non-IID Data Handling
+
+### Data Distribution Strategies
+
+| Type | Description | Challenge |
+|------|-------------|-----------|
+| IID | Balanced, random | None |
+| Pathological | Some classes missing | Severe |
+| Quantity Skew | Unequal samples | Medium |
+| Label Distribution | Unequal label ratios | High |
+| Feature Shift | Different distributions | High |
+
+### Non-IID Mitigation
+
+```python
+from federated_learning import NonIIDHandler
+
+handler = NonIIDHandler(
+    strategy="fedprox",
+    mu=0.1,
+    adaptive_lr=True,
+    lr_scaling="linear",
+    batch_norm_correction=True,
+)
+
+# Monitor non-IID程度
+divergence = handler.measure_divergence(clients_data)
+print(f"Mean JS divergence: {divergence.mean:.4f}")
+print(f"Max JS divergence: {divergence.max:.4f}")
+```
+
+## Cross-Device vs Cross-Silo
+
+### Comparison Table
+
+| Aspect | Cross-Device | Cross-Silo |
+|--------|--------------|------------|
+| Client count | 10K - 10M | 10 - 1000 |
+| Reliability | Low | High |
+| Bandwidth | Limited | Abundant |
+| Compute | Heterogeneous | Homogeneous |
+| Drop rate | 30-50% | 0-5% |
+| Privacy need | High | Medium |
+
+### Cross-Device Configuration
+
+```python
+from federated_learning import CrossDeviceConfig
+
+config = CrossDeviceConfig(
+    clients_per_round=100,
+    min_completion_rate=0.6,
+    timeout_seconds=300,
+    client_sampling="poisson",
+    selection_rate=0.01,
+    speed_normalization=True,
+)
+```
+
+## Federated Learning Metrics
+
+### Convergence Metrics
+
+| Metric | Description | Target |
+|--------|-------------|--------|
+| Communication rounds | Steps to convergence | < 200 |
+| Total communication | MB transferred | < 1000 MB |
+| Client participation | Average % per round | > 10% |
+| Privacy budget used | Cumulative epsilon | < 10 |
+
+### Monitoring Dashboard
+
+```python
+from federated_learning import FLDashboard
+
+dashboard = FLDashboard(
+    metrics=[
+        "global_accuracy", "local_accuracy", "communication_cost",
+        "privacy_spent", "client_participation", "convergence_rate",
+    ],
+    export_format="html",
+)
+
+dashboard.log_round(round_metrics)
+report = dashboard.generate_report()
+```
+
+## Advanced Federated Architectures
+
+### Hierarchical Federated Learning
+
+```
+Level 1: Edge Devices (1000s)
+    |
+Level 2: Edge Servers (100s)
+    |
+Level 3: Cloud Server (1)
+```
+
+### Federated Transfer Learning
+
+```python
+from federated_learning import FederatedTransfer
+
+transfer = FederatedTransfer(
+    source_task="imagenet_classification",
+    target_task="medical_imaging",
+    adaptation_layers=["fc", "layer4"],
+    num_rounds=50,
+)
+```
+
+## Common Pitfalls
+
+| Issue | Symptom | Solution |
+|-------|---------|----------|
+| Client drift | Accuracy oscillates | FedProx, SCAFFOLD |
+| Privacy budget exhaustion | High epsilon | Reduce rounds, increase noise |
+| Slow convergence | Many rounds needed | SCAFFOLD, adaptive LR |
+| Communication bottleneck | Slow training | Gradient compression |
+| Byzantine attack | Accuracy drop | Krum, trimmed mean |
+
+## Future Directions
+
+- **Federated Foundation Models**: Training large language models across organizations
+- **Federated Reinforcement Learning**: Multi-agent RL with privacy
+- **Cross-Platform FL**: Interoperable federated learning
+- **Federated Unlearning**: Forgetting specific data contributions

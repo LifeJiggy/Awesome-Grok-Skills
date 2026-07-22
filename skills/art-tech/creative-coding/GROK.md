@@ -83,3 +83,671 @@ canvas.start_recording("output/animation.mp4", framerate=30, duration=10)
 - **interactive-media** — Interactive art and experience design
 - **3d-rendering** — 3D creative coding and shader programming
 - **digital-installations** — Physical installation output
+
+## Advanced Configuration
+
+### Canvas Configuration
+
+```python
+from creative_coding import Canvas, CanvasConfig, ColorMode
+
+canvas_config = CanvasConfig(
+    width=1920,
+    height=1080,
+    framerate=60,
+    background=(10, 10, 15),
+    color_mode=ColorMode.RGB,  # RGB, HSB, HSL
+    color_range=255,
+    smooth=True,
+    anti_aliasing=True,
+    pixel_density=1,  # Retina support
+    blending_modes=["ADD", "MULTIPLY", "SCREEN", "OVERLAY"],
+)
+
+canvas = Canvas(config=canvas_config)
+
+# Advanced drawing settings
+canvas.set_drawing_settings(
+    stroke_color=(255, 255, 255),
+    stroke_weight=1,
+    fill_color=(255, 100, 50),
+    stroke_cap="round",
+    stroke_join="round",
+    blend_mode="ADD",
+)
+
+# Transform operations
+canvas.push_matrix()
+canvas.translate(960, 540)
+canvas.rotate(45)
+canvas.scale(1.5)
+canvas.rect(-100, -100, 200, 200)
+canvas.pop_matrix()
+```
+
+### Animation System Advanced
+
+```python
+from creative_coding import AnimationSystem, Easing, Tween
+
+anim_system = AnimationSystem(
+    framerate=60,
+    auto_update=True,
+)
+
+# Create complex animations
+ball = anim_system.create_object("ball", x=0, y=540, size=50, color=(255, 0, 0))
+
+# Multi-property animation
+anim_system.tween(ball, {
+    "x": (0, 1920, 3.0, Easing.EASE_IN_OUT_CUBIC),
+    "y": (540, 200, 1.5, Easing.BOUNCE_OUT),
+    "size": (50, 100, 2.0, Easing.LINEAR),
+    "color": ((255, 0, 0), (0, 0, 255), 3.0, Easing.LINEAR),
+})
+
+# Sequence animations
+sequence = anim_system.sequence([
+    {"object": "ball", "property": "x", "from": 0, "to": 1920, "duration": 2.0},
+    {"object": "ball", "property": "y", "from": 540, "to": 0, "duration": 1.0, "delay": 0.5},
+    {"object": "ball", "property": "size", "from": 100, "to": 50, "duration": 0.5},
+])
+
+# Parallel animations
+parallel = anim_system.parallel([
+    {"object": "ball1", "property": "x", "from": 0, "to": 1920, "duration": 3.0},
+    {"object": "ball2", "property": "x", "from": 1920, "to": 0, "duration": 3.0},
+])
+
+# Physics simulation
+physics = anim_system.add_physics(
+    gravity=(0, 0.1),
+    friction=0.99,
+    bounce=0.8,
+)
+```
+
+### Audio-Reactive Advanced
+
+```python
+from creative_coding import AudioReactive, FFTConfig, AudioAnalysis
+
+audio_config = FFTConfig(
+    source="microphone",
+    fft_size=2048,
+    hop_size=512,
+    sample_rate=44100,
+    window_function="hanning",
+    frequency_bands={
+        "sub_bass": (20, 60),
+        "bass": (60, 250),
+        "low_mid": (250, 500),
+        "mid": (500, 2000),
+        "high_mid": (2000, 4000),
+        "presence": (4000, 6000),
+        "brilliance": (6000, 20000),
+    },
+)
+
+audio = AudioReactive(config=audio_config)
+
+# Advanced analysis
+analysis = audio.analyze()
+print(f"BPM: {analysis.tempo_bpm:.1f}")
+print(f"Beat strength: {analysis.beat_strength:.2f}")
+print(f"Frequency bands: {analysis.bands}")
+print(f"Spectral centroid: {analysis.spectral_centroid:.1f}Hz")
+print(f"Spectral flux: {analysis.spectral_flux:.3f}")
+
+# Audio-reactive visuals
+@audio.on_beat
+def on_beat(strength):
+    # Trigger visual on beat
+    canvas.fill(Color(strength * 255, 0, 0))
+    canvas.rect(0, 0, canvas.width, canvas.height)
+
+@audio.on_frequency_band
+def on_frequency_band(band, amplitude):
+    # Map frequency to visual
+    if band == "bass":
+        canvas.background(Color(amplitude * 255, 0, 0))
+    elif band == "treble":
+        particles.add_burst(canvas.width/2, canvas.height/2, amplitude * 100)
+```
+
+## Architecture Patterns
+
+### Creative Coding Pipeline
+
+```
++------------------------------------------------------------------+
+|                 Creative Coding Pipeline                          |
++------------------------------------------------------------------+
+|                                                                  |
+|  +----------------+    +----------------+    +----------------+  |
+|  |  Input         |    |  Processing    |    |  Output        |  |
+|  |  Layer         |    |  Engine        |    |  Layer         |  |
+|  |                |    |                |    |                |  |
+|  |  Mouse/Touch   |    |  Canvas        |    |  Screen        |  |
+|  |  Keyboard      |<-->|  Animation     |<-->|  Recording     |  |
+|  |  Audio         |    |  Physics       |    |  Streaming     |  |
+|  |  Sensors       |    |  Particles     |    |  Export        |  |
+|  +-------+--------+    +-------+--------+    +-------+--------+  |
+|          |                    |                     |             |
+|          v                    v                     v             |
+|  +----------------------------------------------------------------+
+|  |                    Core Systems                                |
+|  |  +--------------+  +--------------+  +--------------+          |
+|  |  |  Color       |  |  Math        |  |  Noise       |          |
+|  |  |  System      |  |  Utilities   |  |  Generator   |          |
+|  |  +--------------+  +--------------+  +--------------+          |
+|  |  +--------------+  +--------------+  +--------------+          |
+|  |  |  Particle    |  |  Easing      |  |  Shader      |          |
+|  |  |  System      |  |  Functions   |  |  Pipeline    |          |
+|  |  +--------------+  +--------------+  +--------------+          |
+|  +----------------------------------------------------------------+
++------------------------------------------------------------------+
+```
+
+### Real-Time Loop Architecture
+
+```
+Real-Time Loop (60fps)
+        |
+        v
++-------------------+
+|  Handle Input     |  Process user input
++-------------------+
+        |
+        v
++-------------------+
+|  Update State     |  Update animations, physics
++-------------------+
+        |
+        v
++-------------------+
+|  Clear Canvas     |  Clear/background
++-------------------+
+        |
+        v
++-------------------+
+|  Draw Content     |  Render shapes, images
++-------------------+
+        |
+        v
++-------------------+
+|  Apply Effects    |  Filters, post-processing
++-------------------+
+        |
+        v
++-------------------+
+|  Export Frame     |  Save if recording
++-------------------+
+        |
+        v
++-------------------+
+|  Loop             |  Request next frame
++-------------------+
+```
+
+### Particle System Architecture
+
+```
+Particle System Pipeline
+        |
+        v
++-------------------+
+|  Emit Particles   |  Create new particles
++-------------------+
+        |
+        v
++-------------------+
+|  Apply Forces     |  Gravity, wind, attraction
++-------------------+
+        |
+        v
++-------------------+
+|  Update Positions |  Move particles
++-------------------+
+        |
+        v
++-------------------+
+|  Update Properties|  Size, color, alpha
++-------------------+
+        |
+        v
++-------------------+
+|  Check Lifespan   |  Remove dead particles
++-------------------+
+        |
+        v
++-------------------+
+|  Render Particles |  Draw to canvas
++-------------------+
+```
+
+## Integration Guide
+
+### p5.js Integration
+
+```javascript
+// p5.js Creative Coding
+let canvas;
+let particles;
+let audioReactive;
+
+function setup() {
+    canvas = createCanvas(1920, 1080);
+    particles = new ParticleSystem(1000);
+    audioReactive = new AudioReactive({
+        source: 'microphone',
+        fftSize: 2048,
+    });
+}
+
+function draw() {
+    // Audio analysis
+    const analysis = audioReactive.analyze();
+    
+    // Clear with fade
+    background(10, 10, 15, 25);
+    
+    // Audio-reactive visuals
+    if (analysis.beat) {
+        particles.addBurst(mouseX, mouseY, analysis.beatStrength * 100);
+    }
+    
+    // Update and draw particles
+    particles.addForce('gravity', createVector(0, 0.1));
+    particles.update();
+    particles.draw();
+    
+    // Interactive drawing
+    if (mouseIsPressed) {
+        particles.addEmitter(mouseX, mouseY, 10);
+    }
+}
+```
+
+### Processing Integration
+
+```java
+// Processing Creative Coding
+import processing.svg.*;
+
+PImage buffer;
+ParticleSystem particles;
+AudioReactive audio;
+
+void setup() {
+    size(1920, 1080, P2D);
+    buffer = createGraphics(1920, 1080);
+    particles = new ParticleSystem(1000);
+    audio = new AudioReactive(this);
+}
+
+void draw() {
+    // Audio analysis
+    AudioAnalysis analysis = audio.analyze();
+    
+    // Fade background
+    fill(10, 10, 15, 25);
+    rect(0, 0, width, height);
+    
+    // Audio-reactive visuals
+    if (analysis.isBeat()) {
+        particles.addBurst(mouseX, mouseY, analysis.getBeatStrength() * 100);
+    }
+    
+    // Update and draw particles
+    particles.addForce(new PVector(0, 0.1));
+    particles.update();
+    particles.draw();
+    
+    // Export frame
+    if (frameCount % 3 == 0) {
+        saveFrame("output/frame_####.png");
+    }
+}
+```
+
+### GLSL Shader Integration
+
+```glsl
+// GLSL Fragment Shader for Creative Coding
+#version 330 core
+
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+uniform sampler2D u_texture;
+
+out vec4 fragColor;
+
+void main() {
+    vec2 uv = gl_FragCoord.xy / u_resolution;
+    vec2 mouse = u_mouse / u_resolution;
+    
+    // Create dynamic pattern
+    float d = distance(uv, mouse);
+    float r = sin(d * 20.0 - u_time * 2.0) * 0.5 + 0.5;
+    
+    // Color mapping
+    vec3 color1 = vec3(0.9, 0.3, 0.2);
+    vec3 color2 = vec3(0.2, 0.4, 0.9);
+    vec3 color = mix(color1, color2, r);
+    
+    // Add glow
+    color += vec3(0.1) / (d + 0.1);
+    
+    fragColor = vec4(color, 1.0);
+}
+```
+
+## Performance Optimization
+
+### Rendering Optimization
+
+```python
+from creative_coding import RenderOptimizer, PerformanceConfig
+
+optimizer = RenderOptimizer(
+    config=PerformanceConfig(
+        target_fps=60,
+        max_frame_time_ms=16.7,
+        buffer_size=3,  # Triple buffering
+    ),
+    optimizations={
+        "spatial_hashing": True,
+        "particle_culling": True,
+        "level_of_detail": True,
+        "shader_caching": True,
+        "batch_rendering": True,
+    },
+)
+
+# Optimize rendering
+@optimizer.optimize_frame
+def render_frame():
+    # Spatial hashing for particles
+    spatial_hash = optimizer.build_spatial_hash(particles, cell_size=50)
+    
+    # Cull off-screen particles
+    visible_particles = optimizer.cull_offscreen(particles, viewport)
+    
+    # Batch render
+    optimizer.batch_render(visible_particles)
+
+# Monitor performance
+stats = optimizer.get_stats()
+print(f"Frame time: {stats.frame_time_ms:.2f}ms")
+print(f"FPS: {stats.fps:.1f}")
+print(f"Particles rendered: {stats.particles_rendered}")
+print(f"Draw calls: {stats.draw_calls}")
+```
+
+### Memory Optimization
+
+```python
+from creative_coding import MemoryOptimizer, ObjectPool
+
+memory_opt = MemoryOptimizer(
+    object_pools={
+        "particles": ObjectPool(max_size=10000, factory=lambda: Particle()),
+        "shapes": ObjectPool(max_size=1000, factory=lambda: Shape()),
+    },
+    buffer_reuse=True,
+    garbage_collection=True,
+)
+
+# Use object pooling
+particle = memory_opt.pools["particles"].acquire()
+particle.position = (x, y)
+# ... use particle ...
+memory_opt.pools["particles"].release(particle)
+```
+
+## Security Considerations
+
+### Content Safety
+
+```python
+from creative_coding import ContentSafety, SafetyConfig
+
+safety = ContentSafety(
+    config=SafetyConfig(
+        nsfw_detection=True,
+        violence_detection=True,
+        confidence_threshold=0.8,
+    ),
+)
+
+# Check generated content
+result = safety.check_frame(frame)
+if not result.is_safe:
+    print(f"Content flagged: {result.flags}")
+```
+
+### Export Security
+
+```python
+from creative_coding import ExportSecurity
+
+security = ExportSecurity(
+    watermark=True,
+    watermark_text="Creative Coding",
+    metadata={
+        "artist": "Artist Name",
+        "license": "CC-BY-NC",
+    },
+)
+
+# Secure export
+security.export_frame(frame, "output/frame.png")
+```
+
+## Troubleshooting Guide
+
+| Issue | Symptoms | Solution |
+|-------|----------|----------|
+| **Low FPS** | Jittery animation | Reduce particle count, optimize shaders |
+| **Memory leaks** | Growing memory usage | Check object pooling, release resources |
+| **Audio sync issues** | Visuals out of sync | Adjust buffer size, check sample rate |
+| **Shader errors** | Black screen | Validate GLSL code, check uniforms |
+| **Export issues** | Corrupted files | Check format compatibility |
+| **Input lag** | Delayed response | Reduce processing complexity |
+
+## API Reference
+
+```python
+class Canvas:
+    """Main drawing canvas."""
+    
+    def __init__(self, width: int, height: int, framerate: int = 60):
+        """Initialize canvas."""
+        
+    def fill(self, color: tuple) -> None:
+        """Set fill color."""
+        
+    def rect(self, x: float, y: float, w: float, h: float) -> None:
+        """Draw rectangle."""
+        
+    def ellipse(self, x: float, y: float, w: float, h: float) -> None:
+        """Draw ellipse."""
+
+class AnimationSystem:
+    """Animation management."""
+    
+    def create_object(self, name: str, **kwargs) -> AnimObject:
+        """Create animatable object."""
+        
+    def tween(self, obj, property: str, from_val, to_val, duration: float, easing: Easing) -> None:
+        """Create tween animation."""
+
+class AudioReactive:
+    """Audio analysis for visuals."""
+    
+    def __init__(self, source: str, fft_size: int = 2048):
+        """Initialize audio reactive."""
+        
+    def analyze(self) -> AudioAnalysis:
+        """Analyze audio input."""
+```
+
+## Data Models
+
+```python
+@dataclass
+class Color:
+    """Color representation."""
+    r: int
+    g: int
+    b: int
+    a: int = 255
+
+@dataclass
+class Vector2:
+    """2D vector."""
+    x: float
+    y: float
+
+@dataclass
+class Particle:
+    """Particle data."""
+    position: Vector2
+    velocity: Vector2
+    color: Color
+    size: float
+    lifetime: float
+    age: float
+
+@dataclass
+class AudioAnalysis:
+    """Audio analysis result."""
+    tempo_bpm: float
+    beat_strength: float
+    bands: dict
+    spectral_centroid: float
+```
+
+## Deployment Guide
+
+### Build Configuration
+
+```python
+from creative_coding import BuildConfig
+
+config = BuildConfig(
+    platforms=["web", "desktop"],
+    output_formats=["png", "svg", "mp4", "gif"],
+    quality={
+        "image": {"dpi": 300},
+        "video": {"fps": 30, "codec": "h264"},
+    },
+)
+```
+
+## Monitoring & Observability
+
+```python
+from creative_coding import Metrics, HealthCheck
+
+metrics = Metrics(
+    tracks=["frame_time", "memory_usage", "particle_count"],
+    sample_rate=0.1,
+)
+
+health = HealthCheck(
+    checks=[
+        {"name": "fps", "threshold": 55},
+        {"name": "memory_usage_mb", "threshold": 1500},
+    ],
+)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from creative_coding import Canvas, AnimationSystem
+
+class TestCanvas:
+    def test_canvas_creation(self):
+        canvas = Canvas(width=1920, height=1080)
+        assert canvas.width == 1920
+        assert canvas.height == 1080
+
+class TestAnimation:
+    def test_tween(self):
+        anim = AnimationSystem()
+        obj = anim.create_object("test", x=0)
+        anim.tween(obj, "x", 0, 100, duration=1.0)
+        assert obj.x == 0
+```
+
+## Versioning & Migration
+
+| Version | Changes | Breaking |
+|---------|---------|----------|
+| 2.0.0 | Added GLSL shaders, improved performance | Yes |
+| 1.5.0 | Added audio-reactive visuals | No |
+| 1.0.0 | Initial release | N/A |
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **Easing** | Rate of change over time |
+| **Tween** | Animation between two values |
+| **FFT** | Fast Fourier Transform |
+| **Particle System** | Physics-based particle simulation |
+| **Shader** | GPU program for visual effects |
+| **Blending Mode** | How colors combine |
+| **Frame Rate** | Frames per second |
+
+## Changelog
+
+### 2.0.0 (2024-01-15)
+- Added GLSL shader support
+- Improved performance
+- Added audio-reactive visuals
+
+### 1.5.0 (2023-10-01)
+- Added particle system
+- Added animation system
+
+### 1.0.0 (2023-06-01)
+- Initial release
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/company/creative-coding.git
+cd creative-coding
+pip install -e ".[dev]"
+pytest tests/
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Company Name
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

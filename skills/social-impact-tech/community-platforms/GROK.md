@@ -240,3 +240,570 @@ print(f"Translation quality: {translation.quality_score}")
 - [crisis-response](../crisis-response/GROK.md) — Emergency coordination and crisis communication
 - [education-access](../education-access/GROK.md) — Educational content delivery and learning communities
 - [health-equity](../health-equity/GROK.md) — Health-focused community support and resource matching
+
+## Advanced Community Engagement Patterns
+
+### Gamification and Reputation Systems
+
+Modern community platforms use gamification to incentivize constructive behavior while preventing abuse. The reputation system must balance reward with anti-gaming protections:
+
+```python
+from community_platforms import ReputationEngine, Badge, Achievement
+
+engine = ReputationEngine()
+
+# Define badge system with anti-gaming protections
+badges = [
+    Badge(
+        name="Helpful Advisor",
+        description="Received 10 upvotes on helpful answers",
+        criteria={"helpful_answer_upvotes": 10},
+        tier="silver",
+        anti_gaming={"min_account_age_days": 30, "max_daily_progress": 3}
+    ),
+    Badge(
+        name="Community Organizer",
+        description="Organized 5 successful events",
+        criteria={"events_organized": 5, "events_with_positive_feedback": 3},
+        tier="gold",
+        anti_gaming={"min_account_age_days": 90, "verification_required": True}
+    ),
+    Badge(
+        name="Mentor",
+        description="Successfully onboarded 3 new members",
+        criteria={"mentored_members": 3, "mentee_retention_30day": 0.8},
+        tier="platinum",
+        anti_gaming={"min_reputation_score": 100, "background_check": True}
+    )
+]
+
+for badge in badges:
+    engine.add_badge(badge)
+
+# Configure anti-gaming rules
+engine.configure_anti_gaming(
+    daily_point_cap=50,
+    suspicious_pattern_detection=True,
+    min_account_age_days=7,
+    max_self_upvotes_ratio=0.3,
+    velocity_checks=True,
+    minimum_time_between_actions_seconds=30
+)
+
+# Calculate reputation with anti-gaming analysis
+rep = engine.calculate_reputation("alice")
+print(f"Reputation: {rep.score}")
+print(f"Level: {rep.level}")
+print(f"Badges: {[b.name for b in rep.badges]}")
+print(f"Anti-gaming flags: {rep.anti_gaming_flags}")
+```
+
+### Content Moderation with ML Integration
+
+```python
+from community_platforms import ModerationPipeline, MLClassifier, HumanReviewer
+
+# Set up multi-layer moderation
+pipeline = ModerationPipeline(auto_filter=True)
+
+# Add ML classifier for spam detection
+spam_classifier = MLClassifier(
+    model="spam_detector_v2",
+    confidence_threshold=0.85,
+    fallback_to_human=True
+)
+pipeline.add_classifier("spam", spam_classifier)
+
+# Add sentiment analysis for hate speech detection
+sentiment_classifier = MLClassifier(
+    model="hate_speech_detector",
+    confidence_threshold=0.80,
+    categories=["hate_speech", "harassment", "threats"],
+    escalation_threshold=0.70
+)
+pipeline.add_classifier("sentiment", sentiment_classifier)
+
+# Configure human review queue
+human_review = HumanReviewer(
+    max_queue_size=100,
+    priority_rules={
+        "high_priority": ["threats", "doxxing", "child_safety"],
+        "medium_priority": ["harassment", "spam"],
+        "low_priority": ["off_topic", "low_quality"]
+    },
+    sla_hours=24
+)
+pipeline.set_human_review(human_review)
+
+# Process content
+content = "Check out my new product! Visit www.spam-link.com for 50% off!!!"
+decision = pipeline.evaluate(
+    content=content,
+    author_reputation=5.0,
+    author_age_days=1
+)
+print(f"Action: {decision.action}")
+print(f"Confidence: {decision.confidence}")
+print(f"Classifiers used: {decision.classifiers_used}")
+```
+
+### Mutual Aid Resource Matching Algorithm
+
+```python
+from community_platforms import MutualAidMatcher, ResourceRequest, ResourceOffer, MatchingAlgorithm
+
+# Configure advanced matching with fairness constraints
+matcher = MutualAidMatcher(
+    radius_km=10,
+    algorithm=MatchingAlgorithm.FAIRNESS_WEIGHTED,
+    fairness_constraints={
+        "max_requests_per_provider": 3,
+        "priority_boost_for_new_providers": 0.2,
+        "geographic_equity_weight": 0.3
+    }
+)
+
+# Add provider offers with skill validation
+offers = [
+    ResourceOffer(
+        provider_id="provider_001",
+        skill="carpentry",
+        availability=["weekday_morning", "weekday_afternoon"],
+        location=(40.7128, -74.0060),
+        capacity=3,
+        verification_status="verified",
+        response_time_hours=2.5
+    ),
+    ResourceOffer(
+        provider_id="provider_002",
+        skill="carpentry",
+        availability=["weekend"],
+        location=(40.7150, -74.0080),
+        capacity=2,
+        verification_status="pending",
+        response_time_hours=24.0
+    )
+]
+
+for offer in offers:
+    matcher.add_offer(offer)
+
+# Add requests with urgency scoring
+requests = [
+    ResourceRequest(
+        requester_id="requester_001",
+        need="furniture_repair",
+        urgency="high",
+        location=(40.7130, -74.0070),
+        special_requirements="wheelchair accessible",
+        deadline_days=3
+    ),
+    ResourceRequest(
+        requester_id="requester_002",
+        need="furniture_repair",
+        urgency="medium",
+        location=(40.7140, -74.0075),
+        special_requirements=None,
+        deadline_days=14
+    )
+]
+
+for req in requests:
+    matcher.add_request(req)
+
+# Find matches with fairness analysis
+matches = matcher.find_matches()
+print(f"Matches found: {len(matches)}")
+for match in matches:
+    print(f"\nMatch: {match.offer.provider_id} → {match.request.requester_id}")
+    print(f"  Score: {match.score:.2f}")
+    print(f"  Distance: {match.distance_km:.1f}km")
+    print(f"  Urgency match: {match.urgency_match:.0%}")
+    print(f"  Fairness score: {match.fairness_score:.2f}")
+    print(f"  Estimated completion: {match.estimated_hours:.1f}h")
+```
+
+### Event Management with Volunteer Coordination
+
+```python
+from community_platforms import EventManager, VolunteerCoordinator, RecurringEvent
+
+em = EventManager()
+
+# Create recurring event with volunteer roles
+event = em.create_recurring_event(
+    title="Weekly Food Distribution",
+    schedule=RecurringEvent(
+        frequency="weekly",
+        day_of_week="saturday",
+        start_time="08:00",
+        end_time="12:00",
+        timezone="America/New_York"
+    ),
+    location="Community Center",
+    max_attendees=50,
+    volunteer_roles=[
+        {"name": "Setup Lead", "skill_required": "physical_labor", "hours": 2},
+        {"name": "Food Handler", "skill_required": "food_safety", "hours": 4},
+        {"name": "Translator", "skill_required": "spanish", "hours": 4},
+        {"name": "Cleanup", "skill_required": "physical_labor", "hours": 2}
+    ],
+    requires_registration=True,
+    accessibility_features=["wheelchair_accessible", "sign_language_interpreter"]
+)
+
+# RSVP with role selection
+em.rsvp(event.id, "member_001", role="Food Handler")
+em.rsvp(event.id, "member_002", role="Translator")
+
+# Generate volunteer schedule
+coordinator = VolunteerCoordinator()
+schedule = coordinator.generate_schedule(
+    event_id=event.id,
+    date="2026-06-20",
+    balance_hours=True,
+    respect_preferences=True
+)
+
+print(f"Event: {event.title}")
+print(f"Date: {event.date}")
+print(f"Registered: {em.get_rsvp_count(event.id)}/{event.max_attendees}")
+print(f"\nVolunteer Schedule:")
+for shift in schedule:
+    print(f"  {shift.volunteer_name}: {shift.role_name} ({shift.start_time}-{shift.end_time})")
+```
+
+### Community Analytics and Health Metrics
+
+```python
+from community_platforms import CommunityAnalytics, HealthMetrics, NetworkAnalysis
+
+analytics = CommunityAnalytics(forum_id="neighborhood_aid")
+
+# Get comprehensive community health
+health = analytics.get_community_health(days=30)
+
+print(f"Community Health Dashboard:")
+print(f"  Active members: {health.active_members}/{health.total_members}")
+print(f"  New member retention (30-day): {health.newcomer_retention:.0%}")
+print(f"  Avg response time to requests: {health.avg_response_hours:.1f}h")
+print(f"  Reciprocity ratio: {health.reciprocity_ratio:.2f}")
+print(f"  Moderation queue size: {health.pending_moderation}")
+print(f"  Sentiment trend: {health.sentiment_trend}")
+
+# Network analysis for community connectivity
+network = NetworkAnalysis(forum_id="neighborhood_aid")
+connectivity = network.analyze_connectivity()
+
+print(f"\nNetwork Analysis:")
+print(f"  Average connections per member: {connectivity.avg_connections:.1f}")
+print(f"  Network density: {connectivity.density:.3f}")
+print(f"  Isolated members: {connectivity.isolated_count}")
+print(f"  Core-periphery score: {connectivity.core_periphery_score:.2f}")
+
+# Identify influential members
+influencers = network.identify_influencers(top_n=5)
+print(f"\nTop Influencers:")
+for member in influencers:
+    print(f"  {member.name}: {member.influence_score:.2f} (connections: {member.connection_count})")
+```
+
+### Private Messaging with Privacy Controls
+
+```python
+from community_platforms import PrivateMessaging, EncryptionManager, PrivacySettings
+
+# Configure encrypted messaging
+messaging = PrivateMessaging(
+    encryption=EncryptionManager(
+        algorithm="AES-256-GCM",
+        key_rotation_days=30,
+        zero_knowledge=True
+    ),
+    retention_policy={
+        "message_retention_days": 365,
+        "attachment_retention_days": 90,
+        "auto_delete_after_read": False
+    }
+)
+
+# Configure privacy settings
+privacy = PrivacySettings(
+    default_visibility="members_only",
+    allow_anonymous_posting=False,
+    data_retention_days=365,
+    export_enabled=True,
+    delete_account_data=True
+)
+
+# Send encrypted message
+message = messaging.send(
+    sender_id="member_001",
+    recipient_id="member_002",
+    content="Hi! I can help with the furniture repair.",
+    attachments=[],
+    expires_days=30
+)
+
+print(f"Message sent: {message.id}")
+print(f"Encryption: {message.encryption_algorithm}")
+print(f"Expires: {message.expires_at}")
+
+# Get message with privacy controls
+received = messaging.get_message(
+    message_id=message.id,
+    user_id="member_002",
+    privacy_settings=privacy
+)
+print(f"Decrypted content: {received.content}")
+```
+
+### Content Versioning and Collaboration
+
+```python
+from community_platforms import ContentVersioning, CollaborationManager, ConflictResolver
+
+# Set up content versioning
+versioning = ContentVersioning(
+    max_versions=50,
+    auto_save_interval_minutes=5,
+    conflict_resolution=ConflictResolver.MERGE
+)
+
+# Create collaborative document
+doc = versioning.create_document(
+    title="Community Garden Guidelines",
+    author_id="member_001",
+    content="Initial draft of community garden rules and guidelines...",
+    collaborators=["member_002", "member_003"]
+)
+
+# Track changes
+versioning.add_revision(
+    document_id=doc.id,
+    author_id="member_002",
+    changes=[
+        {"type": "add", "section": "Rules", "content": "No pesticides allowed"},
+        {"type": "modify", "section": "Hours", "content": "Dawn to dusk"}
+    ],
+    comment="Added environmental guidelines"
+)
+
+# Handle merge conflict
+conflict = versioning.detect_conflict(
+    document_id=doc.id,
+    edit1={"author": "member_001", "section": "Hours", "content": "7am-8pm"},
+    edit2={"author": "member_003", "section": "Hours", "content": "Sunrise to Sunset"}
+)
+
+resolution = versioning.resolve_conflict(conflict, strategy="merge_with_discussion")
+print(f"Conflict resolved: {resolution.resolution}")
+print(f"Final content: {resolution.merged_content}")
+```
+
+### User Onboarding and Trust Levels
+
+```python
+from community_platforms import OnboardingManager, TrustLevel, ProgressionPath
+
+# Configure onboarding flow
+onboarding = OnboardingManager()
+
+# Define trust level progression
+trust_levels = [
+    TrustLevel(
+        level=1,
+        name="Newcomer",
+        requirements={"account_age_days": 0, "completed_profile": True},
+        privileges=["read", "post_limited", "react"]
+    ),
+    TrustLevel(
+        level=2,
+        name="Member",
+        requirements={"account_age_days": 7, "posts_count": 5, "reputation_score": 10},
+        privileges=["read", "post", "react", "message", "create_topic"]
+    ),
+    TrustLevel(
+        level=3,
+        name="Trusted Member",
+        requirements={"account_age_days": 30, "posts_count": 20, "reputation_score": 50},
+        privileges=["read", "post", "react", "message", "create_topic", "moderate_own_posts"]
+    ),
+    TrustLevel(
+        level=4,
+        name="Moderator",
+        requirements={"account_age_days": 90, "reputation_score": 200, "moderator_nomination": True},
+        privileges=["read", "post", "react", "message", "create_topic", "moderate_all", "manage_members"]
+    )
+]
+
+for level in trust_levels:
+    onboarding.add_trust_level(level)
+
+# Track onboarding progress
+progress = onboarding.track_progress("member_004")
+print(f"Onboarding Progress:")
+print(f"  Current level: {progress.current_level}")
+print(f"  Next level: {progress.next_level}")
+print(f"  Requirements met: {progress.requirements_met}")
+print(f"  Requirements remaining: {progress.requirements_remaining}")
+```
+
+### Governance and Decision-Making Tools
+
+```python
+from community_platforms import GovernanceTools, Proposal, VotingSystem
+
+# Set up governance system
+governance = GovernanceTools(
+    voting_system=VotingSystem.RANKED_CHOICE,
+    quorum_percentage=0.3,
+    discussion_period_days=7,
+    voting_period_days=3
+)
+
+# Create proposal
+proposal = governance.create_proposal(
+    title="Implement Monthly Community Meetups",
+    author_id="member_001",
+    description="Proposal to organize monthly in-person meetups at the community center.",
+    proposal_type="initiative",
+    budget=None,
+    timeline="2026-Q3"
+)
+
+# Start discussion period
+governance.start_discussion(proposal.id)
+
+# After discussion, start voting
+governance.start_voting(proposal.id)
+
+# Cast votes
+governance.cast_vote(proposal.id, "member_001", preference=1)
+governance.cast_vote(proposal.id, "member_002", preference=1)
+governance.cast_vote(proposal.id, "member_003", preference=2)
+
+# Get results
+results = governance.get_results(proposal.id)
+print(f"Proposal: {proposal.title}")
+print(f"Status: {results.status}")
+print(f"Votes cast: {results.votes_cast}")
+print(f"Quorum met: {results.quorum_met}")
+print(f"Outcome: {results.outcome}")
+print(f"Winner: {results.winning_option}")
+```
+
+### Multilingual Content Management
+
+```python
+from community_platforms import MultilingualManager, TranslationWorkflow
+
+# Configure multilingual support
+multilingual = MultilingualManager(
+    supported_languages=["en", "es", "fr", "ar", "zh"],
+    default_language="en",
+    auto_translate=True,
+    translation_quality_threshold=0.8
+)
+
+# Post content with automatic translation
+topic = multilingual.post_topic(
+    category="General",
+    author="member_001",
+    title="How to organize a food drive",
+    body="Here are the steps to organize a successful food drive in your neighborhood...",
+    source_language="en",
+    auto_translate=True
+)
+
+# Check translation status
+translations = multilingual.get_translations(topic.id)
+print(f"Translations:")
+for lang, status in translations.items():
+    print(f"  {lang}: {status.state} ({status.quality_score:.2f})")
+
+# Request human review for low-quality translations
+for lang, status in translations.items():
+    if status.quality_score < 0.8:
+        multilingual.request_human_review(topic.id, lang)
+        print(f"  Requested human review for {lang}")
+```
+
+### Anti-Abuse and Fraud Detection
+
+```python
+from community_platforms import AbuseDetector, FraudPrevention, AnomalyAnalyzer
+
+# Configure abuse detection
+detector = AbuseDetector(
+    models=["spam", "scam", "harassment", "coordinated_inauthentic"],
+    sensitivity=0.8,
+    auto_action_threshold=0.9
+)
+
+# Analyze account for suspicious behavior
+analysis = detector.analyze_account("member_005")
+print(f"Account Analysis:")
+print(f"  Risk score: {analysis.risk_score:.2f}")
+print(f"  Suspicious patterns: {analysis.suspicious_patterns}")
+print(f"  Recommended action: {analysis.recommended_action}")
+
+# Detect coordinated inauthentic behavior
+fraud = FraudPrevention()
+coordination = fraud.detect_coordination(
+    accounts=["member_005", "member_006", "member_007"],
+    time_window_hours=24,
+    behavior_similarity_threshold=0.8
+)
+
+if coordination.detected:
+    print(f"\nCoordinated behavior detected:")
+    print(f"  Accounts: {coordination.accounts}")
+    print(f"  Similarity score: {coordination.similarity_score:.2f}")
+    print(f"  Behavior type: {coordination.behavior_type}")
+```
+
+### Community Health Dashboards
+
+```python
+from community_platforms import HealthDashboard, TrendAnalyzer, InterventionRecommender
+
+# Create health dashboard
+dashboard = HealthDashboard(forum_id="neighborhood_aid")
+
+# Get comprehensive health metrics
+health = dashboard.get_health_metrics(days=30)
+
+print(f"Community Health Report:")
+print(f"\nEngagement Metrics:")
+print(f"  Daily active users: {health.dau}")
+print(f"  Weekly active users: {health.wau}")
+print(f"  Monthly active users: {health.mau}")
+print(f"  DAU/MAU ratio: {health.dau_mau_ratio:.2f}")
+
+print(f"\nContent Metrics:")
+print(f"  New posts: {health.new_posts}")
+print(f"  Comments per post: {health.comments_per_post:.1f}")
+print(f"  Reaction rate: {health.reaction_rate:.0%}")
+
+print(f"\nModeration Metrics:")
+print(f"  Reports filed: {health.reports_filed}")
+print(f"  Reports resolved: {health.reports_resolved}")
+print(f"  Average resolution time: {health.avg_resolution_hours:.1f}h")
+
+# Analyze trends
+analyzer = TrendAnalyzer(health)
+trends = analyzer.analyze_trends()
+
+print(f"\nTrend Analysis:")
+for trend in trends:
+    print(f"  {trend.metric}: {trend.direction} ({trend.change_percentage:+.1f}%)")
+
+# Get intervention recommendations
+interventions = InterventionRecommender(health)
+recommendations = interventions.get_recommendations()
+print(f"\nIntervention Recommendations:")
+for rec in recommendations:
+    print(f"  {rec.priority}: {rec.action}")
+    print(f"    Expected impact: {rec.expected_impact}")
+```

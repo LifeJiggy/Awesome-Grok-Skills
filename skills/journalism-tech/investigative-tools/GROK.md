@@ -135,3 +135,580 @@ print(f"  Sentiment: {doc.sentiment}")
 - **data-journalism**: Data analysis for investigations
 - **fact-checking**: Claim verification
 - **content-management**: Publishing investigative reports
+
+---
+
+## Advanced Configuration
+
+### OSINT Configuration
+
+```python
+osint_config = {
+    "social_media": {
+        "platforms": ["linkedin", "twitter", "facebook", "instagram"],
+        "scrape_interval_hours": 24,
+        "respect_robots_txt": True,
+        "rate_limiting": True,
+    },
+    "domain_intelligence": {
+        "whois_lookup": True,
+        "dns_records": True,
+        "ssl_certificate": True,
+        "web_archives": True,
+    },
+    "breach_data": {
+        "haveibeenpwned": True,
+        "dehashed": False,  # Requires paid account
+        "leakcheck": True,
+    },
+}
+```
+
+### Public Records Configuration
+
+```python
+public_records_config = {
+    "federal_sources": {
+        "sec_edgar": {"enabled": True, "api_key": None},
+        "pacer": {"enabled": True, "credentials": "encrypted"},
+        "foia": {"enabled": True, "agencies": ["doj", "dhs", "sec"]},
+    },
+    "state_sources": {
+        "corporate_filings": True,
+        "court_records": True,
+        "property_records": True,
+        "voter_registration": True,
+    },
+    "local_sources": {
+        "property_assessor": True,
+        "business_licenses": True,
+        "meeting_minutes": True,
+    },
+}
+```
+
+### Document Analysis Configuration
+
+```python
+document_analysis_config = {
+    "extraction_types": {
+        "entities": ["person", "organization", "location", "date", "money"],
+        "relationships": True,
+        "key_dates": True,
+        "financial_amounts": True,
+        "sentiment": True,
+    },
+    "ocr_enabled": True,
+    "supported_formats": ["pdf", "docx", "txt", "jpg", "png"],
+    "language_detection": True,
+}
+```
+
+### Network Mapping Configuration
+
+```python
+network_mapping_config = {
+    "relationship_types": [
+        "officer", "director", "shareholder", "family",
+        "business_partner", "legal_representative",
+    ],
+    "visualization": {
+        "graph_tool": "gephi",
+        "export_formats": ["graphml", "pdf", "png"],
+        "interactive": True,
+    },
+    "max_entities": 1000,
+    "max_relationships": 5000,
+}
+```
+
+### Secure Communication Configuration
+
+```python
+secure_comms_config = {
+    "encryption": "pgp",
+    "anonymous_email": True,
+    "secure_drop": True,
+    "vpn_required": True,
+    "tor_support": True,
+}
+```
+
+## Architecture Patterns
+
+### Investigative Journalism Pipeline
+
+```
+┌─────────────────────────────────────────────────┐
+│              Research Layer                      │
+│  ┌─────────┐  ┌─────────┐  ┌─────────────────┐│
+│  │Public   │  │ OSINT   │  │ Document        ││
+│  │Records  │  │ Collect │  │ Analysis        ││
+│  └────┬────┘  └────┬────┘  └───────┬─────────┘│
+│       │            │               │           │
+├───────┴────────────┴───────────────┴───────────┤
+│              Analysis Layer                     │
+│  ┌─────────┐  ┌─────────┐  ┌─────────────────┐│
+│  │Entity   │  │Network  │  │ Timeline        ││
+│  │Extraction│ │Mapping  │  │ Construction    ││
+│  └────┬────┘  └────┬────┘  └───────┬─────────┘│
+│       │            │               │           │
+├───────┴────────────┴───────────────┴───────────┤
+│              Reporting Layer                    │
+│  ┌─────────┐  ┌─────────┐  ┌─────────────────┐│
+│  │Story    │  │Evidence │  │ Publication     ││
+│  │Writing  │  │Compile  │  │ Workflow        ││
+│  └─────────┘  └─────────┘  └─────────────────┘│
+└─────────────────────────────────────────────────┘
+```
+
+### OSINT Collection Flow
+
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│  Target     │────▶│  Source      │────▶│  Data       │
+│  Entity     │     │  Selection   │     │  Collection │
+└─────────────┘     └──────────────┘     └──────┬──────┘
+                                                │
+                         ┌──────────────────────┼──────────────────────┐
+                         │                      │                      │
+                    ┌────┴────┐           ┌─────┴─────┐         ┌─────┴─────┐
+                    │  Social │           │  Domain   │         │  Public   │
+                    │  Media  │           │  Records  │         │  Records  │
+                    └─────────┘           └───────────┘         └───────────┘
+```
+
+### Network Analysis Flow
+
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│  Entities   │────▶│  Relationship│────▶│  Graph      │
+│  Identified │     │  Extraction  │     │  Generation │
+└─────────────┘     └──────────────┘     └──────┬──────┘
+                                                │
+                         ┌──────────────────────┼──────────────────────┐
+                         │                      │                      │
+                    ┌────┴────┐           ┌─────┴─────┐         ┌─────┴─────┐
+                    │  Cluster│           │  Path     │         │  Visualize│
+                    │  Analysis│          │  Analysis │         │  Network  │
+                    └─────────┘           └───────────┘         └───────────┘
+```
+
+## Integration Guide
+
+### PACER Integration
+
+```python
+def search_pacer(case_query, pacer_config):
+    pacer_client = PACERClient(
+        username=pacer_config.username,
+        password=pacer_config.password,
+    )
+
+    results = pacer_client.search_cases(
+        query=case_query.query,
+        jurisdiction=case_query.jurisdiction,
+        date_range=case_query.date_range,
+    )
+    return results
+```
+
+### SEC EDGAR Integration
+
+```python
+def search_sec_filings(company_name, sec_config):
+    sec_client = SECEDGARClient()
+
+    filings = sec_client.search_filings(
+        company=company_name,
+        filing_types=["10-K", "10-Q", "8-K"],
+        date_range={"start": "2020-01-01", "end": "2024-01-01"},
+    )
+    return filings
+```
+
+### Social Media Integration
+
+```python
+def collect_social_media(target, social_config):
+    collector = SocialMediaCollector(
+        platforms=social_config.platforms,
+        rate_limiting=True,
+    )
+
+    profiles = collector.find_profiles(target)
+    posts = collector.collect_posts(profiles)
+    return {"profiles": profiles, "posts": posts}
+```
+
+### Document Analysis Integration
+
+```python
+def analyze_documents(document_paths, analysis_config):
+    analyzer = DocumentAnalyzer(
+        extraction_types=analysis_config.extraction_types,
+        ocr_enabled=analysis_config.ocr_enabled,
+    )
+
+    results = []
+    for path in document_paths:
+        result = analyzer.analyze(path)
+        results.append(result)
+    return results
+```
+
+## Performance Optimization
+
+### Data Collection Optimization
+
+```python
+collection_optimization = {
+    "parallel_collection": True,
+    "rate_limiting": True,
+    "caching_enabled": True,
+    "incremental_updates": True,
+    "batch_processing": True,
+}
+```
+
+### Analysis Optimization
+
+```python
+analysis_optimization = {
+    "parallel_processing": True,
+    "memory_limit_mb": 4096,
+    "chunk_size": 1000,
+    "caching_enabled": True,
+}
+```
+
+### Visualization Optimization
+
+```python
+viz_optimization = {
+    "lazy_rendering": True,
+    "image_compression": True,
+    "vector_formats": True,
+    "interactive_enabled": True,
+}
+```
+
+## Security Considerations
+
+### Operational Security
+
+```python
+opsec_config = {
+    "anonymous_browsing": True,
+    "vpn_required": True,
+    "tor_support": True,
+    "secure_communication": True,
+    "data_encryption": True,
+    "clean_desktop": True,
+}
+```
+
+### Source Protection
+
+```python
+source_protection = {
+    "anonymous_sources": True,
+    "encrypted_storage": True,
+    "secure_communication": True,
+    "data_minimization": True,
+    "access_logging": True,
+}
+```
+
+### Evidence Security
+
+```python
+evidence_security = {
+    "chain_of_custody": True,
+    "hash_verification": True,
+    "encrypted_storage": True,
+    "access_control": True,
+    "backup_enabled": True,
+}
+```
+
+### Legal Compliance
+
+```python
+legal_compliance = {
+    "foia_compliance": True,
+    "privacy_laws": True,
+    "copyright_respect": True,
+    "ethical_guidelines": True,
+}
+```
+
+## Troubleshooting Guide
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| PACER connection failed | Credentials expired | Update credentials |
+| Social media blocked | Rate limiting | Implement backoff |
+| Document OCR failed | Poor image quality | Improve image preprocessing |
+| Network graph too large | Too many entities | Filter and simplify |
+| Source verification failed | Incomplete data | Gather more evidence |
+
+### Debug Commands
+
+```bash
+# Test PACER connection
+investigate-cli test-pacer
+
+# Check OSINT sources
+investigate-cli sources --list
+
+# Verify document
+investigate-cli verify --document financial_report.pdf
+
+# Test network mapping
+investigate-cli network --test --entities entities.csv
+```
+
+## API Reference
+
+### PublicRecordsSearch
+
+```python
+class PublicRecordsSearch:
+    def __init__(self):
+        """Initialize public records search."""
+
+    def search(self, query: SearchQuery) -> SearchResults:
+        """Search public records."""
+
+    def get_record(self, record_id: str) -> Record:
+        """Get specific record."""
+```
+
+### OSINTCollector
+
+```python
+class OSINTCollector:
+    def __init__(self, platforms: List[str]):
+        """Initialize OSINT collector."""
+
+    def collect(self, target: str, sources: List[IntelSource]) -> IntelResults:
+        """Collect intelligence."""
+
+    def find_profiles(self, target: str) -> List[Profile]:
+        """Find social media profiles."""
+```
+
+### DocumentAnalyzer
+
+```python
+class DocumentAnalyzer:
+    def __init__(self, extraction_types: List[str], ocr_enabled: bool):
+        """Initialize document analyzer."""
+
+    def analyze(self, file_path: str) -> AnalyzedDocument:
+        """Analyze document."""
+
+    def extract_entities(self, text: str) -> List[Entity]:
+        """Extract entities from text."""
+```
+
+### NetworkMapper
+
+```python
+class NetworkMapper:
+    def __init__(self):
+        """Initialize network mapper."""
+
+    def add_entity(self, name: str, type: str) -> None:
+        """Add entity to network."""
+
+    def add_relationship(self, relationship: Relationship) -> None:
+        """Add relationship between entities."""
+
+    def generate_graph(self) -> NetworkGraph:
+        """Generate network graph."""
+```
+
+## Data Models
+
+### SearchQuery
+
+```python
+@dataclass
+class SearchQuery:
+    entity_name: str
+    record_types: List[str]
+    jurisdiction: str
+    date_range: Dict[str, str]
+```
+
+### SearchResults
+
+```python
+@dataclass
+class SearchResults:
+    total_count: int
+    corporate_filings: int
+    court_records: int
+    property_records: int
+    records: List[Record]
+```
+
+### IntelResults
+
+```python
+@dataclass
+class IntelResults:
+    social_profiles: List[Profile]
+    domains: List[Domain]
+    data_exposures: List[Exposure]
+```
+
+### AnalyzedDocument
+
+```python
+@dataclass
+class AnalyzedDocument:
+    file_path: str
+    entities: List[Entity]
+    key_dates: List[str]
+    financial_amounts: List[float]
+    sentiment: float
+    relationships: List[Relationship]
+```
+
+### NetworkGraph
+
+```python
+@dataclass
+class NetworkGraph:
+    entity_count: int
+    relationship_count: int
+    cluster_count: int
+    entities: List[Entity]
+    relationships: List[Relationship]
+```
+
+## Deployment Guide
+
+### Initial Setup
+
+```bash
+# Initialize investigative toolkit
+investigate-cli init
+
+# Configure sources
+investigate-cli configure --sources sources.yaml
+
+# Test connections
+investigate-cli test-connections
+```
+
+### Production Deployment
+
+```bash
+# Deploy to secure server
+investigate-cli deploy --config production.yaml
+
+# Verify security
+investigate-cli security-audit
+```
+
+## Monitoring & Observability
+
+### Investigation Metrics
+
+```python
+metrics_config = {
+    "records_searched": "counter",
+    "documents_analyzed": "counter",
+    "entities_mapped": "counter",
+    "sources_verified": "counter",
+    "processing_time": "histogram",
+}
+```
+
+### Dashboards
+
+```python
+dashboard_config = {
+    "title": "Investigative Tools Dashboard",
+    "panels": [
+        "research_activity",
+        "source_coverage",
+        "entity_network",
+        "document_analysis",
+    ],
+}
+```
+
+## Testing Strategy
+
+### Unit Tests
+
+```python
+def test_public_records_search():
+    searcher = PublicRecordsSearch()
+    results = searcher.search(mock_query)
+    assert results.total_count >= 0
+```
+
+### Integration Tests
+
+```python
+def test_osint_collection():
+    collector = OSINTCollector(platforms=["twitter"])
+    results = collector.collect("test_target", [mock_source])
+    assert results.social_profiles is not None
+```
+
+## Versioning & Migration
+
+### Data Versioning
+
+```python
+version_config = {
+    "investigation_versioning": True,
+    "evidence_versioning": True,
+    "source_tracking": True,
+    "backup_frequency": "daily",
+}
+```
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **OSINT** | Open Source Intelligence |
+| **PACER** | Public Access to Court Electronic Records |
+| **SEC EDGAR** | SEC's Electronic Data Gathering and Analysis |
+| **FOIA** | Freedom of Information Act |
+| **Network Mapping** | Visualizing entity relationships |
+| **OPSEC** | Operational Security |
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.0.0 | 2025-01-15 | Major rewrite with OSINT enhancements |
+| 1.5.0 | 2024-11-01 | Added network mapping |
+| 1.4.0 | 2024-09-15 | Enhanced document analysis |
+| 1.3.0 | 2024-07-20 | Public records integration |
+| 1.2.0 | 2024-05-10 | Secure communication |
+| 1.1.0 | 2024-03-01 | Source protection |
+| 1.0.0 | 2024-01-01 | Initial release |
+
+## Contributing Guidelines
+
+1. Follow journalism ethics
+2. Protect source information
+3. Maintain operational security
+4. Document research methods
+5. Verify information thoroughly
+
+## License
+
+MIT License. See LICENSE file for full terms.

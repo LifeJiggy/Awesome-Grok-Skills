@@ -238,3 +238,479 @@ print(f"By severity: {summary['by_severity']}")
 - [interaction-design](../interaction-design/GROK.md) — Accessible interaction patterns and keyboard navigation design
 - [information-architecture](../information-architecture/GROK.md) — Accessible navigation and heading structure
 - [user-research](../user-research/GROK.md) — Inclusive research recruitment and methodology
+
+---
+
+## Advanced Configuration
+
+### ARIA Pattern Registry
+
+```python
+from accessibility import ARIAPatternRegistry
+
+registry = ARIAPatternRegistry()
+registry.register_pattern("modal_dialog", {
+    "role": "dialog",
+    "aria_modal": "true",
+    "aria_labelledby": "dialog-title",
+    "focus_trap": True,
+    "escape_closes": True,
+    "return_focus_on_close": True,
+})
+```
+
+### Automated Scanning Configuration
+
+```python
+from accessibility import ScannerConfig
+
+config = ScannerConfig(
+    axe_version="4.8",
+    wcag_level="AA",
+    include_impact=["critical", "serious", "moderate"],
+    exclude_rules=["region"],
+    page_timeout_ms=30000,
+    max_pages=500,
+)
+scanner = AutomatedScanner(config=config)
+```
+
+## Architecture Patterns
+
+### Accessibility Testing Pyramid
+
+```
+Manual AT Testing (Screen Readers)
+        │
+        ▼
+    ┌──────────────┐
+    │ Automated    │── axe-core, Lighthouse, Pa11y
+    │ Scanning     │
+    └──────┬───────┘
+           │
+           ▼
+    ┌──────────────┐
+    │ CI/CD Gate   │── Build fails on violations
+    └──────┬───────┘
+           │
+           ▼
+    ┌──────────────┐
+    │ Semantic     │── HTML elements, ARIA landmarks
+    │ Foundation   │
+    └──────────────┘
+```
+
+### WCAG POUR Principles
+
+- **Perceivable**: Information must be presentable (alt text, contrast, captions)
+- **Operable**: Interface must be navigable (keyboard, timing, seizure-safe)
+- **Understandable**: Information must be clear (language, predictability, input assistance)
+- **Robust**: Content must work with assistive tech (valid HTML, ARIA, compatibility)
+
+## Integration Guide
+
+### CI/CD Integration
+
+```yaml
+# GitHub Actions accessibility check
+- name: Accessibility Scan
+  uses: deque-labs/axe-action@v1
+  with:
+    urls: http://localhost:3000
+    exit-code: true
+    axe-options: --tags wcag2a,wcag2aa
+```
+
+### Storybook Integration
+
+```python
+from accessibility import StorybookA11yAddon
+
+addon = StorybookA11yAddon()
+addon.check_component("Button", {
+    "html": "<button>Click me</button>",
+    "expected_role": "button",
+    "contrast_ratio": 4.5,
+})
+```
+
+## Performance Optimization
+
+| Optimization | Benefit |
+|-------------|---------|
+| Incremental scanning | Scan only changed pages |
+| Rule caching | Skip unchanged axe rules |
+| Parallel page scanning | 5x faster full-site scans |
+| Baseline comparison | Only report new violations |
+
+## Security Considerations
+
+- **Accessible authentication**: No cognitive function tests for login
+- **CAPTCHA alternatives**: Provide audio or logic-based alternatives
+- **Error identification**: Clear, accessible error messages
+- **Data entry assistance**: Autocomplete, input masking with accessibility
+
+## Troubleshooting Guide
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Screen reader skips content | Missing ARIA landmark | Add role or semantic HTML |
+| Focus trap not working | Missing tabindex | Set tabindex="-1" on trap boundary |
+| Contrast fails after theme change | CSS variable override | Update light theme CSS variables |
+| Live region not announced | Wrong aria-live value | Use "polite" for non-urgent |
+| Form errors inaccessible | No error association | Use aria-describedby on error messages |
+
+## API Reference
+
+### WCAGEvaluator
+
+```python
+class WCAGEvaluator:
+    def __init__(self, level: ConformanceLevel)
+    def evaluate_criterion(self, criterion_id: str, description: str, principle: Principle, status: CriterionStatus, **kwargs) -> None
+    def report(self) -> ConformanceReport
+    def failures_by_principle(self) -> dict
+```
+
+### ContrastAnalyzer
+
+```python
+class ContrastAnalyzer:
+    def check(self, foreground: str, background: str, text_size: TextSize) -> ContrastResult
+    def suggest_fixes(self, foreground: str, background: str, target_ratio: float, fix: str) -> list[ColorSuggestion]
+    def batch_check(self, pairs: list) -> list[ContrastResult]
+```
+
+## Data Models
+
+```python
+from dataclasses import dataclass
+from enum import Enum
+
+class ConformanceLevel(Enum):
+    A = "A"
+    AA = "AA"
+    AAA = "AAA"
+
+class Principle(Enum):
+    PERCEIVABLE = "perceivable"
+    OPERABLE = "operable"
+    UNDERSTANDABLE = "understandable"
+    ROBUST = "robust"
+
+@dataclass
+class CriterionResult:
+    criterion_id: str
+    description: str
+    principle: Principle
+    status: str
+    severity: str
+    affected_elements: int
+
+@dataclass
+class ContrastResult:
+    ratio: float
+    aa_normal: bool
+    aa_large: bool
+    aaa_normal: bool
+    aaa_large: bool
+```
+
+## Deployment Guide
+
+### Installation
+
+```bash
+pip install accessibility
+```
+
+### Accessibility Program Setup
+
+1. Establish baseline with automated scan
+2. Fix critical/serious violations
+3. Set up CI/CD gates
+4. Train team on WCAG basics
+5. Schedule quarterly manual AT testing
+6. Maintain accessibility statement
+
+## Monitoring & Observability
+
+```python
+from accessibility import MetricsCollector
+
+collector = MetricsCollector()
+collector.gauge("a11y.violations.total", count, tags={"severity": sev})
+collector.counter("a11y.violations.fixed", count)
+collector.gauge("a11y.conformance.score", score, tags={"level": level})
+collector.histogram("a11y.scan.duration_seconds", duration)
+```
+
+## Testing Strategy
+
+```python
+import pytest
+from accessibility import ContrastAnalyzer, TextSize
+
+def test_contrast_aa():
+    analyzer = ContrastAnalyzer()
+    result = analyzer.check("#000000", "#FFFFFF", TextSize.NORMAL)
+    assert result.aa_normal is True
+    assert result.ratio >= 4.5
+```
+
+## Versioning & Migration
+
+| Version | Changes | Migration |
+|---------|---------|-----------|
+| 1.0.0 | Initial release | N/A |
+| 1.1.0 | Added APCA contrast | Re-run contrast checks |
+| 2.0.0 | WCAG 2.2 support | Add new 2.2 criteria checks |
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **WCAG** | Web Content Accessibility Guidelines |
+| **ARIA** | Accessible Rich Internet Applications |
+| **Screen Reader** | Assistive technology that reads screen content aloud |
+| **Focus Indicator** | Visual outline showing current keyboard focus |
+| **Skip Link** | Hidden link to bypass repeated navigation |
+| **Live Region** | ARIA region that announces dynamic content changes |
+
+## Changelog
+
+### Version 1.0.0 (2024-01-15)
+- Initial release with WCAG 2.2 evaluation
+- Color contrast analysis (WCAG + APCA)
+- Screen reader test protocols
+- Automated scanning integration
+
+## Contributing Guidelines
+
+```bash
+git clone https://github.com/example/accessibility.git
+pip install -e ".[dev]"
+pytest tests/
+```
+
+## License
+
+MIT License
+
+Copyright (c) 2024 Awesome Grok Skills
+
+---
+
+## Extended Reference
+
+### WCAG 2.2 Success Criteria Quick Reference
+
+| Criterion | Level | Description | Automated? |
+|-----------|-------|-------------|------------|
+| 1.1.1 Non-text Content | A | Alt text for images | Yes |
+| 1.3.1 Info and Relationships | A | Semantic HTML | Partial |
+| 1.4.3 Contrast (Minimum) | AA | 4.5:1 ratio | Yes |
+| 1.4.11 Non-text Contrast | AA | 3:1 for UI components | Yes |
+| 2.1.1 Keyboard | A | All functionality via keyboard | Partial |
+| 2.4.1 Bypass Blocks | A | Skip navigation link | Yes |
+| 2.4.3 Focus Order | A | Logical tab order | Partial |
+| 2.4.7 Focus Visible | AA | Visible focus indicator | Yes |
+| 2.5.7 Dragging Movements | AA | Alternative to drag | Yes |
+| 2.5.8 Target Size | AA | 24x24px minimum | Yes |
+| 3.1.1 Language of Page | A | html lang attribute | Yes |
+| 3.3.1 Error Identification | A | Clear error messages | Partial |
+| 4.1.2 Name, Role, Value | A | ARIA for custom widgets | Partial |
+
+### Color Contrast Quick Reference
+
+| Text Size | AA Ratio | AAA Ratio | Example |
+|-----------|----------|-----------|---------|
+| Normal (< 18pt) | 4.5:1 | 7:1 | Body text |
+| Large (≥ 18pt or 14pt bold) | 3:1 | 4.5:1 | Headings |
+| UI Components | 3:1 | — | Buttons, icons |
+
+### Screen Reader Testing Matrix
+
+| Screen Reader | Browser | Platform | Priority |
+|--------------|---------|----------|----------|
+| NVDA | Firefox | Windows | High |
+| JAWS | Chrome | Windows | High |
+| VoiceOver | Safari | macOS | High |
+| VoiceOver | Safari | iOS | High |
+| TalkBack | Chrome | Android | Medium |
+| NVDA | Edge | Windows | Low |
+
+### ARIA Role Reference
+
+| Role | Usage | Example |
+|------|-------|---------|
+| button | Interactive button | `<button>` or `[role="button"]` |
+| link | Navigation link | `<a href>` or `[role="link"]` |
+| dialog | Modal dialog | Modal overlay |
+| alertdialog | Urgent modal | Error confirmation |
+| navigation | Nav landmark | `<nav>` or `[role="navigation"]` |
+| main | Main content | `<main>` or `[role="main"]` |
+| complementary | Sidebar | `<aside>` or `[role="complementary"]` |
+| contentinfo | Footer | `<footer>` or `[role="contentinfo"]` |
+| banner | Header | `<header>` or `[role="banner"]` |
+| search | Search form | `<form role="search">` |
+| tab | Tab element | Tab interface |
+| tabpanel | Tab content | Tab content area |
+| menu | Menu container | Dropdown menu |
+| menuitem | Menu item | Menu option |
+| listbox | Selection list | Custom select |
+| option | Listbox option | Select option |
+| combobox | Dropdown input | Autocomplete |
+
+### Cognitive Accessibility Guidelines
+
+| Guideline | Description | Implementation |
+|-----------|-------------|----------------|
+| Plain language | Use simple, clear language | Flesch-Kincaid grade 8 or below |
+| Consistent navigation | Same nav on every page | Shared navigation component |
+| Predictable behavior | No unexpected changes | No auto-focus shifts |
+| Error prevention | Confirm before submit | Review step in forms |
+| Error recovery | Clear error messages | Inline validation |
+| Time limits | Extend or remove timeouts | "Need more time?" option |
+| Multiple means | Text, visual, audio | Alt text, captions, transcripts |
+
+### Accessibility Testing Checklist
+
+```
+AUTOMATED TESTING
+    □ Run axe-core scan (0 violations)
+    □ Run Lighthouse accessibility audit (> 90)
+    □ Check color contrast ratios
+    □ Verify all images have alt text
+    □ Check heading hierarchy
+    □ Verify form labels
+    □ Check ARIA attributes
+
+MANUAL TESTING
+    □ Navigate entire page with keyboard only
+    □ Test with screen reader (NVDA + Firefox)
+    □ Test with screen reader (VoiceOver + Safari)
+    □ Check focus indicators
+    □ Test form error handling
+    □ Verify skip navigation works
+    □ Test modal focus trapping
+    □ Check responsive at 200% zoom
+    □ Test with reduced motion
+```
+
+### VPAT Template Structure
+
+```markdown
+# Voluntary Product Accessibility Template (VPAT)
+
+## Product Information
+- Product Name: [Name]
+- Version: [Version]
+- Date: [Date]
+- Contact: [Contact info]
+
+## WCAG 2.1 Conformance Results
+
+### Principle 1: Perceivable
+| Criterion | Level | Status | Notes |
+|-----------|-------|--------|-------|
+| 1.1.1 Non-text Content | A | Supports | All images have alt text |
+| 1.3.1 Info and Relationships | A | Supports | Semantic HTML used |
+
+### Principle 2: Operable
+| Criterion | Level | Status | Notes |
+|-----------|-------|--------|-------|
+| 2.1.1 Keyboard | A | Supports | Full keyboard navigation |
+
+### Principle 3: Understandable
+| Criterion | Level | Status | Notes |
+|-----------|-------|--------|-------|
+| 3.1.1 Language of Page | A | Supports | lang attribute set |
+
+### Principle 4: Robust
+| Criterion | Level | Status | Notes |
+|-----------|-------|--------|-------|
+| 4.1.2 Name, Role, Value | A | Partially Supports | Custom widgets need ARIA |
+
+## Legal Disclaimer
+[Standard VPAT disclaimer text]
+```
+
+### Complete Keyboard Navigation Reference
+
+| Key | Action | Context |
+|-----|--------|---------|
+| Tab | Move to next focusable element | Global |
+| Shift+Tab | Move to previous focusable element | Global |
+| Enter | Activate button/link | Button, Link |
+| Space | Activate button, toggle checkbox | Button, Checkbox |
+| Arrow keys | Navigate within component | Menu, Tabs, Listbox |
+| Escape | Close modal/menu, cancel | Modal, Menu |
+| Home | Move to first item | List, Grid |
+| End | Move to last item | List, Grid |
+| Page Up/Down | Scroll page | Global |
+
+### Complete Focus Management Reference
+
+| Component | Focus Behavior | Trap? | Return? |
+|-----------|---------------|-------|---------|
+| Modal dialog | Move to first element | Yes | Yes, to trigger |
+| Dropdown menu | Move to first item | Yes | Yes, to trigger |
+| Tab panel | Move to active tab | No | N/A |
+| Toast/notification | Move to dismiss button | No | N/A |
+| Tooltip | No focus change | No | N/A |
+
+### Complete ARIA State Reference
+
+| Component | State | Attribute | Values |
+|-----------|-------|-----------|--------|
+| Checkbox | Checked | aria-checked | true, false, mixed |
+| Expandable | Expanded | aria-expanded | true, false |
+| Selected | Selected | aria-selected | true, false |
+| Disabled | Disabled | aria-disabled | true, false |
+| Required | Required | aria-required | true, false |
+| Invalid | Invalid | aria-invalid | true, false |
+| Busy | Busy | aria-busy | true, false |
+| Live | Live | aria-live | off, polite, assertive |
+
+### Complete Color Contrast pairs
+
+| Pair | Ratio | AA | AAA | Use |
+|------|-------|-----|-----|-----|
+| Black on White | 21:1 | Pass | Pass | Maximum contrast |
+| Dark Gray on White | 12:1 | Pass | Pass | High contrast |
+| Medium Gray on White | 4.5:1 | Pass | Fail | Minimum AA |
+| Light Gray on White | 2:1 | Fail | Fail | Insufficient |
+| White on Black | 21:1 | Pass | Pass | Maximum contrast |
+| Yellow on Black | 15:1 | Pass | Pass | High contrast |
+| Blue on White | 8.6:1 | Pass | Pass | Good contrast |
+| Red on White | 4:1 | Fail | Fail | Borderline |
+
+### WCAG 2.2 New Success Criteria (Level AA)
+
+| Criterion | Description | Implementation |
+|-----------|-------------|----------------|
+| 2.4.11 Focus Not Obscured (Minimum) | Focused element not hidden by sticky content | Ensure sticky headers have sufficient padding |
+| 2.4.12 Focus Not Obscured (Enhanced) | Focused element fully visible | Avoid sticky overlays near focus targets |
+| 2.4.13 Focus Appearance | Focus indicator meets size/contrast requirements | Minimum 2px outline, 3:1 contrast |
+| 2.5.7 Dragging Movements | Drag actions have single-pointer alternative | Provide move button alongside drag |
+| 2.5.8 Target Size (Minimum) | Interactive targets at least 24x24 CSS px | Increase padding on small buttons |
+| 3.2.6 Consistent Help | Help mechanisms in consistent location | Footer help link on every page |
+| 3.3.7 Redundant Entry | Don't ask for information already provided | Pre-fill from prior form steps |
+| 3.3.8 Accessible Authentication (Minimum) | No cognitive function test for login | Support passkeys, password managers |
+| 3.3.9 Accessible Authentication (Enhanced) | No object/content recognition for login | Avoid image-based CAPTCHAs |
+
+### Assistive Technology Compatibility Matrix
+
+| Feature | NVDA | JAWS | VoiceOver | TalkBack |
+|---------|------|------|-----------|----------|
+| Landmark navigation | Full | Full | Full | Partial |
+| ARIA live regions | Full | Full | Full | Partial |
+| Table navigation | Full | Full | Full | Partial |
+| Form validation | Full | Full | Full | Full |
+| Modal focus trap | Full | Full | Full | Partial |
+| Custom widgets | Full | Full | Partial | Partial |
+| CSS content (pseudo) | Partial | Full | Partial | None |
+| CSS `content: ""` empty | Hidden | Hidden | Hidden | Hidden |
+| SVG accessible names | Full | Full | Partial | Partial |
+| Canvas fallback | Full | Full | Full | Partial |

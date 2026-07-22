@@ -198,3 +198,523 @@ The ground station toolkit integrates with satellite-systems for pass prediction
 - [satellite-systems](../satellite-systems/GROK.md) — ADCS, constellation design, link budgets
 - [mission-planning](../mission-planning/GROK.md) — Scheduling, launch windows, resource allocation
 - [space-data](../space-data/GROK.md) — Space weather, telemetry data analysis
+
+## Advanced Configuration
+
+### Antenna Pattern Configuration
+```python
+from ground_stations import AntennaPattern
+
+pattern = AntennaPattern(
+    model="parabolic",
+    diameter_m=7.0,
+    aperture_efficiency=0.65,
+    surface_rms_mm=0.5,
+    feed_illumination_edge_taper_db=12.0,
+    sidelobe_model="ITU-RS.1528",
+)
+```
+
+### Signal Processing Chain Advanced
+```python
+from ground_stations import AdvancedSignalChain
+
+chain = AdvancedSignalChain(
+    adc_bits=14,
+    adc_sample_rate_msps=100.0,
+    decimation_factor=10,
+    agc_range_db=60.0,
+    digital_filter_taps=64,
+    carrier_tracking_loop_bw_hz=10.0,
+    symbol_tracking_loop_bw_hz=1.0,
+)
+```
+
+### Rain Fade Model Configuration
+```python
+from ground_stations import RainFadeConfig
+
+rain_config = RainFadeConfig(
+    model="ITU-R_P618",
+    climate_zone="tropical",
+    site_coordinates=(28.5, -80.6),
+    rain_rate_exceedance_pct=0.01,
+    effective_path_length_method="ITU-R_P618-10",
+    site_diversity_enabled=True,
+    site_separation_km=5.0,
+)
+```
+
+## Architecture Patterns
+
+### Event-Driven Ground Station Control
+```python
+from ground_stations import GroundStationEventBus
+
+event_bus = GroundStationEventBus()
+event_bus.subscribe("pass_detected", handle_pass_detection)
+event_bus.subscribe("link_margin_low", handle_low_margin)
+event_bus.subscribe("rain_fade_detected", handle_rain_fade)
+```
+
+### Plugin Architecture for Modems
+```python
+from ground_stations import ModemPluginManager
+
+modem_mgr = ModemPluginManager()
+modem_mgr.register("ccd_modem", CCDModemPlugin())
+modem_mgr.register("agile_modem", AgileModemPlugin())
+modem_mgr.activate("agile_modem")
+```
+
+### State Machine for Station Operations
+```python
+from ground_stations import StationStateMachine
+
+sm = StationStateMachine(station_id="GS-001")
+sm.transition("idle", "tracking")
+sm.transition("tracking", "data_transfer")
+sm.transition("data_transfer", "idle")
+```
+
+## Integration Guide
+
+### DSN Integration
+```python
+from ground_stations import DSNInterface
+
+dsn = DSNInterface(
+    station_id="DSN-14",
+    protocol="DASH",
+    encryption="AES-256",
+)
+dsn.connect()
+dsn.schedule_contact(mission_id="MARS-2028", start_time=datetime.now())
+```
+
+### Network Operations Center
+```python
+from ground_stations import NOCInterface
+
+noc = NOCInterface(
+    noc_url="https://noc.space-agency.gov",
+    api_key="your-api-key",
+    polling_interval_s=30,
+)
+noc.start_monitoring()
+noc.get_station_status("GS-001")
+```
+
+### Cloud Storage Integration
+```python
+from ground_stations import CloudStorage
+
+storage = CloudStorage(
+    provider="aws_s3",
+    bucket="ground-station-data",
+    region="us-east-1",
+    encryption="AES-256",
+)
+storage.upload_telemetry(station_id="GS-001", data=telemetry_data)
+```
+
+## Performance Optimization
+
+### Real-Time Processing
+```python
+from ground_stations import RealTimeProcessor
+
+processor = RealTimeProcessor(
+    buffer_size_samples=10000,
+    processing_threads=4,
+    priority="realtime",
+    memory_lock=True,
+)
+```
+
+### Parallel Pass Processing
+```python
+from ground_stations import ParallelPassProcessor
+
+pass_processor = ParallelPassProcessor(
+    max_concurrent_passes=4,
+    thread_pool_size=16,
+    queue_size=100,
+)
+```
+
+### Data Compression
+```python
+from ground_stations import DataCompressor
+
+compressor = DataCompressor(
+    algorithm="lz4",
+    compression_level=6,
+    chunk_size_mb=1,
+)
+compressed_data = compressor.compress(telemetry_data)
+```
+
+## Security Considerations
+
+### Encryption Standards
+```python
+from ground_stations import EncryptionManager
+
+encryption = EncryptionManager(
+    at_rest_algorithm="AES-256-XTS",
+    in_transit_algorithm="TLS-1.3",
+    key_rotation_days=90,
+    hsm_enabled=True,
+)
+```
+
+### Access Control
+```python
+from ground_stations import GroundStationAccessControl
+
+acl = GroundStationAccessControl()
+acl.add_role("station_operator", permissions=["track", "command", "telemetry"])
+acl.add_role("analyst", permissions=["telemetry", "logs"])
+acl.add_role("viewer", permissions=["status"])
+```
+
+### Intrusion Detection
+```python
+from ground_stations import IntrusionDetector
+
+ids = IntrusionDetector(
+    rules_file="ids_rules.yaml",
+    alert_threshold="medium",
+    log_analysis_enabled=True,
+)
+ids.start_monitoring()
+```
+
+## Troubleshooting Guide
+
+### Common Issues
+
+1. **Antenna Tracking Errors**: Check pointing model calibration and atmospheric refraction corrections
+2. **Signal Lock Loss**: Verify carrier-to-noise ratio and tracking loop bandwidth settings
+3. **Data Loss During Passes**: Check handover timing and buffer sizes
+4. **Rain Fade Disconnections**: Enable adaptive coding and modulation (ACM)
+
+### Diagnostic Tools
+```python
+from ground_stations import DiagnosticTools
+
+diag = DiagnosticTools(station_id="GS-001")
+diag.run_antenna_test()
+diag.check_signal_chain()
+diag.generate_diagnostic_report()
+```
+
+### Performance Analysis
+```python
+from ground_stations import PerformanceAnalyzer
+
+analyzer = PerformanceAnalyzer(station_id="GS-001")
+analyzer.analyze_pass_performance(contact_id="CONTACT-123")
+analyzer.identify_bottlenecks()
+analyzer.generate_optimization_report()
+```
+
+## API Reference
+
+### Core Classes
+- `AntennaTracker` - Antenna tracking geometry computation
+- `SignalChain` - Signal processing chain modeling
+- `DopplerCompensator` - Doppler compensation computation
+- `LinkMarginAnalyzer` - Link margin analysis
+- `GroundStationNetwork` - Multi-station coordination
+
+### Core Functions
+- `compute_pointing()` - Compute antenna pointing angles
+- `compute_link_budget()` - Compute end-to-end link budget
+- `generate_compensation_table()` - Generate Doppler compensation table
+- `schedule_passes()` - Schedule ground station passes
+- `analyze_coverage_gaps()` - Analyze coverage gaps
+
+## Data Models
+
+### Station Configuration
+```python
+class StationConfig:
+    station_id: str
+    name: str
+    latitude_deg: float
+    longitude_deg: float
+    altitude_m: float
+    antenna_diameter_m: float
+    frequency_range_ghz: Tuple[float, float]
+    max_data_rate_mbps: float
+```
+
+### Pass Contact
+```python
+class PassContact:
+    contact_id: str
+    station_id: str
+    satellite_id: str
+    start_time: datetime
+    end_time: datetime
+    max_elevation_deg: float
+    data_volume_gb: float
+    link_margin_db: float
+    status: str
+```
+
+### Signal Quality
+```python
+class SignalQuality:
+    timestamp: float
+    carrier_to_noise_db_hz: float
+    bit_error_rate: float
+    signal_to_noise_db: float
+    lock_status: bool
+    polarization_purity_db: float
+```
+
+## Deployment Guide
+
+### Container Deployment
+```dockerfile
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 8080
+CMD ["python", "-m", "ground_stations.server"]
+```
+
+### Kubernetes Configuration
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ground-stations
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ground-stations
+```
+
+### Docker Compose
+```yaml
+version: '3.8'
+services:
+  ground-stations:
+    image: ground-stations:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+```
+
+## Monitoring & Observability
+
+### Real-Time Metrics
+```python
+from ground_stations import MetricsCollector
+
+collector = MetricsCollector(
+    backend="prometheus",
+    endpoint="/metrics",
+    labels={"station_id": "GS-001"},
+)
+collector.gauge("antenna_elevation_deg", value=45.0)
+collector.counter("bytes_received", value=1024)
+collector.histogram("signal_to_noise_db", value=15.0)
+```
+
+### Alerting System
+```python
+from ground_stations import AlertSystem
+
+alerts = AlertSystem()
+alerts.add_rule(
+    name="low_link_margin",
+    condition="link_margin_db < 3.0",
+    severity="critical",
+    notification="pagerduty",
+)
+```
+
+### Dashboard Integration
+```python
+from ground_stations import Dashboard
+
+dashboard = Dashboard(
+    title="Ground Station Operations",
+    refresh_interval=10,
+    panels=["antenna_status", "signal_quality", "data_throughput"],
+)
+dashboard.deploy()
+```
+
+## Testing Strategy
+
+### Unit Tests
+```python
+import unittest
+from ground_stations import AntennaTracker
+
+class TestAntennaTracker(unittest.TestCase):
+    def test_pointing_computation(self):
+        tracker = AntennaTracker(lat=40.0, lon=-75.0, alt=100.0)
+        # Test pointing computation
+        pass
+```
+
+### Integration Tests
+```python
+def test_signal_chain_workflow():
+    chain = SignalChain(frequency_ghz=8.15, bandwidth_mhz=50.0)
+    # Add components
+    result = chain.compute()
+    assert result.system_noise_temp_k > 0
+```
+
+### Performance Tests
+```python
+import time
+
+def test_tracking_performance():
+    start = time.time()
+    for _ in range(1000):
+        compute_tracking_angles()
+    elapsed = time.time() - start
+    assert elapsed < 5.0
+```
+
+## Versioning & Migration
+
+### Semantic Versioning
+- Major: Breaking changes to API or configuration
+- Minor: New features with backward compatibility
+- Patch: Bug fixes and performance improvements
+
+### Migration Guide
+```python
+from ground_stations import migrate_v1_to_v2
+
+migrate_v1_to_v2(
+    config_path="config.yaml",
+    station_data_path="/data/stations",
+    backup=True,
+)
+```
+
+## Glossary
+
+- **EIRP**: Effective Isotropic Radiated Power (dBW)
+- **G/T**: Receive system figure of merit (dB/K)
+- **Eb/N0**: Energy per bit to noise density ratio (dB)
+- **Doppler Shift**: Frequency shift due to relative motion (Hz)
+- **Pointing Loss**: Gain reduction due to antenna mis-pointing (dB)
+- **Rain Fade**: Signal attenuation due to precipitation (dB)
+- **ACM**: Adaptive Coding and Modulation
+- **DSN**: Deep Space Network
+- **TLE**: Two-Line Element set for satellite tracking
+
+## Changelog
+
+### v1.2.0 (2028-09-01)
+- Added real-time signal quality monitoring
+- Improved rain fade mitigation algorithms
+- New DSN integration
+
+### v1.1.0 (2028-06-15)
+- Enhanced Doppler compensation
+- Added site diversity gain computation
+- New NOC integration
+
+### v1.0.0 (2028-03-01)
+- Initial release with core ground station functionality
+
+## Contributing Guidelines
+
+### Development Setup
+```bash
+git clone https://github.com/ground-stations/ground-stations.git
+cd ground-stations
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Code Standards
+- Follow PEP 8 for Python code
+- Use type hints for all functions
+- Write docstrings for public APIs
+- Maintain >90% test coverage
+
+### Pull Request Process
+1. Fork the repository
+2. Create feature branch
+3. Write tests
+4. Update documentation
+5. Submit pull request
+
+## License
+
+MIT License
+
+Copyright (c) 2028 Ground Stations Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## Additional Reference Data
+
+### Ground Station Frequency Band Reference
+
+| Band | Frequency (GHz) | Typical Use | Antenna Size | G/T (typical) |
+|------|-----------------|-------------|--------------|----------------|
+| S-band | 2.0-4.0 | TT&C, low-rate data | 3-5 m | 15-22 dB/K |
+| X-band | 8.0-12.0 | High-rate downlink | 5-7 m | 28-35 dB/K |
+| Ka-band | 26.5-40.0 | Very high-rate data | 7-12 m | 38-48 dB/K |
+| L-band | 1.0-2.0 | GNSS, mobile sat | 1-3 m | 8-15 dB/K |
+
+### Link Budget Quick Reference
+
+```python
+# Typical link budgets for common mission types
+LINK_BUDGETS = {
+    "ISS_downlink_Sband": {
+        "frequency_ghz": 2.2,
+        "data_rate_kbps": 32,
+        "satellite_eirp_dbw": 10.0,
+        "range_km": 2500,
+        "required_margin_db": 3.0,
+        "availability_target_pct": 99.5,
+    },
+    "EO_satellite_downlink_Xband": {
+        "frequency_ghz": 8.1,
+        "data_rate_mbps": 800,
+        "satellite_eirp_dbw": 35.0,
+        "range_km": 1000,
+        "required_margin_db": 5.0,
+        "availability_target_pct": 99.9,
+    },
+}
+```

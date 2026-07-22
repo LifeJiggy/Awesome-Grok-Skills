@@ -259,3 +259,641 @@ print(f"Sharpe ratio: {result.sharpe_ratio:.4f}")
 - arXiv:2005.02554 - Quantum approximate optimization algorithm: Performance, implementation, and limitations.
 - arXiv:2106.04974 - Quantum advantage with noisy intermediate-scale quantum processors.
 - arXiv:2205.06965 - Quantum optimization algorithms: A comprehensive survey.
+
+---
+
+## Advanced QAOA Techniques
+
+### Multi-Angle QAOA
+
+```python
+from quantum_optimization import MultiAngleQAOA, MaxCutProblem
+
+# Multi-angle QAOA allows different angles per layer
+edges = [(0, 1, 1.0), (1, 2, 1.5), (2, 3, 1.0), (0, 3, 2.0)]
+problem = MaxCutProblem(num_nodes=4, edges=edges)
+
+ma_qaoa = MultiAngleQAOA(
+    p_layers=4,
+    separate_mixer_angles=True,
+    optimizer="COBYLA",
+    maxiter=500,
+    initialization="random"
+)
+
+result = ma_qaoa.solve(problem)
+print(f"Best value: {result.best_value}")
+print(f"Gamma angles: {result.gamma_angles}")
+print(f"Beta angles: {result.beta_angles}")
+print(f"Approximation ratio: {result.approximation_ratio:.4f}")
+```
+
+### Recursive QAOA
+
+```python
+from quantum_optimization import RecursiveQAOA, GraphProblem
+
+# Recursive QAOA reduces problem size iteratively
+graph = GraphProblem(
+    num_nodes=8,
+    edges=[(0,1), (1,2), (2,3), (3,4), (4,5), (5,6), (6,7), (0,7), (0,4)],
+    edge_weights=[1.0, 1.5, 1.0, 2.0, 0.5, 1.0, 1.5, 2.0, 1.0]
+)
+
+rqaoa = RecursiveQAOA(
+    p_layers=2,
+    recursion_strategy="contraction",
+    base_solver="qaoa",
+    classical_threshold=4
+)
+
+result = rqaoa.solve(graph)
+print(f"Best partition: {result.best_solution}")
+print(f"Best cut value: {result.best_value}")
+print(f"Recursion depth: {result.recursion_depth}")
+print(f"Sub-problems solved: {result.num_subproblems}")
+```
+
+### QAOA with Problem-Specific Mixers
+
+```python
+from quantum_optimization import QAOASolver, MaxCutProblem
+
+problem = MaxCutProblem(
+    num_nodes=6,
+    edges=[(0,1,1.0), (1,2,1.5), (2,3,1.0), (3,4,2.0), (4,5,1.0), (0,5,0.5)]
+)
+
+# Use XY mixer for constrained optimization
+solver = QAOASolver(
+    p_layers=3,
+    mixer_hamiltonian="xy_mixer",
+    constraint_type="hamiltonian_penalty",
+    penalty_strength=2.0,
+    optimizer="SPSA",
+    maxiter=300,
+    shots=2048
+)
+
+result = solver.solve(problem)
+print(f"Best cut: {result.best_value}")
+print(f"Constraint satisfied: {result.constraint_satisfied}")
+print(f"Penalty cost: {result.penalty_cost:.4f}")
+```
+
+## Advanced VQE Techniques
+
+### Adaptive VQE with Operator Pool
+
+```python
+from quantum_optimization import AdaptiveVQE, OperatorPool
+
+# Adaptive VQE grows the ansatz iteratively
+pool = OperatorPool(
+    operators=["single_excitations", "double_excitations", "ph_paulis"],
+    symmetry_conserving=True
+)
+
+adaptive_vqe = AdaptiveVQE(
+    num_qubits=4,
+    num_electrons=2,
+    operator_pool=pool,
+    max_operators=20,
+    convergence_threshold=1e-6,
+    optimizer="L-BFGS-B",
+    gradient_method="parameter_shift"
+)
+
+result = adaptive_vqe.solve(hamiltonian)
+print(f"Ground state energy: {result.energy:.6f}")
+print(f"Operators selected: {result.selected_operators}")
+print(f"Ansatz depth: {result.ansatz_depth}")
+print(f"Converged iterations: {result.iterations}")
+```
+
+### VQE with Error Mitigation
+
+```python
+from quantum_optimization import VQESolver, MolecularHamiltonian
+
+hamiltonian = MolecularHamiltonian(
+    num_qubits=4,
+    one_electron_integral=[[-1.25, 0.0, 0.0, 0.0],
+                           [0.0, -1.25, 0.0, 0.0],
+                           [0.0, 0.0, -1.25, 0.0],
+                           [0.0, 0.0, 0.0, -1.25]],
+    two_electron_integral=[[[[0.5, 0.0], [0.0, 0.0]],
+                             [[0.0, 0.0], [0.0, 0.5]]]],
+    nuclear_repulsion=0.7
+)
+
+solver = VQESolver(
+    ansatz="uccsd",
+    num_qubits=4,
+    num_electrons=2,
+    optimizer="L-BFGS-B",
+    maxiter=500,
+    gradient_method="parameter_shift",
+    error_mitigation="zero_noise_extrapolation",
+    noise_levels=[0.001, 0.002, 0.004],
+    measurement_optimization="grouping"
+)
+
+result = solver.solve(hamiltonian)
+print(f"Energy: {result.energy:.6f}")
+print(f"Chemical accuracy: {result.within_chemical_accuracy}")
+print(f"Error mitigation improvement: {result.mitigation_improvement:.6f}")
+print(f"Measurement groups: {result.measurement_groups}")
+```
+
+### Subspace-Expanded VQE
+
+```python
+from quantum_optimization import SubspaceExpandedVQE
+
+# Subspace expansion extends VQE to excited states
+se_vqe = SubspaceExpandedVQE(
+    num_qubits=4,
+    ground_state_solver="vqe",
+    expansion_operators=["x", "y", "z"],
+    num_states=3,
+    overlap_threshold=0.1
+)
+
+result = se_vqe.solve(hamiltonian)
+for i, state in enumerate(result.states):
+    print(f"State {i}: energy = {state.energy:.6f}, "
+          f"gap = {state.energy_gap:.6f}")
+```
+
+## Quantum Annealing Advanced Techniques
+
+### Quantum Monte Carlo Annealing
+
+```python
+from quantum_optimization import QuantumMonteCarloAnnealer, IsingModel
+
+# Quantum Monte Carlo for large-scale optimization
+ising = IsingModel(
+    num_qubits=100,
+    couplings={(i, (i+1) % 100): -1.0 for i in range(100)},
+    fields={i: 0.5 * ((-1) ** i) for i in range(100)}
+)
+
+qmca = QuantumMonteCarloAnnealer(
+    num_trajectories=1000,
+    max_sweeps=10000,
+    temperature_schedule="geometric",
+    initial_temperature=10.0,
+    final_temperature=0.01,
+    tunneling_strength=5.0
+)
+
+result = qmca.anneal(ising)
+print(f"Best energy: {result.best_energy:.4f}")
+print(f"Time-to-solution: {result.time_to_solution:.2f} seconds")
+print(f"Success probability: {result.success_probability:.4f}")
+print(f"Monte Carlo error: {result.mc_error:.6f}")
+```
+
+### Parallel Tempering with Quantum Tunneling
+
+```python
+from quantum_optimization import ParallelTempering, IsingModel
+
+ising = IsingModel(
+    num_qubits=50,
+    couplings={(i, (i+1) % 50): -1.0 for i in range(50)},
+    fields={i: 0.3 * ((-1) ** i) for i in range(50)}
+)
+
+pt = ParallelTempering(
+    num_replicas=16,
+    temperature_range=[0.1, 10.0],
+    swap_interval=100,
+    num_sweeps=50000,
+    quantum_tunneling=True,
+    tunneling_strength=2.0
+)
+
+result = pt.run(ising)
+print(f"Best energy: {result.best_energy:.4f}")
+print(f"Replica exchange acceptance: {result.swap_acceptance:.4f}")
+print(f"Autocorrelation time: {result.autocorrelation_time:.1f}")
+print(f"Thermalization sweeps: {result.thermalization_sweeps}")
+```
+
+## Hybrid Classical-Quantum Solvers
+
+### Crossover Algorithm
+
+```python
+from quantum_optimization import CrossoverSolver, MaxCutProblem
+
+# Crossover uses quantum sampling to escape classical local minima
+problem = MaxCutProblem(
+    num_nodes=10,
+    edges=[(i, (i+1) % 10, 1.0) for i in range(10)]
+)
+
+crossover = CrossoverSolver(
+    classical_solver="simulated_annealing",
+    quantum_solver="qaoa",
+    crossover_rate=0.1,
+    quantum_budget=100,
+    classical_budget=1000,
+    improvement_threshold=0.01
+)
+
+result = crossover.solve(problem)
+print(f"Best value: {result.best_value}")
+print(f"Classical iterations: {result.classical_iterations}")
+print(f"Quantum iterations: {result.quantum_iterations}")
+print(f"Improvements from quantum: {result.quantum_improvements}")
+```
+
+### Quantum-Enhanced Local Search
+
+```python
+from quantum_optimization import QuantumLocalSearch, TSPProblem
+
+# Quantum-enhanced local search for TSP
+tsp = TSPProblem(
+    num_cities=10,
+    distances=[[abs(i-j) for j in range(10)] for i in range(10)]
+)
+
+qls = QuantumLocalSearch(
+    neighborhood_size=20,
+    quantum_perturbation_strength=0.5,
+    num_quantum_steps=50,
+    max_iterations=1000,
+    convergence_threshold=1e-6
+)
+
+result = qls.solve(tsp)
+print(f"Best tour length: {result.best_value:.2f}")
+print(f"Quantum perturbation acceptance: {result.perturbation_acceptance:.4f}")
+print(f"Iterations: {result.iterations}")
+```
+
+## Problem Encoding Strategies
+
+### Higher-Order QUBO Formulation
+
+```python
+from quantum_optimization import HigherOrderQUBO, QuadraticProgram
+
+# Formulate higher-order optimization as QUBO
+qp = QuadraticProgram()
+qp.add_binary_variables(["x0", "x1", "x2", "x3"])
+
+# Cubic objective: x0*x1*x2 + x2*x3*x0
+qp.objective.cubic = {
+    ("x0", "x1", "x2"): 1.0,
+    ("x2", "x3", "x0"): 1.0
+}
+
+# Reduce to quadratic using auxiliary variables
+reduced = qp.reduce_to_quadratic(method="degree_reduction")
+print(f"Original variables: 4")
+print(f"Reduced variables: {reduced.num_variables}")
+print(f"Auxiliary variables: {reduced.num_auxiliary}")
+print(f"QUBO terms: {reduced.num_terms}")
+```
+
+### Graph-Based Problem Encoding
+
+```python
+from quantum_optimization import GraphEncoder, CombinatorialProblem
+
+# Encode graph problems efficiently
+encoder = GraphEncoder(
+    encoding_type="one_hot",
+    num_nodes=6,
+    edge_list=[(0,1), (1,2), (2,3), (3,4), (4,5), (0,5)],
+    constraint_type="partition"
+)
+
+hamiltonian = encoder.to_hamiltonian()
+print(f"Qubits needed: {hamiltonian.num_qubits}")
+print(f"Pauli terms: {hamiltonian.num_terms}")
+print(f"Max Pauli weight: {hamiltonian.max_weight}")
+
+# Alternative: domain wall encoding
+dw_encoder = GraphEncoder(
+    encoding_type="domain_wall",
+    num_nodes=6,
+    edge_list=[(0,1), (1,2), (2,3), (3,4), (4,5), (0,5)]
+)
+
+dw_hamiltonian = dw_encoder.to_hamiltonian()
+print(f"Domain wall qubits: {dw_hamiltonian.num_qubits}")
+print(f"Domain wall terms: {dw_hamiltonian.num_terms}")
+```
+
+## Classical Optimization Strategies
+
+### Gradient-Based Optimization for VQE
+
+```python
+from quantum_optimization import GradientOptimizer, VQEGradient
+
+# Parameter-shift rule for gradient estimation
+optimizer = GradientOptimizer(
+    method="adam",
+    learning_rate=0.01,
+    beta1=0.9,
+    beta2=0.999,
+    epsilon=1e-8,
+    gradient_method="parameter_shift",
+    shot_budget=1024
+)
+
+# Compute gradient
+gradient = optimizer.compute_gradient(
+    circuit_fn=vqe_circuit,
+    parameters=current_params,
+    hamiltonian=hamiltonian,
+    backend="density_matrix"
+)
+
+print(f"Gradient norm: {gradient.norm:.6f}")
+print(f"Max gradient component: {gradient.max_component:.6f}")
+print(f"Gradient variance: {gradient.variance:.6f}")
+
+# Update parameters
+new_params = optimizer.step(current_params, gradient)
+print(f"Parameter update norm: {(new_params - current_params).norm:.6f}")
+```
+
+### SPSA for Noisy Optimization
+
+```python
+from quantum_optimization import SPSAOptimizer
+
+# Simultaneous Perturbation Stochastic Approximation
+spsa = SPSAOptimizer(
+    maxiter=500,
+    blocking=True,
+    allowed_increase=0.05,
+    trust_region=True,
+    initial_point=[0.1, 0.2, 0.3, 0.4],
+    perturbation_factor=0.1,
+    learning_rate=0.1,
+    perturbation_decay=0.6
+)
+
+result = spsa.minimize(
+    objective_fn=lambda x: vqe_energy(x, hamiltonian),
+    initial_parameters=[0.1, 0.2, 0.3, 0.4]
+)
+
+print(f"Optimal parameters: {result.x}")
+print(f"Optimal value: {result.fun:.6f}")
+print(f"Function evaluations: {result.nfev}")
+print(f"Converged: {result.success}")
+```
+
+## Benchmarking and Analysis
+
+### Quantum Advantage Analysis
+
+```python
+from quantum_optimization import AdvantageAnalyzer, BenchmarkSuite
+
+# Analyze potential quantum advantage
+analyzer = AdvantageAnalyzer()
+
+# Generate benchmark problems
+suite = BenchmarkSuite(
+    problem_classes=["maxcut", "tsp", "portfolio", "graph_coloring"],
+    sizes=[4, 8, 12, 16, 20],
+    instances_per_size=10
+)
+
+results = analyzer.analyze(
+    quantum_solver="qaoa_p3",
+    classical_solvers=["greedy", "simulated_annealing", "gurobi"],
+    benchmark_suite=suite,
+    time_budget=100.0,
+    significance_level=0.05
+)
+
+for problem_class, class_results in results.items():
+    print(f"\n{problem_class}:")
+    print(f"  Quantum avg: {class_results.quantum_avg:.4f}")
+    print(f"  Classical best: {class_results.classical_best:.4f}")
+    print(f"  Advantage ratio: {class_results.advantage_ratio:.4f}")
+    print(f"  Statistical significance: {class_results.significant}")
+    print(f"  Problem sizes with advantage: {class_results.advantage_sizes}")
+```
+
+### Solution Quality Distribution Analysis
+
+```python
+from quantum_optimization import SolutionDistribution, QualityAnalyzer
+
+# Analyze distribution of quantum solutions
+analyzer = QualityAnalyzer()
+
+distribution = analyzer.analyze_distribution(
+    solver="qaoa",
+    problem=problem,
+    num_runs=100,
+    shots_per_run=1024
+)
+
+print(f"Mean solution quality: {distribution.mean:.4f}")
+print(f"Std deviation: {distribution.std:.4f}")
+print(f"Best quality: {distribution.best:.4f}")
+print(f"Worst quality: {distribution.worst:.4f}")
+print(f"Skewness: {distribution.skewness:.4f}")
+print(f"Kurtosis: {distribution.kurtosis:.4f}")
+print(f"Quality histogram: {distribution.histogram}")
+```
+
+## Constraint Handling Techniques
+
+### Penalty-Based Constraints
+
+```python
+from quantum_optimization import PenaltyMethod, QuadraticProgram
+
+qp = QuadraticProgram()
+qp.add_binary_variables(["x0", "x1", "x2", "x3"])
+
+# Objective: minimize x0 + x1 + x2 + x3
+qp.objective.linear = {"x0": 1, "x1": 1, "x2": 1, "x3": 1}
+
+# Constraint: x0 + x1 + x2 + x3 == 2
+qp.add_constraint("x0 + x1 + x2 + x3 == 2", name="cardinality")
+
+penalty = PenaltyMethod(
+    constraint_type="equality",
+    penalty_strength=5.0,
+    adaptive_penalty=True,
+    penalty_update_factor=1.5,
+    max_penalty=100.0
+)
+
+penalized_qubo = penalty.apply(qp)
+print(f"Penalty terms added: {penalized_qubo.num_penalty_terms}")
+print(f"Total QUBO terms: {penalized_qubo.num_terms}")
+print(f"Optimal penalty strength: {penalty.optimal_strength:.4f}")
+```
+
+### Constrained QAOA (CQAOA)
+
+```python
+from quantum_optimization import CQAOA, MaxCutProblem
+
+# CQAOA with constraint-preserving mixer
+problem = MaxCutProblem(
+    num_nodes=6,
+    edges=[(0,1,1.0), (1,2,1.5), (2,3,1.0), (3,4,2.0), (4,5,1.0), (0,5,0.5)],
+    constraint="equal_partition"
+)
+
+cqaoa = CQAOA(
+    p_layers=3,
+    mixer_type="xy_mixer",
+    constraint_enforcement="hard",
+    optimizer="COBYLA",
+    maxiter=200
+)
+
+result = cqaoa.solve(problem)
+print(f"Best cut: {result.best_value}")
+print(f"Constraint satisfied: {result.constraint_satisfied}")
+print(f"Penalty cost: {result.penalty_cost:.6f}")
+```
+
+## Quantum Machine Learning Applications
+
+### Quantum Neural Network Training
+
+```python
+from quantum_optimization import QuantumNeuralNetwork, ClassificationProblem
+
+# Train a quantum neural network
+qnn = QuantumNeuralNetwork(
+    num_qubits=4,
+    num_layers=3,
+    encoding="angle",
+    ansatz="hardware_efficient",
+    classifier=True,
+    output_qubit=0
+)
+
+# Generate classification dataset
+dataset = ClassificationProblem(
+    num_features=4,
+    num_samples=200,
+    num_classes=2,
+    separation=0.5
+)
+
+result = qnn.train(
+    dataset=dataset,
+    optimizer="adam",
+    learning_rate=0.01,
+    batch_size=32,
+    epochs=100,
+    shots=1024
+)
+
+print(f"Training accuracy: {result.train_accuracy:.4f}")
+print(f"Test accuracy: {result.test_accuracy:.4f}")
+print(f"Loss curve: {result.loss_history[:5]}")
+print(f"Parameters: {result.num_parameters}")
+```
+
+### Quantum Kernel Methods
+
+```python
+from quantum_optimization import QuantumKernelSVM, FeatureMap
+
+# Quantum kernel for classification
+feature_map = FeatureMap(
+    type="zz_feature_map",
+    num_qubits=4,
+    reps=2,
+    entanglement="full"
+)
+
+kernel_svm = QuantumKernelSVM(
+    feature_map=feature_map,
+    C=1.0,
+    kernel="quantum",
+    shots=1024,
+    optimization_level=2
+)
+
+result = kernel_svm.fit(X_train, y_train)
+print(f"Training accuracy: {result.train_accuracy:.4f}")
+print(f"Support vectors: {result.num_support_vectors}")
+print(f"Kernel matrix condition: {result.kernel_condition:.4f}")
+print(f"Quantum advantage estimated: {result.quantum_advantage:.4f}")
+```
+
+## Problem Decomposition Strategies
+
+### Divide-and-Conquer for Large Problems
+
+```python
+from quantum_optimization import DivideConquerSolver, MaxCutProblem
+
+# Solve large problems by decomposition
+problem = MaxCutProblem(
+    num_nodes=20,
+    edges=[(i, (i+1) % 20, 1.0) for i in range(20)]
+)
+
+solver = DivideConquerSolver(
+    max_subproblem_size=6,
+    decomposition_method="spectral_bisection",
+    overlap_size=2,
+    merge_method="dp_combination",
+    quantum_subproblem_solver="qaoa_p2",
+    classical_fallback="gurobi"
+)
+
+result = solver.solve(problem)
+print(f"Best value: {result.best_value}")
+print(f"Subproblems solved: {result.num_subproblems}")
+print(f"Total quantum circuits: {result.total_quantum_circuits}")
+print(f"Merge overhead: {result.merge_time:.2f} s")
+```
+
+### Cut-Based Decomposition
+
+```python
+from quantum_optimization import CutBasedDecomposition, GraphProblem
+
+graph = GraphProblem(
+    num_nodes=16,
+    edges=[(i, (i+1) % 16, 1.0) for i in range(16)]
+)
+
+decomposer = CutBasedDecomposition(
+    max_qubits_per_fragment=6,
+    num_cuts=4,
+    cut_strategy="greedy",
+    overlap_fraction=0.2
+)
+
+fragments = decomposer.decompose(graph)
+print(f"Number of fragments: {len(fragments)}")
+for i, frag in enumerate(fragments):
+    print(f"  Fragment {i}: {frag.num_qubits} qubits, "
+          f"{frag.num_edges} edges")
+
+# Execute fragments and combine
+combined_result = decomposer.execute_and_combine(
+    fragments,
+    quantum_solver="qaoa_p2",
+    shots=1024
+)
+print(f"Combined result: {combined_result.best_value:.4f}")
+```

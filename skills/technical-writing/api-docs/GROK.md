@@ -221,3 +221,695 @@ The interactive explorer generates a self-contained HTML file with no external d
 - [tutorials](../tutorials/GROK.md) — Progressive tutorial authoring and learning path design
 - [architecture-docs](../architecture-docs/GROK.md) — Architecture Decision Records and system design documentation
 - [release-notes](../release-notes/GROK.md) — Automated release note generation and changelog management
+
+## Advanced Configuration
+
+### OpenAPI Validator Configuration
+
+Customize validation rules through a configuration file:
+
+```yaml
+# api-docs-config.yml
+validation:
+  naming:
+    param_case: camelCase
+    path_case: kebab-case
+    header_case: Pascal-Case
+    enum_case: UPPER_SNAKE_CASE
+  required_fields:
+    - description
+    - summary
+    - operationId
+    - responses
+  response_schemas:
+    require_examples: true
+    max_depth: 4
+    require_error_schemas: true
+  security:
+    require_security_definitions: true
+    validate_scopes: true
+```
+
+### Code Sample Templates
+
+Customize generated code samples with Jinja2 templates:
+
+```python
+from api_docs import CodeSampleGenerator, TemplateConfig
+
+generator = CodeSampleGenerator(
+    spec_path="openapi.yaml",
+    template_config=TemplateConfig(
+        python={
+            "imports": "import requests\nimport os",
+            "auth_header": "Authorization: Bearer {token}",
+            "base_url_var": "API_BASE_URL",
+            "error_handling": "raise_for_status",
+        },
+        javascript={
+            "imports": "const fetch = require('node-fetch');",
+            "auth_header": "Authorization: Bearer {token}",
+            "base_url_var": "API_BASE_URL",
+        }
+    )
+)
+```
+
+### Breaking Change Detection Rules
+
+Configure which changes are considered breaking:
+
+```yaml
+breaking_changes:
+  always_breaking:
+    - removed_endpoint
+    - removed_required_parameter
+    - changed_parameter_type
+    - narrowed_enum_values
+  never_breaking:
+    - added_optional_parameter
+    - added_response_field
+    - added_endpoint
+  context_dependent:
+    - changed_response_schema
+    - renamed_parameter
+    - changed_default_value
+```
+
+## Architecture Patterns
+
+### Specification Pipeline
+
+The API documentation system uses a pipeline architecture with distinct stages:
+
+```
+Source Code -> Extraction -> Normalization -> Validation -> Enrichment -> Output
+                |              |              |              |            |
+           Decorators     Schema         Rules         Samples      Renderers
+           Annotations    Conversion     Checking      Generation   (HTML/PDF)
+```
+
+### Code Sample Generation Architecture
+
+Code samples are generated from templates that receive endpoint metadata:
+
+```python
+from api_docs import CodeSampleGenerator, TemplateRegistry
+
+# Register custom language template
+registry = TemplateRegistry()
+registry.register("rust", "templates/code-samples/rust.j2")
+
+generator = CodeSampleGenerator(
+    spec_path="openapi.yaml",
+    template_registry=registry
+)
+
+samples = generator.generate_all(languages=["python", "rust"])
+```
+
+Template example (`templates/code-samples/rust.j2`):
+
+```rust
+use reqwest::Client;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+struct {{ operation_id }}Request {
+    {% for param in parameters %}
+    pub {{ param.name }}: {{ param.type }},
+    {% endfor %}
+}
+
+pub async fn {{ operation_id }}(client: &Client, base_url: &str) -> Result<{{ response_type }}, reqwest::Error> {
+    let response = client
+        .{{ method }}(format!("{}{{ path }}", base_url))
+        .{% if has_body %}.json(&request){% endif %}
+        .send()
+        .await?;
+
+    response.json().await
+}
+```
+
+### SDK Documentation Extraction Pipeline
+
+```
+Source Files -> Parsing -> Interface Extraction -> Documentation Generation -> Output
+                  |              |                        |                      |
+            AST Analysis    Public API Filter       Docstring Parse        Markdown/PDF
+            Type Resolution  Signature Build        Example Extraction     Site Builder
+```
+
+## Integration Guide
+
+### CI/CD Pipeline Integration
+
+```yaml
+# .github/workflows/api-docs.yml
+name: API Documentation
+on:
+  push:
+    paths: ['openapi.yaml', 'src/**']
+jobs:
+  validate-spec:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate OpenAPI Spec
+        run: python -m api_docs.validate --spec openapi.yaml --fail-on error
+      - name: Check Breaking Changes
+        run: python -m api_docs.breaking --old openapi-v1.yaml --new openapi.yaml
+      - name: Generate Samples
+        run: python -m api_docs.samples --spec openapi.yaml --langs python,javascript,curl
+      - name: Build Explorer
+        run: python -m api_docs.explorer --spec openapi.yaml --output _build/explorer.html
+```
+
+### IDE Integration
+
+Real-time API documentation validation through Language Server Protocol:
+
+```python
+from api_docs import APIDocsLSPServer
+
+server = APIDocsLSPServer(
+    spec_path="openapi.yaml",
+    watch_patterns=["openapi*.yaml", "src/**/*.py"],
+    live_validation=True
+)
+server.start()
+```
+
+### Webhook-triggered Spec Updates
+
+```python
+from api_docs import OpenAPIValidator, CodeSampleGenerator
+
+def on_spec_change(spec_path: str) -> None:
+    """Called by file watcher when openapi.yaml changes."""
+    validator = OpenAPIValidator(spec_path=spec_path)
+    report = validator.validate()
+    if not report.passed:
+        notify_team(f"Spec validation failed: {report.error_count} errors")
+        return
+
+    generator = CodeSampleGenerator(spec_path=spec_path)
+    samples = generator.generate_all()
+    publish_samples_to_docs_site(samples)
+```
+
+## Performance Optimization
+
+### Caching Generated Samples
+
+Cache code samples to avoid regeneration on unchanged endpoints:
+
+```python
+from api_docs import CodeSampleGenerator, CacheConfig
+
+generator = CodeSampleGenerator(
+    spec_path="openapi.yaml",
+    cache_config=CacheConfig(
+        enabled=True,
+        cache_dir=".api-docs-cache/",
+        ttl_seconds=3600
+    )
+)
+
+# Only regenerates samples for changed endpoints
+samples = generator.generate_all(languages=["python", "javascript"])
+```
+
+### Parallel Validation
+
+Validate large specifications in parallel:
+
+```python
+from api_docs import OpenAPIValidator, ParallelConfig
+
+validator = OpenAPIValidator(
+    spec_path="openapi.yaml",
+    parallel_config=ParallelConfig(
+        enabled=True,
+        workers=4,
+        chunk_size=20
+    )
+)
+
+report = validator.validate()
+```
+
+### Incremental Breaking Change Detection
+
+Only compare changed endpoints between specification versions:
+
+```python
+from api_docs import BreakingChangeDetector, DiffMode
+
+detector = BreakingChangeDetector(
+    old_spec="openapi-v1.yaml",
+    new_spec="openapi-v2.yaml",
+    diff_mode=DiffMode.INCREMENTAL  # Only compare changed paths
+)
+
+changes = detector.detect()
+```
+
+## Security Considerations
+
+### Authentication Configuration
+
+Configure authentication for the interactive explorer:
+
+```python
+from api_docs import ExplorerGenerator, AuthConfig
+
+explorer = ExplorerGenerator(
+    spec_path="openapi.yaml",
+    auth_config=AuthConfig(
+        type="oauth2",
+        flows={
+            "authorizationCode": {
+                "authorizationUrl": "https://auth.example.com/authorize",
+                "tokenUrl": "https://auth.example.com/token",
+                "scopes": ["read", "write", "admin"]
+            }
+        }
+    )
+)
+```
+
+### Input Validation
+
+Validate all inputs to the documentation pipeline:
+
+```python
+from api_docs import InputValidator
+
+validator = InputValidator(
+    rules={
+        "spec_path": {"required": True, "extension": [".yaml", ".json"]},
+        "output_dir": {"required": True, "writable": True},
+        "languages": {"allowed": ["python", "javascript", "typescript", "go", "ruby", "curl"]},
+    }
+)
+
+validator.validate({"spec_path": "openapi.yaml", "output_dir": "_build/"})
+```
+
+### Rate Limiting
+
+Protect the interactive explorer from abuse:
+
+```python
+from api_docs import ExplorerGenerator, RateLimitConfig
+
+explorer = ExplorerGenerator(
+    spec_path="openapi.yaml",
+    rate_limit_config=RateLimitConfig(
+        enabled=True,
+        requests_per_minute=60,
+        burst_size=10
+    )
+)
+```
+
+### Secure Credential Handling
+
+Never embed credentials in generated documentation:
+
+```python
+from api_docs import SecurityFilter
+
+filter = SecurityFilter(
+    patterns=[
+        r"password\s*[:=]\s*\S+",
+        r"api[_-]?key\s*[:=]\s*\S+",
+        r"secret\s*[:=]\s*\S+",
+        r"AKIA[0-9A-Z]{16}",
+    ],
+    replacement="[REDACTED]"
+)
+
+filter.scan_directory("docs/")
+```
+
+## Troubleshooting Guide
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Spec validation fails | Missing required fields | Add description, summary, operationId to endpoints |
+| Breaking changes false positive | Normalization issue | Update breaking_changes config to mark as non-breaking |
+| Code samples missing | Template not found | Check template registry for language support |
+| Explorer won't load | CORS or CSP issues | Configure server headers to allow explorer origin |
+| SDK extraction misses methods | Access control too strict | Update exclude_patterns in SDKDocExtractor |
+
+### Debug Commands
+
+```bash
+# Validate spec with verbose output
+python -m api_docs.validate --spec openapi.yaml --verbose
+
+# Debug breaking change detection
+python -m api_docs.breaking --old v1.yaml --new v2.yaml --debug
+
+# Inspect extracted SDK interfaces
+python -m api_docs.sdk --source src/ --language python --inspect
+```
+
+### Log Output
+
+```
+[DEBUG] api_docs.validator: Checking 47 endpoints against rules
+[DEBUG] api_docs.breaking: Normalizing paths for comparison
+[WARNING] api_docs.breaking: Parameter rename detected: user_id -> userId (POST /users)
+[ERROR] api_docs.validator: Missing description on GET /admin/stats
+[INFO] api_docs.samples: Generated 141 code samples (47 endpoints x 3 languages)
+```
+
+## API Reference
+
+### OpenAPIValidator
+
+```python
+class OpenAPIValidator:
+    def __init__(self, spec_path: str, rules: dict = None,
+                 parallel_config: ParallelConfig = None):
+        """Initialize the OpenAPI validator."""
+
+    def validate(self) -> ValidationReport:
+        """Run full validation and return report."""
+
+    def validate_endpoint(self, path: str, method: str) -> List[ValidationIssue]:
+        """Validate a single endpoint."""
+```
+
+### BreakingChangeDetector
+
+```python
+class BreakingChangeDetector:
+    def __init__(self, old_spec: str, new_spec: str,
+                 diff_mode: DiffMode = DiffMode.FULL):
+        """Initialize the breaking change detector."""
+
+    def detect(self) -> List[BreakingChange]:
+        """Detect breaking changes between specifications."""
+
+    def generate_migration_guide(self, changes: List[BreakingChange],
+                                 output: str) -> MigrationGuide:
+        """Generate a consumer-facing migration guide."""
+```
+
+### CodeSampleGenerator
+
+```python
+class CodeSampleGenerator:
+    def __init__(self, spec_path: str,
+                 template_config: TemplateConfig = None,
+                 template_registry: TemplateRegistry = None,
+                 cache_config: CacheConfig = None):
+        """Initialize the code sample generator."""
+
+    def generate_all(self, languages: List[str]) -> Dict[str, Dict[str, str]]:
+        """Generate samples for all endpoints in all languages."""
+
+    def generate_endpoint(self, path: str, method: str,
+                          languages: List[str]) -> Dict[str, str]:
+        """Generate samples for a single endpoint."""
+```
+
+## Data Models
+
+### OpenAPISpec
+
+```python
+@dataclass
+class OpenAPISpec:
+    id: str
+    version: str
+    title: str
+    description: str
+    paths: Dict[str, PathItem]
+    components: Components
+    security: List[SecurityRequirement]
+    metadata: Dict[str, Any]
+```
+
+### ValidationReport
+
+```python
+@dataclass
+class ValidationReport:
+    passed: bool
+    error_count: int
+    warning_count: int
+    info_count: int
+    issues: List[ValidationIssue]
+    spec_version: str
+    validated_at: datetime
+```
+
+### BreakingChange
+
+```python
+@dataclass
+class BreakingChange:
+    severity: str  # critical, major, minor
+    category: str  # endpoint_removed, parameter_changed, type_changed
+    path: str
+    description: str
+    migration_path: Optional[str]
+    affected_consumers: List[str]
+```
+
+### CodeSample
+
+```python
+@dataclass
+class CodeSample:
+    endpoint: str
+    language: str
+    code: str
+    imports: List[str]
+    auth_required: bool
+    dependencies: List[str]
+```
+
+## Deployment Guide
+
+### Docker Deployment
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 8080
+CMD ["python", "-m", "api_docs.server", "--host", "0.0.0.0", "--port", "8080"]
+```
+
+### Kubernetes Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-docs-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-docs
+  template:
+    spec:
+      containers:
+        - name: api-docs
+          image: api-docs:latest
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+```
+
+## Monitoring & Observability
+
+### Metrics Collection
+
+```python
+from api_docs import MetricsCollector
+
+metrics = MetricsCollector(prefix="api_docs")
+
+# Record validation metrics
+metrics.histogram("spec_validation_duration_seconds", duration)
+metrics.counter("spec_validations_total", count, labels={"result": "passed"})
+
+# Record breaking change metrics
+metrics.counter("breaking_changes_total", count, labels={"severity": "critical"})
+```
+
+### Alerting Rules
+
+```yaml
+groups:
+  - name: api-docs
+    rules:
+      - alert: SpecValidationFailing
+        expr: api_docs_spec_validation_errors > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API spec validation is failing"
+
+      - alert: HighBreakingChangeRate
+        expr: rate(api_docs_breaking_changes_total[1h]) > 5
+        labels:
+          severity: warning
+        annotations:
+          summary: "High rate of breaking changes detected"
+```
+
+## Testing Strategy
+
+### Unit Tests
+
+```python
+def test_spec_validation_catches_missing_description():
+    validator = OpenAPIValidator(spec_path="test/fixtures/bad-spec.yaml")
+    report = validator.validate()
+    assert not report.passed
+    assert any("description" in i.message for i in report.issues)
+
+def test_breaking_change_detection():
+    detector = BreakingChangeDetector(
+        old_spec="test/fixtures/v1.yaml",
+        new_spec="test/fixtures/v2.yaml"
+    )
+    changes = detector.detect()
+    assert len(changes) >= 1
+    assert any(c.category == "endpoint_removed" for c in changes)
+```
+
+### Integration Tests
+
+```python
+def test_full_pipeline():
+    validator = OpenAPIValidator(spec_path="openapi.yaml")
+    report = validator.validate()
+    assert report.passed
+
+    generator = CodeSampleGenerator(spec_path="openapi.yaml")
+    samples = generator.generate_all(languages=["python", "curl"])
+    assert len(samples) > 0
+```
+
+## Versioning & Migration
+
+### Semantic Versioning
+
+The API docs module follows semantic versioning:
+- **Major**: Breaking changes to public API or configuration format
+- **Minor**: New features, new language support, new validators
+- **Patch**: Bug fixes, improved error messages
+
+### Deprecation Policy
+
+Deprecated features are marked with warnings for one minor version before removal. Migration guides are provided for all breaking changes.
+
+## Glossary
+
+| Term | Definition |
+|------|-----------|
+| **OpenAPI Specification** | A standard format for describing RESTful APIs |
+| **Breaking Change** | A modification that is not backward-compatible with existing consumers |
+| **Code Sample** | Auto-generated client code demonstrating API endpoint usage |
+| **Interactive Explorer** | A self-contained HTML page for testing API endpoints |
+| **SDK Documentation** | Reference documentation extracted from source code |
+| **Semantic Versioning** | Version numbering scheme (MAJOR.MINOR.PATCH) that communicates change scope |
+
+## Changelog
+
+### v1.4.0 (Latest)
+- Added interactive API explorer generation
+- Added SDK documentation extraction for Python, TypeScript, Go
+- Improved breaking change detection accuracy
+
+### v1.3.0
+- Added code sample generation for Rust and Ruby
+- Improved spec validation with custom rules
+- Added incremental breaking change detection
+
+### v1.2.0
+- Added migration guide generation for breaking changes
+- Improved code sample templates
+- Added caching for generated samples
+
+### v1.1.0
+- Added multi-language code sample generation
+- Improved breaking change detection
+- Added spec validation with custom rules
+
+### v1.0.0
+- Initial release with OpenAPI validation
+- Breaking change detection
+- Code sample generation
+- Changelog generation
+
+## Contributing Guidelines
+
+### How to Contribute
+
+1. Fork the repository and create a feature branch
+2. Follow existing code style and patterns
+3. Write tests for new features
+4. Update documentation as needed
+5. Ensure all CI checks pass
+6. Submit a pull request with a clear description
+
+### Adding New Language Support
+
+1. Create a new template file in `templates/code-samples/`
+2. Register the template in `TemplateRegistry`
+3. Add language to the `Language` enum
+4. Write tests for the new language
+5. Update documentation
+
+## License
+
+MIT License
+
+Copyright (c) 2025 Example Organization
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+### Dependencies
+
+- `pyyaml` >= 6.0 — YAML parsing for OpenAPI specifications
+- `requests` >= 2.31 — HTTP client for API testing
+- `jinja2` >= 3.1 — Template rendering for code samples
+- `pygments` >= 2.15 — Syntax highlighting in code samples
+- `jsonschema` >= 4.17 — OpenAPI schema validation

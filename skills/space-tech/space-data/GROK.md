@@ -292,3 +292,603 @@ for size in data_sizes:
 - [satellite-systems](../satellite-systems/GROK.md) — ADCS, constellation design, link budgets
 - [mission-planning](../mission-planning/GROK.md) — Scheduling, launch windows, resource allocation
 - [ground-stations](../ground-stations/GROK.md) — Antenna tracking, signal processing, telemetry
+
+## Advanced Configuration
+
+### Space Weather Processor Configuration
+```python
+from space_data import SpaceWeatherConfig
+
+sw_config = SpaceWeatherConfig(
+    data_source="NOAA_SWPC",
+    refresh_interval_minutes=5,
+    geomagnetic_model="IGRF-13",
+    radiation_model="AP-8",
+    storm_detection_threshold_kp=5.0,
+    radiation_dose_shielding_mm_al=3.0,
+)
+```
+
+### Earth Observation Pipeline Configuration
+```python
+from space_data import EOPipelineConfig
+
+eo_config = EOPipelineConfig(
+    atmospheric_correction_model="6S_V2",
+    orthorectification_dem="SRTM_30m",
+    radiometric_calibration="absolute",
+    output_crs="EPSG:4326",
+    cloud_detection_algorithm="Fmask",
+    tile_size_pixels=1024,
+    processing_threads=8,
+)
+```
+
+### Debris Catalog Propagation Settings
+```python
+from space_data import DebrisPropagatorConfig
+
+debris_config = DebrisPropagatorConfig(
+    propagator="SGP4",
+    drag_coefficient=2.2,
+    solar_radiation_pressure=True,
+    j2_perturbation=True,
+    atmospheric_density_model="NRLMSISE-00",
+    propagation_step_seconds=60,
+    prediction_horizon_days=7,
+)
+```
+
+### Telemetry Analyzer Configuration
+```python
+from space_data import TelemetryAnalyzerConfig
+
+tm_config = TelemetryAnalyzerConfig(
+    anomaly_detection_method="CUSUM",
+    rolling_window_size=100,
+    threshold_sigma=3.0,
+    ewma_smoothing_alpha=0.2,
+    trend_window_days=90,
+    limit_check_enabled=True,
+    telemetry_rate_hz=1.0,
+)
+```
+
+## Architecture Patterns
+
+### Event-Driven Data Processing
+```python
+from space_data import DataEventBus
+
+event_bus = DataEventBus()
+event_bus.subscribe("space_weather_alert", handle_weather_alert)
+event_bus.subscribe("conjunction_detected", handle_conjunction)
+event_bus.subscribe("telemetry_anomaly", handle_tm_anomaly)
+event_bus.publish("data_received", source="SWPC", data_type="Kp")
+```
+
+### Pipeline Orchestration Pattern
+```python
+from space_data import DataPipeline
+
+pipeline = DataPipeline()
+pipeline.add_stage("ingest", DataIngestionStage())
+pipeline.add_stage("validate", DataValidationStage())
+pipeline.add_stage("process", ProcessingStage())
+pipeline.add_stage("archive", ArchiveStage())
+pipeline.execute(input_path="/data/raw/")
+```
+
+### Observer Pattern for Real-Time Monitoring
+```python
+from space_data import RealTimeObserver
+
+class SpaceWeatherMonitor(RealTimeObserver):
+    def on_data_update(self, metric_name, value, timestamp):
+        if metric_name == "Kp" and value >= 6.0:
+            self.trigger_alert("Geomagnetic storm detected", severity="high")
+
+monitor = SpaceWeatherMonitor()
+monitor.register("Kp_index")
+monitor.register("solar_wind_speed")
+```
+
+### Cache Strategy for Ephemeris Data
+```python
+from space_data import EphemerisCache
+
+cache = EphemerisCache(
+    strategy="time_based",
+    max_entries=10000,
+    ttl_seconds=3600,
+    eviction_policy="lru",
+)
+```
+
+## Integration Guide
+
+### SPICE Kernel Integration
+```python
+from space_data import SPICEInterface
+
+spice = SPICEInterface()
+spice.load_kernels([
+    "naif0012.tls",
+    "pck00010.tpc",
+    "de430.bsp",
+    "spk_predict.bsp",
+])
+state = spice.get_state("MARS", "EARTH", "2028-09-01T12:00:00", "J2000")
+```
+
+### NOAA SWPC Real-Time Feed
+```python
+from space_data import NOAAFeed
+
+feed = NOAAFeed(api_key="your-api-key")
+feed.connect()
+latest_kp = feed.get_latest_kp()
+solar_wind = feed.get_solar_wind()
+```
+
+### CCSDS Telemetry Decoder Integration
+```python
+from space_data import CCSDSDecoder
+
+decoder = CCSDSDecoder(
+    apid_list=[0x100, 0x101, 0x102],
+    sync_word=0x1ACFFC1D,
+    packet_buffer_size=8192,
+)
+packets = decoder.decode(raw_tm_stream)
+```
+
+### GDAL/Rasterio Integration for EO Data
+```python
+from space_data import GDALInterface
+
+gdal = GDALInterface()
+ds = gdal.open_raster("/data/scene_001.tif")
+band_data = ds.read_band(1)
+geotransform = ds.get_geotransform()
+```
+
+## Performance Optimization
+
+### Batch Processing for Large Datasets
+```python
+from space_data import BatchProcessor
+
+processor = BatchProcessor(
+    batch_size=1000,
+    parallel_workers=8,
+    memory_limit_mb=4096,
+    disk_cache_path="/tmp/space_data_cache",
+)
+results = processor.process_batch(input_files, operation="atmospheric_correction")
+```
+
+### Streaming Telemetry Processing
+```python
+from space_data import StreamingProcessor
+
+stream = StreamingProcessor(
+    buffer_size=16384,
+    processing_rate_hz=10.0,
+    thread_count=4,
+    overflow_policy="drop_oldest",
+)
+stream.start()
+```
+
+### GPU-Accelerated Image Processing
+```python
+from space_data import GPUProcessor
+
+gpu = GPUProcessor(
+    device_id=0,
+    memory_pool_size_mb=2048,
+    use_fp16=True,
+    batch_size=32,
+)
+corrected = gpu.batch_atmospheric_correction(image_array)
+```
+
+## Security Considerations
+
+### Data Classification
+```python
+from space_data import DataClassifier
+
+classifier = DataClassifier(
+    classification_levels=["UNCLASSIFIED", "CUI", "SECRET", "TOP_SECRET"],
+    default_level="CUI",
+    export_controlled=True,
+    retention_policy="ITAR_REGULATED",
+)
+```
+
+### Encryption at Rest
+```python
+from space_data import EncryptionManager
+
+encryption = EncryptionManager(
+    algorithm="AES-256-XTS",
+    key_source="aws_kms",
+    key_rotation_days=90,
+    hsm_enabled=True,
+)
+```
+
+### Access Control for Sensitive Data
+```python
+from space_data import DataAccessControl
+
+acl = DataAccessControl()
+acl.add_role("analyst", permissions=["read", "export"])
+acl.add_role("operator", permissions=["read", "write", "process"])
+acl.add_role("admin", permissions=["read", "write", "delete", "admin"])
+```
+
+## Troubleshooting Guide
+
+### Common Issues
+
+1. **SGP4 Propagation Errors**: Verify TLE epoch is within 30 days of propagation time; older elements produce increasingly inaccurate results
+2. **Telemetry Anomaly False Positives**: Adjust rolling window size and threshold sigma to match the specific spacecraft parameter dynamics
+3. **Earth Observation Radiometric Errors**: Verify calibration coefficients match the sensor revision; coefficients change with sensor degradation
+4. **Space Weather Data Gaps**: Use interpolation for short gaps (< 1 hour) and statistical fill for longer gaps; flag interpolated data
+5. **Conjunction False Positives**: Validate orbit covariance quality before running conjunction screening; poor covariances produce unreliable probability estimates
+
+### Diagnostic Tools
+```python
+from space_data import DiagnosticTools
+
+diag = DiagnosticTools()
+diag.validate_tle("1 25544U 98067A   24100.50000000  .00016717  00000-0  10270-3 0  9994")
+diag.check_data_quality("/data/scene_001.raw")
+diag.analyze_processing_log("/var/log/space_data/")
+```
+
+### Performance Profiler
+```python
+from space_data import PerformanceProfiler
+
+profiler = PerformanceProfiler()
+profiler.start()
+# Run processing pipeline
+profiler.stop()
+report = profiler.get_report()
+print(f"Peak memory: {report.peak_memory_mb:.1f} MB")
+print(f"CPU time: {report.cpu_time_s:.2f} s")
+print(f"I/O time: {report.io_time_s:.2f} s")
+```
+
+## API Reference
+
+### Core Classes
+- `SpaceWeatherProcessor` - Space weather data processing and storm classification
+- `EOPipeline` - Earth observation data processing pipeline
+- `DebrisCatalog` - Space debris catalog management and conjunction screening
+- `TelemetryAnalyzer` - Satellite telemetry anomaly detection and trending
+- `EphemerisProcessor` - Ephemeris data processing and frame transformations
+- `SSADataFusion` - Multi-sensor SSA data fusion and track association
+- `CompressionModeler` - On-board data compression ratio estimation
+
+### Core Functions
+- `classify_storm()` - Classify geomagnetic storm severity
+- `estimate_radiation_dose()` - Estimate radiation dose for spacecraft components
+- `compute_ndvi()` - Compute Normalized Difference Vegetation Index
+- `screen_conjunctions()` - Screen for orbital conjunctions
+- `detect_anomalies()` - Detect telemetry anomalies using control charts
+- `propagate_keplerian()` - Propagate orbit using Keplerian mechanics
+- `associate_observation()` - Associate new observation with catalog object
+
+## Data Models
+
+### Space Weather State
+```python
+class SpaceWeatherState:
+    timestamp: datetime
+    kp_index: float
+    dst_nt: float
+    f107_flux: float
+    solar_wind_speed_kms: float
+    imf_bz_nt: float
+    proton_flux_pfu: float
+    storm_classification: str
+```
+
+### Earth Observation Scene
+```python
+class EOScene:
+    scene_id: str
+    acquisition_date: datetime
+    sensor: str
+    bands: int
+    resolution_m: float
+    cloud_cover_pct: float
+    processing_level: str
+    crs: str
+    bbox: Tuple[float, float, float, float]
+```
+
+### Debris Object
+```python
+class DebrisObject:
+    catalog_number: int
+    name: str
+    epoch: datetime
+    sma_km: float
+    eccentricity: float
+    inclination_deg: float
+    raan_deg: float
+    arg_perigee_deg: float
+    mean_anomaly_deg: float
+    cross_section_m2: float
+    mass_kg: float
+    ballistic_coefficient: float
+```
+
+### Telemetry Parameter
+```python
+class TelemetryParameter:
+    name: str
+    value: float
+    unit: str
+    timestamp: datetime
+    limits: Tuple[float, float]
+    quality_flag: int
+```
+
+## Deployment Guide
+
+### Container Deployment
+```dockerfile
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 8080
+CMD ["python", "-m", "space_data.server"]
+```
+
+### Kubernetes Configuration
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: space-data
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: space-data
+  template:
+    spec:
+      containers:
+      - name: space-data
+        image: space-data:latest
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+```
+
+### Helm Chart
+```yaml
+replicaCount: 3
+image:
+  repository: space-data
+  tag: latest
+resources:
+  limits:
+    cpu: 4
+    memory: 8Gi
+persistence:
+  enabled: true
+  size: 100Gi
+  storageClass: ssd
+```
+
+## Monitoring & Observability
+
+### Prometheus Metrics
+```python
+from space_data import MetricsCollector
+
+collector = MetricsCollector(
+    backend="prometheus",
+    endpoint="/metrics",
+    labels={"service": "space-data"},
+)
+collector.counter("data_processed_bytes", value=1048576)
+collector.histogram("processing_latency_seconds", value=12.5)
+collector.gauge("active_conjunctions", value=3)
+collector.gauge("catalog_size", value=30000)
+```
+
+### Alerting Rules
+```python
+from space_data import AlertManager
+
+alert_mgr = AlertManager()
+alert_mgr.add_rule(
+    name="geomagnetic_storm_detected",
+    condition="Kp >= 6",
+    severity="warning",
+    notification="email",
+)
+alert_mgr.add_rule(
+    name="high_conjunction_probability",
+    condition="PoC > 1e-4",
+    severity="critical",
+    notification="pagerduty",
+)
+```
+
+### Dashboard Integration
+```python
+from space_data import Dashboard
+
+dashboard = Dashboard(
+    title="Space Data Operations Dashboard",
+    refresh_interval=60,
+    panels=[
+        "space_weather_status",
+        "debris_catalog_stats",
+        "telemetry_health",
+        "processing_queue",
+    ],
+)
+dashboard.deploy()
+```
+
+## Testing Strategy
+
+### Unit Tests
+```python
+import unittest
+from space_data import SpaceWeatherProcessor, DebrisCatalog
+
+class TestSpaceWeather(unittest.TestCase):
+    def test_storm_classification(self):
+        swp = SpaceWeatherProcessor()
+        # Test storm classification
+        pass
+
+    def test_radiation_dose(self):
+        swp = SpaceWeatherProcessor()
+        dose = swp.estimate_radiation_dose(50.0, 3.0, 24.0)
+        self.assertGreater(dose, 0)
+```
+
+### Integration Tests
+```python
+def test_eo_pipeline_workflow():
+    sensor = SensorConfig(sensor_type="optical", bands=4, resolution_m=10.0)
+    pipeline = EOPipeline(sensor=sensor)
+    result = pipeline.process("/data/test.raw", output_format="GeoTIFF")
+    assert result.processing_time_s > 0
+```
+
+### Performance Tests
+```python
+import time
+
+def test_debris_catalog_performance():
+    start = time.time()
+    catalog = DebrisCatalog()
+    for i in range(10000):
+        catalog.add_object(DebrisObject(catalog_number=i))
+    elapsed = time.time() - start
+    assert elapsed < 30.0
+```
+
+## Versioning & Migration
+
+### Version History
+- v1.2.0 - Added SSA data fusion engine
+- v1.1.0 - Enhanced Earth observation pipeline
+- v1.0.0 - Initial release
+
+### Migration Guide
+```python
+from space_data import migrate_v1_to_v2
+
+migrate_v1_to_v2(
+    config_path="config.yaml",
+    data_path="/data/space_data",
+    backup=True,
+)
+```
+
+## Glossary
+
+- **Kp Index**: Planetary geomagnetic activity index (0-9 scale)
+- **Dst Index**: Disturbance storm time index measuring ring current intensity (nT)
+- **F10.7**: Solar radio flux at 10.7 cm wavelength, proxy for solar activity
+- **SGP4**: Simplified General Perturbations model 4, TLE propagation algorithm
+- **TLE**: Two-Line Element set, standard format for satellite orbital elements
+- **NDVI**: Normalized Difference Vegetation Index, measure of vegetation health
+- **SAR**: Synthetic Aperture Radar, radar imaging technique for Earth observation
+- **CDM**: Conjunction Data Message, standard format for conjunction assessment
+- **EIRP**: Effective Isotropic Radiated Power (dBW)
+- **G/T**: Receive system figure of merit (dB/K)
+- **SSA**: Space Situational Awareness, tracking and cataloguing of space objects
+- **ORDEM**: Orbital Debris Environment Model
+- **CUSUM**: Cumulative Sum control chart for anomaly detection
+- **EWMA**: Exponentially Weighted Moving Average control chart
+- **CCSDS**: Consultative Committee for Space Data Systems
+
+## Changelog
+
+### v1.2.0 (2028-09-01)
+- Added SSA data fusion engine with Bayesian orbit estimation
+- New multi-sensor track association algorithms
+- Enhanced conjunction screening with probability of collision computation
+- Added SPICE kernel integration for ephemeris processing
+
+### v1.1.0 (2028-06-15)
+- Enhanced Earth observation pipeline with 6S atmospheric correction
+- Added SAR data processing support
+- New telemetry anomaly detection with CUSUM and EWMA methods
+- Performance improvements for large debris catalog processing
+
+### v1.0.0 (2028-03-01)
+- Initial release with space weather processing
+- Earth observation optical data pipeline
+- Basic telemetry analysis
+- Ephemeris processing with frame transformations
+
+## Contributing Guidelines
+
+### Development Setup
+```bash
+git clone https://github.com/space-data/space-data.git
+cd space-data
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Code Standards
+- Follow PEP 8 for Python code
+- Use type hints for all functions
+- Write docstrings for public APIs
+- Maintain >90% test coverage
+
+### Pull Request Process
+1. Fork the repository
+2. Create feature branch
+3. Write tests
+4. Update documentation
+5. Submit pull request
+
+## License
+
+MIT License
+
+Copyright (c) 2028 Space Data Processing Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

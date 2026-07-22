@@ -275,6 +275,1019 @@ The module integrates with common compliance and governance tools:
 - **SIEM Integration** — Forward compliance alerts to SIEM platforms for correlation with security events.
 - **GRC Platforms** — Export compliance reports to governance, risk, and compliance platforms for enterprise visibility.
 
+## Detailed Workflow: End-to-End Compliance Audit
+
+### Phase 1: Scope Definition and Framework Selection
+
+```python
+from security_assessment.compliance_audit import AuditWorkflow
+
+workflow = AuditWorkflow(
+    organization="Acme Corp",
+    audit_type="annual",
+    frameworks=["ISO27001", "SOC2", "PCI_DSS"]
+)
+
+# Define organizational scope
+workflow.define_scope(
+    business_units=["Engineering", "Finance", "Operations"],
+    systems=["production-api", "customer-portal", "payment-gateway"],
+    data_classes=["PII", "PCI", "financial", "internal"],
+    locations=["us-east-1", "eu-west-1"],
+    third_party_services=["aws", "cloudflare", "stripe"]
+)
+
+# Identify applicable frameworks and map overlapping requirements
+applicable = workflow.identify_applicable_frameworks()
+for framework in applicable:
+    print(f"{framework.name} v{framework.version}: {framework.control_count} controls")
+    print(f"  Estimated overlap with other frameworks: {framework.overlap_percent:.0f}%")
+    print(f"  Estimated unique controls: {framework.unique_controls}")
+
+# Generate cross-framework mapping
+mapping = workflow.cross_framework_map()
+print(f"\nTotal unique controls across all frameworks: {mapping.unique_count}")
+print(f"Controls satisfying 2+ frameworks: {mapping.overlapping_count}")
+print(f"Estimated audit effort reduction: {mapping.efficiency_gain:.0f}%")
+```
+
+### Phase 2: Evidence Collection Pipeline
+
+```python
+from security_assessment.compliance_audit import EvidencePipeline
+
+pipeline = EvidencePipeline(
+    frameworks=["ISO27001", "SOC2", "PCI_DSS"],
+    evidence_store="./evidence-2025/"
+)
+
+# Configure evidence sources
+pipeline.add_source(
+    name="aws-config",
+    type="cloud_api",
+    provider="aws",
+    config={
+        "regions": ["us-east-1", "eu-west-1"],
+        "rules": ["encrypted-volumes", "public-snapshots", "root-account-mfa"]
+    }
+)
+
+pipeline.add_source(
+    name="github-security",
+    type="code_repository",
+    provider="github",
+    config={
+        "org": "acme-corp",
+        "repos": ["api-gateway", "customer-portal", "payment-service"],
+        "checks": ["dependabot", "code-scanning", "secret-scanning"]
+    }
+)
+
+pipeline.add_source(
+    name="jira-compliance",
+    type="ticketing",
+    provider="jira",
+    config={
+        "project": "SEC",
+        "issue_types": ["Security Finding", "Compliance Gap"],
+        "fields": ["status", "priority", "assignee", "resolution"]
+    }
+)
+
+pipeline.add_source(
+    name="siem-logs",
+    type="log_aggregation",
+    provider="splunk",
+    config={
+        "index": "security",
+        "queries": {
+            "access_reviews": "index=iam action=access_review",
+            "policy_violations": "index=security action=policy_violation",
+            "incident_closures": "index=incident status=closed"
+        }
+    }
+)
+
+# Execute collection
+collection_result = pipeline.collect(
+    control_ids=["A.8.1", "A.8.9", "A.8.24", "CC6.1", "CC6.3", "Req 1", "Req 6"],
+    date_range=("2025-01-01", "2025-12-31"),
+    parallel=True
+)
+
+print(f"Evidence collected: {collection_result.total_artifacts}")
+print(f"  Automated: {collection_result.automated_count}")
+print(f"  Manual required: {collection_result.manual_count}")
+print(f"  Missing evidence: {collection_result.missing_count}")
+
+for missing in collection_result.missing:
+    print(f"  MISSING: {missing.control_id} — {missing.evidence_type}")
+    print(f"    Suggested collection: {missing.collection_method}")
+```
+
+### Phase 3: Gap Analysis and Remediation Planning
+
+```python
+from security_assessment.compliance_audit import GapAnalyzer, RemediationPlanner
+
+# Run gap analysis
+analyzer = GapAnalyzer(framework="ISO27001:2022")
+gaps = analyzer.analyze(
+    controls=organization_controls,
+    evidence=collected_evidence,
+    scope=["A.5", "A.6", "A.7", "A.8"]
+)
+
+# Generate remediation plan
+planner = RemediationPlanner()
+plan = planner.create_plan(
+    gaps=gaps,
+    constraints={
+        "budget": 150000,
+        "timeline_months": 6,
+        "team_capacity": 3  # FTEs available
+    }
+)
+
+print("Remediation Plan:")
+for i, action in enumerate(plan.actions, 1):
+    print(f"  {i}. [{action.priority}] {action.control_id}: {action.description}")
+    print(f"     Effort: {action.estimated_hours}h | Cost: ${action.estimated_cost:,.0f}")
+    print(f"     Owner: {action.owner} | Due: {action.due_date}")
+    print(f"     Dependencies: {action.dependencies}")
+```
+
+### Phase 4: Continuous Compliance Monitoring
+
+```python
+from security_assessment.compliance_audit import ComplianceMonitor, AlertEngine
+
+# Configure continuous monitoring
+monitor = ComplianceMonitor(
+    frameworks=["ISO27001", "SOC2", "PCI_DSS"],
+    check_interval_minutes=15
+)
+
+# Define compliance drift rules
+monitor.add_rule(
+    name="encryption-at-rest-drift",
+    control="A.8.24",
+    description="Detect when encrypted volumes become unencrypted",
+    check=lambda asset: asset.encryption_enabled == True,
+    severity="critical",
+    auto_ticket=True
+)
+
+monitor.add_rule(
+    name="mfa-enforcement-drift",
+    control="CC6.1",
+    description="Detect when MFA is disabled for admin accounts",
+    check=lambda user: user.mfa_enabled == True if user.is_admin else True,
+    severity="high",
+    auto_ticket=True
+)
+
+monitor.add_rule(
+    name="access-review-overdue",
+    control="A.5.18",
+    description="Detect overdue access reviews (>90 days since last review)",
+    check=lambda review: review.last_review_date > (today - timedelta(days=90)),
+    severity="medium",
+    auto_ticket=False
+)
+
+# Configure alerting
+alert_engine = AlertEngine()
+alert_engine.add_channel(
+    type="slack",
+    webhook_url="https://hooks.slack.com/services/T.../B...",
+    severity_filter=["critical", "high"]
+)
+alert_engine.add_channel(
+    type="email",
+    recipients=["security@acme-corp.com", "compliance@acme-corp.com"],
+    severity_filter=["critical", "high", "medium"]
+)
+alert_engine.add_channel(
+    type="pagerduty",
+    service_key="...",
+    severity_filter=["critical"]
+)
+
+monitor.set_alert_engine(alert_engine)
+monitor.start()
+```
+
+### Phase 5: Audit Readiness Assessment
+
+```python
+from security_assessment.compliance_audit import AuditReadinessChecker
+
+checker = AuditReadinessChecker(framework="ISO27001:2022")
+readiness = checker.check(
+    controls=organization_controls,
+    evidence=collected_evidence,
+    policies=policy_documents,
+    previous_findings=previous_audit_findings
+)
+
+print("Audit Readiness Report:")
+print(f"  Overall score: {readiness.score:.0f}%")
+print(f"  Ready: {readiness.ready_count}/{readiness.total_controls}")
+print(f"  High-risk gaps: {readiness.high_risk_gaps}")
+print(f"  Estimated findings: {readiness.estimated_findings}")
+
+for category in readiness.categories:
+    print(f"\n  {category.name}: {category.score:.0f}%")
+    for gap in category.gaps:
+        print(f"    [{gap.severity}] {gap.control_id}: {gap.description}")
+        print(f"    Days to audit: {gap.days_until_audit}")
+        print(f"    Remediation feasible: {gap.remediation_feasible}")
+```
+
+## Advanced Evidence Collection Techniques
+
+### Automated Screenshot Evidence
+
+```python
+from security_assessment.compliance_audit.evidence import ScreenshotEvidence
+
+screenshot_evidence = ScreenshotEvidence(
+    browser="chromium",
+    viewport={"width": 1920, "height": 1080},
+    wait_for_selector=".dashboard-loaded"
+)
+
+# Capture configuration screens as evidence
+screenshots = screenshot_evidence.capture_batch(
+    urls=[
+        "https://console.aws.amazon.com/iam/home#/security_credentials",
+        "https://console.aws.amazon.com/config/home#/settings",
+        "https://console.cloud.google.com/security-center"
+    ],
+    annotations=[
+        {"url_pattern": "iam", "text": "Root account MFA enabled"},
+        {"url_pattern": "config", "text": "AWS Config rules active"},
+        {"url_pattern": "security-center", "text": "SCC findings reviewed"}
+    ],
+    output_dir="./evidence/screenshots/"
+)
+```
+
+### Log-Based Evidence Collection
+
+```python
+from security_assessment.compliance_audit.evidence import LogEvidence
+
+log_evidence = LogEvidence(source="splunk")
+
+# Collect access review evidence
+access_reviews = log_evidence.query(
+    search='index=iam action=access_review status=completed',
+    time_range="last_90_days",
+    fields=["reviewer", "review_date", "systems_reviewed", "findings_count"],
+    output_format="evidence_package"
+)
+
+# Collect incident response evidence
+incident_evidence = log_evidence.query(
+    search='index=incident type="security_incident" status=closed',
+    time_range="last_365_days",
+    fields=["incident_id", "detection_time", "response_time", "resolution_time", "root_cause"],
+    output_format="evidence_package"
+)
+
+# Package with metadata
+access_reviews.package(
+    control_ids=["A.5.18", "CC6.1", "CC6.3"],
+    framework="ISO27001",
+    reviewer="compliance-team",
+    output_path="./evidence/access-reviews/"
+)
+```
+
+### API-Based Evidence Collection
+
+```python
+from security_assessment.compliance_audit.evidence import APIEvidence
+
+# Collect evidence from GitHub security features
+github_evidence = APIEvidence(
+    provider="github",
+    token=os.environ["GITHUB_TOKEN"]
+)
+
+dependabot_evidence = github_evidence.collect(
+    endpoint="/repos/{org}/{repo}/vulnerability-alerts",
+    params={"state": "enabled"},
+    transform=lambda data: {
+        "control": "A.8.8",
+        "evidence_type": "technical_control",
+        "description": f"Dependabot enabled for {repo}",
+        "data": data,
+        "collected_at": datetime.utcnow().isoformat()
+    }
+)
+
+# Collect evidence from AWS Config
+aws_evidence = APIEvidence(
+    provider="aws",
+    profile="security-audit"
+)
+
+config_rules = aws_evidence.collect(
+    service="config",
+    action="DescribeConfigRules",
+    params={"ConfigRuleNames": ["encrypted-volumes", "root-account-mfa-enabled"]},
+    transform=lambda rule: {
+        "control": "A.8.24" if "encrypted" in rule["ConfigRuleName"] else "A.5.16",
+        "evidence_type": "automated_check",
+        "rule_name": rule["ConfigRuleName"],
+        "compliance": rule["Compliance"]["ComplianceStatus"],
+        "evaluation_time": rule["LastSuccessfulInvocationTime"]
+    }
+)
+```
+
+## Non-Conformity Management
+
+### Tracking Non-Conformities
+
+```python
+from security_assessment.compliance_audit import NonConformityTracker
+
+tracker = NonConformityTracker()
+
+# Log a non-conformity
+nc = tracker.create(
+    id="NC-2025-001",
+    control_id="A.8.9",
+    framework="ISO27001",
+    severity="major",
+    description="Cryptographic keys not rotated within 12-month policy period",
+    evidence_package="evidence/nc-2025-001/",
+    root_cause="No automated key rotation configured in AWS KMS",
+    detected_date="2025-06-15",
+    auditor="external-audit-team"
+)
+
+# Create corrective action plan
+cap = tracker.create_cap(
+    nc_id="NC-2025-001",
+    actions=[
+        {
+            "description": "Enable automatic key rotation for all KMS keys",
+            "owner": "cloud-engineering",
+            "due_date": "2025-07-15",
+            "evidence_required": ["kms-rotation-config-screenshot", "rotation-log"]
+        },
+        {
+            "description": "Implement monitoring for key rotation compliance",
+            "owner": "security-operations",
+            "due_date": "2025-07-30",
+            "evidence_required": ["monitoring-dashboard-screenshot", "alert-config"]
+        }
+    ],
+    verification_method="automated-check + manual-review",
+    target_closure_date="2025-08-15"
+)
+
+# Track progress
+status = tracker.get_status("NC-2025-001")
+print(f"NC Status: {status.current_status}")
+print(f"Actions completed: {status.actions_completed}/{status.total_actions}")
+print(f"Days remaining: {status.days_remaining}")
+print(f"Risk of overdue: {status.overdue_risk}")
+```
+
+### Non-Conformity Dashboard
+
+```python
+from security_assessment.compliance_audit import NCDashboard
+
+dashboard = NCDashboard(data_source=tracker)
+summary = dashboard.generate_summary(
+    time_range="last_12_months",
+    group_by=["framework", "severity", "status"]
+)
+
+print("Non-Conformity Summary:")
+print(f"  Total open NCs: {summary.total_open}")
+print(f"  Critical: {summary.critical}")
+print(f"  Major: {summary.major}")
+print(f"  Minor: {summary.minor}")
+print(f"  Average time to closure: {summary.avg_closure_days} days")
+print(f"  NCs overdue: {summary.overdue_count}")
+
+for trend in summary.monthly_trend:
+    print(f"  {trend.month}: Opened={trend.opened}, Closed={trend.closed}")
+```
+
+## Database Schema for Compliance Data
+
+### PostgreSQL Schema
+
+```sql
+-- Framework definitions
+CREATE TABLE frameworks (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    version VARCHAR(20) NOT NULL,
+    description TEXT,
+    control_count INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(name, version)
+);
+
+-- Control definitions
+CREATE TABLE controls (
+    id SERIAL PRIMARY KEY,
+    framework_id INTEGER REFERENCES frameworks(id),
+    control_id VARCHAR(50) NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    subcategory VARCHAR(100),
+    control_type VARCHAR(50), -- preventive, detective, corrective
+    implementation_status VARCHAR(50), -- implemented, partial, not_implemented
+    last_assessed_at TIMESTAMP,
+    next_assessment_due TIMESTAMP,
+    UNIQUE(framework_id, control_id)
+);
+
+-- Cross-framework mapping
+CREATE TABLE control_mappings (
+    id SERIAL PRIMARY KEY,
+    source_control_id INTEGER REFERENCES controls(id),
+    target_control_id INTEGER REFERENCES controls(id),
+    mapping_confidence FLOAT, -- 0.0 to 1.0
+    mapping_type VARCHAR(50), -- exact, partial, related
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(source_control_id, target_control_id)
+);
+
+-- Evidence artifacts
+CREATE TABLE evidence (
+    id SERIAL PRIMARY KEY,
+    control_id INTEGER REFERENCES controls(id),
+    evidence_type VARCHAR(50), -- screenshot, log, document, api_response, manual
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    file_path VARCHAR(500),
+    file_hash VARCHAR(64), -- SHA-256
+    collected_by VARCHAR(100),
+    collected_at TIMESTAMP NOT NULL,
+    valid_until TIMESTAMP,
+    framework_specific JSONB, -- framework-specific metadata
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Audit trail
+CREATE TABLE audit_trail (
+    id BIGSERIAL PRIMARY KEY,
+    entity_type VARCHAR(50) NOT NULL,
+    entity_id INTEGER NOT NULL,
+    action VARCHAR(50) NOT NULL,
+    actor VARCHAR(100) NOT NULL,
+    old_value JSONB,
+    new_value JSONB,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ip_address INET,
+    user_agent TEXT
+);
+
+-- Non-conformities
+CREATE TABLE non_conformities (
+    id SERIAL PRIMARY KEY,
+    nc_number VARCHAR(50) UNIQUE NOT NULL,
+    control_id INTEGER REFERENCES controls(id),
+    severity VARCHAR(20) NOT NULL, -- critical, major, minor
+    description TEXT NOT NULL,
+    root_cause TEXT,
+    detected_date DATE NOT NULL,
+    target_closure_date DATE,
+    actual_closure_date DATE,
+    status VARCHAR(50) DEFAULT 'open',
+    auditor VARCHAR(100),
+    evidence_package_path VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Corrective action plans
+CREATE TABLE corrective_actions (
+    id SERIAL PRIMARY KEY,
+    nc_id INTEGER REFERENCES non_conformities(id),
+    action_description TEXT NOT NULL,
+    owner VARCHAR(100) NOT NULL,
+    due_date DATE NOT NULL,
+    completed_date DATE,
+    status VARCHAR(50) DEFAULT 'pending',
+    evidence_required JSONB,
+    verification_method TEXT,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Compliance snapshots (periodic)
+CREATE TABLE compliance_snapshots (
+    id SERIAL PRIMARY KEY,
+    framework_id INTEGER REFERENCES frameworks(id),
+    snapshot_date DATE NOT NULL,
+    overall_score FLOAT,
+    controls_compliant INTEGER,
+    controls_partial INTEGER,
+    controls_non_compliant INTEGER,
+    controls_no_evidence INTEGER,
+    risk_score FLOAT,
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for performance
+CREATE INDEX idx_controls_framework ON controls(framework_id);
+CREATE INDEX idx_controls_status ON controls(implementation_status);
+CREATE INDEX idx_evidence_control ON evidence(control_id);
+CREATE INDEX idx_evidence_collected ON evidence(collected_at);
+CREATE INDEX idx_audit_trail_entity ON audit_trail(entity_type, entity_id);
+CREATE INDEX idx_audit_trail_timestamp ON audit_trail(timestamp);
+CREATE INDEX idx_nc_status ON non_conformities(status);
+CREATE INDEX idx_nc_severity ON non_conformities(severity);
+CREATE INDEX idx_snapshots_framework_date ON compliance_snapshots(framework_id, snapshot_date);
+```
+
+## Compliance Reporting API
+
+### REST API Endpoints
+
+```python
+from fastapi import FastAPI, Query, Depends
+from security_assessment.compliance_audit import ComplianceAPI
+
+app = FastAPI(title="Compliance Audit API", version="1.0.0")
+api = ComplianceAPI(data_store=postgresql_store)
+
+@app.get("/api/v1/frameworks")
+async def list_frameworks(
+    organization_id: str = Depends(get_org_id)
+):
+    """List all applicable frameworks for the organization."""
+    frameworks = await api.list_frameworks(organization_id)
+    return {
+        "frameworks": [
+            {
+                "name": f.name,
+                "version": f.version,
+                "control_count": f.control_count,
+                "compliance_score": f.compliance_score,
+                "last_assessed": f.last_assessed
+            }
+            for f in frameworks
+        ]
+    }
+
+@app.get("/api/v1/frameworks/{framework}/controls")
+async def list_controls(
+    framework: str,
+    status: str = Query(None, enum=["compliant", "partial", "non_compliant", "no_evidence"]),
+    category: str = None
+):
+    """List controls for a framework with optional filtering."""
+    controls = await api.list_controls(framework, status=status, category=category)
+    return {"controls": controls, "total": len(controls)}
+
+@app.get("/api/v1/controls/{control_id}/evidence")
+async def list_evidence(control_id: str):
+    """List evidence artifacts for a specific control."""
+    evidence = await api.list_evidence(control_id)
+    return {
+        "control_id": control_id,
+        "evidence": evidence,
+        "coverage_score": api.calculate_evidence_coverage(control_id)
+    }
+
+@app.post("/api/v1/gap-analysis")
+async def run_gap_analysis(request: GapAnalysisRequest):
+    """Run gap analysis for a framework."""
+    result = await api.run_gap_analysis(
+        framework=request.framework,
+        scope=request.scope,
+        date_range=request.date_range
+    )
+    return result
+
+@app.get("/api/v1/compliance-dashboard")
+async def compliance_dashboard(
+    frameworks: List[str] = Query(...),
+    time_range: str = Query("30d")
+):
+    """Get compliance dashboard data."""
+    dashboard = await api.get_dashboard(frameworks, time_range)
+    return {
+        "overall_score": dashboard.overall_score,
+        "framework_scores": dashboard.framework_scores,
+        "trend_data": dashboard.trend_data,
+        "recent_findings": dashboard.recent_findings,
+        "upcoming_audits": dashboard.upcoming_audits
+    }
+
+@app.post("/api/v1/non-conformities")
+async def create_nc(request: CreateNCRequest):
+    """Create a new non-conformity."""
+    nc = await api.create_non_conformity(request)
+    return {"nc_id": nc.id, "nc_number": nc.number}
+
+@app.put("/api/v1/non-conformities/{nc_id}/status")
+async def update_nc_status(nc_id: str, request: UpdateNCStatusRequest):
+    """Update non-conformity status."""
+    nc = await api.update_nc_status(nc_id, request)
+    return {"nc_id": nc.id, "status": nc.status, "updated_at": nc.updated_at}
+```
+
+## Deployment Configuration
+
+### Kubernetes Deployment
+
+```yaml
+# compliance-audit-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: compliance-audit-service
+  namespace: security-tools
+  labels:
+    app: compliance-audit
+    version: v2.0.0
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: compliance-audit
+  template:
+    metadata:
+      labels:
+        app: compliance-audit
+    spec:
+      serviceAccountName: compliance-audit-sa
+      containers:
+        - name: compliance-audit
+          image: acme-corp/compliance-audit:2.0.0
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: compliance-db-credentials
+                  key: url
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: access-key-id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credentials
+                  key: secret-access-key
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: alerting-credentials
+                  key: slack-webhook
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: evidence-storage
+              mountPath: /app/evidence
+      volumes:
+        - name: evidence-storage
+          persistentVolumeClaim:
+            claimName: compliance-evidence-pvc
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: compliance-evidence-collection
+  namespace: security-tools
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: compliance-audit-sa
+          containers:
+            - name: evidence-collector
+              image: acme-corp/compliance-audit:2.0.0
+              command: ["python", "-m", "compliance_audit.collect_evidence"]
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: compliance-db-credentials
+                      key: url
+          restartPolicy: OnFailure
+      backoffLimit: 3
+```
+
+## Testing Examples
+
+### Unit Tests for Compliance Analyzer
+
+```python
+import pytest
+from unittest.mock import Mock, patch
+from security_assessment.compliance_audit import ComplianceAnalyzer, GapAnalyzer
+
+class TestComplianceAnalyzer:
+    def setup_method(self):
+        self.analyzer = ComplianceAnalyzer(framework="ISO27001:2022")
+
+    def test_gap_analysis_all_compliant(self):
+        controls = [
+            {"id": "A.8.1", "status": "compliant", "evidence": ["doc1", "doc2"]},
+            {"id": "A.8.2", "status": "compliant", "evidence": ["doc3"]},
+        ]
+        gaps = self.analyzer.gap_analysis(
+            current_controls=controls,
+            target_scope=["A.8"]
+        )
+        assert gaps.compliant == 2
+        assert gaps.non_compliant == 0
+        assert gaps.no_evidence == 0
+
+    def test_gap_analysis_with_gaps(self):
+        controls = [
+            {"id": "A.8.1", "status": "compliant", "evidence": ["doc1"]},
+            {"id": "A.8.2", "status": "partial", "evidence": []},
+            {"id": "A.8.3", "status": "non_compliant", "evidence": ["doc2"]},
+        ]
+        gaps = self.analyzer.gap_analysis(
+            current_controls=controls,
+            target_scope=["A.8"]
+        )
+        assert gaps.compliant == 1
+        assert gaps.partial == 1
+        assert gaps.non_compliant == 1
+
+    def test_gap_analysis_priority_scoring(self):
+        controls = [
+            {"id": "A.8.1", "status": "non_compliant", "criticality": "high"},
+            {"id": "A.8.2", "status": "non_compliant", "criticality": "low"},
+        ]
+        gaps = self.analyzer.gap_analysis(
+            current_controls=controls,
+            target_scope=["A.8"]
+        )
+        high_priority = [g for g in gaps.findings if g.priority == "critical"]
+        assert len(high_priority) == 1
+
+    @patch("security_assessment.compliance_audit.evidence.Collector")
+    def test_evidence_collection_mock(self, mock_collector):
+        mock_collector.return_value.collect.return_value = [
+            {"control": "A.8.1", "evidence": "config-screenshot.png"}
+        ]
+        result = self.analyzer.collect_evidence(
+            control_ids=["A.8.1"],
+            sources=["aws_config"]
+        )
+        assert len(result) > 0
+
+
+class TestSOC2Analyzer:
+    def setup_method(self):
+        self.analyzer = SOC2Analyzer(
+            trust_service_criteria=["CC", "A", "C"]
+        )
+
+    def test_readiness_assessment(self):
+        controls = [
+            {"criteria": "CC6.1", "status": "effective", "evidence": ["doc1"]},
+            {"criteria": "CC6.2", "status": "partial", "evidence": []},
+        ]
+        readiness = self.analyzer.assess(
+            controls=controls,
+            evidence_store={},
+            review_period="2025-01-01 to 2025-12-31"
+        )
+        assert readiness.criteria_scores[0].score > 0
+
+    def test_trust_service_criteria_coverage(self):
+        criteria_coverage = self.analyzer.get_criteria_coverage()
+        assert "CC" in criteria_coverage
+        assert "A" in criteria_coverage
+
+
+class TestCrossFrameworkMapper:
+    def setup_method(self):
+        self.mapper = CrossFrameworkMapper()
+        self.mapper.load_frameworks(["ISO27001", "SOC2", "PCI_DSS"])
+
+    def test_control_mapping(self):
+        mapping = self.mapper.map_control(
+            control_description="Multi-factor authentication for administrative access"
+        )
+        assert len(mapping.matches) > 0
+        assert all(m.confidence > 0 for m in mapping.matches)
+
+    def test_overlap_analysis(self):
+        overlap = self.mapper.analyze_overlap()
+        assert overlap.total_unique_controls > 0
+        assert overlap.overlapping_percentage >= 0
+```
+
+## Monitoring and Alerting Setup
+
+### Prometheus Metrics
+
+```python
+from prometheus_client import Counter, Gauge, Histogram
+from security_assessment.compliance_audit import ComplianceMonitor
+
+# Define metrics
+controls_assessed_total = Counter(
+    'compliance_controls_assessed_total',
+    'Total number of controls assessed',
+    ['framework', 'status']
+)
+
+compliance_score_gauge = Gauge(
+    'compliance_score',
+    'Current compliance score per framework',
+    ['framework']
+)
+
+evidence_collection_duration = Histogram(
+    'compliance_evidence_collection_duration_seconds',
+    'Time taken to collect evidence',
+    ['source_type'],
+    buckets=[1, 5, 10, 30, 60, 120, 300]
+)
+
+non_conformities_open = Gauge(
+    'compliance_non_conformities_open',
+    'Number of open non-conformities',
+    ['severity', 'framework']
+)
+
+gap_remediation_progress = Gauge(
+    'compliance_gap_remediation_progress',
+    'Percentage of gaps remediated',
+    ['framework', 'category']
+)
+
+# Instrument the monitor
+class MetricsCollector:
+    def __init__(self, monitor: ComplianceMonitor):
+        self.monitor = monitor
+
+    def record_assessment(self, framework: str, control_id: str, status: str):
+        controls_assessed_total.labels(framework=framework, status=status).inc()
+
+    def update_score(self, framework: str, score: float):
+        compliance_score_gauge.labels(framework=framework).set(score)
+
+    def update_nc_count(self, framework: str, severity: str, count: int):
+        non_conformities_open.labels(severity=severity, framework=framework).set(count)
+
+    def update_remediation(self, framework: str, category: str, progress: float):
+        gap_remediation_progress.labels(framework=framework, category=category).set(progress)
+```
+
+### Grafana Dashboard Configuration
+
+```json
+{
+  "dashboard": {
+    "title": "Compliance Audit Dashboard",
+    "panels": [
+      {
+        "title": "Compliance Score by Framework",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "compliance_score",
+            "legendFormat": "{{framework}}"
+          }
+        ]
+      },
+      {
+        "title": "Controls Assessment Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "compliance_controls_assessed_total",
+            "legendFormat": "{{framework}} - {{status}}"
+          }
+        ]
+      },
+      {
+        "title": "Open Non-Conformities",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "compliance_non_conformities_open",
+            "legendFormat": "{{framework}} - {{severity}}"
+          }
+        ]
+      },
+      {
+        "title": "Remediation Progress",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "compliance_gap_remediation_progress",
+            "legendFormat": "{{framework}} - {{category}}"
+          }
+        ],
+        "thresholds": {
+          "steps": [
+            {"color": "red", "value": 0},
+            {"color": "yellow", "value": 50},
+            {"color": "green", "value": 80}
+          ]
+        }
+      },
+      {
+        "title": "Evidence Collection Duration",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "rate(compliance_evidence_collection_duration_seconds_sum[5m])",
+            "legendFormat": "{{source_type}}"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Alert Rules
+
+```yaml
+# compliance_alerts.yaml
+groups:
+  - name: compliance_alerts
+    rules:
+      - alert: ComplianceScoreDropped
+        expr: compliance_score < 80
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "Compliance score dropped below 80%"
+          description: "Framework {{ $labels.framework }} score is {{ $value }}%"
+
+      - alert: CriticalNonConformity
+        expr: compliance_non_conformities_open{severity="critical"} > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical non-conformity detected"
+          description: "{{ $value }} critical NCs open for {{ $labels.framework }}"
+
+      - alert: EvidenceCollectionFailed
+        expr: rate(compliance_evidence_collection_errors_total[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Evidence collection failures detected"
+          description: "Evidence collection failing for source {{ $labels.source }}"
+
+      - alert: AuditDeadlineApproaching
+        expr: days_until(compliance_next_audit_date) < 30 and compliance_score < 90
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Audit deadline approaching with low compliance score"
+          description: "Audit in {{ $value }} days with score {{ $labels.score }}%"
+```
+
 ## References
 
 - ISO 27001:2022 — Information Security Management Systems
